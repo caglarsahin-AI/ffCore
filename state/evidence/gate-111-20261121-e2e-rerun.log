@@ -1,0 +1,106 @@
+=== gate111 e2e rerun, main 97342eb 2026-11-21 00:57:16
+
+=== 00:57:17 A. stack up FAKE_EMBED=0 (model-missing stage)
+ Container ffmain-langfuse-redis-1  Healthy
+ Container ffmain-langfuse-clickhouse-1  Healthy
+ Container ffmain-mcp-sql-1  Healthy
+ Container ffmain-mcp-search-1  Healthy
+up exit=0
+
+=== 00:58:29 A. seed (prompts + superadmin)
+2026-11-20 21:58:48,423 WARNING langfuse Prompt 'platform_rules-label:production' not found during refresh, evicting from cache.
+prompts created: ['eval_judge_rubric_v2', 'platform_rules']
+prompts already present: -
+superadmin created: e85bf12e-f575-424e-9c1d-17b89657c526
+
+=== 00:59:01 A. readyz now (FAKE_EMBED=0)
+{"status":"not_ready","checks":[{"name":"warmup","status":"failed","code":"model_missing","detail":"ModelMissing: BAAI/bge-m3 is not in /models/huggingface/hub; run `make models` (offline by default)"},{"name":"models","status":"ok","code":null,"detail":"BAAI/bge-m3, BAAI/bge-reranker-v2-m3"},{"name":"embed_dim","status":"ok","code":null,"detail":"chunks.embedding vector(1024), EMBED_DIM 1024"},{"name":"ollama_context","status":"skipped","code":null,"detail":"no active Ollama model with limits.context_tokens"},{"name":"vector_store","status":"ok","code":null,"detail":"pgvector"},{"name":"llm_slots","status":"ok","code":null,"detail":"in_use=0/4 waiting: interactive=0, interactive_low=0, background=0; background window open"},{"name":"ollama_runtime_context","status":"skipped","code":null,"detail":"no active Ollama model with limits.context_tokens"},{"name":"ingest_queue","status":"ok","code":null,"detail":"queued=0"}]}
+
+=== 00:59:03 A. e2e @model-missing
+  ✓  1 [chromium] › tests/e2e/test_10bp1_10_readiness.spec.ts:10:5 › test_10bp1_10_readiness: @model-missing without weights the page says why and how to fix it (1.5s)
+  1 passed (1.7m)
+e2e-mm exit=0
+
+=== 01:01:39 B. recreate whole stack with FAKE_EMBED=1
+ Container ffmain-langfuse-web-1  Healthy
+ Container ffmain-backend-1  Healthy
+ Container ffmain-mcp-sql-1  Healthy
+ Container ffmain-mcp-search-1  Healthy
+up2 exit=0
+
+=== 01:02:24 B. agent-worker env check
+FAKE_EMBED=1
+EGRESS_ALLOWLIST=superset.example.com
+ALLOWED_INTERNAL_HOSTS=backend,litellm,langfuse-web,litellm,langfuse-web,mcp-search,mcp-sql,ticket-desk,fake-llm,ffmain-e2e-upstream
+
+=== 01:02:30 B. readyz (FAKE_EMBED=1)
+{"status":"ready","checks":[{"name":"warmup","status":"ok","code":null,"detail":null},{"name":"models","status":"ok","code":null,"detail":"FAKE_EMBED=1: deterministic test models"},{"name":"embed_dim","status":"ok","code":null,"detail":"chunks.embedding vector(1024), EMBED_DIM 1024"},{"name":"ollama_context","status":"skipped","code":null,"detail":"no active Ollama model with limits.context_tokens"},{"name":"vector_store","status":"ok","code":null,"detail":"pgvector"},{"name":"llm_slots","status":"ok","code":null,"detail":"in_use=0/4 waiting: interactive=0, interactive_low=0, background=0; background window open"},{"name":"ollama_runtime_context","status":"skipped","code":null,"detail":"no active Ollama model with limits.context_tokens"},{"name":"ingest_queue","status":"ok","code":null,"de
+
+=== 01:02:32 B. e2e main (grep-invert @model-missing, fake upstream)
+  ✓   67 [chromium] › tests/e2e/test_10af_3_provider_test.spec.ts:12:5 › test_10af_3_provider_test: an unsaved configuration is tested, and a failed test does not block saving (4.1s)
+  ✓   87 [chromium] › tests/e2e/test_10bp1_12_query_failures.spec.ts:7:5 › test_10bp1_12_query_failures: a failed knowledge base read is an error, never an empty screen (2.5s)
+  ✓   93 [chromium] › tests/e2e/test_10bp1_4_gate_reject.spec.ts:10:5 › test_10bp1_4_gate_reject: a rejected and a failed file stay in the list with their reason and code (4.1s)
+  ✓  119 [chromium] › tests/e2e/test_10bp2_13_query_failures.spec.ts:9:5 › test_10bp2_13_query_failures: a missing record or a failed list is an error, never an empty screen (3.8s)
+  ✘  121 [chromium] › tests/e2e/test_10bp2_3_agent_wizard_lifecycle.spec.ts:11:5 › test_10bp2_3_agent_wizard_lifecycle: create, a placeholder without a variable is refused, save, publish, new draft, roll back (337ms)
+  ✘  122 [chromium] › tests/e2e/test_10bp2_4_contract_assistant_cited.spec.ts:16:5 › test_10bp2_4_contract_assistant_cited: an analyst builds the contract assistant and gets an answer with sources (522ms)
+  ✘  123 [chromium] › tests/e2e/test_10bp2_5_inline_approval.spec.ts:18:5 › test_10bp2_5_inline_approval: approve continues the run and calls the tool; reject continues without it (369ms)
+  ✘  124 [chromium] › tests/e2e/test_10bp2_7_runs_list_detail.spec.ts:8:5 › test_10bp2_7_runs_list_detail: a run is listed under its filters and its detail shows the stored events (390ms)
+  ✘  125 [chromium] › tests/e2e/test_10bp2_8_run_feedback.spec.ts:8:5 › test_10bp2_8_run_feedback: an expert votes on a completed run; the run moves from pending to given feedback (451ms)
+  ✘  126 [chromium] › tests/e2e/test_10bp2_9_approvals_queue.spec.ts:8:5 › test_10bp2_9_approvals_queue: the queue opens on waiting approvals and says so when there are none (6.3s)
+  ✘  127 [chromium] › tests/e2e/test_10bp2_9_approvals_queue.spec.ts:19:5 › test_10bp2_9_approvals_queue: a waiting approval is listed and counted, read access cannot decide, approve once, a second decision is 409 (377ms)
+  ✘  128 [chromium] › tests/e2e/test_10c1_1_suite_run_stream.spec.ts:9:5 › test_10c1_1_suite_run_stream: analyst builds a suite, adds an item, runs the exam and reads it (3.1s)
+  ✘  129 [chromium] › tests/e2e/test_10c1_2_not_run_visible.spec.ts:11:5 › test_10c1_2_not_run_visible: approval_required and complete=false are shown as written (4.0s)
+  ✘  130 [chromium] › tests/e2e/test_10c1_3_compare.spec.ts:10:5 › test_10c1_3_compare: two completed exams compare; a mismatched pair shows eval_runs_not_comparable (4.1s)
+  ✘  131 [chromium] › tests/e2e/test_10c1_4_publish_gate.spec.ts:10:5 › test_10c1_4_publish_gate: reasons readable, force admin-only with a reason, exam link on the version (3.0s)
+  ✘  132 [chromium] › tests/e2e/test_10c1_5_read_only.spec.ts:45:7 › test_10c1_5_read_only: suites in edit and read mode (0ms)
+  ✘  138 [chromium] › tests/e2e/test_10c1_6_screens_themes_axe.spec.ts:52:9 › test_10c1_6_screens_themes_axe: suites light (0ms)
+  ✘  152 [chromium] › tests/e2e/test_10c1_7_stream_stall.spec.ts:30:5 › test_10c1_7_stream_stall: a silent stream reads with GET within STALL_MS, ends in lost, GET shows the real status (4.2s)
+  ✘  153 [chromium] › tests/e2e/test_10c1_7_stream_stall.spec.ts:73:5 › test_10c1_7_stream_stall: a stream that comes back ends the reconnecting phase (3.0s)
+  ✘  154 [chromium] › tests/e2e/test_10c2_1_api_keys.spec.ts:9:5 › test_10c2_1_api_keys: create, show once, revoke (6.8s)
+  ✘  155 [chromium] › tests/e2e/test_10c2_2_quota_alert.spec.ts:12:5 › test_10c2_2_quota_alert: warn quota, real calls, alert, ack, badge (6.0s)
+  ✘  156 [chromium] › tests/e2e/test_10c2_3_retention.spec.ts:9:5 › test_10c2_3_retention: project admin is refused the screen (6.2s)
+  ✘  157 [chromium] › tests/e2e/test_10c2_3_retention.spec.ts:16:5 › test_10c2_3_retention: dry run, cancelled run, confirmed run (6.5s)
+  ✘  158 [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:28:5 › test_10c2_6_read_only: every 10a-10c screen has its change controls disabled in read mode (6.8s)
+  ✘  159 [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: overview light edit and read, axe (6.2s)
+  ✘  160 [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: overview dark edit and read, axe (6.1s)
+  ✘  161 [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: usage light edit and read, axe (6.7s)
+  ✘  162 [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: usage dark edit and read, axe (6.3s)
+  ✘  163 [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: api-keys light edit and read, axe (6.3s)
+  ✘  164 [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: api-keys dark edit and read, axe (6.1s)
+  ✘  165 [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: quotas light edit and read, axe (6.7s)
+  ✘  166 [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: quotas dark edit and read, axe (6.4s)
+  ✘  167 [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: alerts light edit and read, axe (6.2s)
+  ✘  168 [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: alerts dark edit and read, axe (5.9s)
+  ✘  169 [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: retention light edit and read, axe (6.9s)
+  ✘  170 [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: retention dark edit and read, axe (6.5s)
+  ✘  171 [chromium] › tests/e2e/test_10c3_1_publish_add_tool.spec.ts:22:5 › test_10c3_1_publish_add_tool: sample spec to published server to tool (6.1s)
+  ✘  172 [chromium] › tests/e2e/test_10c3_2_path_invalid.spec.ts:11:5 › test_10c3_2_path_invalid: an unsafe document path is refused with its message (6.2s)
+  ✘  173 [chromium] › tests/e2e/test_10c3_3_monitoring.spec.ts:23:5 › test_10c3_3_monitoring: ok and error calls with their codes (3.0s)
+  ✘  174 [chromium] › tests/e2e/test_10c3_4_read_only_roles.spec.ts:13:5 › test_10c3_4_read_only: list and server page have every change disabled in read mode (4.1s)
+  ✘  175 [chromium] › tests/e2e/test_10c3_4_read_only_roles.spec.ts:36:5 › test_10c3_4_roles: an analyst does not get the MCP servers screen (6.2s)
+  ✘  176 [chromium] › tests/e2e/test_10c3_4_read_only_roles.spec.ts:46:7 › test_10c3_4_screens: server page light edit and read (8.2s)
+  ✘  177 [chromium] › tests/e2e/test_10c3_4_read_only_roles.spec.ts:46:7 › test_10c3_4_screens: server page dark edit and read (6.9s)
+  ✘  178 [chromium] › tests/e2e/test_10c3_5_screens_themes_axe.spec.ts:18:7 › test_10c3_5_axe: MCP screens light (8.4s)
+  ✘  179 [chromium] › tests/e2e/test_10c3_5_screens_themes_axe.spec.ts:18:7 › test_10c3_5_axe: MCP screens dark (6.9s)
+  ✘  182 [chromium] › tests/e2e/test_10mrk_3_sidebar_logo.spec.ts:10:7 › test_10mrk_3_sidebar_logo: logo in the sidebar, open and collapsed (en) (6.0s)
+  ✘  183 [chromium] › tests/e2e/test_10mrk_3_sidebar_logo.spec.ts:10:7 › test_10mrk_3_sidebar_logo: logo in the sidebar, open and collapsed (tr) (6.4s)
+  ✘  188 [chromium] › tests/e2e/test_10mrk_5_both_themes.spec.ts:12:9 › test_10mrk_5_both_themes: projects light (6.6s)
+  ✘  189 [chromium] › tests/e2e/test_10mrk_5_both_themes.spec.ts:12:9 › test_10mrk_5_both_themes: projects dark (5.8s)
+  ✘  190 [chromium] › tests/e2e/test_11_1_ask_and_source_card.spec.ts:10:5 › test_11_1_ask_and_source_card: ask in /chat, open the cited passage, find the conversation again (8.2s)
+  ✘  191 [chromium] › tests/e2e/test_11_2_unpublished_hidden.spec.ts:10:5 › test_11_2_unpublished_hidden: a draft agent is not listed and its URL is not available (8.3s)
+  ✘  192 [chromium] › tests/e2e/test_11_2_unpublished_hidden.spec.ts:26:5 › test_11_2_no_project: /chat without a selected project asks for one (6.2s)
+  ✘  193 [chromium] › tests/e2e/test_11_3_read_only.spec.ts:9:5 › test_11_3_read_only: a read-only member asks, sees the answer and deletes the conversation (8.4s)
+  ✘  194 [chromium] › tests/e2e/test_11_4_screens_themes_axe.spec.ts:23:9 › test_11_4_screens_themes_axe: light desktop (8.3s)
+  ✘  195 [chromium] › tests/e2e/test_11_4_screens_themes_axe.spec.ts:23:9 › test_11_4_screens_themes_axe: light mobile (7.0s)
+  ✘  196 [chromium] › tests/e2e/test_11_4_screens_themes_axe.spec.ts:23:9 › test_11_4_screens_themes_axe: dark desktop (4.1s)
+  ✘  197 [chromium] › tests/e2e/test_11_4_screens_themes_axe.spec.ts:23:9 › test_11_4_screens_themes_axe: dark mobile (4.0s)
+    Error: expect(page).not.toHaveURL(expected) failed
+    Error: expect(page).not.toHaveURL(expected) failed
+    Error: expect(page).not.toHaveURL(expected) failed
+e2e-main exit=1
+
+=== 01:18:27 down -v
+ Volume ffmain_e2e_node_modules  Removed
+ Volume ffmain_langfuse_clickhouse_data  Removed
+
+=== 01:18:56 done

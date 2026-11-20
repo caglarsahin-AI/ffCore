@@ -83,3 +83,13 @@ DUZELT-MAIN alındı. Dal `fix/11-1-parity` (worktree `.worktrees/fix/11-1-parit
 ### C-11-0015 · 2026-11-21 01:10 · → koordinator · YIGIN-AC
 Paket: 11 · Cevap: K-11-0012 · Yigin: ffcore-11
 18770/13770, `--env-file .env.test`, `FFCORE_VERSION=0.0.0-11p`, `--profile test up -d --wait --build --pull never` (dal kaynağından); önce main'de kırmızı kanıt (`11-1-parity-red.log`), sonra dalda 03a/06a/11 hedefli (`11-1-parity-green.log`). Bitince `down -v` + YIGIN-KAPA.
+
+### C-11-0016 · 2026-11-21 01:35 · → koordinator · DURUM
+Paket: 11 · Cevap: K-11-0012, K-11-0014 · SHA: 43f5ed86021b41f2d54b192afed3181677e7be0f
+**Parity düzeltmesi:** `fix/11-1-parity` 43f5ed8 (tek test commit'i, 3 dosya +37; ürün kodu değişmedi). Kırmızı main 97342eb'de: 03a/06a/11 dosyaları 2 failed, 24 passed (`11-1-parity-red.log`; aynı iki KeyError). Dalda: ruff 0, aynı üç dosya **27 passed** (`11-1-parity-green.log`); `make lint && make test` llmaas **2159 passed** (`11-1-parity-make-test.log`). Yöntem notu: yığın C-11-0015'te yazdığım `--build 0.0.0-11p` yerine `--no-build` `0.0.0-11` ile açıldı (tools kaynağı `.:/work` bağlı; `uv.lock`/`pyproject`/Dockerfile f9d213f..main arasında aynı).
+**@model-missing (madde 4):** ffcore-11'i main'den `--build` (`0.0.0-11m`), `FAKE_EMBED=0` ile açtım; spec **koşmadı**: makinede **disk doldu**: seed-prompts'ta Langfuse 500, create-superadmin `psycopg DiskFull: No space left on device`, e2e'de redis unhealthy (`11-1-parity-model-missing.log`). Disk dolmadan önce alınan `/readyz` spec'in beklediği gibi: `not_ready`, warmup `failed` `model_missing` (bge-m3 yok), `ollama_runtime_context` ve `ollama_context` **skipped** (failed değil). Bu temiz yığında ENV-204 belirtisi yok ve 11-1 readiness'e dokunmuyor. ffmain'deki düşüşün olası nedeni aynı disk dolması ya da K-11-0014'teki karışık FAKE_EMBED; trace sende. Spec'i senin tekrar koşunla sınıflandırmanı öneririm. **Disk uyarısı:** `docker system df` Images 81.9 GB (70.9 GB geri alınabilir), Volumes 24.7 GB; ffmain e2e tekrarı da etkilenebilir. Başkasının imajını silmedim; temizlik kararı sende.
+**Bekleyen:** ENV-209 tam test-int (senin YIGIN-KAPA'n ve disk açılınca), sonra PR-HAZIR.
+
+### C-11-0017 · 2026-11-21 01:35 · → koordinator · YIGIN-KAPA
+Paket: 11 · Cevap: C-11-0015 · Yigin: ffcore-11
+`down -v` (test, e2e, tools): konteyner 0, volume 0 (`11-1-parity-down.log`).
