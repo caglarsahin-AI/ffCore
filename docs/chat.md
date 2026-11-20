@@ -36,9 +36,13 @@ automatically. Without a selection the chat asks for one.
   - **Source cards** under an answer: `[n] document`, page, breadcrumb and the document's update
     date. A card opens the cited passage. The passage is read when you open it, with **your**
     document access list, not the access list of whoever started the run. A passage that
-    cannot be shown says why: `source_deleted` (the document was deleted),
-    `source_reindexed` (the document was re-indexed and the passage replaced) or
-    `source_not_visible` (403: the document's access list does not include you).
+    cannot be shown says why: `source_not_found` (404: the run did not cite this passage),
+    `source_deleted` (the document was deleted), `source_reindexed` (the document was
+    re-indexed and the passage replaced) or `source_not_visible` (403: the document's access
+    list does not include you).
+    The card's document name, page and breadcrumb are what the run cited at the time and stay in
+    your conversation. If the document's access list is closed to you later, the card still
+    shows them, but its passage is refused with `source_not_visible`.
   - **Badges:** an answer where the model said it could not find the information (`declined`)
     always shows "Not found in the sources". "Low confidence" appears only when the agent's
     definition has `answer_rules.show_confidence: true` and a calibrated
