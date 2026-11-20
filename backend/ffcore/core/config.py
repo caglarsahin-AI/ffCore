@@ -5,6 +5,7 @@ Profile differences are configuration values, never `if profile` branches (PLAN 
 
 from functools import lru_cache
 from typing import Annotated, Literal
+from urllib.parse import urlsplit
 
 from pydantic import Field, SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
@@ -35,6 +36,9 @@ class Settings(BaseSettings):
     egress_allowlist: CommaList = []
     # Hosts or CIDRs that may resolve to private addresses (compose service names, internal APIs).
     allowed_internal_hosts: CommaList = []
+    # FOLLOWUP-208: forward proxy for external hosts (http://host:port; the egress profile sets
+    # http://egress-proxy:3128). Empty: the backend dials external hosts itself (pinned).
+    egress_proxy_url: str = ""
 
     # --- 03a ---
     # HS256 key for console session tokens; separate from obo_jwt_secret.
@@ -215,6 +219,34 @@ class Settings(BaseSettings):
         if isinstance(value, str):
             return [item.strip().lower() for item in value.split(",") if item.strip()]
         return value
+
+    @field_validator("egress_proxy_url")
+    @classmethod
+    def _plain_proxy_origin(cls, value: str) -> str:
+        """Only http://host:port: no credentials (the URL would leak them into logs), no path,
+        no TLS to the proxy (an internal service), no other scheme."""
+        if not value:
+            return value
+        parts = urlsplit(value)
+        try:
+            port = parts.port
+        except ValueError:
+            port = None
+        if (
+            parts.scheme != "http"
+            or not parts.hostname
+            or port is None
+            or parts.username is not None
+            or parts.path not in ("", "/")
+            or parts.query
+            or parts.fragment
+        ):
+            raise ValueError(
+                "egress_proxy_url_invalid: EGRESS_PROXY_URL must be http://<host>:<port> "
+                "(no credentials, path or query) or empty"
+            )
+        host = f"[{parts.hostname}]" if ":" in parts.hostname else parts.hostname
+        return f"http://{host}:{port}"
 
     @field_validator("console_origins", mode="before")
     @classmethod
