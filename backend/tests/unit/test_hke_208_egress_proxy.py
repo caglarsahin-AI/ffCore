@@ -295,8 +295,10 @@ def test_hke_208_proxy_backend_dials_only_the_proxy_origin():
     with pytest.raises(EgressDenied):
         anyio.run(dial, "egress-proxy", 3129)
     assert inner.dialed == []
-    with pytest.raises(httpcore2.ConnectError):
+    # the proxy origin is dialed (at its resolved address); a refusal is egress_proxy_unreachable
+    with pytest.raises(EgressRequestFailed) as exc:
         anyio.run(dial, "egress-proxy", 3128)
+    assert exc.value.code == "egress_proxy_unreachable"
     assert inner.dialed == [("172.18.0.9", 3128)]
 
 
