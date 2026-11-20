@@ -87,4 +87,4 @@ def test_12_5c_vllm_image_is_pinned_in_its_own_list():
 def test_12_5c_save_takes_another_image_list():
     save = (OFFLINE / "save.sh").read_text(encoding="utf-8")
     assert 'IMAGES="${IMAGES_TXT:-$HERE/images.txt}"' in save
-    assert '"$HERE/images.txt"' not in save.replace('${IMAGES_TXT:-$HERE/images.txt}', "")
+    assert '"$HERE/images.txt"' not in save.replace("${IMAGES_TXT:-$HERE/images.txt}", "")
