@@ -25,6 +25,8 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public
     GRANT USAGE, SELECT, UPDATE ON SEQUENCES TO ffcore_app;
 
 DO $$
+DECLARE
+    t record;
 BEGIN
     -- Append-only tables: insert and read only (their triggers refuse the rest anyway).
     IF to_regclass('public.audit_events') IS NOT NULL THEN
@@ -43,6 +45,19 @@ BEGIN
         ALTER DEFAULT PRIVILEGES IN SCHEMA checkpoints
             GRANT USAGE, SELECT, UPDATE ON SEQUENCES TO ffcore_app;
     END IF;
+    -- Audit partitions: INSERT and SELECT only while attached, SELECT only once detached
+    -- (review 12-2 r1 MAJOR-1; ensure/detach keep it so for later ones, migration 12_0002).
+    FOR t IN
+        SELECT c.relname, EXISTS (SELECT FROM pg_inherits i WHERE i.inhrelid = c.oid) AS attached
+        FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
+        WHERE n.nspname = 'public' AND c.relkind = 'r'
+          AND c.relname ~ '^audit_events_[0-9]{4}_[0-9]{2}$'
+    LOOP
+        EXECUTE format('REVOKE UPDATE, DELETE, TRUNCATE ON %I FROM ffcore_app', t.relname);
+        IF NOT t.attached THEN
+            EXECUTE format('REVOKE INSERT ON %I FROM ffcore_app', t.relname);
+        END IF;
+    END LOOP;
     -- The audit partition functions (migration 12_0001).
     IF to_regprocedure('ffcore_audit_detach_partition(text)') IS NOT NULL THEN
         GRANT EXECUTE ON FUNCTION ffcore_audit_ensure_partition(date) TO ffcore_app;
