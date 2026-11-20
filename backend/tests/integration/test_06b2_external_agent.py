@@ -319,7 +319,13 @@ def test_06b2_r1_rename_and_delete_external_need_admin(ext, make_user, client_fa
     assert analyst.delete(base).status_code == 403
     row = pg.execute("SELECT name, deleted_at FROM agents WHERE id = %s", (agent["id"],)).fetchone()
     assert row == ("Dış", None)
-    # the decorator's rows (authorize also writes its route row, as for every refused route)
+    # FOLLOWUP-203 (A): one row per refusal, the decorator's, with authorize()'s reason in it.
+    every = pg.execute(
+        "SELECT resource_type, after->>'code', after->>'min_role' FROM audit_events"
+        " WHERE actor_id = %s AND outcome = 'denied' ORDER BY ts",
+        (str(analyst_id),),
+    ).fetchall()
+    assert every == [("agent", "insufficient_role", "admin")] * 2
     denied = pg.execute(
         "SELECT action, outcome FROM audit_events WHERE resource_type = 'agent'"
         " AND action IN ('update_agent', 'delete_agent') AND actor_id = %s ORDER BY ts",
