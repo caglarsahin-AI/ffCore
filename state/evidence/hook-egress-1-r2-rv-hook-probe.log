@@ -1,0 +1,72 @@
+HEAD=3da0bfb38bc37f41ef5be2fcd677f32b02c02f3c (git archive copy) vs main 6780731ffcd9096339aea0abb271b53a0b79125d, host py -3.12
+=== probe1 (r1 batch, 65 cases)
+BAD [env] py heredoc edit .env.example comment 'cp .env.example .env': exit 2 (want 0) rules=['ENV']
+BAD [env] py heredoc edit .env.example new comment 'fills in .env;': exit 2 (want 0) rules=['ENV']
+BAD [env] py heredoc writes docs text 'the .env file': exit 2 (want 0) rules=['ENV']
+BAD [env] py heredoc preflight --env-file .env in a string: exit 2 (want 0) rules=['ENV']
+cases=65 mismatches=4
+=== probe2 (r1 batch 2, 16 cases; second guard = main)
+mode=block rol=isci-b; branch=99bb7a3 guard, main=main guard (comparison)
+OK  data heredoc then real pytest: branch exit 2 ['KAPI'] | main exit 2 ['KAPI'] | want 2
+OK  python heredoc then make test: branch exit 2 ['KAPI'] | main exit 2 ['KAPI'] | want 2
+OK  two heredocs, second bash pytest: branch exit 2 ['KAPI'] | main exit 2 ['KAPI'] | want 2
+OK  <<- tab delimiter bash pytest: branch exit 2 ['KAPI'] | main exit 2 ['KAPI'] | want 2
+OK  bash -s heredoc pytest: branch exit 2 ['KAPI'] | main exit 2 ['KAPI'] | want 2
+OK  cat heredoc | sh -s pytest: branch exit 2 ['KAPI'] | main exit 2 ['KAPI'] | want 2
+OK  env X=1 bash heredoc pytest: branch exit 2 ['KAPI'] | main exit 2 ['KAPI'] | want 2
+OK  timeout 600 bash heredoc pytest: branch exit 2 ['KAPI'] | main exit 2 ['KAPI'] | want 2
+OK  compose run -T tools sh heredoc pytest: branch exit 2 ['KAPI'] | main exit 2 ['KAPI'] | want 2
+OK  compose exec -T backend bash heredoc pytest: branch exit 2 ['KAPI'] | main exit 2 ['KAPI'] | want 2
+OK  docker exec -i c sh heredoc pytest: branch exit 2 ['KAPI'] | main exit 2 ['KAPI'] | want 2
+OK  compose run tools sh heredoc docker build: branch exit 2 ['PROSES-175'] | main exit 0 [] | want 2
+OK  compose run tools sh heredoc pytest | tee: branch exit 0 [] | main exit 2 ['KAPI'] | want 0
+OK  compose exec psql heredoc (data): branch exit 0 [] | main exit 0 [] | want 0
+OK  bash heredoc nested python heredoc mentions pytest: branch exit 0 [] | main exit 2 ['KAPI'] | want 0
+OK  sh -c with heredoc inside: branch exit 2 ['KAPI'] | main exit 2 ['KAPI'] | want 2
+=== probe3 (r2)
+mode=block rol=isci-b; r2=3da0bfb guard, main guard for comparison
+OK  ENV code message (py heredoc 'cp .env.example .env'): r2 exit 2 | main exit 2 | want 2
+      r2: FFCORE-GUARD [ENV] yorumlayıcı kodunda (heredoc gövdesi ya da -c) çıplak `.env` geçiyor; kod komut sayılır. Metin düzenlemesiyse dosyayı Write/Edit aracıyla yaz ya da betiği Write ile dosyaya koyup `py dosya.py` ile koş; .env okun
+OK  ENV path message (cat .env): r2 exit 2 | main exit 2 | want 2
+      r2: FFCORE-GUARD [ENV] .env okunmaz ve yazılmaz; testler .env.test ile (SECURITY_AND_PERMISSIONS)
+OK  ENV path wins over code (py heredoc + cat .env): r2 exit 2 | main exit 2 | want 2
+      r2: FFCORE-GUARD [ENV] .env okunmaz ve yazılmaz; testler .env.test ile (SECURITY_AND_PERMISSIONS)
+OK  ENV path in -c (py -c open('.env')): r2 exit 2 | main exit 2 | want 2
+      r2: FFCORE-GUARD [ENV] .env okunmaz ve yazılmaz; testler .env.test ile (SECURITY_AND_PERMISSIONS)
+OK  sh -c with heredoc then pytest (quoted): r2 exit 2 | main exit 2 | want 2
+      r2: FFCORE-GUARD [KAPI] kapı/test çıktısı tamamen dosyaya: ... 2>&1 | tee state/evidence/<paket>-<adım>.log (K-05a-0011)
+OK  sh -c with data heredoc, make test in body only: r2 exit 0 | main exit 2 | want 0
+OK  bash -c heredoc + tee inside: r2 exit 0 | main exit 2 | want 0
+OK  comment with apostrophe, then kanal heredoc: r2 exit 0 | main exit 0 | want 0
+OK  escaped apostrophe, then kanal heredoc: r2 exit 0 | main exit 2 | want 0
+OK  apostrophe in double quotes, then kanal heredoc: r2 exit 0 | main exit 2 | want 0
+OK  kanal heredoc whose body has an apostrophe, then another kanal heredoc: r2 exit 0 | main exit 0 | want 0
+BAD comment with apostrophe, then real pytest: r2 exit 0 | main exit 0 | want 2
+OK  multi-line sh -c '...' with heredoc then outer pytest: r2 exit 2 | main exit 2 | want 2
+      r2: FFCORE-GUARD [KAPI] kapı/test çıktısı tamamen dosyaya: ... 2>&1 | tee state/evidence/<paket>-<adım>.log (K-05a-0011)
+OK  env X=1 bash heredoc pytest: r2 exit 2 | main exit 2 | want 2
+      r2: FFCORE-GUARD [KAPI] kapı/test çıktısı tamamen dosyaya: ... 2>&1 | tee state/evidence/<paket>-<adım>.log (K-05a-0011)
+OK  timeout -s KILL 600 bash heredoc pytest: r2 exit 2 | main exit 2 | want 2
+      r2: FFCORE-GUARD [KAPI] kapı/test çıktısı tamamen dosyaya: ... 2>&1 | tee state/evidence/<paket>-<adım>.log (K-05a-0011)
+OK  docker exec -u root -w /w c bash heredoc pytest: r2 exit 2 | main exit 2 | want 2
+      r2: FFCORE-GUARD [KAPI] kapı/test çıktısı tamamen dosyaya: ... 2>&1 | tee state/evidence/<paket>-<adım>.log (K-05a-0011)
+OK  compose run -e A=1 --rm -T tools sh heredoc pytest: r2 exit 2 | main exit 2 | want 2
+      r2: FFCORE-GUARD [KAPI] kapı/test çıktısı tamamen dosyaya: ... 2>&1 | tee state/evidence/<paket>-<adım>.log (K-05a-0011)
+OK  compose exec -T postgres psql heredoc (data): r2 exit 0 | main exit 2 | want 0
+OK  docker exec c python heredoc mentions pytest (code): r2 exit 0 | main exit 2 | want 0
+HEAD=3da0bfb; main 6780731ffcd9096339aea0abb271b53a0b79125d; r1 99bb7a3; want 2 for every case
+# don't
+pytest -q {'r2': 0, 'main': 0, 'r1': 0}
+# don't
+cat .env {'r2': 2, 'main': 2, 'r1': 2}
+# don't
+git push {'r2': 0, 'main': 0, 'r1': 0}
+echo hi # don't
+pytest {'r2': 0, 'main': 0, 'r1': 0}
+# dont (no apostrophe)
+pytest {'r2': 2, 'main': 2, 'r1': 2}
+# don't
+docker build . {'r2': 0, 'main': 0, 'r1': 0}
+--- r2 direct command behind timeout (handbook: timeout not checked)
+timeout 600 pytest -q -> exit 0
+timeout 600 make test -> exit 0

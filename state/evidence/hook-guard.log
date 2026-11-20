@@ -103,3 +103,5 @@
 2026-11-20T21:44:23	warn	isci-b	Bash	KAPI	py -3.12 - <<'EOF' from pathlib import Path p = Path("docs/takim/ajanlarla-gelistirme.md") s = p.read_text(encoding="utf
 2026-11-20T21:46:00	warn	isci-b	Bash	ENV	py -3.12 - <<'PYEOF' import importlib.util, sys base = "C:/Users/CAGLAR~1.SAH/AppData/Local/Temp/claude/9398d5fca5badfb5
 2026-11-20T21:55:01	warn	isci-b	Bash	KAPI	cd /c/ai_paycore/ffcore && cat >> state/pr/hook-egress-1.md <<'MSG' ## r2 (K-HKE-0005, inceleme r1 ONAY B0 M0 m2 N3) HEA
+2026-11-20T22:16:12	warn	inceleyici	Bash	KAPI	S=C:/Users/CAGLAR~1.SAH/AppData/Local/Temp/claude/9398d5fca5badfb5/ecb79a59-6471-4590-b997-842940d7a702/scratchpad; cat 
+2026-11-20T22:16:12	warn	inceleyici	Bash	PUSH	S=C:/Users/CAGLAR~1.SAH/AppData/Local/Temp/claude/9398d5fca5badfb5/ecb79a59-6471-4590-b997-842940d7a702/scratchpad; cat 

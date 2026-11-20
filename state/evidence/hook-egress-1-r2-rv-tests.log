@@ -1,0 +1,12 @@
+HEAD=3da0bfb38bc37f41ef5be2fcd677f32b02c02f3c (git archive copy)
+=== host py -3.12 tests/hooks tests/scripts
+........................................................................ [ 83%]
+........................................................................ [100%]
+432 passed in 119.22s (0:01:59)
+=== tools 0.0.0-hke --network none: ruff + egress unit tests (source mounted)
+All checks passed!
+10 files already formatted
+........................................................................ [ 85%]
+............                                                             [100%]
+84 passed in 8.40s
+exit 0

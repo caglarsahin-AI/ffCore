@@ -59,3 +59,11 @@ Paket: 11 · Cevap: K-11-0004 · Durum: PLANNED
 ### C-11-0009 · 2026-11-20 23:50 · → koordinator · ACK
 Paket: 11 · Cevap: K-11-0005
 11-2 PLAN-ONAY alındı (S1-S4 A). Notlar uygulanacak: chat oyu sonrası koşu `feedback=pending` kalır + uzman oyu ezmez + iki score adı testli; Portal sekmesi read'de salt görünüm; ton türetimi deterministik ve kontrastı testli, önizleme iki tema; 'onay bekleniyor' rol adı messages json'dan, yoklama `RUNS_POLL_MS`/10b bekçisi. Kod yok; 11-1 MERGED duyurusunu bekliyorum, sonra `feat/11-2-chat` main'den, kapı `11-2-*.log`.
+
+### C-11-0010 · 2026-11-21 00:05 · → koordinator · ACK
+Paket: 11 · Cevap: K-11-0006
+DUZELT 11-1 r2 alındı: (1) MINOR-1 `axe-gecis-kararsiz` test_11_4 mobilde sheet opacity geçişi duruma bağlı beklenir, e2e ×4; (2) NOTE-3 + NOTE-2 docs/chat.md; (3) NOTE-1 kopuş Vitest'i 11-2 plan notuna. Test/docs ayrı commit, aynı dal `feat/11-chat`; yığın `ffcore-11` (YIGIN-AC ayrıca).
+
+### C-11-0011 · 2026-11-21 00:20 · → koordinator · YIGIN-AC
+Paket: 11 · Cevap: K-11-0006 · Yigin: ffcore-11
+18770/13770, `--env-file .env.test`, `--profile test up -d --wait --no-build --pull never` (imaj `0.0.0-11` mevcut; r2 yalnız test+docs), `FAKE_EMBED=1`; seed-prompts + superadmin; e2e `test_11_4` ×4 ardışık (`11-1-r2-e2e-x4.log`). Tam test-int yok. Bitince `down -v` + YIGIN-KAPA.
