@@ -182,8 +182,9 @@ def validate_config(name: str, config: dict[str, Any]) -> dict[str, str]:
     return clean
 
 
-# Configuration fields that hold the provider's address (FOLLOWUP-194).
-URL_FIELDS = ("base_url", "api_base")
+# Every driver's address field (FOLLOWUP-194; `url` is the qdrant driver's, review r1 NOTE-1):
+# saving refuses what the connection test refuses.
+URL_FIELDS = ("base_url", "api_base", "url")
 
 
 def refuse_platform_urls(config: dict[str, str], settings: Settings) -> None:

@@ -14,6 +14,7 @@ from types import SimpleNamespace
 import pytest
 
 from ffcore.core import egress
+from ffcore.core.errors import ApiError
 from ffcore.services import mcp_client, notify
 from ffcore.services import providers as drivers
 from ffcore.services.litellm_reconcile import ReconcileProblem, desired_model
@@ -56,6 +57,31 @@ def test_trj_194_other_internal_hosts_pass(url, platform_settings):
 def test_trj_194_connection_test_refuses(url, platform_settings, monkeypatch):
     monkeypatch.setattr(drivers, "SafeOutboundClient", NoClient)
     result = asyncio.run(drivers.test_connection("ollama", {"base_url": url}, platform_settings))
+    assert (result.ok, result.code) == (False, "endpoint_is_platform")
+
+
+@pytest.mark.parametrize("field", ["base_url", "api_base", "url"])
+@pytest.mark.parametrize("url", PLATFORM_URLS)
+def test_trj_194_saved_address_fields_refused(field, url, platform_settings):
+    """Every driver's address field is checked when saved, the qdrant driver's `url` too
+    (review r1 NOTE-1): saving and the connection test give the same answer."""
+    with pytest.raises(ApiError) as err:
+        drivers.refuse_platform_urls({field: url}, platform_settings)
+    assert (err.value.status_code, err.value.code) == (400, "endpoint_is_platform")
+    assert "://" not in err.value.message
+
+
+def test_trj_194_url_fields_cover_every_driver_address():
+    names = {f.name for d in drivers.DRIVERS.values() for f in d.fields}
+    address = {n for n in names if "url" in n or n == "api_base"}
+    assert address == {"base_url", "api_base", "url"}
+    assert address <= set(drivers.URL_FIELDS), address
+
+
+@pytest.mark.parametrize("url", PLATFORM_URLS)
+def test_trj_194_qdrant_connection_test_refuses(url, platform_settings, monkeypatch):
+    monkeypatch.setattr(drivers, "SafeOutboundClient", NoClient)
+    result = asyncio.run(drivers.test_connection("qdrant", {"url": url}, platform_settings))
     assert (result.ok, result.code) == (False, "endpoint_is_platform")
 
 
