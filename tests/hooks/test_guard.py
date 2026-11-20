@@ -157,6 +157,42 @@ def test_compose_build_message_names_up_build(guard, main_root):
     assert "up --build --pull never" in violations[0].message
 
 
+
+@pytest.mark.parametrize(
+    "cmd",
+    [
+        "docker build -t x .",
+        "docker build --pull=false -f backend/Dockerfile backend",
+        "docker buildx build --load -t x .",
+        "docker image build -t x .",
+        "docker builder build -t x .",
+        "docker --context default build .",
+        "cd backend && docker build .",
+        'sh -c "docker buildx build ."',
+    ],
+)
+def test_bare_docker_build_blocked(main_root, cmd):
+    # FOLLOWUP-210: the BuildKit base image metadata problem (5 November decision) is not
+    # compose-specific; images are built by `up --build --pull never`.
+    assert_blocked(run_hook(bash(cmd), main_root), "PROSES-175")
+
+
+@pytest.mark.parametrize(
+    "cmd",
+    [
+        "docker buildx ls",
+        "docker build --help",
+        "docker buildx version",
+        "docker images",
+        "docker image ls",
+        "docker tag a b",
+        "echo docker build",
+        "grep -n 'docker build' docs/kurulum.md",
+    ],
+)
+def test_docker_non_build_allowed(main_root, cmd):
+    assert_allowed(run_hook(bash(cmd), main_root))
+
 def test_compose_up_build_pull_never_allowed(guard, main_root, monkeypatch):
     monkeypatch.setattr(guard, "running_ff_stacks", lambda: [])
     cmd = "docker compose -p ffcore-x --env-file .env.test up -d --wait --build --pull never"
