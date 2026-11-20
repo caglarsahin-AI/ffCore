@@ -170,7 +170,9 @@ def test_hke_208_backend_client_reaches_an_allowlisted_host_through_the_proxy():
     assert response.json()["object"] == "list"
 
 
-@pytest.mark.parametrize("url", [f"{DENIED}/v1/models", f"{REBIND}/v1/models", f"{BENCH}/v1/models"])
+@pytest.mark.parametrize(
+    "url", [f"{DENIED}/v1/models", f"{REBIND}/v1/models", f"{BENCH}/v1/models"]
+)
 def test_hke_208_proxy_refusal_reaches_the_backend_as_egress_proxy_denied(url):
     from ffcore.core.egress import EgressDenied
 
