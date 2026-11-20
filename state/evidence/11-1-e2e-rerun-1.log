@@ -1,0 +1,112 @@
+time="2026-11-20T21:24:04+03:00" level=warning msg="volume \"ffcore-11_e2e_node_modules\" already exists but was not created by Docker Compose. Use `external: true` to use an existing volume"
+ Container ffcore-11-redis-1  Running
+ Container ffcore-11-postgres-1  Running
+ Container ffcore-11-litellm-1  Running
+ Container ffcore-11-migrate-1  Created
+ Container ffcore-11-backend-1  Running
+ Container ffcore-11-postgres-1  Waiting
+ Container ffcore-11-postgres-1  Waiting
+ Container ffcore-11-postgres-1  Healthy
+ Container ffcore-11-migrate-1  Starting
+ Container ffcore-11-postgres-1  Healthy
+ Container ffcore-11-migrate-1  Started
+ Container ffcore-11-litellm-1  Waiting
+ Container ffcore-11-migrate-1  Waiting
+ Container ffcore-11-postgres-1  Waiting
+ Container ffcore-11-redis-1  Waiting
+ Container ffcore-11-postgres-1  Healthy
+ Container ffcore-11-redis-1  Healthy
+ Container ffcore-11-litellm-1  Healthy
+ Container ffcore-11-migrate-1  Exited
+
+Running 6 tests using 1 worker
+
+[1/6] [chromium] › tests/e2e/test_10ab_2_project_create.spec.ts:7:5 › test_10ab_2_project_create: superadmin creates a project and sees it listed
+[2/6] [chromium] › tests/e2e/test_10ab_2_project_create.spec.ts:25:5 › test_10ab_2_project_create: a used key is refused by the backend
+[3/6] [chromium] › tests/e2e/test_10ab_2_project_create.spec.ts:36:5 › test_10ab_2_project_create: a project admin who is not a superadmin gets no create button
+[4/6] [chromium] › tests/e2e/test_10bp1_10_readiness.spec.ts:10:5 › test_10bp1_10_readiness: @model-missing without weights the page says why and how to fix it
+  1) [chromium] › tests/e2e/test_10bp1_10_readiness.spec.ts:10:5 › test_10bp1_10_readiness: @model-missing without weights the page says why and how to fix it 
+
+    Error: run this stage with FAKE_EMBED=0 (docs/onyuz.md)
+
+    expect(locator).not.toContainText(expected) failed
+
+    Locator: getByTestId('check-models').getByTestId('check-detail')
+    Expected substring: not "FAKE_EMBED=1"
+    Received string: "FAKE_EMBED=1: deterministic test models"
+    Timeout: 5000ms
+
+    Call log:
+      - run this stage with FAKE_EMBED=0 (docs/onyuz.md) getByTestId('check-models').getByTestId('check-detail') with timeout 5000ms
+      - waiting for getByTestId('check-models').getByTestId('check-detail')
+        14 × locator resolved to <td data-slot="table-cell" data-testid="check-detail" class="p-2 whitespace-nowrap [&:has([role=checkbox])]:pr-0 align-top font-mono text-sm break-all">FAKE_EMBED=1: deterministic test models</td>
+           - unexpected value "FAKE_EMBED=1: deterministic test models"
+
+
+      13 |   const models = page.getByTestId("check-models");
+      14 |   // Precondition, not a skip: this stage needs FAKE_EMBED off.
+    > 15 |   await expect(models.getByTestId("check-detail"), "run this stage with FAKE_EMBED=0 (docs/onyuz.md)").not.toContainText(
+         |                                                                                                            ^
+      16 |     "FAKE_EMBED=1",
+      17 |   );
+      18 |   await expect(page.getByTestId("readiness-overall")).toHaveAttribute("data-status", "not_ready");
+        at /work/frontend/tests/e2e/test_10bp1_10_readiness.spec.ts:15:108
+
+    Error Context: test-results/test_10bp1_10_readiness-te-84a5f--says-why-and-how-to-fix-it-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/test_10bp1_10_readiness-te-84a5f--says-why-and-how-to-fix-it-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/test_10bp1_10_readiness-te-84a5f--says-why-and-how-to-fix-it-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[5/6] [chromium] › tests/e2e/test_10bp1_10_readiness.spec.ts:28:5 › test_10bp1_10_readiness: with stand-in models the page is ready and names FAKE_EMBED
+  2) [chromium] › tests/e2e/test_10bp1_10_readiness.spec.ts:28:5 › test_10bp1_10_readiness: with stand-in models the page is ready and names FAKE_EMBED 
+
+    Error: expect(locator).toHaveAttribute(expected) failed
+
+    Locator:  getByTestId('readiness-overall')
+    Expected: "ready"
+    Received: "not_ready"
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveAttribute" getByTestId('readiness-overall') with timeout 5000ms
+      - waiting for getByTestId('readiness-overall')
+        14 × locator resolved to <div data-status="not_ready" class="flex items-center gap-3" data-testid="readiness-overall">…</div>
+           - unexpected value "not_ready"
+
+
+      29 |   await signIn(page, fixture().superadmin.email);
+      30 |   await page.goto("/system-status");
+    > 31 |   await expect(page.getByTestId("readiness-overall")).toHaveAttribute("data-status", "ready");
+         |                                                       ^
+      32 |   await expect(page.getByTestId("check-models").getByTestId("check-detail")).toContainText("FAKE_EMBED=1");
+      33 |   for (const name of ["warmup", "models", "embed_dim", "ollama_context", "vector_store"]) {
+      34 |     await expect(page.getByTestId(`check-${name}`)).toBeVisible();
+        at /work/frontend/tests/e2e/test_10bp1_10_readiness.spec.ts:31:55
+
+    Error Context: test-results/test_10bp1_10_readiness-te-47f07--ready-and-names-FAKE-EMBED-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/test_10bp1_10_readiness-te-47f07--ready-and-names-FAKE-EMBED-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/test_10bp1_10_readiness-te-47f07--ready-and-names-FAKE-EMBED-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[6/6] [chromium] › tests/e2e/test_11_1_ask_and_source_card.spec.ts:10:5 › test_11_1_ask_and_source_card: ask in /chat, open the cited passage, find the conversation again
+  2 failed
+    [chromium] › tests/e2e/test_10bp1_10_readiness.spec.ts:10:5 › test_10bp1_10_readiness: @model-missing without weights the page says why and how to fix it 
+    [chromium] › tests/e2e/test_10bp1_10_readiness.spec.ts:28:5 › test_10bp1_10_readiness: with stand-in models the page is ready and names FAKE_EMBED 
+  4 passed (4.7m)
+npm notice
+npm notice New major version of npm available! 11.19.1 -> 12.2.3
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.3
+npm notice To update run: npm install -g npm@12.2.3
+npm notice

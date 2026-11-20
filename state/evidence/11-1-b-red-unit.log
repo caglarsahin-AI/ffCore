@@ -1,0 +1,50 @@
+
+==================================== ERRORS ====================================
+_________________ ERROR collecting tests/unit/test_11_title.py _________________
+ImportError while importing test module '/work/backend/tests/unit/test_11_title.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/local/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/unit/test_11_title.py:4: in <module>
+    from ffcore.services.runs_start import TITLE_CHARS, conversation_title
+E   ImportError: cannot import name 'TITLE_CHARS' from 'ffcore.services.runs_start' (/work/backend/ffcore/services/runs_start.py)
+=========================== short test summary info ============================
+ERROR tests/unit/test_11_title.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+1 error in 15.70s
+..F..F..                                                                 [100%]
+=================================== FAILURES ===================================
+____________________ test_03a_3_exemptions_are_real_routes _____________________
+
+    def test_03a_3_exemptions_are_real_routes():
+        names = {route.name for route in api_routes(app.routes)}
+>       assert names >= WRITE_EXEMPT
+E       AssertionError: assert {'ack_alert',...approve', ...} >= {'cancel_run'...rdrails', ...}
+E         
+E         Extra items in the right set:
+E         'delete_conversation'
+
+tests/unit/test_03a_write_flag.py:78: AssertionError
+________________ test_06a_0_draft_has_the_contracted_operations ________________
+
+    def test_06a_0_draft_has_the_contracted_operations():
+        paths = yaml.safe_load(render("06a"))["paths"]
+>       assert {p: set(ops) for p, ops in paths.items()} == EXPECTED
+E       AssertionError: assert {'/api/v1/pro..., 'put'}, ...} == {'/api/v1/pro..., 'put'}, ...}
+E         
+E         Omitting 14 identical items, use -vv to show
+E         Right contains 5 more items:
+E         {'/api/v1/projects/{project_id}/chat/agents': {'get'},
+E          '/api/v1/projects/{project_id}/conversations': {'get'},
+E          '/api/v1/projects/{project_id}/conversations/{conversation_id}': {'delete'},
+E          '/api/v1/projects/{project_id}/conversations/{conversation_id}/messages': {'get'},
+E          '/api/v1/projects/{project_id}/runs/{run_id}/sources/{chunk_id}': {'get'}}
+E         Use -v to get more diff
+
+tests/contract/test_06a_openapi.py:48: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/test_03a_write_flag.py::test_03a_3_exemptions_are_real_routes
+FAILED tests/contract/test_06a_openapi.py::test_06a_0_draft_has_the_contracted_operations
+2 failed, 6 passed in 10.80s

@@ -1,0 +1,59 @@
+F.................                                                       [100%]
+=================================== FAILURES ===================================
+__________________ test_11_1_chat_agents_lists_published_only __________________
+
+chatting = (UUID('3a8c8ffd-b903-4560-850c-d7c4463fcbbc'), UUID('5cd0641b-a5fc-498e-ab40-eaf782510d7a'), <starlette.testclient.TestClient object at 0x7f3250534b90>, <tests.integration.runtime_support.ScriptedModel object at 0x7f32505349b0>)
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_5a45bd7e0f9b) at 0x7f32528c9190>
+
+    def test_11_1_chat_agents_lists_published_only(chatting, pg):
+        project_id, _, client, _ = chatting
+        _insert_agent(pg, project_id, "taslak")
+        _insert_agent(pg, project_id, "silinmis", deleted=True)
+>       _insert_agent(pg, project_id, "dis", kind="external", status="published")
+
+tests/integration/test_11_chat.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_11_chat.py:30: in _insert_agent
+    pg.execute(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_5a45bd7e0f9b) at 0x7f32528c9190>
+query = "INSERT INTO agents (id, project_id, key, name, kind, status, created_by, deleted_at) VALUES (%s, %s, %s, %s, %s, %s, 't', CASE WHEN %s THEN now() END)"
+params = (UUID('06a9b071-8420-4f9e-95ec-e78c3313d502'), UUID('3a8c8ffd-b903-4560-850c-d7c4463fcbbc'), 'dis', 'DIS', 'external', 'published', ...)
+prepare = None, binary = False
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool = False,
+    ) -> Cursor[Row]:
+        """Execute a query and return a cursor to read its results."""
+        try:
+            cur = self.cursor()
+            if binary:
+                cur.format = BINARY
+    
+            if isinstance(query, Template):
+                if params is not None:
+                    raise TypeError(
+                        "'execute()' with string template query doesn't support parameters"
+                    )
+                return cur.execute(query, prepare=prepare)
+            else:
+                return cur.execute(query, params, prepare=prepare)
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.CheckViolation: new row for relation "agents" violates check constraint "ck_agents_external_config"
+E           DETAIL:  Failing row contains (06a9b071-8420-4f9e-95ec-e78c3313d502, 3a8c8ffd-b903-4560-850c-d7c4463fcbbc, dis, DIS, , published, external, null, 2026-11-20 17:04:28.113978+00, 2026-11-20 17:04:28.113978+00, t, null, null).
+
+/opt/venv/lib/python3.12/site-packages/psycopg/connection.py:304: CheckViolation
+---------------------------- Captured stderr setup -----------------------------
+2026-11-20 17:04:28,099 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=571
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=571
+=========================== short test summary info ============================
+FAILED tests/integration/test_11_chat.py::test_11_1_chat_agents_lists_published_only
+1 failed, 17 passed in 166.33s (0:02:46)

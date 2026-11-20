@@ -1,0 +1,8 @@
+cd backend && python -m ffcore.cli seed-prompts --path prompts
+2026-11-20 17:39:24,232 WARNING langfuse Prompt 'eval_judge_rubric_v2-label:production' not found during refresh, evicting from cache.
+2026-11-20 17:39:25,139 WARNING langfuse Prompt 'platform_rules-label:production' not found during refresh, evicting from cache.
+prompts created: ['eval_judge_rubric_v2', 'platform_rules']
+prompts already present: -
+superadmin created: 2252af7b-46a2-4abf-b838-864fb55e81f8
+ffcore-11_e2e_node_modules
+484

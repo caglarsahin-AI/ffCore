@@ -1,0 +1,38 @@
+time="2026-11-20T21:30:38+03:00" level=warning msg="volume \"ffcore-11_e2e_node_modules\" already exists but was not created by Docker Compose. Use `external: true` to use an existing volume"
+ Container ffcore-11-redis-1  Running
+ Container ffcore-11-postgres-1  Running
+ Container ffcore-11-migrate-1  Created
+ Container ffcore-11-litellm-1  Running
+ Container ffcore-11-backend-1  Running
+ Container ffcore-11-postgres-1  Waiting
+ Container ffcore-11-postgres-1  Waiting
+ Container ffcore-11-postgres-1  Healthy
+ Container ffcore-11-postgres-1  Healthy
+ Container ffcore-11-migrate-1  Starting
+ Container ffcore-11-migrate-1  Started
+ Container ffcore-11-litellm-1  Waiting
+ Container ffcore-11-migrate-1  Waiting
+ Container ffcore-11-postgres-1  Waiting
+ Container ffcore-11-redis-1  Waiting
+ Container ffcore-11-litellm-1  Healthy
+ Container ffcore-11-postgres-1  Healthy
+ Container ffcore-11-redis-1  Healthy
+ Container ffcore-11-migrate-1  Exited
+
+Running 9 tests using 1 worker
+
+[1/9] [chromium] › tests/e2e/test_10c3_1_publish_add_tool.spec.ts:22:5 › test_10c3_1_publish_add_tool: sample spec to published server to tool
+[2/9] [chromium] › tests/e2e/test_10c3_2_path_invalid.spec.ts:11:5 › test_10c3_2_path_invalid: an unsafe document path is refused with its message
+[3/9] [chromium] › tests/e2e/test_10c3_3_monitoring.spec.ts:23:5 › test_10c3_3_monitoring: ok and error calls with their codes
+[4/9] [chromium] › tests/e2e/test_10c3_4_read_only_roles.spec.ts:13:5 › test_10c3_4_read_only: list and server page have every change disabled in read mode
+[5/9] [chromium] › tests/e2e/test_10c3_4_read_only_roles.spec.ts:36:5 › test_10c3_4_roles: an analyst does not get the MCP servers screen
+[6/9] [chromium] › tests/e2e/test_10c3_4_read_only_roles.spec.ts:46:7 › test_10c3_4_screens: server page light edit and read
+[7/9] [chromium] › tests/e2e/test_10c3_4_read_only_roles.spec.ts:46:7 › test_10c3_4_screens: server page dark edit and read
+[8/9] [chromium] › tests/e2e/test_10c3_5_screens_themes_axe.spec.ts:18:7 › test_10c3_5_axe: MCP screens light
+[9/9] [chromium] › tests/e2e/test_10c3_5_screens_themes_axe.spec.ts:18:7 › test_10c3_5_axe: MCP screens dark
+  9 passed (2.8m)
+npm notice
+npm notice New major version of npm available! 11.19.1 -> 12.2.3
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.3
+npm notice To update run: npm install -g npm@12.2.3
+npm notice

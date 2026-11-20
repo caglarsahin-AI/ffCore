@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-b-hke1 (local_24bba94d-3d92-4034-946d-459bec3b7f0a; önceki lease ffcore-isci-b-triage1 RETIRED, B-TRJ-0012)
 - Aktif paket: hook-egress-1 (fix/hook-egress-1)
 - Durum: ACTIVE
-- Son okunan: koordinator K-HKE-0004
+- Son okunan: koordinator K-HKE-0005
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/isci-b-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 309 mesaj); ID ile atıf orada bulunur.
@@ -39,3 +39,7 @@ Paket: hook-egress-1 · Cevap: K-HKE-0002 · SHA: 99bb7a39787a40ca053dade6611d1d
 PR notu `state/pr/hook-egress-1.md` ("Teslim"). Delta `1c0abcd..99bb7a3` (19 commit, 20 dosya, hepsi touch-zone; test/kod/docs ayrı; block commit'i fcc2978, 208'den önce). Kapı logları: `hke-hooks-final.log` (host 409 passed), `hke-make-test.log` (llmaas 2145 passed; airgap 2150 passed + 1 zamanlama hatası `test_08t_secrets_linear[API_KEY]` 10.8 s > 8 s, tek başına 7/7 `hke-make-test-airgap-rerun.log`), `hke-lint-r2.log` (make lint temiz), `hke-208-test-int.log` (egress+tls yığını `test_12_egress.py` 17 passed, Squid erişim logu), `hke-208-test-int-red-on-main.log` (main koduyla 5 kırmızı), `hke-lint-smoke.log` (smoke geçti). Tam test-int NOT_RUN (ENV-209; hedefli koşu).
 **Bilerek değişen testler:** `test_03b_2_transport_pool_uses_pinned_backend` (pinli havuz yönlendirici taşıyıcının altında), `test_log_truncates_to_120` → `_240`, `test_settings_command_runs_guard` (settings_hook_argv).
 **Notlar:** (1) `docs/takim/ajanlarla-gelistirme.md` 648/654 "120 karakter" ve `warn` örneği eskidi, touch-zone dışı. (2) Block'ta ENV'nin yorumlayıcı-gövdesi YP sınıfı (kararla kabul) artık engeller; bu oturumda 19:44'te bir ENV uyarısı var, komutu kesik kayıttan kurulamadı. (3) Merge sonrası açık oturumlar block'la denetlenir (K-GEN-0035 duyurusu yapıldı).
+
+### B-HKE-0007 · 2026-11-20 21:40 · → koordinator · ACK
+Paket: hook-egress-1 · Cevap: K-HKE-0005
+r2 DUZELT alındı (r1 raporu okundu). Sıra: MINOR-2 (probe2'nin altı BAD biçimi + `compose run … sh <<EOF` gövdesinde `docker build` kırmızı test; psql/python/cat gövdeleri sessiz), MINOR-1 A (ENV kod gövdesi mesajı + handbook), NOTE-2 (`egress_proxy_unreachable`, birim testi), NOTE-1/NOTE-3 docs. Kapı: host hook, lint, `make test` llmaas; tee `hke-r2-*.log`.

@@ -1,0 +1,46 @@
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.12 [39m[90m/w/frontend[39m
+
+ [31m❯[39m tests/unit/test_11_1_chat_view.test.ts [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m tests/unit/test_11_2_chat_screen.test.tsx [2m([22m[2m0 test[22m[2m)[22m
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Suites 2 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m tests/unit/test_11_1_chat_view.test.ts[2m [ tests/unit/test_11_1_chat_view.test.ts ][22m
+[31m[1mError[22m: Cannot find package '@/lib/chat-view' imported from /w/frontend/tests/unit/test_11_1_chat_view.test.ts[39m
+[36m [2m❯[22m tests/unit/test_11_1_chat_view.test.ts:[2m4:1[22m[39m
+    [90m  2|[39m
+    [90m  3|[39m [35mimport[39m type { [33mChatMessage[39m } [35mfrom[39m [32m"@/lib/api/chat-queries"[39m[33m;[39m
+    [90m  4|[39m import { answerBadge, chatPath, pendingRun, settledRun, toolActivity }…
+    [90m   |[39m [31m^[39m
+    [90m  5|[39m [35mimport[39m { homePath } [35mfrom[39m [32m"@/lib/navigation"[39m[33m;[39m
+    [90m  6|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/test_11_2_chat_screen.test.tsx[2m [ tests/unit/test_11_2_chat_screen.test.tsx ][22m
+[31m[1mError[22m: Failed to resolve import "@/components/chat/chat-home" from "tests/unit/test_11_2_chat_screen.test.tsx". Does the file exist?[39m
+  Plugin: [35mvite:import-analysis[39m
+  File: [36m/w/frontend/tests/unit/test_11_2_chat_screen.test.tsx[39m:6:0
+[33m  9  |  const __vi_import_0__ = await import("@tanstack/react-query");
+  10 |  const __vi_import_1__ = await import("@testing-library/react");
+  11 |  const __vi_import_2__ = await import("@/components/chat/chat-home");
+     |                                       ^
+  12 |  const __vi_import_3__ = await import("@/components/chat/chat-screen");
+  13 |  const __vi_import_4__ = await import("./eval-support");[39m
+[90m [2m❯[22m TransformPluginContext._formatLog node_modules/vite/dist/node/chunks/node.js:[2m8803:39[22m[39m
+[90m [2m❯[22m TransformPluginContext.error node_modules/vite/dist/node/chunks/node.js:[2m8800:14[22m[39m
+[90m [2m❯[22m resolveId node_modules/vite/dist/node/chunks/node.js:[2m26594:18[22m[39m
+[90m [2m❯[22m node_modules/vite/dist/node/chunks/node.js:[2m26693:23[22m[39m
+[90m [2m❯[22m TransformPluginContext.transform node_modules/vite/dist/node/chunks/node.js:[2m26666:4[22m[39m
+[90m [2m❯[22m EnvironmentPluginContainer.transform node_modules/vite/dist/node/chunks/node.js:[2m8582:14[22m[39m
+[90m [2m❯[22m loadAndTransform node_modules/vite/dist/node/chunks/node.js:[2m20155:26[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m2 failed[39m[22m[90m (2)[39m
+[2m      Tests [22m [2mno tests[22m
+[2m   Start at [22m 17:13:23
+[2m   Duration [22m 1.59s[2m (transform 276ms, setup 0ms, import 0ms, tests 0ms, environment 1.05s)[22m
+
