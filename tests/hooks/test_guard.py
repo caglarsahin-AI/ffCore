@@ -634,6 +634,18 @@ def test_settings_command_runs_guard(main_root):
     assert_blocked(proc, "KAPI")
 
 
+
+def test_settings_command_skips_without_py_launcher(monkeypatch):
+    """FOLLOWUP-212: no `py` launcher (Linux tools container) is an explicit skip, not an error;
+    the gate's hook step runs on the host with py -3.12."""
+    import shutil
+
+    from conftest import settings_hook_argv
+
+    monkeypatch.setattr(shutil, "which", lambda name: None)
+    with pytest.raises(pytest.skip.Exception, match="FOLLOWUP-212"):
+        settings_hook_argv()
+
 # --- archive (MULTI_AGENT_PROTOCOL "Bağlam bütçesi ve arşiv", 16 Nov 2026) ----
 
 
