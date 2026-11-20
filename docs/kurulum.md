@@ -207,10 +207,32 @@ With the `egress` profile the stack has one way out: a forward proxy (Squid,
   is FOLLOWUP-211.
 - The proxy logs one line per request to `docker compose logs egress-proxy`: time, client,
   method, host and port, status, bytes. No path or query.
-- **Known limit (FOLLOWUP-208):** the backend's own outbound calls do not use a proxy (they pin
-  the address they checked). With the `egress` profile, remote MCP servers, OpenAPI tools,
-  alert webhooks and external agents fail with a connection error; leave the profile off where
-  those are needed until FOLLOWUP-208 lands. Model calls are not affected.
+- The backend's own outbound calls (remote MCP servers, OpenAPI tools, alert webhooks, external
+  agents) go through the proxy as well: the overlay sets
+  `EGRESS_PROXY_URL=http://egress-proxy:3128` for `backend` and the workers (FOLLOWUP-208).
+  The backend first applies its host rules (scheme, `OFFLINE`, `EGRESS_ALLOWLIST`, every
+  redirect hop again), then sends the request to the proxy **by host name** (`CONNECT` for
+  https; TLS and the certificate check stay end to end in the backend). The backend cannot
+  resolve outside names on the internal network, so the address check (private address, DNS
+  rebinding) is the proxy's: it resolves the name and checks the address it dials. A refusal by
+  the proxy reaches the caller as `egress_proxy_denied`, never as the target's own 403. Hosts
+  in `ALLOWED_INTERNAL_HOSTS` stay direct and pinned. Nothing falls back from one path to the
+  other: an unreachable proxy is a failed call.
+- Without the `egress` profile `EGRESS_PROXY_URL` is empty and the backend dials external
+  hosts itself, checking every resolved address (unchanged).
+- Not through the proxy: SMTP alerts (the proxy carries HTTP and `CONNECT` only) fail with a
+  connection error under the `egress` profile; use a webhook alert channel there. The
+  `/readyz` probe of the alert job calls the backend itself (internal) and is not affected.
+
+Where the address check runs, by path:
+
+| Check | Without proxy (`EGRESS_PROXY_URL` empty) | Through the proxy (`egress` profile) |
+|---|---|---|
+| scheme, port, `OFFLINE`, `EGRESS_ALLOWLIST`, platform target | backend | backend, then the proxy's own `EGRESS_ALLOWLIST` |
+| every redirect hop | backend | backend |
+| private / non-global address, DNS rebinding | backend (Python `is_global`, on the dialed address) | proxy (`to_private` in `deploy/egress/squid.conf`, on the dialed address) |
+| documentation ranges (192.0.2.0/24, 198.51.100.0/24, 203.0.113.0/24, 2001:db8::/32) and 192.0.0.0/24 | refused | **allowed** (no provider resolves there; the egress test stack uses 198.51.100.0/24 as its outside) |
+| internal hosts (`ALLOWED_INTERNAL_HOSTS`) | direct, pinned | direct, pinned |
 - Published ports do not reach the host on an internal network (measured, Docker 24), so the
   `egress` profile needs the `tls` profile as the way in; the preflight enforces it.
 
@@ -282,4 +304,6 @@ or malformed `EGRESS_ALLOWLIST` (scheme, port, path or an inner `*`), or a non-n
 `EGRESS_ALLOWED_PORTS`.
 
 **A provider call fails with 403 from the proxy.** The host is not in `EGRESS_ALLOWLIST`, or it
-resolves to a private address. The proxy log line names the host.
+resolves to a private address. The proxy log line names the host. A backend call (tool, webhook,
+remote MCP server) refused this way fails with `egress_proxy_denied`; `egress_not_allowlisted`
+means the backend's own `EGRESS_ALLOWLIST` refused it before the proxy.
