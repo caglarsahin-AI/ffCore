@@ -389,13 +389,20 @@ class _ProxyOnlyBackend(httpcore2.AsyncNetworkBackend):
             ) from None
         if not addresses:
             raise EgressRequestFailed("egress_proxy_unreachable", f"{name}:{port}", "no address")
-        return await self._inner.connect_tcp(
-            addresses[0],
-            port,
-            timeout=timeout,
-            local_address=local_address,
-            socket_options=socket_options,
-        )
+        try:
+            return await self._inner.connect_tcp(
+                addresses[0],
+                port,
+                timeout=timeout,
+                local_address=local_address,
+                socket_options=socket_options,
+            )
+        except (httpcore2.ConnectError, OSError):
+            # r1 NOTE-2: a refused or reset connection to the proxy has the same code as a
+            # proxy name that does not resolve; a connect timeout stays egress_timeout.
+            raise EgressRequestFailed(
+                "egress_proxy_unreachable", f"{name}:{port}", "proxy refused the connection"
+            ) from None
 
     async def connect_unix_socket(self, path, timeout=None, socket_options=None):
         raise EgressDenied("egress_invalid_url", "unix://", "unix sockets are not allowed")
