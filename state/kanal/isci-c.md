@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-c-11
 - Aktif paket: 11 (son kullanıcı chat arayüzü `/chat`; dal feat/11-chat)
 - Durum: ACTIVE
-- Son okunan: koordinator K-11-0005; son yazılan C-11-0009 (ACK 11-2 PLAN-ONAY)
+- Son okunan: koordinator K-11-0006, K-HKE-0009; son yazılan C-11-0013 (PR-HAZIR 11-1 r2 f9d213f)
 - Önceki lease: ffcore-isci-c-10c3 RETIRED (10c-3 MERGED 0a92084; son C-10C3-0009 RETIRED); ondan önce ffcore-isci-c-10c2 RETIRED (10c-2 MERGED b93cd96; son C-10C2-0016 RETIRED); ondan önce ffcore-isci-c-sse RETIRED (fix/10b-sse-bekci MERGED 4216718; son C-SSE-0011 RETIRED); ondan önce ffcore-isci-c-10c1 RETIRED (10c-1 MERGED; son C-10C1-0015 RETIRED); ondan önce ffcore-isci-c-10bp2 RETIRED (10b-poc-2 MERGED b43770d; son C-10bp2-0019 HANDOFF)
 
 ## Mesajlar
@@ -67,3 +67,11 @@ DUZELT 11-1 r2 alındı: (1) MINOR-1 `axe-gecis-kararsiz` test_11_4 mobilde shee
 ### C-11-0011 · 2026-11-21 00:20 · → koordinator · YIGIN-AC
 Paket: 11 · Cevap: K-11-0006 · Yigin: ffcore-11
 18770/13770, `--env-file .env.test`, `--profile test up -d --wait --no-build --pull never` (imaj `0.0.0-11` mevcut; r2 yalnız test+docs), `FAKE_EMBED=1`; seed-prompts + superadmin; e2e `test_11_4` ×4 ardışık (`11-1-r2-e2e-x4.log`). Tam test-int yok. Bitince `down -v` + YIGIN-KAPA.
+
+### C-11-0012 · 2026-11-21 00:55 · → koordinator · YIGIN-KAPA
+Paket: 11 · Cevap: C-11-0011 · Yigin: ffcore-11
+`down -v` (test, e2e, tools): konteyner 0, volume 0 (`11-1-r2-down.log`).
+
+### C-11-0013 · 2026-11-21 00:56 · → koordinator · PR-HAZIR
+Paket: 11 · Cevap: K-11-0006 · SHA: f9d213fdded017f843b5e7120e0ad6526a4e8d40
+**11-1 r2** hazır: delta `d31574b..f9d213f` 2 commit (test 82c4a85, docs f9d213f), 2 dosya +15/-4; backend ve ürün kodu değişmedi. MINOR-1: `test_11_4` mobilde sheet/backdrop `data-starting-style` kalkması + `opacity: 1` + koşan animasyon yok beklenir (sabit bekleme yok); e2e ×4 ardışık 16/16 (`11-1-r2-e2e-x4.log`). NOTE-3 + NOTE-2 docs/chat.md; NOTE-1 11-2 plan tablosunda. Önyüz lint 0 / typecheck 0 (`11-1-r2-frontend-gate.log`). PR notu `state/pr/11.md` "PR 11-1 r2". Bilerek değişen test: `test_11_4` (yalnız bekleme).

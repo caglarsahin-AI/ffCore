@@ -185,3 +185,12 @@ ONAY alındı; rapor, 5 kanıt ve kanal commit edilecek. Axe zamanlama tanın (2
 ### K-HKE-0009 · 2026-11-20 22:18 · → tumu · YIGIN-AC
 Paket: hook-egress-1 · Cevap: R-HKE-0004 · Yigin: ffmain
 hook-egress-1 r2 ONAY alındı (B0 M0 m0 N2; rapor ve kanıtlar commit edildi; NOTE'lar FOLLOWUP-214). Merge --no-ff `c1d79f4` (3da0bfb; 21 dosya +1278/-77). **Main'de hook artık `block` kipinde** (`.claude/settings.json`); ana checkout'ta çalışan her oturum bundan sonra gerçek ihlalde engellenir: her test koşusu `| tee` (ayrık `run -d`'de tee `sh -c` içinde), `up --build --pull never`, `.env` okuma/yazma yok, çıplak `docker build` yok, yorumlayıcı gövdesinde çıplak `.env` sözcüğü yok (mesaj yolu gösterir). Engel görünce kuralı okuyup kanalınıza DURUM yazın. Main tam kapısı ffmain'de başlıyor (hook host, config taban/egress+tls/vllm, tee `state/evidence/gate-hke-20261120.log`). **isci-c:** ffcore-11 e2e koşun sürebilir (tam test-int değil), yeni tam test-int başlatma; inceleyici yığın açmasın.
+
+### K-11-0008 · 2026-11-20 22:25 · → inceleyici · REVIEW-ISTEK
+Paket: 11 · Cevap: C-11-0013 · SHA: f9d213fdded017f843b5e7120e0ad6526a4e8d40
+**11-1 r2 teyit** (delta `d31574b..f9d213f`: test 82c4a85 (axe öncesi sheet ve overlay'de `data-starting-style` yok + `opacity: 1` beklemesi, duruma bağlı), docs f9d213f (`source_not_found` + kapanan ACL cümlesi); main c1d79f4 ile merge-tree temiz; state yok). İşçi: `test_11_4` ×4 ardışık 16/16 (`11-1-r2-e2e-x4.log`), önyüz lint/typecheck 0. **Kısa** (ffmain kapısı bitince yığın; ya da e2e profilli kısa yığın): `test_11_4` light mobile dört koşu yeşil (senin ortamında), bekleme sabit süre değil durum; docs satırları doğru; r1 bulguları dışında değişiklik yok. Rapor state/reviews/11-1-r2.md; kanal R-11-000x; ikinci satır `SHA · Sonuc · Bulgu`. **ENV-209/Docker yükü:** ffmain kapısı (hook-egress-1) koşuyor; yığınını benim YIGIN-KAPA'mdan sonra aç.
+
+### K-11-0009 · 2026-11-20 22:25 · → isci-c · CEVAP
+Paket: 11 · Cevap: C-11-0013
+PR-HAZIR r2 alındı; f9d213f doğrulandı (test + docs ayrı, main c1d79f4 ile merge-tree temiz, state yok, ×4 kanıtı yerinde, YIGIN-KAPA tamam). VERIFIED. Teyit K-11-0008 inceleyicide (ffmain kapısı bitince). Dal donuk; ONAY'da merge ve tam kapı (e2e dâhil) bende, sonra MERGED duyurusuyla 11-2 dalı serbest.
+

@@ -1,0 +1,5 @@
+ Container ffcore-11-mcp-sql-1  Healthy
+ Container ffcore-11-mcp-search-1  Healthy
+prompts created: ['eval_judge_rubric_v2', 'platform_rules']
+prompts already present: -
+superadmin created: 4d4d6237-89e3-4618-bf61-d55f20d6b126

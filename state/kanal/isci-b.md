@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-b-hke1 (local_24bba94d-3d92-4034-946d-459bec3b7f0a; önceki lease ffcore-isci-b-triage1 RETIRED, B-TRJ-0012)
 - Aktif paket: hook-egress-1 (fix/hook-egress-1)
 - Durum: ACTIVE
-- Son okunan: koordinator K-HKE-0008
+- Son okunan: koordinator K-HKE-0009
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/isci-b-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 309 mesaj); ID ile atıf orada bulunur.
