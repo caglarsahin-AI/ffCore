@@ -51,7 +51,14 @@ for (const theme of THEMES) {
         // The side list is hidden at this width (CSS), not removed.
         await expect(page.getByTestId("chat-conversations").first()).toBeHidden();
         await page.getByTestId("chat-open-list").click();
-        await expect(page.getByRole("dialog").getByTestId("chat-conversation").first()).toBeVisible();
+        const sheet = page.locator('[data-slot="sheet-content"]');
+        await expect(sheet.getByTestId("chat-conversation").first()).toBeVisible();
+        // r1 MINOR-1 (axe-gecis-kararsiz): axe measures colours, so it runs only once the sheet and
+        // its backdrop have finished their opacity/slide transitions (state, not a fixed wait).
+        await expect(sheet).not.toHaveAttribute("data-starting-style");
+        await expect(page.locator('[data-slot="sheet-overlay"]')).not.toHaveAttribute("data-starting-style");
+        await expect(sheet).toHaveCSS("opacity", "1");
+        await page.waitForFunction(() => document.getAnimations().every((a) => a.playState !== "running"));
         await axe(page);
         const width = await page.evaluate(() => document.documentElement.scrollWidth);
         expect(width).toBeLessThanOrEqual(viewport.width);
