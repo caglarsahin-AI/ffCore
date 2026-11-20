@@ -380,6 +380,36 @@ def test_pr_alias_field_allowed(main_root):
     assert_allowed(run_hook(edit(path), main_root))
 
 
+
+@pytest.mark.parametrize("name", ["04b-1", "04b-2", "04b-12"])
+def test_worker_writes_sub_pr_note_allowed(main_root, name):
+    # K-HKE-0002 K1: a package split into PRs writes state/pr/<package>-<n>.md (04b-2 warn line)
+    path = main_root / "state" / "pr" / f"{name}.md"
+    proc = run_hook(edit(path), main_root, FFCORE_ROL="isci-b", FFCORE_PAKET="04b")
+    assert_allowed(proc)
+
+
+@pytest.mark.parametrize("name", ["04b-x", "04b2", "04b-1-r1", "04", "04b-1a"])
+def test_worker_writes_non_sub_pr_note_blocked(main_root, name):
+    path = main_root / "state" / "pr" / f"{name}.md"
+    proc = run_hook(edit(path), main_root, FFCORE_ROL="isci-b", FFCORE_PAKET="04b")
+    assert_blocked(proc, "TEK-YAZAR")
+
+
+def test_sub_pr_alias_from_registry_allowed(main_root):
+    write_registry(
+        main_root,
+        {SESSION_ID: {"rol": "isci-a", "paket": "12", "pr": "12", "acildi": "x"}},
+    )
+    assert_allowed(run_hook(edit(main_root / "state" / "pr" / "12-2.md"), main_root))
+
+
+def test_sub_pr_rule_only_under_state_pr(main_root):
+    # the <pr>-<n> form is a PR note rule; a channel or review file is not touched by it
+    path = main_root / "state" / "reviews" / "04b-1.md"
+    proc = run_hook(edit(path), main_root, FFCORE_ROL="isci-b", FFCORE_PAKET="04b")
+    assert_blocked(proc, "TEK-YAZAR")
+
 def test_reviewer_writes_reviews_allowed(main_root):
     path = main_root / "state" / "reviews" / "10c-1-r1.md"
     assert_allowed(run_hook(edit(path, "Write"), main_root, FFCORE_ROL="inceleyici"))
@@ -566,11 +596,12 @@ def test_warn_writes_log_line(main_root):
     assert lines[0].split("\t")[1:5] == ["warn", "-", "Bash", "KAPI"]
 
 
-def test_log_truncates_to_120(main_root):
+def test_log_truncates_to_240(main_root):
+    # K-HKE-0002: 120 characters left 38 warn lines unclassifiable (state/pr/hook-egress-1.md)
     cmd = "make test && echo " + "x" * 300
     run_hook(bash(cmd), main_root)
     detail = log_lines(main_root)[0].split("\t")[5]
-    assert len(detail) == 120
+    assert len(detail) == 240
 
 
 def test_allowed_call_writes_no_log(main_root):
