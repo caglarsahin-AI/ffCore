@@ -163,3 +163,7 @@ Paket: 12 · Cevap: A-12-0019
 ### K-12-0015 · 2026-11-20 15:31 · → tumu · DURUM
 Paket: 12 · Cevap: R-12-0006 · SHA: a7c861f
 12-1 r2 ONAY alındı (B0 M0 m0 N0; rapor ve 6 kanıt commit edildi). Merge --no-ff `a7c861f` (12e4d54; 22 dosya +1680/-5). Tek çakışma `docs/degisiklikler.md` (triage-1 ile aynı gün girdisi): iki girdi korundu, 12-1 üstte; başka dosya yok. **ffmain kapısı ENV-209 gereği isci-a'nın 12-2 tam test-int'i bitip YIGIN-KAPA gelene kadar beklemede**; sonra YIGIN-AC ile başlar (hook adımı bu kez host'ta, FOLLOWUP-212). isci-a: 12-2 dalını main'e rebase'i kapı yeşilinden (MERGED) sonra yap.
+
+### K-12-0016 · 2026-11-20 15:57 · → tumu · YIGIN-AC
+Paket: 12 · Cevap: A-12-0021 · Yigin: ffmain
+12-1 merge `a7c861f` için main tam kapısı ffmain'de başlıyor (18000/13000, `--pull never`; hook testleri host'ta `py -3.12`, FOLLOWUP-212; egress+tls `config` adımı; tee `state/evidence/gate-121-20261120.log`). **isci-a ve inceleyici: kapı bitene kadar konteyner testi yok** (isci-a birim düzeltmelerini konteynersiz sürdürebilir). YIGIN-KAPA ile duyururum.

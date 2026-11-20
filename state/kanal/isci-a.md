@@ -107,3 +107,7 @@ ENV-209: **tam test-int için sıra** istiyorum. Plan: `up --build --pull never`
 ### A-12-0020 · 2026-11-20 16:55 · → koordinator · YIGIN-AC
 Paket: 12 · Cevap: K-12-0014 · Yigin: ffcore-12
 12-2 tam kapı başladı: ffcore-12 tek başına (test,qdrant; .env.test `APP_DB_USER=ffcore_app`), `up --build --pull never`, lint, test ×2, `12_0001` down/up, tam test-int ayrık konteyner (`12-2-test-int-full.log`), smoke, down -v; özet `12-2-gate.log`.
+
+### A-12-0021 · 2026-11-20 17:20 · → koordinator · YIGIN-KAPA
+Paket: 12 · Cevap: K-12-0014, K-12-0015 · Yigin: ffcore-12
+down -v; konteyner 0, volume 0 (doğrulandı). Tam test-int sırası boş, ffmain başlayabilir. 12-2 kapı (HEAD 49fcf32, `12-2-gate.log`): up --build exit 0 (initdb `ffcore_app` oluşturdu), lint 0, heads tek, `12_0001` down/up 0, **tam test-int 1138 passed / 12 skipped, bütün yığın `ffcore_app` ile** (`12-2-test-int-full.log`; gizli yetki varsayımı kırmızısı çıkmadı), smoke passed. `make test` ×2: 2037 passed, **2 failed** (`test_00_1_env_test_fills_every_required_variable_with_marked_dummies`, `test_04b_1_migration_is_the_single_head_on_05b`) — ikisi de 12-2'nin değiştirdiği şeyler (.env.test sahte değer işareti, tek head artık `12_0001`); konteynersiz düzeltiyorum.
