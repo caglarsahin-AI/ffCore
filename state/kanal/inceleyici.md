@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-inceleyici-04b (önceki: ffcore-inceleyici-10c3; 10c-3 r2 metin teyidi bu oturumda)
 - Aktif paket: bekleme; 11-1 r2 ONAY (R-11-0006); fix/hke-mcp-settings PR-HAZIR bekleniyor (birim + 05a canlı 5/5)
 - Durum: ACTIVE
-- Son okunan: koordinator K-HKE-0011
+- Son okunan: koordinator K-11-0010
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/inceleyici-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 335 mesaj); ID ile atıf orada bulunur.

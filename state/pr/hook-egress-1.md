@@ -131,3 +131,13 @@ HEAD **3da0bfb38bc37f41ef5be2fcd677f32b02c02f3c**, delta `99bb7a3..3da0bfb` (7 c
 **Bilerek değişen test:** `test_hke_208_proxy_backend_dials_only_the_proxy_origin` son adımı `httpcore2.ConnectError` yerine `EgressRequestFailed` `egress_proxy_unreachable` bekler (NOTE-2'nin doğrudan sonucu).
 
 **Kapı (r2, 3da0bfb):** `hke-r2-hooks.log` host `tests/hooks tests/scripts` 432 passed; `hke-r2-lint.log` make lint temiz (553 formatlı) + `hke-r2-ruff-hooks.log` `.claude/hooks tests/hooks` temiz; `hke-r2-make-test.log` make test llmaas 2152 passed (yığınsız `docker run --network none`, `.env.test`). Kırmızılar: `hke-r2-red-hooks.log`, `hke-r2-red-egress.log`, `hke-r2-red-quoted.log`. 208 test-int tekrarlanmadı (K-HKE-0005: NOTE-2 birim testiyle).
+
+## DUZELT-MAIN (K-HKE-0010): fix/hke-mcp-settings
+
+HEAD **a9cc7016ae1d0002bd90ee8bceed9a986a4642a9**, dal `fix/hke-mcp-settings`, baz main 4841c9a; delta `4841c9a..a9cc701` (2 commit: kırmızı test f7cd5d1, kod a9cc701).
+
+- **Neden:** `_EgressTransport` `settings.egress_proxy_url` okuyor; mcp-search ve mcp-sql `SafeOutboundClient`'ı `McpServiceSettings` ile kuruyor, alan yoktu → `AttributeError` → her çağrı 500. Benim kaçırdığım: paylaşılan modülü değiştiren PR'da tam test-int sırası almadım; birim testleri yalnız `Settings` ile kurdu (ders not edildi).
+- **Düzeltme:** `core/config.py` modül düzeyinde `_plain_proxy_origin` + `EgressProxyUrl = Annotated[str, AfterValidator(...)]` (tek tanım); `Settings.egress_proxy_url` ve `McpServiceSettings.egress_proxy_url` bu tipte, varsayılan boş, ortam değişkeni aynı. `getattr` yok.
+- **Testler** (`backend/tests/unit/test_hke_208_settings_classes.py`): McpServiceSettings ile `SafeOutboundClient` ve `policy_http_client` kurulur; ortamdan `EGRESS_PROXY_URL` okunur ve proxy yolu açılır; aynı doğrulama (`egress_proxy_url_invalid`); **yapısal:** `ffcore` altındaki `egress_allowlist` taşıyan her `BaseSettings` sınıfı `egress_proxy_url` da taşır (bugün Settings + McpServiceSettings). ticket-desk `SafeOutboundClient` kullanmıyor (tarandı).
+- **Kapı:** `hke-mcp-red.log` (4 kırmızı), `hke-mcp-green-unit.log` (82 passed + ruff), `hke-mcp-test-int.log` (ffcore-hke taban test yığını, backend imajı a9cc701 ile derlendi: `test_05a_live_services.py` 5/5, `down -v` 0), `hke-mcp-lint.log` (temiz), `hke-mcp-make-test.log` (llmaas 2156 passed).
+- **Not:** egress overlay mcp-search/mcp-sql'e `EGRESS_PROXY_URL` vermiyor: ikisi yalnız backend'i (iç host) çağırır; alan boş kalır, doğrudan pinli yol.

@@ -1,0 +1,422 @@
+=== 22:58:15 HEAD=a9cc7016ae1d0002bd90ee8bceed9a986a4642a9 up
+#0 building with "default" instance using docker driver
+
+#1 [backend internal] load build definition from Dockerfile
+#1 transferring dockerfile: 2.41kB done
+#1 DONE 0.0s
+
+#2 [backend internal] load .dockerignore
+#2 transferring context: 2B done
+#2 DONE 0.0s
+
+#3 [backend internal] load metadata for docker.io/library/python:3.12.10-slim-bookworm
+#3 DONE 2.5s
+
+#4 [backend internal] load metadata for ghcr.io/astral-sh/uv:0.10.12
+#4 DONE 2.6s
+
+#5 [backend uv 1/1] FROM ghcr.io/astral-sh/uv:0.10.12@sha256:72ab0aeb448090480ccabb99fb5f52b0dc3c71923bffb5e2e26517a1c27b7fec
+#5 DONE 0.0s
+
+#6 [backend base 1/6] FROM docker.io/library/python:3.12.10-slim-bookworm@sha256:fd95fa221297a88e1cf49c55ec1828edd7c5a428187e67b5d1805692d11588db
+#6 DONE 0.0s
+
+#7 [backend internal] load build context
+#7 transferring context: 4.33MB 0.2s done
+#7 DONE 0.2s
+
+#8 [backend runtime 1/5] RUN uv sync --frozen --no-dev --no-install-project
+#8 CACHED
+
+#9 [backend base 6/6] COPY pyproject.toml uv.lock ./
+#9 CACHED
+
+#10 [backend base 4/6] RUN mkdir -p /models /data/storage && chown 10001 /models /data/storage
+#10 CACHED
+
+#11 [backend base 5/6] WORKDIR /app
+#11 CACHED
+
+#12 [backend base 2/6] COPY --from=uv /uv /usr/local/bin/uv
+#12 CACHED
+
+#13 [backend base 3/6] RUN apt-get update     && apt-get install -y --no-install-recommends libgomp1 libgl1 libglib2.0-0 libxcb1 make curl     && rm -rf /var/lib/apt/lists/*
+#13 CACHED
+
+#14 [backend runtime 2/5] COPY alembic.ini ./
+#14 CACHED
+
+#15 [backend runtime 3/5] COPY alembic ./alembic
+#15 DONE 0.1s
+
+#16 [backend runtime 4/5] COPY ffcore ./ffcore
+#16 DONE 0.1s
+
+#17 [backend runtime 5/5] RUN useradd --system --uid 10001 --home-dir /models ffcore
+#17 0.254 useradd warning: ffcore's uid 10001 is greater than SYS_UID_MAX 999
+#17 DONE 0.4s
+
+#18 [backend] exporting to image
+#18 exporting layers 0.1s done
+2026/11/20 22:58:26 http2: server: error reading preface from client //./pipe/docker_engine: file has already been closed
+#18 writing image sha256:a0c307048b8ee291013165bdb20017a8bc1642677ee15443bd960904e1460beb done
+#18 naming to docker.io/ffcore/backend:0.0.0-hke 0.0s done
+#18 DONE 0.2s
+
+#19 [frontend internal] load .dockerignore
+#19 transferring context: 115B done
+#19 DONE 0.0s
+
+#20 [frontend internal] load build definition from Dockerfile
+#20 transferring dockerfile: 665B done
+#20 DONE 0.1s
+
+#21 [frontend internal] load metadata for docker.io/library/node:20.19.5-alpine
+#21 DONE 0.0s
+
+#22 [frontend 1/6] FROM docker.io/library/node:20.19.5-alpine
+#22 DONE 0.0s
+
+#23 [frontend internal] load build context
+#23 transferring context: 3.51MB 0.1s done
+#23 DONE 0.1s
+
+#24 [frontend 2/6] WORKDIR /app
+#24 CACHED
+
+#25 [frontend 3/6] COPY package.json package-lock.json ./
+#25 CACHED
+
+#26 [frontend 4/6] RUN npm ci --no-audit --no-fund
+#26 CACHED
+
+#27 [frontend 5/6] COPY . .
+#27 CACHED
+
+#28 [frontend 6/6] RUN npm run build
+#28 CACHED
+
+#29 [frontend] exporting to image
+#29 exporting layers done
+#29 writing image sha256:bd69419738c7f73569466d110f7793009c0321914b14c68f68757e64c6b04480 done
+#29 naming to docker.io/ffcore/frontend:0.0.0-hke done
+#29 DONE 0.0s
+ Network ffcore-hke_default  Creating
+ Network ffcore-hke_default  Created
+ Volume "ffcore-hke_langfuse_minio_data"  Creating
+ Volume "ffcore-hke_langfuse_minio_data"  Created
+ Volume "ffcore-hke_langfuse_clickhouse_logs"  Creating
+ Volume "ffcore-hke_langfuse_clickhouse_logs"  Created
+ Volume "ffcore-hke_langfuse_postgres_data"  Creating
+ Volume "ffcore-hke_langfuse_postgres_data"  Created
+ Volume "ffcore-hke_qdrant_data"  Creating
+ Volume "ffcore-hke_qdrant_data"  Created
+ Volume "ffcore-hke_model_cache"  Creating
+ Volume "ffcore-hke_model_cache"  Created
+ Volume "ffcore-hke_knowledge_storage"  Creating
+ Volume "ffcore-hke_knowledge_storage"  Created
+ Volume "ffcore-hke_redis_data"  Creating
+ Volume "ffcore-hke_redis_data"  Created
+ Volume "ffcore-hke_langfuse_clickhouse_data"  Creating
+ Volume "ffcore-hke_langfuse_clickhouse_data"  Created
+ Volume "ffcore-hke_postgres_data"  Creating
+ Volume "ffcore-hke_postgres_data"  Created
+ Container ffcore-hke-ticket-desk-1  Creating
+ Container ffcore-hke-postgres-1  Creating
+ Container ffcore-hke-redis-1  Creating
+ Container ffcore-hke-qdrant-1  Creating
+ Container ffcore-hke-fake-llm-1  Creating
+ Container ffcore-hke-langfuse-minio-1  Creating
+ Container ffcore-hke-langfuse-postgres-1  Creating
+ Container ffcore-hke-langfuse-redis-1  Creating
+ Container ffcore-hke-langfuse-clickhouse-1  Creating
+ Container ffcore-hke-langfuse-postgres-1  Created
+ Container ffcore-hke-langfuse-clickhouse-1  Created
+ Container ffcore-hke-fake-llm-1  Created
+ Container ffcore-hke-redis-1  Created
+ Container ffcore-hke-qdrant-1  Created
+ Container ffcore-hke-langfuse-minio-1  Created
+ Container ffcore-hke-ticket-desk-1  Created
+ Container ffcore-hke-langfuse-redis-1  Created
+ Container ffcore-hke-langfuse-worker-1  Creating
+ Container ffcore-hke-langfuse-web-1  Creating
+ Container ffcore-hke-postgres-1  Created
+ Container ffcore-hke-litellm-1  Creating
+ Container ffcore-hke-migrate-1  Creating
+ Container ffcore-hke-langfuse-worker-1  Created
+ Container ffcore-hke-litellm-1  Created
+ Container ffcore-hke-langfuse-web-1  Created
+ Container ffcore-hke-migrate-1  Created
+ Container ffcore-hke-backend-1  Creating
+ Container ffcore-hke-backend-1  Created
+ Container ffcore-hke-agent-worker-bg-1  Creating
+ Container ffcore-hke-mcp-search-1  Creating
+ Container ffcore-hke-mcp-sql-1  Creating
+ Container ffcore-hke-worker-1  Creating
+ Container ffcore-hke-frontend-1  Creating
+ Container ffcore-hke-agent-worker-1  Creating
+ Container ffcore-hke-frontend-1  Created
+ Container ffcore-hke-worker-1  Created
+ Container ffcore-hke-mcp-search-1  Created
+ Container ffcore-hke-agent-worker-bg-1  Created
+ Container ffcore-hke-mcp-sql-1  Created
+ Container ffcore-hke-agent-worker-1  Created
+ Container ffcore-hke-postgres-1  Starting
+ Container ffcore-hke-langfuse-minio-1  Starting
+ Container ffcore-hke-langfuse-redis-1  Starting
+ Container ffcore-hke-qdrant-1  Starting
+ Container ffcore-hke-langfuse-clickhouse-1  Starting
+ Container ffcore-hke-ticket-desk-1  Starting
+ Container ffcore-hke-fake-llm-1  Starting
+ Container ffcore-hke-langfuse-postgres-1  Starting
+ Container ffcore-hke-redis-1  Starting
+ Container ffcore-hke-langfuse-minio-1  Started
+ Container ffcore-hke-langfuse-redis-1  Started
+ Container ffcore-hke-langfuse-postgres-1  Started
+ Container ffcore-hke-fake-llm-1  Started
+ Container ffcore-hke-ticket-desk-1  Started
+ Container ffcore-hke-qdrant-1  Started
+ Container ffcore-hke-redis-1  Started
+ Container ffcore-hke-postgres-1  Started
+ Container ffcore-hke-postgres-1  Waiting
+ Container ffcore-hke-postgres-1  Waiting
+ Container ffcore-hke-langfuse-clickhouse-1  Started
+ Container ffcore-hke-langfuse-postgres-1  Waiting
+ Container ffcore-hke-langfuse-clickhouse-1  Waiting
+ Container ffcore-hke-langfuse-postgres-1  Waiting
+ Container ffcore-hke-langfuse-clickhouse-1  Waiting
+ Container ffcore-hke-langfuse-minio-1  Waiting
+ Container ffcore-hke-langfuse-redis-1  Waiting
+ Container ffcore-hke-langfuse-minio-1  Waiting
+ Container ffcore-hke-langfuse-redis-1  Waiting
+ Container ffcore-hke-langfuse-redis-1  Healthy
+ Container ffcore-hke-langfuse-minio-1  Healthy
+ Container ffcore-hke-langfuse-redis-1  Healthy
+ Container ffcore-hke-langfuse-minio-1  Healthy
+ Container ffcore-hke-langfuse-postgres-1  Healthy
+ Container ffcore-hke-langfuse-postgres-1  Healthy
+ Container ffcore-hke-postgres-1  Healthy
+ Container ffcore-hke-litellm-1  Starting
+ Container ffcore-hke-postgres-1  Healthy
+ Container ffcore-hke-migrate-1  Starting
+ Container ffcore-hke-langfuse-clickhouse-1  Healthy
+ Container ffcore-hke-langfuse-worker-1  Starting
+ Container ffcore-hke-langfuse-clickhouse-1  Healthy
+ Container ffcore-hke-langfuse-web-1  Starting
+ Container ffcore-hke-litellm-1  Started
+ Container ffcore-hke-migrate-1  Started
+ Container ffcore-hke-redis-1  Waiting
+ Container ffcore-hke-litellm-1  Waiting
+ Container ffcore-hke-migrate-1  Waiting
+ Container ffcore-hke-postgres-1  Waiting
+ Container ffcore-hke-langfuse-worker-1  Started
+ Container ffcore-hke-langfuse-web-1  Started
+ Container ffcore-hke-postgres-1  Healthy
+ Container ffcore-hke-redis-1  Healthy
+ Container ffcore-hke-migrate-1  Exited
+ Container ffcore-hke-litellm-1  Healthy
+ Container ffcore-hke-backend-1  Starting
+ Container ffcore-hke-backend-1  Started
+ Container ffcore-hke-backend-1  Waiting
+ Container ffcore-hke-backend-1  Waiting
+ Container ffcore-hke-backend-1  Waiting
+ Container ffcore-hke-backend-1  Waiting
+ Container ffcore-hke-backend-1  Waiting
+ Container ffcore-hke-postgres-1  Waiting
+ Container ffcore-hke-backend-1  Waiting
+ Container ffcore-hke-postgres-1  Healthy
+ Container ffcore-hke-backend-1  Healthy
+ Container ffcore-hke-worker-1  Starting
+ Container ffcore-hke-backend-1  Healthy
+ Container ffcore-hke-mcp-search-1  Starting
+ Container ffcore-hke-backend-1  Healthy
+ Container ffcore-hke-frontend-1  Starting
+ Container ffcore-hke-backend-1  Healthy
+ Container ffcore-hke-agent-worker-1  Starting
+ Container ffcore-hke-backend-1  Healthy
+ Container ffcore-hke-mcp-sql-1  Starting
+ Container ffcore-hke-backend-1  Healthy
+ Container ffcore-hke-agent-worker-bg-1  Starting
+ Container ffcore-hke-frontend-1  Started
+ Container ffcore-hke-agent-worker-bg-1  Started
+ Container ffcore-hke-worker-1  Started
+ Container ffcore-hke-mcp-search-1  Started
+ Container ffcore-hke-mcp-sql-1  Started
+ Container ffcore-hke-agent-worker-1  Started
+ Container ffcore-hke-langfuse-web-1  Waiting
+ Container ffcore-hke-langfuse-worker-1  Waiting
+ Container ffcore-hke-frontend-1  Waiting
+ Container ffcore-hke-mcp-sql-1  Waiting
+ Container ffcore-hke-langfuse-postgres-1  Waiting
+ Container ffcore-hke-worker-1  Waiting
+ Container ffcore-hke-fake-llm-1  Waiting
+ Container ffcore-hke-backend-1  Waiting
+ Container ffcore-hke-ticket-desk-1  Waiting
+ Container ffcore-hke-langfuse-clickhouse-1  Waiting
+ Container ffcore-hke-langfuse-minio-1  Waiting
+ Container ffcore-hke-agent-worker-bg-1  Waiting
+ Container ffcore-hke-migrate-1  Waiting
+ Container ffcore-hke-redis-1  Waiting
+ Container ffcore-hke-agent-worker-1  Waiting
+ Container ffcore-hke-langfuse-redis-1  Waiting
+ Container ffcore-hke-postgres-1  Waiting
+ Container ffcore-hke-mcp-search-1  Waiting
+ Container ffcore-hke-qdrant-1  Waiting
+ Container ffcore-hke-litellm-1  Waiting
+ Container ffcore-hke-langfuse-minio-1  Healthy
+ Container ffcore-hke-migrate-1  Exited
+ Container ffcore-hke-langfuse-clickhouse-1  Healthy
+ Container ffcore-hke-ticket-desk-1  Healthy
+ Container ffcore-hke-qdrant-1  Healthy
+ Container ffcore-hke-agent-worker-bg-1  Healthy
+ Container ffcore-hke-redis-1  Healthy
+ Container ffcore-hke-fake-llm-1  Healthy
+ Container ffcore-hke-litellm-1  Healthy
+ Container ffcore-hke-agent-worker-1  Healthy
+ Container ffcore-hke-langfuse-postgres-1  Healthy
+ Container ffcore-hke-backend-1  Healthy
+ Container ffcore-hke-postgres-1  Healthy
+ Container ffcore-hke-frontend-1  Healthy
+ Container ffcore-hke-langfuse-redis-1  Healthy
+ Container ffcore-hke-langfuse-worker-1  Healthy
+ Container ffcore-hke-worker-1  Healthy
+ Container ffcore-hke-langfuse-web-1  Healthy
+ Container ffcore-hke-mcp-search-1  Healthy
+ Container ffcore-hke-mcp-sql-1  Healthy
+up exit=0
+=== 22:59:24 test_05a_live_services
+============================= test session starts ==============================
+platform linux -- Python 3.12.10, pytest-9.2.0, pluggy-1.7.0 -- /opt/venv/bin/python
+rootdir: /work/backend
+configfile: pyproject.toml
+plugins: Faker-40.43.0, anyio-4.15.1, langsmith-0.14.8
+collecting ... collected 5 items
+
+tests/integration/test_05a_live_services.py::test_05a_live_discovery[mcp-search-actions0] PASSED [ 20%]
+tests/integration/test_05a_live_services.py::test_05a_live_discovery[mcp-sql-actions1] PASSED [ 40%]
+tests/integration/test_05a_live_services.py::test_05a_live_token_for_another_tool_refused PASSED [ 60%]
+tests/integration/test_05a_live_services.py::test_05a_live_run_sql_on_demo_database PASSED [ 80%]
+tests/integration/test_05a_live_services.py::test_05a_live_forged_token_refused_by_mcp_sql PASSED [100%]
+
+============================== 5 passed in 5.90s ===============================
+test exit=0
+--- mcp-sql / mcp-search log tail
+mcp-sql-1     | INFO:     Started server process [1]
+mcp-sql-1     | INFO:     Waiting for application startup.
+mcp-sql-1     | 2026-11-20 19:59:15,628 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+mcp-sql-1     | INFO:     Application startup complete.
+mcp-sql-1     | INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+mcp-sql-1     | 2026-11-20 19:59:39,706 INFO mcp.server.streamable_http_manager Created new transport with session ID: a338d7e3db5f458eabd5ea17cd03e6c1
+mcp-sql-1     | 2026-11-20 19:59:39,726 INFO mcp.server.streamable_http Terminating session: a338d7e3db5f458eabd5ea17cd03e6c1
+mcp-sql-1     | 2026-11-20 19:59:40,115 INFO mcp.server.streamable_http_manager Created new transport with session ID: 2e06eabf305f47ab9dfcb53f7a7162a7
+mcp-sql-1     | 2026-11-20 19:59:40,154 INFO ffcore.mcp_sql run_sql outcome=ok
+mcp-sql-1     | 2026-11-20 19:59:40,165 INFO mcp.server.streamable_http Terminating session: 2e06eabf305f47ab9dfcb53f7a7162a7
+mcp-search-1  | INFO:     Started server process [1]
+mcp-search-1  | INFO:     Waiting for application startup.
+mcp-search-1  | 2026-11-20 19:59:15,184 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+mcp-search-1  | INFO:     Application startup complete.
+mcp-search-1  | INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+mcp-search-1  | 2026-11-20 19:59:39,632 INFO mcp.server.streamable_http_manager Created new transport with session ID: b66d23e2956943a7b79e4c7dc0b85835
+mcp-search-1  | 2026-11-20 19:59:39,648 INFO mcp.server.streamable_http Terminating session: b66d23e2956943a7b79e4c7dc0b85835
+=== 22:59:48 down -v
+ Container ffcore-hke-langfuse-worker-1  Stopping
+ Container ffcore-hke-fake-llm-1  Stopping
+ Container ffcore-hke-mcp-search-1  Stopping
+ Container ffcore-hke-langfuse-web-1  Stopping
+ Container ffcore-hke-ticket-desk-1  Stopping
+ Container ffcore-hke-frontend-1  Stopping
+ Container ffcore-hke-qdrant-1  Stopping
+ Container ffcore-hke-worker-1  Stopping
+ Container ffcore-hke-agent-worker-bg-1  Stopping
+ Container ffcore-hke-agent-worker-1  Stopping
+ Container ffcore-hke-mcp-sql-1  Stopping
+ Container ffcore-hke-worker-1  Stopped
+ Container ffcore-hke-worker-1  Removing
+ Container ffcore-hke-worker-1  Removed
+ Container ffcore-hke-qdrant-1  Stopped
+ Container ffcore-hke-qdrant-1  Removing
+ Container ffcore-hke-qdrant-1  Removed
+ Container ffcore-hke-frontend-1  Stopped
+ Container ffcore-hke-frontend-1  Removing
+ Container ffcore-hke-frontend-1  Removed
+ Container ffcore-hke-ticket-desk-1  Stopped
+ Container ffcore-hke-ticket-desk-1  Removing
+ Container ffcore-hke-ticket-desk-1  Removed
+ Container ffcore-hke-mcp-search-1  Stopped
+ Container ffcore-hke-mcp-search-1  Removing
+ Container ffcore-hke-mcp-search-1  Removed
+ Container ffcore-hke-mcp-sql-1  Stopped
+ Container ffcore-hke-mcp-sql-1  Removing
+ Container ffcore-hke-mcp-sql-1  Removed
+ Container ffcore-hke-agent-worker-bg-1  Stopped
+ Container ffcore-hke-agent-worker-bg-1  Removing
+ Container ffcore-hke-agent-worker-bg-1  Removed
+ Container ffcore-hke-agent-worker-1  Stopped
+ Container ffcore-hke-agent-worker-1  Removing
+ Container ffcore-hke-agent-worker-1  Removed
+ Container ffcore-hke-backend-1  Stopping
+ Container ffcore-hke-backend-1  Stopped
+ Container ffcore-hke-backend-1  Removing
+ Container ffcore-hke-backend-1  Removed
+ Container ffcore-hke-migrate-1  Stopping
+ Container ffcore-hke-redis-1  Stopping
+ Container ffcore-hke-litellm-1  Stopping
+ Container ffcore-hke-migrate-1  Stopped
+ Container ffcore-hke-migrate-1  Removing
+ Container ffcore-hke-migrate-1  Removed
+ Container ffcore-hke-redis-1  Stopped
+ Container ffcore-hke-redis-1  Removing
+ Container ffcore-hke-redis-1  Removed
+ Container ffcore-hke-litellm-1  Stopped
+ Container ffcore-hke-litellm-1  Removing
+ Container ffcore-hke-litellm-1  Removed
+ Container ffcore-hke-postgres-1  Stopping
+ Container ffcore-hke-postgres-1  Stopped
+ Container ffcore-hke-postgres-1  Removing
+ Container ffcore-hke-postgres-1  Removed
+ Container ffcore-hke-fake-llm-1  Stopped
+ Container ffcore-hke-fake-llm-1  Removing
+ Container ffcore-hke-fake-llm-1  Removed
+ Container ffcore-hke-langfuse-worker-1  Stopped
+ Container ffcore-hke-langfuse-worker-1  Removing
+ Container ffcore-hke-langfuse-worker-1  Removed
+ Container ffcore-hke-langfuse-web-1  Stopped
+ Container ffcore-hke-langfuse-web-1  Removing
+ Container ffcore-hke-langfuse-web-1  Removed
+ Container ffcore-hke-langfuse-minio-1  Stopping
+ Container ffcore-hke-langfuse-redis-1  Stopping
+ Container ffcore-hke-langfuse-clickhouse-1  Stopping
+ Container ffcore-hke-langfuse-postgres-1  Stopping
+ Container ffcore-hke-langfuse-minio-1  Stopped
+ Container ffcore-hke-langfuse-minio-1  Removing
+ Container ffcore-hke-langfuse-minio-1  Removed
+ Container ffcore-hke-langfuse-redis-1  Stopped
+ Container ffcore-hke-langfuse-redis-1  Removing
+ Container ffcore-hke-langfuse-redis-1  Removed
+ Container ffcore-hke-langfuse-postgres-1  Stopped
+ Container ffcore-hke-langfuse-postgres-1  Removing
+ Container ffcore-hke-langfuse-postgres-1  Removed
+ Container ffcore-hke-langfuse-clickhouse-1  Stopped
+ Container ffcore-hke-langfuse-clickhouse-1  Removing
+ Container ffcore-hke-langfuse-clickhouse-1  Removed
+ Volume ffcore-hke_knowledge_storage  Removing
+ Volume ffcore-hke_langfuse_minio_data  Removing
+ Volume ffcore-hke_redis_data  Removing
+ Volume ffcore-hke_langfuse_clickhouse_logs  Removing
+ Volume ffcore-hke_qdrant_data  Removing
+ Volume ffcore-hke_langfuse_clickhouse_data  Removing
+ Volume ffcore-hke_langfuse_postgres_data  Removing
+ Volume ffcore-hke_model_cache  Removing
+ Volume ffcore-hke_postgres_data  Removing
+ Network ffcore-hke_default  Removing
+ Volume ffcore-hke_knowledge_storage  Removed
+ Volume ffcore-hke_langfuse_minio_data  Removed
+ Volume ffcore-hke_redis_data  Removed
+ Volume ffcore-hke_langfuse_clickhouse_logs  Removed
+ Volume ffcore-hke_qdrant_data  Removed
+ Volume ffcore-hke_langfuse_clickhouse_data  Removed
+ Volume ffcore-hke_postgres_data  Removed
+ Network ffcore-hke_default  Removed
+ Volume ffcore-hke_model_cache  Removed
+ Volume ffcore-hke_langfuse_postgres_data  Removed
+down exit=0

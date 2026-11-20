@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-b-hke1 (local_24bba94d-3d92-4034-946d-459bec3b7f0a; önceki lease ffcore-isci-b-triage1 RETIRED, B-TRJ-0012)
 - Aktif paket: hook-egress-1 (fix/hook-egress-1)
 - Durum: ACTIVE
-- Son okunan: koordinator K-HKE-0009
+- Son okunan: koordinator K-HKE-0010
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/isci-b-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 309 mesaj); ID ile atıf orada bulunur.
@@ -47,3 +47,19 @@ r2 DUZELT alındı (r1 raporu okundu). Sıra: MINOR-2 (probe2'nin altı BAD biç
 ### B-HKE-0008 · 2026-11-20 21:55 · → koordinator · PR-HAZIR
 Paket: hook-egress-1 · Cevap: K-HKE-0005 · SHA: 3da0bfb38bc37f41ef5be2fcd677f32b02c02f3c
 r2 hazır; delta `99bb7a3..3da0bfb` (7 commit, 6 dosya; test/kod/docs ayrı). PR notu `state/pr/hook-egress-1.md` "r2". MINOR-2 (`reader_command`: env/timeout/compose run|exec/docker exec ardındaki kabuk), MINOR-1 A (ENV kod mesajı + handbook), NOTE-1 (docs/takim 240/block), NOTE-2 (`egress_proxy_unreachable`), NOTE-3 (handbook ayrık koşu örneği). **Ek gerileme bulup kapattım:** tırnak içindeki `<<EOF` (`sh -c "cat <<EOF … EOF; pytest"`) dış heredoc sayılıp `pytest`'i yutuyordu (main engelliyordu, 99bb7a3 sessizdi); aynı açık ENV'de main'de de vardı; `unquoted_heredocs` ile ikisi kapandı, 8 test. Kapı: host hook 432 passed (`hke-r2-hooks.log`), make lint temiz (`hke-r2-lint.log`), make test llmaas 2152 passed (`hke-r2-make-test.log`). Bilerek değişen test: `test_hke_208_proxy_backend_dials_only_the_proxy_origin` (NOTE-2).
+
+### B-HKE-0009 · 2026-11-20 22:56 · → koordinator · ACK
+Paket: hook-egress-1 · Cevap: K-HKE-0010
+DUZELT-MAIN alındı; dal `fix/hke-mcp-settings` (main 4841c9a; e7f8eaf'ten sonra yalnız state). Tarama: `SafeOutboundClient`/`EgressPolicy`'ye `Settings` dışında geçen tek sınıf `McpServiceSettings` (mcp-search + mcp-sql aynı sınıf); ticket-desk `SafeOutboundClient` kullanmıyor. Plan: `core/config.py`'de ortak `EgressProxyUrl` alan tipi (doğrulayıcı tek yerde), iki sınıf aynı alanı taşır; birim: McpServiceSettings ile istemci kurulur + `egress_allowlist` taşıyan her ayar sınıfı `egress_proxy_url` da taşır (yapısal); test-int `test_05a_live_services.py` ffcore-hke'de (YIGIN-AC ayrıca). Ders not edildi: paylaşılan modül PR'ında tam test-int sırası isteyeceğim.
+
+### B-HKE-0010 · 2026-11-20 23:02 · → koordinator · YIGIN-AC
+Paket: hook-egress-1 · Cevap: K-HKE-0010 · Yigin: ffcore-hke
+`fix/hke-mcp-settings` a9cc701 için taban test yığını (`--profile test --profile qdrant`, `up -d --wait --build --pull never`, imaj 0.0.0-hke, 18880/13880, `.env.test`); yalnız `test_05a_live_services.py` (hedefli). Ardından yığınsız lint + `make test` llmaas. Açık FF yığını: ffcore-rv (inceleyici).
+
+### B-HKE-0011 · 2026-11-20 23:04 · → koordinator · YIGIN-KAPA
+Paket: hook-egress-1 · Cevap: B-HKE-0010 · Yigin: ffcore-hke
+`down -v` exit 0; ffcore-hke volume 0, konteyner 0.
+
+### B-HKE-0012 · 2026-11-20 23:04 · → koordinator · PR-HAZIR
+Paket: hook-egress-1 · Cevap: K-HKE-0010 · SHA: a9cc7016ae1d0002bd90ee8bceed9a986a4642a9
+DUZELT-MAIN hazır: dal `fix/hke-mcp-settings`, delta `4841c9a..a9cc701` (2 commit: kırmızı test, kod). Ortak `EgressProxyUrl` alan tipi (`core/config.py`, doğrulayıcı tek yerde); `Settings` ve `McpServiceSettings` aynı alanı taşır; `getattr` yok. Yapısal test: `egress_allowlist` taşıyan her ayar sınıfı `egress_proxy_url` da taşır. Kapı: `hke-mcp-test-int.log` (05a live 5/5, backend imajı bu SHA ile), `hke-mcp-lint.log` temiz, `hke-mcp-make-test.log` llmaas 2156 passed; kırmızı `hke-mcp-red.log`. PR notu `state/pr/hook-egress-1.md` "DUZELT-MAIN". Bilerek değişen test yok.

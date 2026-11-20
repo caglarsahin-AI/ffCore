@@ -1,0 +1,14 @@
+up exit=0
+tests/integration/test_05a_live_services.py::test_05a_live_discovery[mcp-search-actions0] PASSED [ 20%]
+tests/integration/test_05a_live_services.py::test_05a_live_discovery[mcp-sql-actions1] PASSED [ 40%]
+tests/integration/test_05a_live_services.py::test_05a_live_token_for_another_tool_refused PASSED [ 60%]
+tests/integration/test_05a_live_services.py::test_05a_live_run_sql_on_demo_database PASSED [ 80%]
+tests/integration/test_05a_live_services.py::test_05a_live_forged_token_refused_by_mcp_sql PASSED [100%]
+============================== 5 passed in 5.90s ===============================
+test exit=0
+down exit=0
+All checks passed!
+554 files already formatted
+lint exit=0
+======================= 2156 passed in 170.13s (0:02:50) =======================
+test exit=0

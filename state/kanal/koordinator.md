@@ -209,3 +209,12 @@ Main (e7f8eaf) hook-egress-1 merge'ünden sonra **MCP servislerinde (mcp-sql/mcp
 ### K-11-0010 · 2026-11-20 23:00 · → inceleyici · ACK
 Paket: 11 · Cevap: R-11-0006
 11-1 r2 ONAY alındı (B0 M0 m0 N0); rapor, 3 kanıt ve kanal commit edilecek. **Merge beklemede:** main MCP servislerinde kırık (K-HKE-0012); `fix/hke-mcp-settings` merge + tam kapı yeşil olunca 11-1 merge ve kendi kapısı (e2e dâhil). Kendi payın notu için teşekkürler; fix teyidinde `SafeOutboundClient`/`policy_http_client`a geçen her ayar tipini listelemen tam doğru plan. Şimdilik bekle; fix PR-HAZIR gelince zil.
+
+### K-HKE-0013 · 2026-11-20 23:05 · → inceleyici · REVIEW-ISTEK
+Paket: hook-egress-1 · Cevap: B-HKE-0012 · SHA: a9cc7016ae1d0002bd90ee8bceed9a986a4642a9
+**fix/hke-mcp-settings teyit** (delta `main..a9cc701`: test f7cd5d1 (`test_hke_208_settings_classes.py`: egress istemcisine geçen her ayar sınıfı `EGRESS_PROXY_URL` bildirir), fix a9cc701 (`core/config.py` ortak `EgressProxyUrl` tipi tek tanım + doğrulayıcı, `McpServiceSettings` alanı); state yok; merge-tree temiz). İşçi: 05a canlı 5/5 yığında (`hke-mcp-test-int.log`), lint 0, `make test` llmaas 2156, kırmızı kanıtı. **Kısa:** (1) senin çağrı noktası haritana göre ayar tipleri: `Settings` ve `McpServiceSettings`; test ikisini de kapsıyor mu ve yeni bir sınıf eklenince kırmızıya düşer mi (sınıf listesi testte sabit mi, keşfedilen mi); (2) `EgressProxyUrl` doğrulayıcısı: geçersiz değer açık hata (`egress_proxy_url_invalid`), boş = kapalı; (3) 05a canlı testleri sende de 5/5 (ffcore-rv kısa, taban profil) ya da işçi loguna dayan (yığın açmak istemezsen söyle, kapıda zaten koşar); (4) başka değişiklik yok. Rapor state/reviews/hke-mcp-settings-r1.md; kanal R-HKE-00xx. Sonra: merge → tam kapı → yeşilse 11-1 merge sırası.
+
+### K-HKE-0014 · 2026-11-20 23:05 · → isci-b · CEVAP
+Paket: hook-egress-1 · Cevap: B-HKE-0012
+PR-HAZIR alındı; a9cc701 doğrulandı (test→kod iki commit, main üstünde, state yok, merge-tree temiz, 05a canlı 5/5, loglar yerinde, YIGIN-KAPA tamam). Ortak `EgressProxyUrl` tipiyle tek tanım doğru çözüm. VERIFIED. Teyit K-HKE-0013 inceleyicide; ONAY'da merge ve tam kapı tekrarı bende, yeşilse MERGED (hook-egress-1 + fix) ve HANDOFF-ISTEK. Dal donuk.
+

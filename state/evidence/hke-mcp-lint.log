@@ -1,0 +1,6 @@
+=== 23:00:09 HEAD=a9cc7016ae1d0002bd90ee8bceed9a986a4642a9 make lint
+ruff check backend scripts data/samples/scripts services tests/deploy
+All checks passed!
+ruff format --check backend scripts data/samples/scripts services tests/deploy
+554 files already formatted
+lint exit=0

@@ -1,0 +1,121 @@
+FFFF                                                                     [100%]
+=================================== FAILURES ===================================
+____________ test_hke_mcp_service_settings_build_the_egress_clients ____________
+
+    def test_hke_mcp_service_settings_build_the_egress_clients():
+        settings = _mcp_settings()
+>       assert settings.egress_proxy_url == ""
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_hke_208_settings_classes.py:30: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = McpServiceSettings(service_token=SecretStr('**********'), offline=False, egress_allowlist=[], allowed_internal_hosts=[...ternal_api_url='http://backend:8000', log_level='INFO', sql_demo_database_url=None, sql_max_rows=500, sql_timeout_s=20)
+item = 'egress_proxy_url'
+
+    def __getattr__(self, item: str) -> Any:
+        private_attributes = object.__getattribute__(self, '__private_attributes__')
+        if item in private_attributes:
+            attribute = private_attributes[item]
+            if hasattr(attribute, '__get__'):
+                return attribute.__get__(self, type(self))  # type: ignore
+    
+            try:
+                # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
+                return self.__pydantic_private__[item]  # type: ignore
+            except KeyError as exc:
+                raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}') from exc
+        else:
+            # `__pydantic_extra__` can fail to be set if the model is not yet fully initialized.
+            # See `BaseModel.__repr_args__` for more details
+            try:
+                pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
+            except AttributeError:
+                pydantic_extra = None
+    
+            if pydantic_extra and item in pydantic_extra:
+                return pydantic_extra[item]
+            else:
+                if hasattr(self.__class__, item):
+                    return super().__getattribute__(item)  # Raises AttributeError if appropriate
+                else:
+                    # this is the current error
+>                   raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+E                   AttributeError: 'McpServiceSettings' object has no attribute 'egress_proxy_url'
+
+/opt/venv/lib/python3.12/site-packages/pydantic/main.py:1105: AttributeError
+______ test_hke_mcp_service_settings_read_the_proxy_from_the_environment _______
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f4829f66810>
+
+    def test_hke_mcp_service_settings_read_the_proxy_from_the_environment(monkeypatch):
+        monkeypatch.setenv("EGRESS_PROXY_URL", "http://egress-proxy:3128")
+        settings = _mcp_settings()
+>       assert settings.egress_proxy_url == "http://egress-proxy:3128"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_hke_208_settings_classes.py:38: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = McpServiceSettings(service_token=SecretStr('**********'), offline=False, egress_allowlist=[], allowed_internal_hosts=[...ternal_api_url='http://backend:8000', log_level='INFO', sql_demo_database_url=None, sql_max_rows=500, sql_timeout_s=20)
+item = 'egress_proxy_url'
+
+    def __getattr__(self, item: str) -> Any:
+        private_attributes = object.__getattribute__(self, '__private_attributes__')
+        if item in private_attributes:
+            attribute = private_attributes[item]
+            if hasattr(attribute, '__get__'):
+                return attribute.__get__(self, type(self))  # type: ignore
+    
+            try:
+                # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
+                return self.__pydantic_private__[item]  # type: ignore
+            except KeyError as exc:
+                raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}') from exc
+        else:
+            # `__pydantic_extra__` can fail to be set if the model is not yet fully initialized.
+            # See `BaseModel.__repr_args__` for more details
+            try:
+                pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
+            except AttributeError:
+                pydantic_extra = None
+    
+            if pydantic_extra and item in pydantic_extra:
+                return pydantic_extra[item]
+            else:
+                if hasattr(self.__class__, item):
+                    return super().__getattribute__(item)  # Raises AttributeError if appropriate
+                else:
+                    # this is the current error
+>                   raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+E                   AttributeError: 'McpServiceSettings' object has no attribute 'egress_proxy_url'
+
+/opt/venv/lib/python3.12/site-packages/pydantic/main.py:1105: AttributeError
+______ test_hke_mcp_service_settings_validate_the_proxy_like_the_backend _______
+
+    def test_hke_mcp_service_settings_validate_the_proxy_like_the_backend():
+>       with pytest.raises(ValidationError, match="egress_proxy_url_invalid"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValidationError
+
+tests/unit/test_hke_208_settings_classes.py:44: Failed
+___________ test_hke_every_egress_settings_class_declares_the_proxy ____________
+
+    def test_hke_every_egress_settings_class_declares_the_proxy():
+        # egress_allowlist marks a class the egress client reads; it needs every egress field
+        egress = [c for c in _settings_classes() if "egress_allowlist" in c.model_fields]
+        assert {c.__name__ for c in egress} >= {"Settings", "McpServiceSettings"}
+        missing = [c.__name__ for c in egress if "egress_proxy_url" not in c.model_fields]
+>       assert missing == []
+E       AssertionError: assert ['McpServiceSettings'] == []
+E         
+E         Left contains one more item: 'McpServiceSettings'
+E         Use -v to get more diff
+
+tests/unit/test_hke_208_settings_classes.py:66: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/test_hke_208_settings_classes.py::test_hke_mcp_service_settings_build_the_egress_clients
+FAILED tests/unit/test_hke_208_settings_classes.py::test_hke_mcp_service_settings_read_the_proxy_from_the_environment
+FAILED tests/unit/test_hke_208_settings_classes.py::test_hke_mcp_service_settings_validate_the_proxy_like_the_backend
+FAILED tests/unit/test_hke_208_settings_classes.py::test_hke_every_egress_settings_class_declares_the_proxy
+4 failed in 11.90s
