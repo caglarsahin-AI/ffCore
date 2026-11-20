@@ -175,3 +175,19 @@ ONAY alındı; rapor, 7 kanıt ve kanal commit edilecek. Normalize-yol probe'u (
 ### K-TRJ-0009 · 2026-11-20 13:38 · → tumu · YIGIN-AC
 Paket: triage-1 · Cevap: R-TRJ-0004 · Yigin: ffmain
 triage-1 r2 ONAY alındı (B0 M0 m0 N0; rapor ve kanıt commit edildi). Merge --no-ff `e9d0de6` (f6ec3e5; 27 dosya +636/-85). Main tam kapısı ffmain'de başlıyor (18000/13000, `--pull never`, hook testleri dahil, tee `state/evidence/gate-trj-20261120.log`). **isci-a ve inceleyici: kapı bitene kadar konteyner testi başlatma** (12-1 r2 kodunu yazabilirsin, koşuyu beklet); YIGIN-KAPA ile duyururum. Not: bu kapı sonrası hook'un yeni PROSES-175 kuralı main'de etkin.
+
+### K-TRJ-0010 · 2026-11-20 14:24 · → tumu · YIGIN-KAPA
+Paket: triage-1 · Cevap: K-TRJ-0009 · Yigin: ffmain
+Kapı bitti, `down -v` tamam. Konteyner testi serbest (ENV-209: aynı anda tek tam test-int).
+
+### K-TRJ-0011 · 2026-11-20 14:24 · → tumu · MERGED
+Paket: triage-1 · Cevap: R-TRJ-0004 · SHA: e9d0de6
+fix/followup-triage-1 merge --no-ff `e9d0de6` (f6ec3e5; 27 dosya +636/-85). Kapı `state/evidence/gate-trj-20261120.log`: imajlar build, lint 0, heads tek, test 2014×2, test-samples, test-int 1121/12/0, smoke, önyüz typecheck/check:api 0 + Vitest 279; hook testleri konteynerde 346/347 (tek düşen `py` başlatıcısı yok → FOLLOWUP-212), host'ta 347/347. WORK_QUEUE DONE; FOLLOWUP 202/203/194/201/207 ve DRIFT-198 kapandı. Main'de yeni: hook PROSES-175 kuralı (`up --build --pull never` kabul), admin kullanıcıya özel belgeyi tekil uçlarda yönetir, tek `denied` audit satırı, platform hedefi reddi beş yüzeyde, kota testi kararlı, plan metni. Push kullanıcı talimatını bekliyor.
+
+### K-TRJ-0012 · 2026-11-20 14:24 · → isci-b · HANDOFF-ISTEK
+Paket: triage-1 · Cevap: B-TRJ-0011
+MERGED e9d0de6; triage-1 tamam. Kanalına HANDOFF yaz (kalan riskler: FOLLOWUP-210 çıplak docker build, 211 Squid CONNECT-only, 212 hook testi `py`; 202'de liste süzgeçli kaldı), sonra lease `RETIRED`. Worktree `.worktrees/fix/followup-triage-1` ve `0.0.0-trj` etiketi silme kullanıcıda. İki turda B0 M0, altı dilim; teşekkürler.
+
+### K-12-0010 · 2026-11-20 14:24 · → isci-a · GOREV-EK
+Paket: 12 · Cevap: A-12-0012
+triage-1 MERGED e9d0de6, ffmain kapalı: 12-1 r2 kısa koşunu şimdi yapabilirsin (overlay yığını, hedefli; tam test-int yok) → PR-HAZIR r2. **12-2 serbest (sıra: önce PR-HAZIR r2):** yeni dal `feat/12-2-kurulum` main `e9d0de6`'dan (12-1 merge olmadan aynı dalda birikmesin; 12-1 merge'ünde rebase), worktree `.worktrees/feat/12-2-kurulum`; dilimler state/pr/12.md 7-12 (yedek/geri yükleme + prova test-int, vLLM overlay manifest-only, FOLLOWUP-46 `ffcore_app` + `12_0001` SECURITY DEFINER + retention, FOLLOWUP-95 Dockerfile, donanim.md, kurulum.md + kurulum-kapali-ag.md en sona); backend dokunuşu K-12-0002 S1 ile sınırlı; yığın `ffcore-12` aynı portlar; PR notu state/pr/12.md 'PR 12-2'. Önce kısa PLANNED 12-2 (dosya listesi, 46 göç tasarımı, geri yükleme provası) → PLAN-ONAY. ENV-209: tam test-int için sıra iste.

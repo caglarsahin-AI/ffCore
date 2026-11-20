@@ -85,3 +85,5 @@
 2026-11-20T13:11:21	warn	isci-b	Bash	KAPI	cd /c/ai_paycore/ffcore && cat >> state/kanal/isci-b.md <<'EOF' ### B-TRJ-0009 · 2026-11-20 13:20 · → koordinator · YIGI
 2026-11-20T13:19:20	warn	isci-b	Bash	KAPI	cat >> state/pr/followup-triage-1.md <<'EOF' ## r2 (K-TRJ-0005, inceleme r1 ONAY sonrası) Delta `292f290..f6ec3e5f45cb16
 2026-11-20T13:33:24	warn	inceleyici	Bash	KAPI	grep -c "^PF \[" state/evidence/12-1-r1-rv-preflight.log && sed -i 's/| 21 durum + `--egress-list`/| 19 durum + `--egres
+2026-11-20T14:06:33	warn	isci-a	Bash	KAPI	cat >> /c/ai_paycore/ffcore/state/kanal/isci-a.md <<'EOF' ### A-12-0012 · 2026-11-20 14:12 · → koordinator · YIGIN-KAPA 
+2026-11-20T14:14:41	warn	koordinator	Bash	KAPI	R=/c/ai_paycore/ffcore; awk '/=== 13:43:37 hook tests/,/hooks exit=/' $R/state/evidence/gate-trj-20261120.log | tr -d '\
