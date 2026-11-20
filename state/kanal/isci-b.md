@@ -25,3 +25,15 @@ Worktree `.worktrees/fix/followup-triage-1`, baz **main a60228d** (57f3590 deği
 **6. DRIFT-198** plan/04 satır 6 ve PLAN.md 7'de **iki yer** (satır 209 tablo, 233 dalga listesi): "DuckDB → Postgres göçü (DEBT-1)" → "`migrate-vectors` + sürücü eşdeğerliği (D1; meta 04a'dan beri Postgres, DEBT-10 kapalı)". PLAN 89 (bölüm 4) ve 273 (geçmiş) DOC-18 gereği dokunulmaz. docs ayrı commit (+ docs/bilgi-tabani.md admin cümlesi, degisiklikler.md).
 **Felsefe:** ARCH-07 yeni özellik yok, hepsi mevcut kuralı tek yere toplar; ARCH-09 platform karşılığı yok; ARCH-06 194 sessiz değil 400/kodlu red, 203 kayıt kaybı yok.
 **Açık sorular:** (S-1) 202'de liste C15 süzgeçli kalsın mı (önerilen: evet, brief GET/PATCH/DELETE diyor; admin id'yi yükleme cevabından/audit'ten bilir) — yoksa admin listede de görsün mü? (S-2) 203 A/B. (S-3) 207 kuralının metni `handbook/ENVIRONMENT_AND_COMMANDS.md:49` ve `docs/takim/ajanlarla-gelistirme.md:422-423`'te eski haliyle duruyor; touch-zone dışında — eklensin mi (önerilen: evet, aynı docs commit'inde), yoksa DRIFT kaydı mı? (S-4) `core/config.py` gerekmiyor. Yığın `ffcore-trj` yalnız test-int için, PLAN-ONAY sonrası YIGIN-AC ile.
+
+### B-TRJ-0003 · 2026-11-20 10:35 · → koordinator · ACK
+Paket: triage-1 · Cevap: K-TRJ-0002
+PLAN-ONAY alındı (S-1 evet, S-2 A, S-3 evet, S-4 tamam). PR notu `state/pr/followup-triage-1.md` oluşturuldu (plan + dilim/commit tablosu). Dilim 207'den başlıyorum.
+
+### B-TRJ-0004 · 2026-11-20 11:40 · → koordinator · YIGIN-AC
+Paket: triage-1 · Cevap: K-TRJ-0002 · Yigin: ffcore-trj
+Kırmızı koşu (201/202/203/194 test commit'leri, kod öncesi) ve sonra yeşil + hedefli test-int için: varsayılan servisler + `--profile qdrant --profile test`, `FFCORE_VERSION=0.0.0-trj` (backend/frontend/tools `0.0.0-main` imajlarından etiket; bağımlılık değişmiyor, imaj derlenmiyor), `--env-file .env.test`, `--pull never`, 18660/13660. 207 tamam (hook testleri 358 geçti, Docker'sız). Log'lar `state/evidence/trj-*.log`. Açık FF yığını: ffcore-12.
+
+### B-TRJ-0005 · 2026-11-20 13:20 · → koordinator · DURUM
+Paket: triage-1 · Cevap: K-TRJ-0002 · Durum: IMPLEMENTED
+Altı dilim kodlandı (test/kod/docs ayrı commit; tablo `state/pr/followup-triage-1.md`). Kırmızı → yeşil hedefli koşu (`trj-red.log` → `trj-green-targeted.log`, `trj-194-green.log`), 201 20/20 (`trj-201-x20.log`), `make lint` 0, `make test` llmaas 1989 / airgap 1989. Tam `make test-int` ffcore-trj'de koşuyor (auth/audit değişikliği her yere dokunduğu için tam koşu); bitince PR-HAZIR + YIGIN-KAPA. Not: `docs/api.md` 194 cümlesi touch-zone dışında, istenirse ek commit (PR notu "Notlar").
