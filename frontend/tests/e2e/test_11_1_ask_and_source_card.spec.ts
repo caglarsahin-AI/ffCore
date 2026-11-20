@@ -15,8 +15,8 @@ test("test_11_1_ask_and_source_card: ask in /chat, open the cited passage, find 
   await signIn(page, analyst.email);
   await selectProject(context, baseURL!, alpha.id);
   await page.goto("/chat");
-  const card = page.getByTestId("chat-agent").filter({ hasText: agent.name }).first();
-  await card.click();
+  // Every e2e agent is named "E2E agent": pick this one by its link.
+  await page.locator(`a[data-testid="chat-agent"][href="/chat/${agent.key}"]`).click();
   await expect(page).toHaveURL(new RegExp(`/chat/${agent.key}$`));
   await expect(page.getByTestId("chat-welcome")).toBeVisible();
 
