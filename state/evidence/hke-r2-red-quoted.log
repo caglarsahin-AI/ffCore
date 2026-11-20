@@ -1,0 +1,121 @@
+............................FFFFFF.....                                  [100%]
+================================== FAILURES ===================================
+_ test_heredoc_inside_quotes_belongs_to_the_inner_shell[sh -c "cat <<EOF\nx\nEOF\npytest"-KAPI] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\hook-egress-1\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-101/test_heredoc_inside_quotes_bel0/ffcore')
+cmd = 'sh -c "cat <<EOF\nx\nEOF\npytest"', rule = 'KAPI'
+
+    @pytest.mark.parametrize(("cmd", "rule"), QUOTED_HEREDOC)
+    def test_heredoc_inside_quotes_belongs_to_the_inner_shell(guard, main_root, cmd, rule):
+>       assert rule in rules(guard, cmd, main_root), cmd
+E       AssertionError: sh -c "cat <<EOF
+E         x
+E         EOF
+E         pytest"
+E       assert 'KAPI' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\hook-egress-1\\.claude\\hooks\\ffcore_guard.py'>, 'sh -c "cat <<EOF\nx\nEOF\npytest"', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-101/test_heredoc_inside_quotes_bel0/ffcore'))
+
+tests\hooks\test_heredoc_commands.py:111: AssertionError
+_ test_heredoc_inside_quotes_belongs_to_the_inner_shell[sh -c 'cat <<EOF\nx\nEOF\npytest'-KAPI] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\hook-egress-1\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-101/test_heredoc_inside_quotes_bel1/ffcore')
+cmd = "sh -c 'cat <<EOF\nx\nEOF\npytest'", rule = 'KAPI'
+
+    @pytest.mark.parametrize(("cmd", "rule"), QUOTED_HEREDOC)
+    def test_heredoc_inside_quotes_belongs_to_the_inner_shell(guard, main_root, cmd, rule):
+>       assert rule in rules(guard, cmd, main_root), cmd
+E       AssertionError: sh -c 'cat <<EOF
+E         x
+E         EOF
+E         pytest'
+E       assert 'KAPI' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\hook-egress-1\\.claude\\hooks\\ffcore_guard.py'>, "sh -c 'cat <<EOF\nx\nEOF\npytest'", WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-101/test_heredoc_inside_quotes_bel1/ffcore'))
+
+tests\hooks\test_heredoc_commands.py:111: AssertionError
+_ test_heredoc_inside_quotes_belongs_to_the_inner_shell[bash -c 'cat > f <<EOF\nx\nEOF\nmake test'-KAPI] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\hook-egress-1\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-101/test_heredoc_inside_quotes_bel2/ffcore')
+cmd = "bash -c 'cat > f <<EOF\nx\nEOF\nmake test'", rule = 'KAPI'
+
+    @pytest.mark.parametrize(("cmd", "rule"), QUOTED_HEREDOC)
+    def test_heredoc_inside_quotes_belongs_to_the_inner_shell(guard, main_root, cmd, rule):
+>       assert rule in rules(guard, cmd, main_root), cmd
+E       AssertionError: bash -c 'cat > f <<EOF
+E         x
+E         EOF
+E         make test'
+E       assert 'KAPI' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\hook-egress-1\\.claude\\hooks\\ffcore_guard.py'>, "bash -c 'cat > f <<EOF\nx\nEOF\nmake test'", WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-101/test_heredoc_inside_quotes_bel2/ffcore'))
+
+tests\hooks\test_heredoc_commands.py:111: AssertionError
+_ test_heredoc_inside_quotes_belongs_to_the_inner_shell[sh -c "cat <<EOF\nx\nEOF\ncat .env"-ENV] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\hook-egress-1\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-101/test_heredoc_inside_quotes_bel3/ffcore')
+cmd = 'sh -c "cat <<EOF\nx\nEOF\ncat .env"', rule = 'ENV'
+
+    @pytest.mark.parametrize(("cmd", "rule"), QUOTED_HEREDOC)
+    def test_heredoc_inside_quotes_belongs_to_the_inner_shell(guard, main_root, cmd, rule):
+>       assert rule in rules(guard, cmd, main_root), cmd
+E       AssertionError: sh -c "cat <<EOF
+E         x
+E         EOF
+E         cat .env"
+E       assert 'ENV' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\hook-egress-1\\.claude\\hooks\\ffcore_guard.py'>, 'sh -c "cat <<EOF\nx\nEOF\ncat .env"', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-101/test_heredoc_inside_quotes_bel3/ffcore'))
+
+tests\hooks\test_heredoc_commands.py:111: AssertionError
+_ test_heredoc_inside_quotes_belongs_to_the_inner_shell[bash -c 'cat > f <<EOF\nx\nEOF\ncat .env'-ENV] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\hook-egress-1\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-101/test_heredoc_inside_quotes_bel4/ffcore')
+cmd = "bash -c 'cat > f <<EOF\nx\nEOF\ncat .env'", rule = 'ENV'
+
+    @pytest.mark.parametrize(("cmd", "rule"), QUOTED_HEREDOC)
+    def test_heredoc_inside_quotes_belongs_to_the_inner_shell(guard, main_root, cmd, rule):
+>       assert rule in rules(guard, cmd, main_root), cmd
+E       AssertionError: bash -c 'cat > f <<EOF
+E         x
+E         EOF
+E         cat .env'
+E       assert 'ENV' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\hook-egress-1\\.claude\\hooks\\ffcore_guard.py'>, "bash -c 'cat > f <<EOF\nx\nEOF\ncat .env'", WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-101/test_heredoc_inside_quotes_bel4/ffcore'))
+
+tests\hooks\test_heredoc_commands.py:111: AssertionError
+_ test_quoted_heredoc_data_stays_silent[sh -c 'cat <<EOF\nmake test\nEOF\n'] __
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\hook-egress-1\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-101/test_quoted_heredoc_data_stays0/ffcore')
+cmd = "sh -c 'cat <<EOF\nmake test\nEOF\n'"
+
+    @pytest.mark.parametrize(
+        "cmd",
+        [
+            "sh -c 'cat <<EOF\nmake test\nEOF\n'",
+            "echo 'a <<EOF b'\nmake test 2>&1 | tee x.log",
+            "cat >> state/kanal/isci-b.md <<'EOF'\nit's done: make test\nEOF",
+        ],
+    )
+    def test_quoted_heredoc_data_stays_silent(guard, main_root, cmd):
+>       assert rules(guard, cmd, main_root) == [], cmd
+E       AssertionError: sh -c 'cat <<EOF
+E         make test
+E         EOF
+E         '
+E       assert ['KAPI'] == []
+E         
+E         Left contains one more item: 'KAPI'
+E         Use -v to get more diff
+
+tests\hooks\test_heredoc_commands.py:123: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/hooks/test_heredoc_commands.py::test_heredoc_inside_quotes_belongs_to_the_inner_shell[sh -c "cat <<EOF\nx\nEOF\npytest"-KAPI]
+FAILED tests/hooks/test_heredoc_commands.py::test_heredoc_inside_quotes_belongs_to_the_inner_shell[sh -c 'cat <<EOF\nx\nEOF\npytest'-KAPI]
+FAILED tests/hooks/test_heredoc_commands.py::test_heredoc_inside_quotes_belongs_to_the_inner_shell[bash -c 'cat > f <<EOF\nx\nEOF\nmake test'-KAPI]
+FAILED tests/hooks/test_heredoc_commands.py::test_heredoc_inside_quotes_belongs_to_the_inner_shell[sh -c "cat <<EOF\nx\nEOF\ncat .env"-ENV]
+FAILED tests/hooks/test_heredoc_commands.py::test_heredoc_inside_quotes_belongs_to_the_inner_shell[bash -c 'cat > f <<EOF\nx\nEOF\ncat .env'-ENV]
+FAILED tests/hooks/test_heredoc_commands.py::test_quoted_heredoc_data_stays_silent[sh -c 'cat <<EOF\nmake test\nEOF\n']
+6 failed, 33 passed in 1.09s

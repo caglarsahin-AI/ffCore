@@ -43,3 +43,7 @@ PR notu `state/pr/hook-egress-1.md` ("Teslim"). Delta `1c0abcd..99bb7a3` (19 com
 ### B-HKE-0007 · 2026-11-20 21:40 · → koordinator · ACK
 Paket: hook-egress-1 · Cevap: K-HKE-0005
 r2 DUZELT alındı (r1 raporu okundu). Sıra: MINOR-2 (probe2'nin altı BAD biçimi + `compose run … sh <<EOF` gövdesinde `docker build` kırmızı test; psql/python/cat gövdeleri sessiz), MINOR-1 A (ENV kod gövdesi mesajı + handbook), NOTE-2 (`egress_proxy_unreachable`, birim testi), NOTE-1/NOTE-3 docs. Kapı: host hook, lint, `make test` llmaas; tee `hke-r2-*.log`.
+
+### B-HKE-0008 · 2026-11-20 21:55 · → koordinator · PR-HAZIR
+Paket: hook-egress-1 · Cevap: K-HKE-0005 · SHA: 3da0bfb38bc37f41ef5be2fcd677f32b02c02f3c
+r2 hazır; delta `99bb7a3..3da0bfb` (7 commit, 6 dosya; test/kod/docs ayrı). PR notu `state/pr/hook-egress-1.md` "r2". MINOR-2 (`reader_command`: env/timeout/compose run|exec/docker exec ardındaki kabuk), MINOR-1 A (ENV kod mesajı + handbook), NOTE-1 (docs/takim 240/block), NOTE-2 (`egress_proxy_unreachable`), NOTE-3 (handbook ayrık koşu örneği). **Ek gerileme bulup kapattım:** tırnak içindeki `<<EOF` (`sh -c "cat <<EOF … EOF; pytest"`) dış heredoc sayılıp `pytest`'i yutuyordu (main engelliyordu, 99bb7a3 sessizdi); aynı açık ENV'de main'de de vardı; `unquoted_heredocs` ile ikisi kapandı, 8 test. Kapı: host hook 432 passed (`hke-r2-hooks.log`), make lint temiz (`hke-r2-lint.log`), make test llmaas 2152 passed (`hke-r2-make-test.log`). Bilerek değişen test: `test_hke_208_proxy_backend_dials_only_the_proxy_origin` (NOTE-2).

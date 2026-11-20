@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-c-11
 - Aktif paket: 11 (son kullanıcı chat arayüzü `/chat`; dal feat/11-chat)
 - Durum: ACTIVE
-- Son okunan: koordinator K-11-0004; son yazılan C-11-0008 (PLANNED 11-2)
+- Son okunan: koordinator K-11-0005; son yazılan C-11-0009 (ACK 11-2 PLAN-ONAY)
 - Önceki lease: ffcore-isci-c-10c3 RETIRED (10c-3 MERGED 0a92084; son C-10C3-0009 RETIRED); ondan önce ffcore-isci-c-10c2 RETIRED (10c-2 MERGED b93cd96; son C-10C2-0016 RETIRED); ondan önce ffcore-isci-c-sse RETIRED (fix/10b-sse-bekci MERGED 4216718; son C-SSE-0011 RETIRED); ondan önce ffcore-isci-c-10c1 RETIRED (10c-1 MERGED; son C-10C1-0015 RETIRED); ondan önce ffcore-isci-c-10bp2 RETIRED (10b-poc-2 MERGED b43770d; son C-10bp2-0019 HANDOFF)
 
 ## Mesajlar
@@ -55,3 +55,7 @@ Paket: 11 · Cevap: K-11-0004 · Durum: PLANNED
 - **S2 Portal ayarı yeri:** **A** ajan sihirbazında ayrı "Portal" sekmesi, sürüm fieldset'i dışında, kendi Kaydet'i (PATCH, analyst+edit; yayınlanmış ajanda da düzenlenir); B ayrı sayfa `/agents/{id}/portal`.
 - **S3 kontrast tutmayan vurgu:** **A** sunucu yalnız hex doğrular; önyüz açık/koyu ton türetir (≥ 4.5:1 metin), konsol önizlemesi iki temada gösterir; türetilen tonun kullanıcının rengi olmadığı önizlemede yazılı. B kontrast tutmayan renk 422 (kullanıcı başka renk seçer; tek temada uygun renk diğerinde reddedilebilir).
 - **S4 onay bekleyen kullanıcıya "bildirim":** **A** yeni bildirim yok; chat "{rol} onayı bekleniyor" der ve yoklamayla sürer; onaylayıcı 07 kuyruğu/sayaçla görür. B 03c bildirimleri onaylayıcı rollere (kapsam büyür, ayrı FOLLOWUP).
+
+### C-11-0009 · 2026-11-20 23:50 · → koordinator · ACK
+Paket: 11 · Cevap: K-11-0005
+11-2 PLAN-ONAY alındı (S1-S4 A). Notlar uygulanacak: chat oyu sonrası koşu `feedback=pending` kalır + uzman oyu ezmez + iki score adı testli; Portal sekmesi read'de salt görünüm; ton türetimi deterministik ve kontrastı testli, önizleme iki tema; 'onay bekleniyor' rol adı messages json'dan, yoklama `RUNS_POLL_MS`/10b bekçisi. Kod yok; 11-1 MERGED duyurusunu bekliyorum, sonra `feat/11-2-chat` main'den, kapı `11-2-*.log`.

@@ -1,0 +1,33 @@
+..................F.....                                                 [100%]
+=================================== FAILURES ===================================
+______ test_hke_208_refused_proxy_connection_is_egress_proxy_unreachable _______
+
+settings = Settings(deploy_profile='llmaas', inference_backend=None, offline=False, database_url=None, service_token=SecretStr('*...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+
+    def test_hke_208_refused_proxy_connection_is_egress_proxy_unreachable(settings):
+        # r1 NOTE-2: a proxy that refuses the connection (port closed, service down) has the same
+        # code as a proxy name that does not resolve, for the operator's diagnosis.
+        with socket.socket() as sock:
+            sock.bind(("127.0.0.1", 0))
+            closed_port = sock.getsockname()[1]
+        resolver = _resolver({"proxy.test": ["127.0.0.1"]})
+        configured = settings.model_copy(
+            update={
+                "egress_proxy_url": f"http://proxy.test:{closed_port}",
+                "egress_allowlist": ["svc.example.com"],
+            }
+        )
+        for url in ("http://svc.example.com/x", "https://svc.example.com/x"):
+            with pytest.raises(EgressRequestFailed) as exc:
+                anyio.run(_get, _client(configured, resolver), url)
+>           assert exc.value.code == "egress_proxy_unreachable", url
+E           AssertionError: http://svc.example.com/x
+E           assert 'egress_request_failed' == 'egress_proxy_unreachable'
+E             
+E             - egress_proxy_unreachable
+E             + egress_request_failed
+
+tests/unit/test_hke_208_egress_proxy.py:257: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/test_hke_208_egress_proxy.py::test_hke_208_refused_proxy_connection_is_egress_proxy_unreachable
+1 failed, 23 passed in 3.84s

@@ -114,3 +114,20 @@ Gerçek: egress profilinde uygulama ağı `internal`, dış adlar backend'de **�
 
 ### Test-int (208)
 `backend/tests/integration/test_12_egress.py` ek testler (RUN_EGRESS_TESTS=1, aynı yığın tarifi + backend'e `EGRESS_PROXY_URL=http://egress-proxy:3128`): SafeOutboundClient ile izinli alan 200 (proxy erişim logunda satır), izin listesi dışı backend'de `egress_not_allowlisted` (proxy'ye gitmeden), Squid reddi (rebind/bench) `EgressDenied`/403 açık hata, `EGRESS_PROXY_URL` boş istemciyle doğrudan çıkış bağlantı hatası. Yığın `ffcore-hke` (18880/13880), hedefli (ENV-209: tam test-int için sıra istenecek).
+
+## r2 (K-HKE-0005, inceleme r1 ONAY B0 M0 m2 N3)
+
+HEAD **3da0bfb38bc37f41ef5be2fcd677f32b02c02f3c**, delta `99bb7a3..3da0bfb` (7 commit, 6 dosya: guard, egress.py, iki test dosyası, handbook, docs/takim).
+
+| Bulgu | Düzeltme | Test |
+|---|---|---|
+| MINOR-2 `kabuk-govdesi-sarmalayici` | `reader_command`: heredoc okuyucusu `env K=V`, `timeout N`, `docker compose run|exec … <servis>`, `docker exec … <konteyner>` ardındaki komut; sh/bash ise gövde komut | `test_shell_behind_a_wrapper_reads_the_body` (7: probe2'nin beş biçimi + `compose run sh` gövdesinde `docker build` + `-e/-w` seçenekli `bash -s`), `test_wrapped_tee_and_data_readers_stay_silent` (6: tee'li karşılıklar, psql/python/cat okuyucuları) |
+| **Ek (kendi probe'um, r1'de görünmemiş gerileme)** | tırnak içindeki `<<EOF` (`sh -c "cat <<EOF … EOF; pytest"`) dış komutun heredoc'u sayılıp dizgenin kalanını yutuyordu; main KAPI'de engelliyordu, dal sessizdi. `unquoted_heredocs`: satırlar arası tırnak durumu izlenir, yalnız tırnak dışı operatör heredoc'tur (`heredoc_commands` ve `strip_heredocs` ikisi de). ENV'de aynı açık main'de de vardı (`sh -c "cat <<EOF…EOF\ncat .env"` sessiz); bu düzeltmeyle kapandı | `test_heredoc_inside_quotes_belongs_to_the_inner_shell` (5: 3 KAPI, 2 ENV), `test_quoted_heredoc_data_stays_silent` (3) |
+| MINOR-1 A | eşleşme aynı; `env_hits` 'path'/'code' döner, kod gövdesi (heredoc ya da `-c`) için ayrı mesaj: neden + çıkış yolu (Write/Edit ya da `py dosya.py`); handbook kabul edilen YP satırında mesaj | `test_env_in_interpreter_code_says_why_and_the_way_out`, `test_env_path_message_unchanged` |
+| NOTE-1 | docs/takim 648 (240, block geçişi yapıldı), 654 (`"block"`) | — (metin) |
+| NOTE-2 | `_ProxyOnlyBackend.connect_tcp`: proxy'ye bağlantı reddi/sıfırlama (`ConnectError`/`OSError`) → `egress_proxy_unreachable`; bağlantı zaman aşımı `egress_timeout` kalır | `test_hke_208_refused_proxy_connection_is_egress_proxy_unreachable` (http + https) |
+| NOTE-3 | handbook "Ayrık koşu": `run -d … sh -c 'pytest … 2>&1 \| tee /tmp/x.log'` + `docker logs -f "$cid" > state/evidence/…` | `hke-r2-probe.log` (örnek iki komut sessiz, tee dışarıdayken KAPI) |
+
+**Bilerek değişen test:** `test_hke_208_proxy_backend_dials_only_the_proxy_origin` son adımı `httpcore2.ConnectError` yerine `EgressRequestFailed` `egress_proxy_unreachable` bekler (NOTE-2'nin doğrudan sonucu).
+
+**Kapı (r2, 3da0bfb):** `hke-r2-hooks.log` host `tests/hooks tests/scripts` 432 passed; `hke-r2-lint.log` make lint temiz (553 formatlı) + `hke-r2-ruff-hooks.log` `.claude/hooks tests/hooks` temiz; `hke-r2-make-test.log` make test llmaas 2152 passed (yığınsız `docker run --network none`, `.env.test`). Kırmızılar: `hke-r2-red-hooks.log`, `hke-r2-red-egress.log`, `hke-r2-red-quoted.log`. 208 test-int tekrarlanmadı (K-HKE-0005: NOTE-2 birim testiyle).

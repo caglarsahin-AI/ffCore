@@ -100,3 +100,6 @@
 2026-11-20T19:38:12	warn	isci-b	Bash	KAPI	git add tests/hooks/test_guard.py && git commit -q -m "test(hooks): red test for the settings hook test without a py lau
 2026-11-20T19:44:05	warn	isci-b	Bash	ENV	py -3.12 - <<'EOF' from pathlib import Path p = Path("tests/hooks/test_guard.py") s = p.read_text(encoding="utf-8") s = 
 2026-11-20T21:35:59	warn	isci-c	Bash	KAPI	cat >> state/pr/11.md <<'EOF' --- # PR 11-1 · [B] feat(11): end user chat core (`/chat`) **Branch:** feat/11-chat · **Ba
+2026-11-20T21:44:23	warn	isci-b	Bash	KAPI	py -3.12 - <<'EOF' from pathlib import Path p = Path("docs/takim/ajanlarla-gelistirme.md") s = p.read_text(encoding="utf
+2026-11-20T21:46:00	warn	isci-b	Bash	ENV	py -3.12 - <<'PYEOF' import importlib.util, sys base = "C:/Users/CAGLAR~1.SAH/AppData/Local/Temp/claude/9398d5fca5badfb5
+2026-11-20T21:55:01	warn	isci-b	Bash	KAPI	cd /c/ai_paycore/ffcore && cat >> state/pr/hook-egress-1.md <<'MSG' ## r2 (K-HKE-0005, inceleme r1 ONAY B0 M0 m2 N3) HEA

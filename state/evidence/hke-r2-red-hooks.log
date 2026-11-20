@@ -1,0 +1,144 @@
+...............FFFFFFF......F..                                          [100%]
+================================== FAILURES ===================================
+_ test_shell_behind_a_wrapper_reads_the_body[env X=1 bash <<'EOF'\npy -3.12 -m pytest tests\nEOF-KAPI] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\hook-egress-1\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-99/test_shell_behind_a_wrapper_re0/ffcore')
+cmd = "env X=1 bash <<'EOF'\npy -3.12 -m pytest tests\nEOF", rule = 'KAPI'
+
+    @pytest.mark.parametrize(("cmd", "rule"), WRAPPED_SHELL)
+    def test_shell_behind_a_wrapper_reads_the_body(guard, main_root, cmd, rule):
+>       assert rule in rules(guard, cmd, main_root), cmd
+E       AssertionError: env X=1 bash <<'EOF'
+E         py -3.12 -m pytest tests
+E         EOF
+E       assert 'KAPI' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\hook-egress-1\\.claude\\hooks\\ffcore_guard.py'>, "env X=1 bash <<'EOF'\npy -3.12 -m pytest tests\nEOF", WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-99/test_shell_behind_a_wrapper_re0/ffcore'))
+
+tests\hooks\test_heredoc_commands.py:77: AssertionError
+_ test_shell_behind_a_wrapper_reads_the_body[timeout 600 bash <<'EOF'\npytest tests\nEOF-KAPI] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\hook-egress-1\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-99/test_shell_behind_a_wrapper_re1/ffcore')
+cmd = "timeout 600 bash <<'EOF'\npytest tests\nEOF", rule = 'KAPI'
+
+    @pytest.mark.parametrize(("cmd", "rule"), WRAPPED_SHELL)
+    def test_shell_behind_a_wrapper_reads_the_body(guard, main_root, cmd, rule):
+>       assert rule in rules(guard, cmd, main_root), cmd
+E       AssertionError: timeout 600 bash <<'EOF'
+E         pytest tests
+E         EOF
+E       assert 'KAPI' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\hook-egress-1\\.claude\\hooks\\ffcore_guard.py'>, "timeout 600 bash <<'EOF'\npytest tests\nEOF", WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-99/test_shell_behind_a_wrapper_re1/ffcore'))
+
+tests\hooks\test_heredoc_commands.py:77: AssertionError
+_ test_shell_behind_a_wrapper_reads_the_body[docker compose run --rm -T tools sh <<'EOF'\npytest tests\nEOF-KAPI] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\hook-egress-1\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-99/test_shell_behind_a_wrapper_re2/ffcore')
+cmd = "docker compose run --rm -T tools sh <<'EOF'\npytest tests\nEOF"
+rule = 'KAPI'
+
+    @pytest.mark.parametrize(("cmd", "rule"), WRAPPED_SHELL)
+    def test_shell_behind_a_wrapper_reads_the_body(guard, main_root, cmd, rule):
+>       assert rule in rules(guard, cmd, main_root), cmd
+E       AssertionError: docker compose run --rm -T tools sh <<'EOF'
+E         pytest tests
+E         EOF
+E       assert 'KAPI' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\hook-egress-1\\.claude\\hooks\\ffcore_guard.py'>, "docker compose run --rm -T tools sh <<'EOF'\npytest tests\nEOF", WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-99/test_shell_behind_a_wrapper_re2/ffcore'))
+
+tests\hooks\test_heredoc_commands.py:77: AssertionError
+_ test_shell_behind_a_wrapper_reads_the_body[docker compose -p x exec -T backend bash <<'EOF'\nmake test\nEOF-KAPI] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\hook-egress-1\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-99/test_shell_behind_a_wrapper_re3/ffcore')
+cmd = "docker compose -p x exec -T backend bash <<'EOF'\nmake test\nEOF"
+rule = 'KAPI'
+
+    @pytest.mark.parametrize(("cmd", "rule"), WRAPPED_SHELL)
+    def test_shell_behind_a_wrapper_reads_the_body(guard, main_root, cmd, rule):
+>       assert rule in rules(guard, cmd, main_root), cmd
+E       AssertionError: docker compose -p x exec -T backend bash <<'EOF'
+E         make test
+E         EOF
+E       assert 'KAPI' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\hook-egress-1\\.claude\\hooks\\ffcore_guard.py'>, "docker compose -p x exec -T backend bash <<'EOF'\nmake test\nEOF", WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-99/test_shell_behind_a_wrapper_re3/ffcore'))
+
+tests\hooks\test_heredoc_commands.py:77: AssertionError
+_ test_shell_behind_a_wrapper_reads_the_body[docker exec -i ffcore-x-backend-1 sh <<'EOF'\npytest tests\nEOF-KAPI] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\hook-egress-1\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-99/test_shell_behind_a_wrapper_re4/ffcore')
+cmd = "docker exec -i ffcore-x-backend-1 sh <<'EOF'\npytest tests\nEOF"
+rule = 'KAPI'
+
+    @pytest.mark.parametrize(("cmd", "rule"), WRAPPED_SHELL)
+    def test_shell_behind_a_wrapper_reads_the_body(guard, main_root, cmd, rule):
+>       assert rule in rules(guard, cmd, main_root), cmd
+E       AssertionError: docker exec -i ffcore-x-backend-1 sh <<'EOF'
+E         pytest tests
+E         EOF
+E       assert 'KAPI' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\hook-egress-1\\.claude\\hooks\\ffcore_guard.py'>, "docker exec -i ffcore-x-backend-1 sh <<'EOF'\npytest tests\nEOF", WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-99/test_shell_behind_a_wrapper_re4/ffcore'))
+
+tests\hooks\test_heredoc_commands.py:77: AssertionError
+_ test_shell_behind_a_wrapper_reads_the_body[docker compose run --rm tools sh <<'EOF'\ndocker build -t x .\nEOF-PROSES-175] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\hook-egress-1\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-99/test_shell_behind_a_wrapper_re5/ffcore')
+cmd = "docker compose run --rm tools sh <<'EOF'\ndocker build -t x .\nEOF"
+rule = 'PROSES-175'
+
+    @pytest.mark.parametrize(("cmd", "rule"), WRAPPED_SHELL)
+    def test_shell_behind_a_wrapper_reads_the_body(guard, main_root, cmd, rule):
+>       assert rule in rules(guard, cmd, main_root), cmd
+E       AssertionError: docker compose run --rm tools sh <<'EOF'
+E         docker build -t x .
+E         EOF
+E       assert 'PROSES-175' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\hook-egress-1\\.claude\\hooks\\ffcore_guard.py'>, "docker compose run --rm tools sh <<'EOF'\ndocker build -t x .\nEOF", WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-99/test_shell_behind_a_wrapper_re5/ffcore'))
+
+tests\hooks\test_heredoc_commands.py:77: AssertionError
+_ test_shell_behind_a_wrapper_reads_the_body[docker compose run --rm -e A=1 -w /work/backend tools bash -s <<'EOF'\npytest\nEOF-KAPI] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\hook-egress-1\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-99/test_shell_behind_a_wrapper_re6/ffcore')
+cmd = "docker compose run --rm -e A=1 -w /work/backend tools bash -s <<'EOF'\npytest\nEOF"
+rule = 'KAPI'
+
+    @pytest.mark.parametrize(("cmd", "rule"), WRAPPED_SHELL)
+    def test_shell_behind_a_wrapper_reads_the_body(guard, main_root, cmd, rule):
+>       assert rule in rules(guard, cmd, main_root), cmd
+E       AssertionError: docker compose run --rm -e A=1 -w /work/backend tools bash -s <<'EOF'
+E         pytest
+E         EOF
+E       assert 'KAPI' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\hook-egress-1\\.claude\\hooks\\ffcore_guard.py'>, "docker compose run --rm -e A=1 -w /work/backend tools bash -s <<'EOF'\npytest\nEOF", WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-99/test_shell_behind_a_wrapper_re6/ffcore'))
+
+tests\hooks\test_heredoc_commands.py:77: AssertionError
+____________ test_env_in_interpreter_code_says_why_and_the_way_out ____________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\hook-egress-1\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-99/test_env_in_interpreter_code_s0/ffcore')
+
+    def test_env_in_interpreter_code_says_why_and_the_way_out(guard, main_root):
+        # r1 MINOR-1 A: same match, a message that names the cause and the exit
+        cmd = "python - <<'EOF'\ns = 'cp .env.example .env'\nEOF"
+        found = guard.decide(bash(cmd), base_env(main_root, FFCORE_ROL="isci-b"))
+        messages = [v.message for v in found if v.rule == "ENV"]
+        assert messages, found
+>       assert "yorumlayýcý" in messages[0] and "Write" in messages[0] and "py " in messages[0]
+E       AssertionError: assert ('yorumlayýcý' in '.env okunmaz ve yazýlmaz; testler .env.test ile (SECURITY_AND_PERMISSIONS)')
+
+tests\hooks\test_heredoc_commands.py:103: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/hooks/test_heredoc_commands.py::test_shell_behind_a_wrapper_reads_the_body[env X=1 bash <<'EOF'\npy -3.12 -m pytest tests\nEOF-KAPI]
+FAILED tests/hooks/test_heredoc_commands.py::test_shell_behind_a_wrapper_reads_the_body[timeout 600 bash <<'EOF'\npytest tests\nEOF-KAPI]
+FAILED tests/hooks/test_heredoc_commands.py::test_shell_behind_a_wrapper_reads_the_body[docker compose run --rm -T tools sh <<'EOF'\npytest tests\nEOF-KAPI]
+FAILED tests/hooks/test_heredoc_commands.py::test_shell_behind_a_wrapper_reads_the_body[docker compose -p x exec -T backend bash <<'EOF'\nmake test\nEOF-KAPI]
+FAILED tests/hooks/test_heredoc_commands.py::test_shell_behind_a_wrapper_reads_the_body[docker exec -i ffcore-x-backend-1 sh <<'EOF'\npytest tests\nEOF-KAPI]
+FAILED tests/hooks/test_heredoc_commands.py::test_shell_behind_a_wrapper_reads_the_body[docker compose run --rm tools sh <<'EOF'\ndocker build -t x .\nEOF-PROSES-175]
+FAILED tests/hooks/test_heredoc_commands.py::test_shell_behind_a_wrapper_reads_the_body[docker compose run --rm -e A=1 -w /work/backend tools bash -s <<'EOF'\npytest\nEOF-KAPI]
+FAILED tests/hooks/test_heredoc_commands.py::test_env_in_interpreter_code_says_why_and_the_way_out
+8 failed, 23 passed in 0.77s

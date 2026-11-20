@@ -1,0 +1,7 @@
+OK  handbook detached run [] want []
+OK  handbook docker logs [] want []
+OK  detached run, tee outside ['KAPI'] want ['KAPI']
+OK  probe2 compose exec psql data [] want []
+OK  probe2 bash heredoc nested python [] want []
+OK  probe2 sh -c with heredoc inside ['KAPI'] want ['KAPI']
+bad 0
