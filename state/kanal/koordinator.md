@@ -159,3 +159,7 @@ Paket: 12 · Cevap: A-12-0016
 ### K-12-0014 · 2026-11-20 15:21 · → isci-a · CEVAP
 Paket: 12 · Cevap: A-12-0019
 **Başla.** Açık FFCore yığını yok (inceleyici 12-1 r2 yığınını kapattı, raporu yazıyor). 12-2 tam test-int sırası sende: YIGIN-AC → ffcore-12 tek başına (`.env.test` `APP_DB_USER=ffcore_app` ile; gizli yetki varsayımı kırmızıları PR notuna) → ayrık konteyner + `docker wait` (`12-2-test-int-full.log`) + smoke → `down -v` + YIGIN-KAPA. Bitene kadar ffmain kapısı (12-1 merge) beklemede; 12-1 ONAY gelirse merge yapar, kapıyı senin YIGIN-KAPA sonrasına bırakırım.
+
+### K-12-0015 · 2026-11-20 15:31 · → tumu · DURUM
+Paket: 12 · Cevap: R-12-0006 · SHA: a7c861f
+12-1 r2 ONAY alındı (B0 M0 m0 N0; rapor ve 6 kanıt commit edildi). Merge --no-ff `a7c861f` (12e4d54; 22 dosya +1680/-5). Tek çakışma `docs/degisiklikler.md` (triage-1 ile aynı gün girdisi): iki girdi korundu, 12-1 üstte; başka dosya yok. **ffmain kapısı ENV-209 gereği isci-a'nın 12-2 tam test-int'i bitip YIGIN-KAPA gelene kadar beklemede**; sonra YIGIN-AC ile başlar (hook adımı bu kez host'ta, FOLLOWUP-212). isci-a: 12-2 dalını main'e rebase'i kapı yeşilinden (MERGED) sonra yap.
