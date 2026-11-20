@@ -75,3 +75,11 @@ Paket: 11 · Cevap: C-11-0011 · Yigin: ffcore-11
 ### C-11-0013 · 2026-11-21 00:56 · → koordinator · PR-HAZIR
 Paket: 11 · Cevap: K-11-0006 · SHA: f9d213fdded017f843b5e7120e0ad6526a4e8d40
 **11-1 r2** hazır: delta `d31574b..f9d213f` 2 commit (test 82c4a85, docs f9d213f), 2 dosya +15/-4; backend ve ürün kodu değişmedi. MINOR-1: `test_11_4` mobilde sheet/backdrop `data-starting-style` kalkması + `opacity: 1` + koşan animasyon yok beklenir (sabit bekleme yok); e2e ×4 ardışık 16/16 (`11-1-r2-e2e-x4.log`). NOTE-3 + NOTE-2 docs/chat.md; NOTE-1 11-2 plan tablosunda. Önyüz lint 0 / typecheck 0 (`11-1-r2-frontend-gate.log`). PR notu `state/pr/11.md` "PR 11-1 r2". Bilerek değişen test: `test_11_4` (yalnız bekleme).
+
+### C-11-0014 · 2026-11-21 01:10 · → koordinator · ACK
+Paket: 11 · Cevap: K-11-0012 · SHA: 97342eb
+DUZELT-MAIN alındı. Dal `fix/11-1-parity` (worktree `.worktrees/fix/11-1-parity`, main 97342eb). Düzeltme yalnız test: 03a `PARITY_EXEMPT_PREFIXES`'e `conversations/{conversation_id}`, 06a döngüsünde `runs/{run_id}/sources/{chunk_id}` atlanır (gerekçe yorumlu); `test_11_chat.py`'ye `test_11_4_read_mode_get_parity` (aynı üye edit→read, 4 GET aynı durum+gövde). Ürün kodu değişmez. Tam test-int ffmain YIGIN-KAPA'nı bekler.
+
+### C-11-0015 · 2026-11-21 01:10 · → koordinator · YIGIN-AC
+Paket: 11 · Cevap: K-11-0012 · Yigin: ffcore-11
+18770/13770, `--env-file .env.test`, `FFCORE_VERSION=0.0.0-11p`, `--profile test up -d --wait --build --pull never` (dal kaynağından); önce main'de kırmızı kanıt (`11-1-parity-red.log`), sonra dalda 03a/06a/11 hedefli (`11-1-parity-green.log`). Bitince `down -v` + YIGIN-KAPA.

@@ -170,3 +170,7 @@ Paket: 11 · Cevap: C-11-0013 · SHA: b81f7ef
 ### K-11-0013 · 2026-11-21 00:47 · → inceleyici · CEVAP
 Paket: 11 · Cevap: R-11-0006
 11-1 ffmain kapısı test-int'te kırmızı: 03a/06a `read_mode_get_parity` 11-1'in yeni yollarını fikstürde bulamıyor (`conversation_id`, `chunk_id`); e2e @model-missing readiness varyantı düştü (ENV-204 şüphesi, sınıflandırma isci-c'de). DUZELT-MAIN isci-c'de (`fix/11-1-parity`). Teyitin hedefli kapsamı bunu göremezdi; süreç dersi FOLLOWUP-216 (paylaşılan sözleşme dokunuşunda işçi tam test-int sırası alır). fix PR-HAZIR gelince kısa teyit (parity dosyaları + `test_11_chat` parite). ffmain e2e ana koşusu sürüyor; YIGIN-KAPA'ya kadar yığın açma.
+
+### K-11-0014 · 2026-11-21 00:57 · → tumu · DURUM
+Paket: 11 · Cevap: K-11-0011 · Yigin: ffmain
+ffmain 11-1 kapısı bitti: test-int 2 kırmızı (parity, K-11-0012 isci-c'de); **e2e ana koşusu 35 düşen / 144 geçen, nedeni kapı betiğim:** eski docs dizisiyle `FAKE_EMBED=1` yalnız backend+worker için yeniden kurulmuş, `agent-worker` `FAKE_EMBED=0` kalmış → koşular `model_missing`, koşuya bağlı tüm spec'ler düştü (chat cevabı, onaylar, sınav, kota, model düzenleme). 11-1 kaynaklı değil. **e2e tekrarı şimdi** (yığın tümüyle `FAKE_EMBED=1` + sahte upstream, docs/onyuz.md 10c-3 dizisi; önce `@model-missing` readiness ayrıntısı; tee `gate-111-20261121-e2e-rerun.log`, ~50 dk). ffmain açık kalıyor: **isci-c** hedefli parity koşularını sürdürebilir, tam test-int sırası tekrar bitince (YIGIN-KAPA); inceleyici yığın açmasın.
