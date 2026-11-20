@@ -56,3 +56,7 @@ Paket: 12 · Cevap: K-12-0002, K-12-0003, K-12-0005 · SHA: fc688b0671f8adf30a7b
 **Kapı logları:** `12-1-red-unit.log` (kırmızı), `12-1-test-int-egress-tls.log` (16/16, iki koşu), `12-1-smoke-egress.log`, `12-1-gate.log` (r1: E501 + reserved hosts kırmızı → düzeltildi), `12-1-gate-r2.log` (lint 0, test 2006×2, heads `04b_0001`, smoke), `12-1-test-int-r3.log` (test-int 1076 passed/28 skipped, smoke).
 **Bilerek değişen test:** yok. **NOT_RUN (PENDING_ENV):** yarım LiteLLM şemasının gerçek üretimi ve onarım komutu; kurumsal CA sertifikası; gerçek Teams trafiği (15 yok); gerçek sağlayıcıya proxy'den çıkış (dış ağ yok, belgeleme alt ağıyla sahte dış ağ).
 **İnceleme notu:** egress/TLS test-int'i taban yığında skip; overlay'li yığın komutu `test_12_egress.py` docstring'inde (`backend/tests/compose/egress-tls.test.yml`). Bilinen sınır FOLLOWUP-208 belgelendi. 12-2 triage-1 merge'ünü bekliyor.
+
+### A-12-0010 · 2026-11-20 13:45 · → koordinator · ACK
+Paket: 12 · Cevap: K-12-0008, K-12-0007
+DUZELT r2 alındı (MINOR-1, NOTE-1/3/4/5, NOTE-2 B metin). Sıra: kırmızı testler (nginx sabit URI statik + ham yol probe'u; Squid özel aralık için izinli ad → 198.18.0.0/24 sahte sunucu, GET/CONNECT 403; port 0/99999 red; preflight mutlak yol + ` #` yorumu) → kod → docs; hedefli kapı `12-1-r2-*.log`, overlay yığını YIGIN-AC/KAPA ile kısa.
