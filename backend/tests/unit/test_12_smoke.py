@@ -34,7 +34,8 @@ def test_12_smoke_fails_on_egress_without_allowlist(monkeypatch):
     monkeypatch.setenv("DEPLOY_PROFILE", "llmaas")
     monkeypatch.setenv("COMPOSE_PROFILES", "egress,tls")
     monkeypatch.setenv(
-        "COMPOSE_FILE", "compose.yaml:deploy/docker-compose.egress.yml:deploy/docker-compose.tls.yml"
+        "COMPOSE_FILE",
+        "compose.yaml:deploy/docker-compose.egress.yml:deploy/docker-compose.tls.yml",
     )
     monkeypatch.setenv("EGRESS_ALLOWLIST", "")
     with pytest.raises(smoke.SmokeError, match="egress_allowlist_empty"):

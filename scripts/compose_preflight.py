@@ -86,7 +86,8 @@ def check(env: dict) -> list[str]:
     if unknown:
         raise PreflightError(
             "unknown_profile",
-            f"COMPOSE_PROFILES names {', '.join(unknown)}; known: {', '.join(sorted(KNOWN_PROFILES))}",
+            f"COMPOSE_PROFILES names {', '.join(unknown)}; "
+            f"known: {', '.join(sorted(KNOWN_PROFILES))}",
         )
 
     for profile, overlay in OVERLAYS.items():
@@ -115,7 +116,8 @@ def check(env: dict) -> list[str]:
                 "ollama_context_length_missing",
                 "OLLAMA_CONTEXT_LENGTH is empty (Ollama's default 4096 truncates prompts silently)",
             )
-        lines.append(f"ollama: compose service, OLLAMA_CONTEXT_LENGTH={env['OLLAMA_CONTEXT_LENGTH']}")
+        context = env["OLLAMA_CONTEXT_LENGTH"]
+        lines.append(f"ollama: compose service, OLLAMA_CONTEXT_LENGTH={context}")
     elif deploy == "airgap" and backend == "ollama":
         lines.append("ollama: external (profile inactive; the address is the ollama provider's)")
 
@@ -168,7 +170,8 @@ def main(argv: list[str] | None = None) -> int:
     env = read_env_file(args.env_file) if args.env_file else dict(os.environ)
     try:
         if args.egress_list:
-            lines = egress_list(env.get("EGRESS_ALLOWLIST", ""), env.get("EGRESS_ALLOWED_PORTS", ""))
+            allowlist, ports = env.get("EGRESS_ALLOWLIST", ""), env.get("EGRESS_ALLOWED_PORTS", "")
+            lines = egress_list(allowlist, ports)
         else:
             lines = check(env)
     except PreflightError as exc:
