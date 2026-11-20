@@ -4,6 +4,26 @@ Behaviour and configuration changes that a deployment or an API client notices, 
 (handbook/RELEASE_AND_ROLLBACK.md, CHANGE_CONTROL.md). Each entry names the package and what to do,
 if anything.
 
+## 2026-11-20 · 12-1 · Egress proxy and TLS reverse proxy overlays, compose preflight, LiteLLM schema health
+
+- **What:** two optional overlays for `llmaas` (docs/kurulum.md): `egress` (Squid forward proxy;
+  the app network becomes internal, LiteLLM's provider calls go through the proxy, which applies
+  `EGRESS_ALLOWLIST` by host name and refuses private destinations) and `tls` (nginx; internal
+  HTTPS listener for the console and API, public listener for `/channels/teams/messages` only).
+  New `scripts/compose_preflight.py` (`make preflight`, `make egress-list`); `make smoke` runs it
+  first. `docs/veri-isleme.md`, the data processing record template.
+- **Changed:** LiteLLM's healthcheck and `make smoke` also ask `/key/info` with the master key; a
+  half-migrated LiteLLM database (500) is now unhealthy instead of healthy (FOLLOWUP-82). `make
+  smoke` fails on an incoherent `COMPOSE_PROFILES`/`COMPOSE_FILE` pair (FOLLOWUP-35) and on an
+  unknown profile name. `deploy/offline/images.txt` lists the proxy and nginx images, so the
+  offline archive (package 19) carries them too.
+- **Known limit:** with the `egress` overlay the backend's own direct external calls (remote MCP
+  servers, OpenAPI tools, alert webhooks, external agents) fail with a connection error until
+  FOLLOWUP-208.
+- **Action:** none for existing installations (both overlays are off unless added). An
+  installation whose `COMPOSE_PROFILES` names a profile no compose file defines now fails smoke
+  by name: remove the name.
+
 ## 2026-11-19 · 04b-2 · Scope filter, Turkish normalizer layer, video flag, threshold table, Ollama runtime context
 
 - **What:** agent definitions accept `knowledge[].filter.scope` (document sources, exact match)
