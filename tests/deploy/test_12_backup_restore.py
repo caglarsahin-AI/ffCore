@@ -91,7 +91,12 @@ def test_12_7_backup_then_restore_on_a_fresh_stack(env, tmp_path):
     assert "counts equal" in restored.stdout
 
     files = compose(
-        "exec", "-T", "backend", "sh", "-c", "find /data/storage -type f -exec sha256sum {} +",
+        "exec",
+        "-T",
+        "backend",
+        "sh",
+        "-c",
+        "find /data/storage -type f -exec sha256sum {} +",
         env=env,
     )
     assert data["document_sha256"] in files.stdout

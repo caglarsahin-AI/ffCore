@@ -6,7 +6,8 @@ with an analyst member, the fake-llm models, one knowledge base with a Markdown 
 one chat run by the analyst. Prints one JSON line: ids, the document's sha256 and filename.
 
     docker compose ... --env-file tests/e2e/scenarios/e2e.env run --rm \
-      -e E2E_ADMIN_EMAIL -e E2E_ADMIN_PASSWORD -e E2E_PASSWORD tools python tests/deploy/backup_seed.py
+      -e E2E_ADMIN_EMAIL -e E2E_ADMIN_PASSWORD -e E2E_PASSWORD \
+      tools python tests/deploy/backup_seed.py
 
 Passwords come from the environment the host test generates per run; nothing is written.
 """
