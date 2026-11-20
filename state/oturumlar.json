@@ -63,7 +63,9 @@
       "paket": "12",
       "lease": "ffcore-isci-a-12",
       "acildi": "2026-11-20T10:35",
-      "model": "claude-opus-5-5"
+      "model": "claude-opus-5-5",
+      "durum": "RETIRED",
+      "kapandi": "2026-11-20T22:11"
     },
     "local_96285dc5-3de6-4ce8-b724-decf871d915a": {
       "rol": "isci-b",
