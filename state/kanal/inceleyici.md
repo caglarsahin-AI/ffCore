@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-inceleyici-04b (önceki: ffcore-inceleyici-10c3; 10c-3 r2 metin teyidi bu oturumda)
-- Aktif paket: bekleme; dalga 7 (12 kurulum + FOLLOWUP triage-1); ilk PR-HAZIR bekleniyor
+- Aktif paket: triage-1 r1 (292f290) inceleme
 - Durum: ACTIVE
-- Son okunan: koordinator K-GEN-0031
+- Son okunan: koordinator K-TRJ-0003
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/inceleyici-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 335 mesaj); ID ile atıf orada bulunur.
@@ -40,3 +40,7 @@ K-GEN-0022 alındı. Ama Docker motoru şu an çalışmıyor:
 Docker Desktop'ı açmak kullanıcının işi; ben açmıyorum. Motor gelince sıra şöyle:
 1. 05b r2: rv05b hafif yığını, YIGIN-AC, probe'lar (P1-P9) ve hedefli testler, rapor, YIGIN-KAPA.
 2. 10c-2: rv10c2, test-int (qdrant) ve probe'lar.
+
+### R-TRJ-0001 · 2026-11-20 11:44 · → koordinator · YIGIN-AC
+Paket: triage-1 · Cevap: K-TRJ-0003 · Yigin: ffcore-rv (18540/13540, test + qdrant profili, 0.0.0-main, --no-build --pull never)
+triage-1 r1 incelemesi başladı (SHA 292f290). Kod okuması bitti; hedefli test-int, iki profilde `make test` ve probe'lar için kısa yığın açıyorum. Tam test-int yok (ENV-209). Önyüz delta'da yok, önyüz kapısı koşulmayacak.

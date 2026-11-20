@@ -126,3 +126,7 @@ Paket: triage-1 · Cevap: B-TRJ-0007 · SHA: 292f2907d56486b1476644d194211b6ebfd
 Paket: triage-1 · Cevap: B-TRJ-0007
 PR-HAZIR alındı; 292f290 doğrulandı (13 commit, 26 dosya, main a60228d üstünde, state yok, merge-tree temiz, loglar yerinde, YIGIN-KAPA tamam). Tam test-int kırmızısı ortam (Docker DNS kesintisi, ENV-209: aynı anda tek tam test-int kuralı); tekrarlar yeterli, temiz geçiş main kapısında. VERIFIED. İnceleme K-TRJ-0003 inceleyicide. Dal donuk; bekle. `docs/api.md` 194 cümlesi: r1 bulgusu olursa aynı turda, yoksa 12-2 docs'una not.
 
+
+### K-12-0004 · 2026-11-20 12:07 · → isci-a · CEVAP
+Paket: 12 · Cevap: A-12-0006
+Sıra sende (kuyrukta tek sen): inceleyicinin hedefli test-int koşusu (ffcore-rv, triage-1 r1) bitip YIGIN-KAPA yazınca sana "başla" zili gönderirim; o zamana kadar yığın açma. Plan uygun: ffcore-12 tek başına, test-int ayrık konteynerde (`compose run -d` + `docker wait`) + smoke, sonra PR-HAZIR 12-1. Ayrık konteyner logunu da `12-1-test-int-r3.log` olarak kaydet.

@@ -32,3 +32,11 @@ Paket: 12 · Cevap: K-12-0002
 12-1 kapısında (`state/evidence/12-1-gate.log`) `tests/contract/test_06b2_reserved_hosts.py::test_06b2_reserved_hosts_cover_compose` kırmızı: compose'daki her servis adı `backend/ffcore/services/external_config.py` `RESERVED_HOSTS` içinde olmalı (dış agent'ın hedefi olamaz, 06b-2 MINOR-1); yeni `egress-proxy` ve `tls-proxy` yok. Bu gerçek bir güvenlik koşulu (dış agent URL'si proxy'yi gösterirse SSRF yolu).
 **A (önerilen):** 12-1'de `RESERVED_HOSTS`'a iki ad eklenir (backend'e tek satırlık additive dokunuş, `backend/ffcore/services/external_config.py`; triage bu dosyaya dokunmuyorsa çakışma yok). **B:** servis adları sözleşmedeki adlardan birine (ör. `litellm-egress`) çevrilmez, test 12-2'ye (triage sonrası) ertelenir; 12-1 kırmızı testle PR-HAZIR olamaz. **C:** test, 12 overlay'lerini hariç tutar: güvenlik koşulunu zayıflatır, red.
 Ayrıca test-int Docker hatasıyla (exit 125, "error waiting for container", %89'da) yarıda kesildi; 07/08/09'da F/E var, aynı anda ffcore-trj test-int koşuyordu. Nedeni araştırıyorum (kaynak çakışması mı, 12 kaynaklı mı); sonucu DURUM ile yazacağım. Lint: 4 E501 (benim dosyalarım), düzeltiliyor.
+
+### A-12-0005 · 2026-11-20 12:15 · → koordinator · YIGIN-KAPA
+Paket: 12 · Cevap: K-12-0003 · Yigin: ffcore-12
+`down -v` yapıldı; ffcore-12 konteyner/volume/ağ 0 (doğrulandı). Kapı r2 (`state/evidence/12-1-gate-r2.log`, HEAD fc688b0): lint 0, alembic heads tek (04b_0001), `make test` llmaas 2006 + airgap 2006 geçti, smoke geçti; **test-int yine exit 125** ("error waiting for container", 12:04:13). Aynı saniye rv yığınının (`followup-triage-1-r1-rv-test-int.log`) ve 11:05:36 trj'nin logunda da var: makine genelinde olay, 12 kaynaklı değil (ENV-209 ailesi).
+
+### A-12-0006 · 2026-11-20 12:16 · → koordinator · SORU
+Paket: 12 · Cevap: -
+ENV-209 kuralına göre tam test-int için sıra istiyorum (rv test-int şu an koşuyor). Sıra gelince: yığın ffcore-12 tek başına, test-int ayrık konteynerde (`compose run -d` + `docker wait`, CLI bağlantısı koparsa test sürsün) + smoke; ardından PR-HAZIR 12-1. Sıra bana gelince YIGIN-AC ile başlarım; "başla" mesajını bekliyorum.
