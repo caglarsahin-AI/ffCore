@@ -58,8 +58,20 @@ def test_12_squid_config_denies_private_targets_and_logs_no_path():
     allow = rules.index(["http_access", "allow", "ffcore_allow"])
     assert deny_private < allow
     private = next(line for line in conf.splitlines() if line.startswith("acl to_private dst"))
-    for cidr in ("10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16", "127.0.0.0/8", "169.254.0.0/16"):
-        assert cidr in private
+    cidrs = private.split()[3:]
+    for cidr in (
+        "10.0.0.0/8",
+        "172.16.0.0/12",
+        "192.168.0.0/16",
+        "127.0.0.0/8",
+        "169.254.0.0/16",
+        # r1 NOTE-3: aligned with the backend's ipaddress.is_global (core/egress.py).
+        "198.18.0.0/15",
+        "240.0.0.0/4",
+        "::",
+        "::ffff:0:0/96",
+    ):
+        assert cidr in cidrs, cidr
     logformat = next(line for line in conf.splitlines() if line.startswith("logformat ffcore"))
     assert "%>rd" in logformat and "%ru" not in logformat and "%>ru" not in logformat
     assert "cache deny all" in conf
@@ -96,8 +108,12 @@ def test_12_squid_start_refuses_empty_or_malformed(allowlist):
     assert "egress" in result.stderr
 
 
-def test_12_squid_start_refuses_malformed_ports():
-    assert run_start("api.anthropic.com", "443 abc").returncode == 1
+@pytest.mark.parametrize("ports", ["443 abc", "0", "99999", "443 65536"])
+def test_12_squid_start_refuses_malformed_ports(ports):
+    # r1 NOTE-1: 1-65535 only.
+    result = run_start("api.anthropic.com", ports)
+    assert result.returncode == 1
+    assert "EGRESS_ALLOWED_PORTS" in result.stderr
 
 
 def test_12_tls_overlay_service():
@@ -133,6 +149,9 @@ def test_12_nginx_public_listener_opens_only_the_teams_path():
     public = next(b for b in _server_blocks(conf) if "listen 9443" in b)
     locations = re.findall(r"^location (.+?) \{", public, re.M)
     assert locations == ["= /channels/teams/messages", "/"]
+    # r1 MINOR-1: a fixed URI, so nginx sends the normalised path, never the client's raw one.
+    teams = public.split("location = /channels/teams/messages {")[1].split("}")[0]
+    assert "proxy_pass http://backend:8000/channels/teams/messages;" in teams
     assert "return 404" in public.split("location / {")[1]
     internal = next(b for b in _server_blocks(conf) if "listen 8443" in b)
     assert "proxy_pass http://frontend:3000" in internal
@@ -171,3 +190,10 @@ def test_12_82_litellm_healthcheck_detects_a_half_migrated_schema():
 def test_12_tools_gets_compose_file_for_the_preflight():
     env = load(BASE)["services"]["tools"]["environment"]
     assert env["COMPOSE_FILE"] == "${COMPOSE_FILE:-}"
+
+
+def test_12_squid_config_says_non_connect_requests_are_allowed():
+    # r1 NOTE-2 B: plain requests to allowlisted hosts stay allowed (FOLLOWUP-211); written down.
+    conf = (DEPLOY / "egress" / "squid.conf").read_text(encoding="utf-8")
+    assert "FOLLOWUP-211" in conf
+    assert not any(line.startswith("http_access deny !CONNECT") for line in conf.splitlines())

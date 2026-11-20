@@ -7,6 +7,10 @@ services:
     environment:
       # Fake providers listen on 9999 (backend/tests/fakes/fake_openai.py); production is 443.
       EGRESS_ALLOWED_PORTS: "443 9999"
+    networks:
+      - default
+      - egress
+      - egress-bench
 
   egress-allowed:
     image: ${REGISTRY_PREFIX}ffcore/backend:${FFCORE_VERSION:?FFCORE_VERSION tanımlı değil}
@@ -44,7 +48,24 @@ services:
         aliases: [rebind.test]
     restart: "no"
 
+  egress-bench:
+    # Allowlisted name on a benchmark-range address (198.18.0.0/15): refused (r1 NOTE-3).
+    image: ${REGISTRY_PREFIX}ffcore/backend:${FFCORE_VERSION:?FFCORE_VERSION tanımlı değil}
+    profiles: ["test"]
+    command: ["python", "/fakes/fake_openai.py"]
+    volumes:
+      - ./backend/tests/fakes:/fakes:ro
+    networks:
+      egress-bench:
+        ipv4_address: 198.18.0.10
+        aliases: [bench.test]
+    restart: "no"
+
 networks:
+  egress-bench:
+    ipam:
+      config:
+        - subnet: 198.18.0.0/24
   egress:
     ipam:
       config:

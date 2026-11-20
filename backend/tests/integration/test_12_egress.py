@@ -5,7 +5,7 @@ subnet, 198.51.100.0/24, so the proxy's private-address rule is the production o
 egress overlay needs EGRESS_ALLOWLIST and the TLS overlay TLS_CERT_DIR (a directory outside
 the repository with a self-signed fullchain.pem/privkey.pem for CN tls-proxy, made for the run):
 
-    export EGRESS_ALLOWLIST=api.allowed.test,rebind.test TLS_CERT_DIR=<dir>
+    export EGRESS_ALLOWLIST=api.allowed.test,rebind.test,bench.test TLS_CERT_DIR=<dir>
     export COMPOSE_FILE=compose.yaml:deploy/docker-compose.egress.yml:deploy/docker-compose.tls.yml
     docker compose -p ffcore-12 --env-file .env.test \
       -f compose.yaml -f deploy/docker-compose.egress.yml -f deploy/docker-compose.tls.yml \
@@ -34,6 +34,8 @@ PROXY = "http://egress-proxy:3128"
 ALLOWED = "http://api.allowed.test:9999"
 DENIED = "http://api.denied.test:9999"
 REBIND = "http://rebind.test:9999"  # allowlisted, resolves to the internal network
+# r1 NOTE-3: allowlisted, resolves into 198.18.0.0/15 (benchmark range, not global).
+BENCH = "http://bench.test:9999"
 OUTSIDE_IP = "198.51.100.10"  # api.allowed.test's address on the "outside" network
 LITELLM = "http://litellm:4000"
 
@@ -55,6 +57,17 @@ def test_12_e1_host_outside_the_allowlist_is_refused():
 
 def test_12_e1_allowlisted_name_on_a_private_address_is_refused():
     assert via_proxy(f"{REBIND}/v1/models").status_code == 403
+
+
+def test_12_r2_allowlisted_name_in_the_benchmark_range_is_refused():
+    assert via_proxy(f"{BENCH}/v1/models").status_code == 403
+
+
+def test_12_r2_connect_to_the_benchmark_range_is_refused():
+    with socket.create_connection(("egress-proxy", 3128), timeout=10) as sock:
+        sock.sendall(b"CONNECT bench.test:9999 HTTP/1.1\r\nHost: bench.test:9999\r\n\r\n")
+        status_line = sock.recv(4096).split(b"\r\n", 1)[0].decode()
+    assert status_line.split()[1] == "403", status_line
 
 
 def test_12_e1_no_direct_way_out_without_the_proxy():

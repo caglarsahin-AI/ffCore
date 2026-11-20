@@ -210,3 +210,54 @@ def test_12_35_comma_path_separator_from_env_example_is_understood():
         )
     )
     assert any("ollama" in line for line in lines)
+
+
+@pytest.mark.parametrize("ports", ["443 99999", "0", "443 abc"])
+def test_12_r2_egress_ports_out_of_range_are_refused(ports):
+    # r1 NOTE-1: preflight (and so smoke) checks the proxy's ports, 1-65535.
+    code, message = error_code(
+        env(
+            COMPOSE_PROFILES="egress,tls",
+            COMPOSE_FILE=EGRESS_FILES,
+            EGRESS_ALLOWLIST="api.anthropic.com",
+            EGRESS_ALLOWED_PORTS=ports,
+        )
+    )
+    assert code == "egress_ports_invalid" and "EGRESS_ALLOWED_PORTS" in message
+
+
+def test_12_r2_egress_list_refuses_out_of_range_ports():
+    with pytest.raises(preflight.PreflightError) as caught:
+        preflight.egress_list("api.anthropic.com", "443 99999")
+    assert caught.value.code == "egress_ports_invalid"
+
+
+def test_12_r2_absolute_overlay_paths_match():
+    # r1 NOTE-4: an overlay is matched by the end of its path, so absolute paths pass.
+    lines = preflight.check(
+        env(
+            COMPOSE_PROFILES="tls",
+            COMPOSE_FILE="/opt/ff/compose.yaml:/opt/ff/deploy/docker-compose.tls.yml",
+        )
+    )
+    assert any(line.startswith("tls:") for line in lines)
+
+
+def test_12_r2_a_similar_file_name_is_not_the_overlay():
+    code, _ = error_code(
+        env(COMPOSE_PROFILES="tls", COMPOSE_FILE="compose.yaml:deploy/my-docker-compose.tls.yml")
+    )
+    assert code == "profile_overlay_mismatch"
+
+
+def test_12_r2_env_file_inline_comment_is_dropped(tmp_path):
+    # r1 NOTE-4: compose reads ` #` in an unquoted value as a comment; the preflight does too.
+    env_file = tmp_path / "deploy.env"
+    env_file.write_text(
+        "EGRESS_ALLOWLIST=a.test # provider\nQUOTED='b.test # kept'\nHASH=x#y\n",
+        encoding="utf-8",
+    )
+    values = preflight.read_env_file(env_file)
+    assert values["EGRESS_ALLOWLIST"] == "a.test"
+    assert values["QUOTED"] == "b.test # kept"
+    assert values["HASH"] == "x#y"
