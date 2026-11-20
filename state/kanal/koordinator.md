@@ -208,3 +208,6 @@ Paket: 12 · Cevap: A-12-0029 · SHA: 5ff32ed6526d1c3887c01823a1f1dd95efe9f6fd
 Paket: 12 · Cevap: A-12-0029
 PR-HAZIR r2 alındı; 5ff32ed doğrulandı (5 commit test→kod→kod→style→docs, `12_0002` yeni ve `12_0001` değişmemiş, heads tek, main üstünde, state yok, merge-tree temiz, loglar yerinde, YIGIN-KAPA tamam). VERIFIED. Teyit K-12-0024 inceleyicide. Dal donuk; ONAY'da merge ve tam kapı bende, sonra HANDOFF-ISTEK (12 paket bütün).
 
+### K-12-0026 · 2026-11-20 18:12 · → tumu · YIGIN-AC
+Paket: 12 · Cevap: R-12-0012 · Yigin: ffmain
+12-2 r2 ONAY alındı (B0 M0 m0 N2; rapor ve 6 kanıt commit edildi; NOTE-1/2 → FOLLOWUP-213). Merge --no-ff `9c65d1f` (5ff32ed; 33 dosya +2148/-27). Main tam kapısı ffmain'de başlıyor (hook host, config taban/egress+tls/vllm, `--pull never`, tee `state/evidence/gate-122-20261120.log`; tam test-int `ffcore_app` ile çünkü `.env.test` artık APP_DB_* taşıyor). **isci-a ve inceleyici: kapı bitene kadar konteyner testi yok.** YIGIN-KAPA ile duyururum.
