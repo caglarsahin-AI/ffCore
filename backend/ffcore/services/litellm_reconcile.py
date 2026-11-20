@@ -30,6 +30,7 @@ from ffcore.core.egress import (
     EgressPolicy,
     EgressTimeout,
     SafeOutboundClient,
+    is_platform_target,
 )
 from ffcore.core.secrets import decrypt_json
 from ffcore.models.catalog import Model, Provider, ProviderProject, litellm_name
@@ -146,6 +147,10 @@ def desired_model(project_key: str, model: Any, provider: Any, settings: Setting
             "LiteLLM has no per-model switch for forwarding unknown parameters",
         )
     base, params = _upstream(provider.driver, provider.config, model.model_id)
+    if is_platform_target(base, settings):
+        # FOLLOWUP-194: LiteLLM would call the backend in the provider's name (a row saved
+        # before the rule, or written around the API).
+        raise ReconcileProblem("endpoint_is_platform", "upstream is the FFCore backend")
     try:
         EgressPolicy(settings).check_url(httpx2.URL(base))
     except EgressDenied as exc:

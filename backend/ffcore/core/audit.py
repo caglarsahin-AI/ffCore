@@ -293,6 +293,8 @@ def audited(
                 )
 
             before = None
+            # FOLLOWUP-203: authorize() inside this endpoint leaves the denied row to us.
+            request.state.audited_endpoint = True
             try:
                 # Everything the decorator manages is inside this boundary: a failure while
                 # loading the before state, in the endpoint, while serialising, at flush (a
@@ -306,9 +308,11 @@ def audited(
             except Exception as exc:
                 await session.rollback()
                 status = _status_of(exc)
-                outcome = "denied" if status in (401, 403) else "error"
+                # authorize()'s reason (code, min_role, write) when it refused inside the call.
+                detail = getattr(exc, "audit_detail", None)
+                outcome = "denied" if status in (401, 403) or detail else "error"
                 try:
-                    await write_event_detached(entry(outcome, before=before))
+                    await write_event_detached(entry(outcome, before=before, after=detail))
                 except Exception as audit_exc:
                     error = AuditWriteError(f"audit event for {action} could not be written")
                     # Type only: the original message may carry SQL parameters or other secrets.

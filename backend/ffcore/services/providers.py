@@ -16,6 +16,8 @@ from ffcore.core.egress import (
     EgressTimeout,
     EgressTimeoutError,
     SafeOutboundClient,
+    is_platform_target,
+    refuse_platform_target,
 )
 from ffcore.core.errors import ApiError
 
@@ -180,6 +182,17 @@ def validate_config(name: str, config: dict[str, Any]) -> dict[str, str]:
     return clean
 
 
+# Every driver's address field (FOLLOWUP-194; `url` is the qdrant driver's, review r1 NOTE-1):
+# saving refuses what the connection test refuses.
+URL_FIELDS = ("base_url", "api_base", "url")
+
+
+def refuse_platform_urls(config: dict[str, str], settings: Settings) -> None:
+    """A provider never points at the backend itself: 400 endpoint_is_platform when saved."""
+    for name in URL_FIELDS:
+        refuse_platform_target(config.get(name), settings, f"provider {name}")
+
+
 def merge_config(name: str, stored: dict[str, str], update: dict[str, Any]) -> dict[str, str]:
     """A secret field sent back as "***" keeps its stored value (the API never returns it)."""
     secret = {f.name for f in DRIVERS[name].fields if f.secret}
@@ -211,6 +224,9 @@ async def test_connection(
             message=spec.no_test_reason,
         )
     url, headers = spec.test_call(config)
+    if is_platform_target(url, settings):
+        # FOLLOWUP-194: refused before any connection, like a saved configuration would be.
+        return _failed("endpoint_is_platform", "The provider URL points at the FFCore backend.")
     started = time.monotonic()
     try:
         async with SafeOutboundClient(

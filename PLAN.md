@@ -206,7 +206,7 @@ Tablo sahipliği yukarıdaki listedir; bir paket başka paketin tablosuna kolon 
 | 01 | LiteLLM gateway (uzlaştırıcı: modeller yalnızca LiteLLM DB'sinde, config'de `model_list` yok; sanal model ad uzayı; tipli fallback tespiti; team/sanal anahtar yok) | 00, 03a | 2,5 gün | evet |
 | 02 | Langfuse izleme (init, tracing, prompt istemcisi; iz alanları 06a'da) | 00, 01 | 1 gün | evet |
 | 03 | Backend çekirdek: **03a** kimlik + sağlayıcı/model kataloğu (3); **03b** audit, on-behalf-of, iç servis token'ı, `core/egress.py` (2); **03c** API key, kota, usage, retention, uyarılar, bildirim ayarı (3,5, PoC sonrası) | 00 | 8,5 gün | 03a, 03b |
-| 04 | Bilgi tabanı. **04a** çekirdek: PayCore ingest/RAG'i saran `KnowledgeStore` bağdaştırıcısı, elle yükleme yolu, süreç içi dense+sparse embedding, `VectorStore` (Qdrant sparse birincil, pgvector), hibrit arama, reranker, ACL payload, `kb_queries.candidates`, warmup, yönetim/arama API'si (5,5). **04b**: `migrate-vectors`, reconvert, video, TR normalizer, rewrite, eşik tablosu, ingest raporu, DuckDB → Postgres göçü (4) | 04a: 00i, 03a, 01, 13a; 04b: 04a | 9,5 gün | 04a |
+| 04 | Bilgi tabanı. **04a** çekirdek: PayCore ingest/RAG'i saran `KnowledgeStore` bağdaştırıcısı, elle yükleme yolu, süreç içi dense+sparse embedding, `VectorStore` (Qdrant sparse birincil, pgvector), hibrit arama, reranker, ACL payload, `kb_queries.candidates`, warmup, yönetim/arama API'si (5,5). **04b**: `migrate-vectors`, reconvert, video, TR normalizer, rewrite, eşik tablosu, ingest raporu, `migrate-vectors` + sürücü eşdeğerliği (D1; meta 04a'dan beri Postgres, DRIFT-198) (4) | 04a: 00i, 03a, 01, 13a; 04b: 04a | 9,5 gün | 04a |
 | 05 | Araç katmanı. **05a** çekirdek: araç kaydı, upstream kimlik, mcp-sql, mcp-search (4). **05b**: OpenAPI→MCP yayınlama, Superset (3) | 05a: 03a, 03b, 04a, 08; 05b: 05a | 7 gün | 05a |
 | 06 | Agent runtime. **06a** çekirdek: tanım -> LangGraph, run API, SSE, bağlam bütçesi, kuyruk ve `LLM_SLOTS`, iz alanları, guardrail bağlama, `knowledge[].filter` (PayCore profilleri = agent) (6,5). **06b**: OpenAI-uyumlu facade, dış agent, manifest (3) | 06a: 03a, 03b, 01, 02, 04a, 05a, 08; 06b: 06a, 03c | 9,5 gün | 06a (iki agent: `always` + tek çağrılı SQL) |
 | 07 | Onay kuyruğu | 06a, 03b | 1,5 gün | evet |
@@ -230,7 +230,7 @@ Paralel çalışabilecek gruplar (kapı kuralı E: bir paket **kendi doğrudan b
 - Dalga 3: 01, 02, 04a (01 03a'yı bekler; 02 01'in hemen ardından). Dalga sonunda Alembic merge PR'ı.
 - Dalga 4: 05a, sonra 06a (kritik yol; 06a 02 ve 08'i de bekler)
 - Dalga 5: 07, 10b-poc; 13b = **M3 / PoC kapısı** (Open WebUI ile demo)
-- PoC sonrası dalga 6: 03c, 06b, 11, 04b (DuckDB → Postgres göçü dahil), 05b, 08 tam, 09, 10c
+- PoC sonrası dalga 6: 03c, 06b, 11, 04b (`migrate-vectors` + sürücü eşdeğerliği dahil), 05b, 08 tam, 09, 10c
 - Dalga 7: 12, 14, 17
 - Dalga 8: 16; 15 (widget ve Mattermost; Slack/Teams 17 sonrası)
 

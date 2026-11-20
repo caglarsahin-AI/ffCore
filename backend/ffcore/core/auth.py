@@ -357,15 +357,19 @@ async def authorize(
     if code in HIDDEN_PROJECT:
         # A project the caller cannot see answers exactly like a missing one (FOLLOWUP-103,
         # decision A): same status, same body. The real reason stays in the audit row.
-        await _audit_denied(request, actor, project_id, "project_not_found", need, reason=code)
-        raise ApiError(404, "not_found_error", "project_not_found", "Project not found.")
+        error = ApiError(404, "not_found_error", "project_not_found", "Project not found.")
+        await _audit_denied(
+            request, actor, project_id, "project_not_found", need, error, reason=code
+        )
+        raise error
     if code is not None:
-        await _audit_denied(request, actor, project_id, code, need)
         message = {
             "read_only_access": "Your access mode is read-only.",
             "obo_project_scope": "A call on behalf of a user is limited to the token's project.",
         }.get(code, "Your role does not allow this.")
-        raise ApiError(403, "permission_error", code, message)
+        error = ApiError(403, "permission_error", code, message)
+        await _audit_denied(request, actor, project_id, code, need, error)
+        raise error
     request.state.grant = grant
     # replace(): every other field (scopes, 03c acl_role and via_key_id) stays as resolved.
     return replace(actor, project_id=str(project_id) if project_id else actor.project_id)
@@ -440,17 +444,17 @@ async def _audit_denied(
     project_id: str | None,
     code: str,
     need: RoleRequirement,
+    error: ApiError,
     *,
     reason: str | None = None,
 ) -> None:
+    """One `denied` row per refusal (FOLLOWUP-203, decision A). Inside an @audited endpoint
+    the decorator writes it, about its own resource, with this reason merged in (`error`
+    carries it there); a refusal before the endpoint (the route's RoleRequirement) has no
+    decorator and gets this `route` row."""
     from ffcore.core.audit import AuditEntry, request_context, write_event_detached
 
     route = request.scope.get("route")
-    request_id, ip = request_context(request)
-    try:
-        valid_project = str(uuid.UUID(project_id)) if project_id else None
-    except ValueError:
-        valid_project = None
     after = {
         "method": request.method,
         "path": getattr(route, "path", request.url.path),
@@ -460,6 +464,14 @@ async def _audit_denied(
     }
     if reason is not None:
         after["reason"] = reason
+    if getattr(request.state, "audited_endpoint", False):
+        error.audit_detail = after
+        return
+    request_id, ip = request_context(request)
+    try:
+        valid_project = str(uuid.UUID(project_id)) if project_id else None
+    except ValueError:
+        valid_project = None
     await write_event_detached(
         AuditEntry(
             action=getattr(route, "name", request.url.path),

@@ -787,25 +787,18 @@ def check_compose(toks: list[str]) -> list[Violation]:
     if idx is None:
         return []
     _, sub = subcommand(toks, idx, COMPOSE_VALUE_OPTS)
+    # FOLLOWUP-207 (5 November decision): a standalone build reaches docker.io/ghcr.io for base
+    # image metadata even with --pull=false; images are built by `up --build --pull never`.
     if sub == "build":
-        if "--pull=false" not in toks:
-            return [
-                Violation(
-                    "PROSES-175",
-                    "compose build yalnız --pull=false ile (BuildKit base imaj metadata'sı "
-                    "için docker.io/ghcr.io'ya bağlanır)",
-                )
-            ]
-        return []
-    if sub != "up":
-        return []
-    if "--build" in toks:
         return [
             Violation(
                 "PROSES-175",
-                "up --build yok; imaj önce build --pull=false, sonra up --no-build --pull never",
+                "ayrı compose build yok (BuildKit base imaj metadata'sı için docker.io/ghcr.io'ya "
+                "bağlanır); imaj `up --build --pull never` ile derlenir",
             )
         ]
+    if sub != "up":
+        return []
     pull_never = "--pull=never" in toks or any(
         t == "--pull" and i + 1 < len(toks) and toks[i + 1] == "never" for i, t in enumerate(toks)
     )
@@ -813,7 +806,8 @@ def check_compose(toks: list[str]) -> list[Violation]:
         return [
             Violation(
                 "PROSES-175",
-                "yığın up -d --wait --no-build --pull never ile açılır (ENVIRONMENT_AND_COMMANDS)",
+                "yığın `up -d --wait --pull never` ile açılır (imaj gerekiyorsa `--build` eklenir; "
+                "ENVIRONMENT_AND_COMMANDS)",
             )
         ]
     try:

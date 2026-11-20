@@ -19,6 +19,8 @@ from ffcore.api.common import ERROR_RESPONSES, SessionDep, invalid, not_found, p
 from ffcore.api.schemas import Patch, Strict
 from ffcore.core.audit import audited
 from ffcore.core.auth import Actor, require_role, require_superadmin, resolve_actor
+from ffcore.core.config import Settings, get_settings
+from ffcore.core.egress import refuse_platform_target
 from ffcore.models.alerts import ALERT_KINDS, Alert, AlertRule
 from ffcore.services.alerts import EMITTED_KINDS
 
@@ -30,6 +32,7 @@ ProjectAcker = Annotated[Actor, Depends(require_role("analyst", write=True))]
 TenantReader = Annotated[Actor, Depends(require_superadmin())]
 TenantWriter = Annotated[Actor, Depends(require_superadmin(write=True))]
 RuleIdDep = Annotated[str, Depends(path_resource("rule_id"))]
+SettingsDep = Annotated[Settings, Depends(get_settings)]
 
 AlertKind = StrEnum("AlertKind", {k: k for k in ALERT_KINDS})
 
@@ -128,7 +131,9 @@ def alert_out(a: Alert) -> AlertOut:
     )
 
 
-def _validate(kind: str, channel: str, recipients: list[str], params: dict) -> None:
+def _validate(
+    kind: str, channel: str, recipients: list[str], params: dict, settings: Settings
+) -> None:
     if kind not in EMITTED_KINDS:
         raise invalid("alert_kind_unavailable", f"Nothing emits {kind} yet; see /alert-kinds.")
     if channel == "email" and not recipients:
@@ -139,6 +144,10 @@ def _validate(kind: str, channel: str, recipients: list[str], params: dict) -> N
         or not all(isinstance(t, int) and 0 < t <= 1000 for t in thresholds)
     ):
         raise invalid("thresholds_invalid", "thresholds is a list of percentages (1..1000).")
+    webhook_url = params.get("webhook_url")
+    refuse_platform_target(
+        webhook_url if isinstance(webhook_url, str) else None, settings, "webhook_url"
+    )
 
 
 @router.get("/alert-kinds", response_model=AlertKinds, summary="Alert kinds a rule may use")
@@ -166,8 +175,10 @@ async def _list_rules(session, project_id) -> AlertRuleList:
     return AlertRuleList(data=[rule_out(r) for r in rows])
 
 
-async def _create_rule(session, project_id, body: AlertRuleCreate, actor) -> AlertRuleOut:
-    _validate(body.kind.value, body.channel.value, body.recipients, body.params)
+async def _create_rule(
+    session, project_id, body: AlertRuleCreate, actor, settings: Settings
+) -> AlertRuleOut:
+    _validate(body.kind.value, body.channel.value, body.recipients, body.params, settings)
     row = AlertRule(
         project_id=project_id,
         kind=body.kind.value,
@@ -183,7 +194,9 @@ async def _create_rule(session, project_id, body: AlertRuleCreate, actor) -> Ale
     return rule_out(row)
 
 
-async def _update_rule(session, project_id, rule_id, body: AlertRuleUpdate) -> AlertRuleOut:
+async def _update_rule(
+    session, project_id, rule_id, body: AlertRuleUpdate, settings: Settings
+) -> AlertRuleOut:
     row = await _rule(session, project_id, rule_id)
     changes = body.model_dump(exclude_unset=True)
     _validate(
@@ -191,6 +204,7 @@ async def _update_rule(session, project_id, rule_id, body: AlertRuleUpdate) -> A
         row.channel,
         changes.get("recipients", list(row.recipients or [])),
         changes.get("params", row.params or {}),
+        settings,
     )
     for name, value in changes.items():
         setattr(row, name, value)
@@ -255,8 +269,9 @@ async def create_project_rule(
     request: Request,
     actor: ProjectAdmin,
     session: SessionDep,
+    settings: SettingsDep,
 ):
-    return await _create_rule(session, project_id, body, actor)
+    return await _create_rule(session, project_id, body, actor, settings)
 
 
 async def _project_rule_before(project_id, rule_id, session, **_):
@@ -274,8 +289,9 @@ async def update_project_rule(
     request: Request,
     actor: ProjectAdmin,
     session: SessionDep,
+    settings: SettingsDep,
 ):
-    return await _update_rule(session, project_id, rule_id, body)
+    return await _update_rule(session, project_id, rule_id, body, settings)
 
 
 @router.delete(
@@ -328,9 +344,13 @@ async def list_rules(actor: TenantReader, session: SessionDep):
 )
 @audited("create_alert_rule", "alert_rule")
 async def create_rule(
-    body: AlertRuleCreate, request: Request, actor: TenantWriter, session: SessionDep
+    body: AlertRuleCreate,
+    request: Request,
+    actor: TenantWriter,
+    session: SessionDep,
+    settings: SettingsDep,
 ):
-    return await _create_rule(session, None, body, actor)
+    return await _create_rule(session, None, body, actor, settings)
 
 
 async def _rule_before(rule_id, session, **_):
@@ -349,8 +369,9 @@ async def update_rule(
     request: Request,
     actor: TenantWriter,
     session: SessionDep,
+    settings: SettingsDep,
 ):
-    return await _update_rule(session, None, rule_id, body)
+    return await _update_rule(session, None, rule_id, body, settings)
 
 
 @router.delete(

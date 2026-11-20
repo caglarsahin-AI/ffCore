@@ -142,6 +142,7 @@ async def create_provider(
     """The configuration is stored encrypted; secret fields are never returned."""
     drivers.validate_domains(body.driver, body.domains)
     config = drivers.validate_config(body.driver, body.config)
+    drivers.refuse_platform_urls(config, settings)
     if await session.scalar(select(Provider.id).where(Provider.key == body.key)) is not None:
         raise conflict("provider_key_taken", "This provider key is already used.")
     provider = Provider(
@@ -176,6 +177,7 @@ async def test_provider_config(
 ):
     """A failed test does not block saving. Drivers without a test return supported=false."""
     config = drivers.validate_config(body.driver, body.config)
+    drivers.refuse_platform_urls(config, settings)
     return await drivers.test_connection(body.driver, config, settings)
 
 
@@ -203,6 +205,7 @@ async def update_provider(
     if "config" in changes:
         stored = decrypt_json(provider.config_encrypted, settings)
         merged = drivers.merge_config(provider.driver, stored, changes.pop("config"))
+        drivers.refuse_platform_urls(merged, settings)
         provider.config_encrypted = encrypt_json(merged, settings)
     if changes.get("is_active") is False and provider.is_active:
         await _ensure_unused(session, provider_id)  # same rule as DELETE (review r1 MAJOR-3)

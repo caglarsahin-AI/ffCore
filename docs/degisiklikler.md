@@ -4,6 +4,23 @@ Behaviour and configuration changes that a deployment or an API client notices, 
 (handbook/RELEASE_AND_ROLLBACK.md, CHANGE_CONTROL.md). Each entry names the package and what to do,
 if anything.
 
+## 2026-11-20 · triage-1 · Admin manages user-only documents, one audit row per refusal, no backend as provider or webhook
+
+- **What:** a project admin (and a superadmin) gets, changes and deletes a knowledge base document
+  readable by named users only through `GET`, `PATCH` and `DELETE …/documents/{id}` (it got 404
+  before; FOLLOWUP-202). The document list, search and ingest report still hide it.
+- **Changed:** a refusal inside a change endpoint (for example an analyst changing a document's
+  ACL or renaming an external agent) writes one `denied` audit row, not two: the row of the
+  change, with the resource it is about and the reason (`after.code`, `after.min_role`,
+  `after.write`; FOLLOWUP-203). Refusals before the endpoint keep their `route` row. A provider
+  `base_url`/`api_base`, an alert rule `webhook_url` and the default webhook URL that point at the
+  backend itself (its `INTERNAL_API_URL` origin, the `backend` service name, loopback on port 8000)
+  are refused with 400 `endpoint_is_platform` when saved, even when `ALLOWED_INTERNAL_HOSTS` lists
+  the backend; the connection test answers `endpoint_is_platform`, LiteLLM reconcile skips such a
+  model with that code and a webhook delivery fails with it (FOLLOWUP-194).
+- **Action:** audit queries that counted two rows per refusal count one. A provider or webhook
+  saved earlier with the backend's address stops working; give the target service's address.
+
 ## 2026-11-19 · 04b-2 · Scope filter, Turkish normalizer layer, video flag, threshold table, Ollama runtime context
 
 - **What:** agent definitions accept `knowledge[].filter.scope` (document sources, exact match)

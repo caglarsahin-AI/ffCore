@@ -18,6 +18,7 @@ from ffcore.api.schemas import Strict
 from ffcore.core.audit import audited
 from ffcore.core.auth import Actor, require_role, require_superadmin
 from ffcore.core.config import Settings, get_settings
+from ffcore.core.egress import refuse_platform_target
 from ffcore.core.errors import ApiError
 from ffcore.core.secrets import decrypt_json, encrypt_json
 from ffcore.models.alerts import NotificationSettings
@@ -107,6 +108,7 @@ def _out(row: NotificationSettings | None, project_id, settings) -> Notification
 async def _put(session, project_id, body: NotificationSettingsIn, actor, settings):
     if body.smtp is not None and body.smtp.port not in (25, 465, 587):
         raise invalid("smtp_port_not_allowed", "SMTP port must be 25, 465 or 587.")
+    refuse_platform_target(body.default_webhook_url, settings, "default webhook URL")
     row = await _row(session, project_id)
     if row is None:
         row = NotificationSettings(project_id=project_id, updated_by=actor.actor_id)

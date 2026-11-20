@@ -144,14 +144,34 @@ def test_compose_build_with_file_blocked(main_root):
     assert_blocked(proc, "PROSES-175")
 
 
-def test_compose_build_pull_false_allowed(main_root):
+def test_compose_build_pull_false_blocked(main_root):
+    # FOLLOWUP-207: a standalone build reaches the registry for base image metadata even with
+    # --pull=false (5 November decision); images are built by `up --build --pull never`.
     proc = run_hook(bash("docker compose -p x build --pull=false backend"), main_root)
-    assert_allowed(proc)
-
-
-def test_compose_up_build_blocked(main_root):
-    proc = run_hook(bash("docker compose up -d --build --pull never"), main_root)
     assert_blocked(proc, "PROSES-175")
+
+
+def test_compose_build_message_names_up_build(guard, main_root):
+    violations = guard.check_compose(["docker", "compose", "build", "--pull=false"])
+    assert [v.rule for v in violations] == ["PROSES-175"]
+    assert "up --build --pull never" in violations[0].message
+
+
+def test_compose_up_build_pull_never_allowed(guard, main_root, monkeypatch):
+    monkeypatch.setattr(guard, "running_ff_stacks", lambda: [])
+    cmd = "docker compose -p ffcore-x --env-file .env.test up -d --wait --build --pull never"
+    assert rules(guard, bash(cmd), main_root) == []
+
+
+def test_compose_up_build_without_pull_never_blocked(main_root):
+    proc = run_hook(bash("docker compose up -d --build"), main_root)
+    assert_blocked(proc, "PROSES-175")
+
+
+def test_compose_up_build_counts_stacks(guard, main_root, monkeypatch):
+    monkeypatch.setattr(guard, "running_ff_stacks", lambda: ["ffcore-a", "ffcore-b", "ffcore-c"])
+    cmd = "docker compose -p ffcore-x up -d --build --pull never"
+    assert "YIGIN" in rules(guard, bash(cmd), main_root)
 
 
 def test_compose_up_without_pull_never_blocked(main_root):

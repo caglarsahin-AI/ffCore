@@ -27,6 +27,7 @@ import httpcore2
 import httpx2
 
 from ffcore.core.config import Settings
+from ffcore.core.errors import ApiError
 
 Resolver = Callable[[str, int], Awaitable[list[str]]]
 IPAddress = ipaddress.IPv4Address | ipaddress.IPv6Address
@@ -96,6 +97,43 @@ def _origin(url: httpx2.URL) -> str:
 def _origin_key(url: httpx2.URL) -> tuple[str, str, int | None]:
     port = url.port or _DEFAULT_PORTS.get(url.scheme)
     return url.scheme, (url.host or "").lower().rstrip("."), port
+
+
+# The port the backend listens on in its container: loopback on it is the backend itself.
+BACKEND_CONTAINER_PORT = 8000
+
+
+def is_platform_target(url: str, settings: Settings) -> bool:
+    """The backend itself (FOLLOWUP-159, -194): its INTERNAL_API_URL origin, the `backend`
+    service name on any port, or loopback on the backend's container port. Never the target of
+    a tool (05b), a provider URL (01) or a webhook (03c), whatever ALLOWED_INTERNAL_HOSTS says;
+    the backend calls itself only by its own code (05b self endpoint, the /readyz probe).
+    A URL that does not parse is not the platform; the caller's own URL check refuses it."""
+    try:
+        scheme, host, port = _origin_key(httpx2.URL(url))
+    except httpx2.InvalidURL:
+        return False
+    if (scheme, host, port) == _origin_key(httpx2.URL(settings.internal_api_url)):
+        return True
+    if host == "backend":
+        return True
+    try:
+        loopback = host == "localhost" or ipaddress.ip_address(host.strip("[]")).is_loopback
+    except ValueError:
+        loopback = False
+    return loopback and port == BACKEND_CONTAINER_PORT
+
+
+def refuse_platform_target(url: str | None, settings: Settings, what: str) -> None:
+    """400 endpoint_is_platform when a URL being saved points at the backend (FOLLOWUP-194).
+    The message names the field, never the URL (it may carry a credential)."""
+    if url and is_platform_target(url, settings):
+        raise ApiError(
+            400,
+            "invalid_request_error",
+            "endpoint_is_platform",
+            f"The {what} points at the FFCore backend itself; give the target service's address.",
+        )
 
 
 def _is_credential_header(name: str) -> bool:
