@@ -1,0 +1,16 @@
+.........F..............................................                 [100%]
+================================== FAILURES ===================================
+________________ test_12_r2_initdb_creates_the_role_with_both _________________
+
+tmp_path = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-96/test_12_r2_initdb_creates_the_0')
+
+    def test_12_r2_initdb_creates_the_role_with_both(tmp_path):
+        result, calls = _initdb(tmp_path, APP_DB_USER="ffcore_app", APP_DB_PASSWORD="x")
+        assert result.returncode == 0, result.stderr
+>       assert "/ffcore/app-role.sql" in calls
+E       AssertionError: assert '/ffcore/app-role.sql' in ''
+
+tests\unit\test_12_46_app_role_static.py:127: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/unit/test_12_46_app_role_static.py::test_12_r2_initdb_creates_the_role_with_both
+1 failed, 55 passed in 8.54s

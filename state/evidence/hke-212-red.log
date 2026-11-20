@@ -1,0 +1,18 @@
+.F                                                                       [100%]
+================================== FAILURES ===================================
+_______________ test_settings_command_skips_without_py_launcher _______________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000253B9B969C0>
+
+    def test_settings_command_skips_without_py_launcher(monkeypatch):
+        """FOLLOWUP-212: no `py` launcher (Linux tools container) is an explicit skip, not an error;
+        the gate's hook step runs on the host with py -3.12."""
+        import shutil
+    
+>       from conftest import settings_hook_argv
+E       ImportError: cannot import name 'settings_hook_argv' from 'conftest' (C:\ai_paycore\ffcore\.worktrees\fix\hook-egress-1\tests\hooks\conftest.py)
+
+tests\hooks\test_guard.py:643: ImportError
+=========================== short test summary info ===========================
+FAILED tests/hooks/test_guard.py::test_settings_command_skips_without_py_launcher
+1 failed, 1 passed, 144 deselected in 3.66s

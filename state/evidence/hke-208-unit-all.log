@@ -1,0 +1,6 @@
+FAILED tests/unit/test_09_r4.py::test_09_r4b_judge_call_estimate_is_configured_and_bounded_by_a_tick
+FAILED tests/unit/test_09_r5.py::test_09_r5_major1_judge_call_estimate_bounded_by_the_usable_window
+FAILED tests/unit/test_116_source_state.py::test_116_9_checkpoint_sweep_cron_on_background_worker_only
+FAILED tests/unit/test_19_raw_staging.py::test_19_s1_cli_refuses_prsim_before_any_work
+FAILED tests/unit/test_19r_cli_exit.py::test_19r_r1m1_cli_exits_1_on_unregistered_failure
+40 failed, 2008 passed in 204.21s (0:03:24)

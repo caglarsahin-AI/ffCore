@@ -1,0 +1,15 @@
+    228 E         Field required [type=missing]
+    228 E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+     33 E       obo_jwt_secret
+     32 E       offline
+     31 E       secret_key
+     31 E       fernet_key
+     31 E       embed_dim
+     30 E       service_token
+     30 E       deploy_profile
+     28 E       pydantic_core._pydantic_core.ValidationError: 7 validation errors for Settings
+      5 E       pydantic_core._pydantic_core.ValidationError: 2 validation errors for GuardrailSettings
+      5 E       guardrail_egress_ner
+      5 E       guardrail_egress_enabled
+      2 E       pydantic_core._pydantic_core.ValidationError: 6 validation errors for Settings
+      2 E       pydantic_core._pydantic_core.ValidationError: 2 validation errors for Settings

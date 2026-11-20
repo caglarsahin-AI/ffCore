@@ -1,0 +1,256 @@
+FFFFFF........F.FFF.....F.F                                              [100%]
+================================== FAILURES ===================================
+_ test_heredoc_body_text_is_not_a_command[cat >> /c/ai_paycore/ffcore/state/kanal/isci-b.md <<'EOF'\n### B-X-0001 \xb7 2026-11-20 13:20 \xb7 \u2192 koordinator \xb7 YIGIN-KAPA\nmake test 2>&1 | tail -3\ndocker compose -p ffcore-x build backend\nEOF] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\hook-egress-1\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-87/test_heredoc_body_text_is_not_0/ffcore')
+cmd = "cat >> /c/ai_paycore/ffcore/state/kanal/isci-b.md <<'EOF'\\n### B-X-0001 \xb7 2026-11-20 13:20 \xb7 \u2192 koordinator \xb7 YIGIN-KAPA\\nmake test 2>&1 | tail -3\\ndocker compose -p ffcore-x build backend\\nEOF"
+
+    @pytest.mark.parametrize("cmd", SILENT)
+    def test_heredoc_body_text_is_not_a_command(guard, main_root, cmd):
+>       assert rules(guard, cmd, main_root) == [], cmd
+E       AssertionError: cat >> /c/ai_paycore/ffcore/state/kanal/isci-b.md <<'EOF'
+E         ### B-X-0001 \xb7 2026-11-20 13:20 \xb7 \u2192 koordinator \xb7 YIGIN-KAPA
+E         make test 2>&1 | tail -3
+E         docker compose -p ffcore-x build backend
+E         EOF
+E       assert ['KAPI', 'PROSES-175'] == []
+E         
+E         Left contains 2 more items, first extra item: 'KAPI'
+E         Use -v to get more diff
+
+tests\hooks\test_heredoc_commands.py:36: AssertionError
+_ test_heredoc_body_text_is_not_a_command[cat >> state/pr/x.md <<EOF\npy -3.12 -m pytest tests/hooks -q\nEOF] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\hook-egress-1\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-87/test_heredoc_body_text_is_not_1/ffcore')
+cmd = 'cat >> state/pr/x.md <<EOF\npy -3.12 -m pytest tests/hooks -q\nEOF'
+
+    @pytest.mark.parametrize("cmd", SILENT)
+    def test_heredoc_body_text_is_not_a_command(guard, main_root, cmd):
+>       assert rules(guard, cmd, main_root) == [], cmd
+E       AssertionError: cat >> state/pr/x.md <<EOF
+E         py -3.12 -m pytest tests/hooks -q
+E         EOF
+E       assert ['KAPI'] == []
+E         
+E         Left contains one more item: 'KAPI'
+E         Use -v to get more diff
+
+tests\hooks\test_heredoc_commands.py:36: AssertionError
+_ test_heredoc_body_text_is_not_a_command[cat <<-EOF > notes.md\n\tmake lint\n\tEOF] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\hook-egress-1\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-87/test_heredoc_body_text_is_not_2/ffcore')
+cmd = 'cat <<-EOF > notes.md\n\tmake lint\n\tEOF'
+
+    @pytest.mark.parametrize("cmd", SILENT)
+    def test_heredoc_body_text_is_not_a_command(guard, main_root, cmd):
+>       assert rules(guard, cmd, main_root) == [], cmd
+E       AssertionError: cat <<-EOF > notes.md
+E         	make lint
+E         	EOF
+E       assert ['KAPI'] == []
+E         
+E         Left contains one more item: 'KAPI'
+E         Use -v to get more diff
+
+tests\hooks\test_heredoc_commands.py:36: AssertionError
+_ test_heredoc_body_text_is_not_a_command[python - <<'EOF'\np='docs/x.md'\ns=open(p).read()\nmake test\ndocker build -t x .\nEOF] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\hook-egress-1\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-87/test_heredoc_body_text_is_not_3/ffcore')
+cmd = "python - <<'EOF'\np='docs/x.md'\ns=open(p).read()\nmake test\ndocker build -t x .\nEOF"
+
+    @pytest.mark.parametrize("cmd", SILENT)
+    def test_heredoc_body_text_is_not_a_command(guard, main_root, cmd):
+>       assert rules(guard, cmd, main_root) == [], cmd
+E       AssertionError: python - <<'EOF'
+E         p='docs/x.md'
+E         s=open(p).read()
+E         make test
+E         docker build -t x .
+E         EOF
+E       assert ['KAPI', 'PROSES-175'] == []
+E         
+E         Left contains 2 more items, first extra item: 'KAPI'
+E         Use -v to get more diff
+
+tests\hooks\test_heredoc_commands.py:36: AssertionError
+_ test_heredoc_body_text_is_not_a_command[py -3.12 - <<'PY'\nfrom pathlib import Path\npytest tests\nPY] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\hook-egress-1\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-87/test_heredoc_body_text_is_not_4/ffcore')
+cmd = "py -3.12 - <<'PY'\nfrom pathlib import Path\npytest tests\nPY"
+
+    @pytest.mark.parametrize("cmd", SILENT)
+    def test_heredoc_body_text_is_not_a_command(guard, main_root, cmd):
+>       assert rules(guard, cmd, main_root) == [], cmd
+E       AssertionError: py -3.12 - <<'PY'
+E         from pathlib import Path
+E         pytest tests
+E         PY
+E       assert ['KAPI'] == []
+E         
+E         Left contains one more item: 'KAPI'
+E         Use -v to get more diff
+
+tests\hooks\test_heredoc_commands.py:36: AssertionError
+_ test_heredoc_body_text_is_not_a_command[cat > f <<'EOF'\nmake test\nEOF\nmake test 2>&1 | tee state/evidence/x.log] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\hook-egress-1\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-87/test_heredoc_body_text_is_not_5/ffcore')
+cmd = "cat > f <<'EOF'\nmake test\nEOF\nmake test 2>&1 | tee state/evidence/x.log"
+
+    @pytest.mark.parametrize("cmd", SILENT)
+    def test_heredoc_body_text_is_not_a_command(guard, main_root, cmd):
+>       assert rules(guard, cmd, main_root) == [], cmd
+E       AssertionError: cat > f <<'EOF'
+E         make test
+E         EOF
+E         make test 2>&1 | tee state/evidence/x.log
+E       assert ['KAPI'] == []
+E         
+E         Left contains one more item: 'KAPI'
+E         Use -v to get more diff
+
+tests\hooks\test_heredoc_commands.py:36: AssertionError
+_________________ test_tee_after_shell_heredoc_satisfies_gate _________________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\hook-egress-1\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-87/test_tee_after_shell_heredoc_s0/ffcore')
+
+    def test_tee_after_shell_heredoc_satisfies_gate(guard, main_root):
+        cmd = "bash <<'EOF' 2>&1 | tee state/evidence/x.log\nmake test\nEOF"
+>       assert "KAPI" not in rules(guard, cmd, main_root)
+E       assert 'KAPI' not in ['KAPI']
+E        +  where ['KAPI'] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\hook-egress-1\\.claude\\hooks\\ffcore_guard.py'>, "bash <<'EOF' 2>&1 | tee state/evidence/x.log\nmake test\nEOF", WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-87/test_tee_after_shell_heredoc_s0/ffcore'))
+
+tests\hooks\test_heredoc_commands.py:60: AssertionError
+________________ test_worker_writes_sub_pr_note_allowed[04b-1] ________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-87/test_worker_writes_sub_pr_note0/ffcore')
+name = '04b-1'
+
+    @pytest.mark.parametrize("name", ["04b-1", "04b-2", "04b-12"])
+    def test_worker_writes_sub_pr_note_allowed(main_root, name):
+        # K-HKE-0002 K1: a package split into PRs writes state/pr/<package>-<n>.md (04b-2 warn line)
+        path = main_root / "state" / "pr" / f"{name}.md"
+        proc = run_hook(edit(path), main_root, FFCORE_ROL="isci-b", FFCORE_PAKET="04b")
+>       assert_allowed(proc)
+
+tests\hooks\test_guard.py:389: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\\\Users\\\\caglar.sahin\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python312\\\\python.exe', 'C:\\\\ai_pay...=2, stdout='', stderr='FFCORE-GUARD [TEK-YAZAR] state/pr/04b-1.md \u2192 paketin i\u015f\xe7isi; senin rol\xfcn isci-b, paketin 04b\\n')
+
+    def assert_allowed(proc) -> None:
+>       assert proc.returncode == 0, (proc.returncode, proc.stderr)
+E       AssertionError: (2, 'FFCORE-GUARD [TEK-YAZAR] state/pr/04b-1.md \u2192 paketin i\u015f\xe7isi; senin rol\xfcn isci-b, paketin 04b
+E         ')
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['C:\\\\Users\\\\caglar.sahin\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python312\\\\python.exe', 'C:\\\\ai_pay...=2, stdout='', stderr='FFCORE-GUARD [TEK-YAZAR] state/pr/04b-1.md \u2192 paketin i\u015f\xe7isi; senin rol\xfcn isci-b, paketin 04b\\n').returncode
+
+tests\hooks\test_guard.py:34: AssertionError
+________________ test_worker_writes_sub_pr_note_allowed[04b-2] ________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-87/test_worker_writes_sub_pr_note1/ffcore')
+name = '04b-2'
+
+    @pytest.mark.parametrize("name", ["04b-1", "04b-2", "04b-12"])
+    def test_worker_writes_sub_pr_note_allowed(main_root, name):
+        # K-HKE-0002 K1: a package split into PRs writes state/pr/<package>-<n>.md (04b-2 warn line)
+        path = main_root / "state" / "pr" / f"{name}.md"
+        proc = run_hook(edit(path), main_root, FFCORE_ROL="isci-b", FFCORE_PAKET="04b")
+>       assert_allowed(proc)
+
+tests\hooks\test_guard.py:389: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\\\Users\\\\caglar.sahin\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python312\\\\python.exe', 'C:\\\\ai_pay...=2, stdout='', stderr='FFCORE-GUARD [TEK-YAZAR] state/pr/04b-2.md \u2192 paketin i\u015f\xe7isi; senin rol\xfcn isci-b, paketin 04b\\n')
+
+    def assert_allowed(proc) -> None:
+>       assert proc.returncode == 0, (proc.returncode, proc.stderr)
+E       AssertionError: (2, 'FFCORE-GUARD [TEK-YAZAR] state/pr/04b-2.md \u2192 paketin i\u015f\xe7isi; senin rol\xfcn isci-b, paketin 04b
+E         ')
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['C:\\\\Users\\\\caglar.sahin\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python312\\\\python.exe', 'C:\\\\ai_pay...=2, stdout='', stderr='FFCORE-GUARD [TEK-YAZAR] state/pr/04b-2.md \u2192 paketin i\u015f\xe7isi; senin rol\xfcn isci-b, paketin 04b\\n').returncode
+
+tests\hooks\test_guard.py:34: AssertionError
+_______________ test_worker_writes_sub_pr_note_allowed[04b-12] ________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-87/test_worker_writes_sub_pr_note2/ffcore')
+name = '04b-12'
+
+    @pytest.mark.parametrize("name", ["04b-1", "04b-2", "04b-12"])
+    def test_worker_writes_sub_pr_note_allowed(main_root, name):
+        # K-HKE-0002 K1: a package split into PRs writes state/pr/<package>-<n>.md (04b-2 warn line)
+        path = main_root / "state" / "pr" / f"{name}.md"
+        proc = run_hook(edit(path), main_root, FFCORE_ROL="isci-b", FFCORE_PAKET="04b")
+>       assert_allowed(proc)
+
+tests\hooks\test_guard.py:389: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\\\Users\\\\caglar.sahin\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python312\\\\python.exe', 'C:\\\\ai_pay...2, stdout='', stderr='FFCORE-GUARD [TEK-YAZAR] state/pr/04b-12.md \u2192 paketin i\u015f\xe7isi; senin rol\xfcn isci-b, paketin 04b\\n')
+
+    def assert_allowed(proc) -> None:
+>       assert proc.returncode == 0, (proc.returncode, proc.stderr)
+E       AssertionError: (2, 'FFCORE-GUARD [TEK-YAZAR] state/pr/04b-12.md \u2192 paketin i\u015f\xe7isi; senin rol\xfcn isci-b, paketin 04b
+E         ')
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['C:\\\\Users\\\\caglar.sahin\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python312\\\\python.exe', 'C:\\\\ai_pay...2, stdout='', stderr='FFCORE-GUARD [TEK-YAZAR] state/pr/04b-12.md \u2192 paketin i\u015f\xe7isi; senin rol\xfcn isci-b, paketin 04b\\n').returncode
+
+tests\hooks\test_guard.py:34: AssertionError
+___________________ test_sub_pr_alias_from_registry_allowed ___________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-87/test_sub_pr_alias_from_registr0/ffcore')
+
+    def test_sub_pr_alias_from_registry_allowed(main_root):
+        write_registry(
+            main_root,
+            {SESSION_ID: {"rol": "isci-a", "paket": "12", "pr": "12", "acildi": "x"}},
+        )
+>       assert_allowed(run_hook(edit(main_root / "state" / "pr" / "12-2.md"), main_root))
+
+tests\hooks\test_guard.py:404: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\\\Users\\\\caglar.sahin\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python312\\\\python.exe', 'C:\\\\ai_pay...de=2, stdout='', stderr='FFCORE-GUARD [TEK-YAZAR] state/pr/12-2.md \u2192 paketin i\u015f\xe7isi; senin rol\xfcn isci-a, paketin 12\\n')
+
+    def assert_allowed(proc) -> None:
+>       assert proc.returncode == 0, (proc.returncode, proc.stderr)
+E       AssertionError: (2, 'FFCORE-GUARD [TEK-YAZAR] state/pr/12-2.md \u2192 paketin i\u015f\xe7isi; senin rol\xfcn isci-a, paketin 12
+E         ')
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['C:\\\\Users\\\\caglar.sahin\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python312\\\\python.exe', 'C:\\\\ai_pay...de=2, stdout='', stderr='FFCORE-GUARD [TEK-YAZAR] state/pr/12-2.md \u2192 paketin i\u015f\xe7isi; senin rol\xfcn isci-a, paketin 12\\n').returncode
+
+tests\hooks\test_guard.py:34: AssertionError
+__________________________ test_log_truncates_to_240 __________________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-87/test_log_truncates_to_2400/ffcore')
+
+    def test_log_truncates_to_240(main_root):
+        # K-HKE-0002: 120 characters left 38 warn lines unclassifiable (state/pr/hook-egress-1.md)
+        cmd = "make test && echo " + "x" * 300
+        run_hook(bash(cmd), main_root)
+        detail = log_lines(main_root)[0].split("\t")[5]
+>       assert len(detail) == 240
+E       AssertionError: assert 120 == 240
+E        +  where 120 = len('make test && echo xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')
+
+tests\hooks\test_guard.py:604: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/hooks/test_heredoc_commands.py::test_heredoc_body_text_is_not_a_command[cat >> /c/ai_paycore/ffcore/state/kanal/isci-b.md <<'EOF'\n### B-X-0001 \xb7 2026-11-20 13:20 \xb7 \u2192 koordinator \xb7 YIGIN-KAPA\nmake test 2>&1 | tail -3\ndocker compose -p ffcore-x build backend\nEOF]
+FAILED tests/hooks/test_heredoc_commands.py::test_heredoc_body_text_is_not_a_command[cat >> state/pr/x.md <<EOF\npy -3.12 -m pytest tests/hooks -q\nEOF]
+FAILED tests/hooks/test_heredoc_commands.py::test_heredoc_body_text_is_not_a_command[cat <<-EOF > notes.md\n\tmake lint\n\tEOF]
+FAILED tests/hooks/test_heredoc_commands.py::test_heredoc_body_text_is_not_a_command[python - <<'EOF'\np='docs/x.md'\ns=open(p).read()\nmake test\ndocker build -t x .\nEOF]
+FAILED tests/hooks/test_heredoc_commands.py::test_heredoc_body_text_is_not_a_command[py -3.12 - <<'PY'\nfrom pathlib import Path\npytest tests\nPY]
+FAILED tests/hooks/test_heredoc_commands.py::test_heredoc_body_text_is_not_a_command[cat > f <<'EOF'\nmake test\nEOF\nmake test 2>&1 | tee state/evidence/x.log]
+FAILED tests/hooks/test_heredoc_commands.py::test_tee_after_shell_heredoc_satisfies_gate
+FAILED tests/hooks/test_guard.py::test_worker_writes_sub_pr_note_allowed[04b-1]
+FAILED tests/hooks/test_guard.py::test_worker_writes_sub_pr_note_allowed[04b-2]
+FAILED tests/hooks/test_guard.py::test_worker_writes_sub_pr_note_allowed[04b-12]
+FAILED tests/hooks/test_guard.py::test_sub_pr_alias_from_registry_allowed - A...
+FAILED tests/hooks/test_guard.py::test_log_truncates_to_240 - AssertionError:...
+12 failed, 15 passed, 161 deselected in 11.22s

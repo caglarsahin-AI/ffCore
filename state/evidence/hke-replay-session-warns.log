@@ -1,0 +1,2 @@
+19:37 py heredoc editing a test (body: make test): []
+19:38 commit && py heredoc && tee'd pytest: []

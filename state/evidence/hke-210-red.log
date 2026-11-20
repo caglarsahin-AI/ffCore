@@ -1,0 +1,300 @@
+FFFFFFFF........                                                         [100%]
+================================== FAILURES ===================================
+_____________ test_bare_docker_build_blocked[docker build -t x .] _____________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-85/test_bare_docker_build_blocked0/ffcore')
+cmd = 'docker build -t x .'
+
+    @pytest.mark.parametrize(
+        "cmd",
+        [
+            "docker build -t x .",
+            "docker build --pull=false -f backend/Dockerfile backend",
+            "docker buildx build --load -t x .",
+            "docker image build -t x .",
+            "docker builder build -t x .",
+            "docker --context default build .",
+            "cd backend && docker build .",
+            'sh -c "docker buildx build ."',
+        ],
+    )
+    def test_bare_docker_build_blocked(main_root, cmd):
+        # FOLLOWUP-210: the BuildKit base image metadata problem (5 November decision) is not
+        # compose-specific; images are built by `up --build --pull never`.
+>       assert_blocked(run_hook(bash(cmd), main_root), "PROSES-175")
+
+tests\hooks\test_guard.py:177: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\hook-egress-1\\.claude\\hooks\\ffcore_guard.py'], returncode=0, stdout='', stderr='')
+rule = 'PROSES-175'
+
+    def assert_blocked(proc, rule: str) -> None:
+>       assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+E       AssertionError: (0, '')
+E       assert 0 == 2
+E        +  where 0 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\hook-egress-1\\.claude\\hooks\\ffcore_guard.py'], returncode=0, stdout='', stderr='').returncode
+
+tests\hooks\test_guard.py:29: AssertionError
+_ test_bare_docker_build_blocked[docker build --pull=false -f backend/Dockerfile backend] _
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-85/test_bare_docker_build_blocked1/ffcore')
+cmd = 'docker build --pull=false -f backend/Dockerfile backend'
+
+    @pytest.mark.parametrize(
+        "cmd",
+        [
+            "docker build -t x .",
+            "docker build --pull=false -f backend/Dockerfile backend",
+            "docker buildx build --load -t x .",
+            "docker image build -t x .",
+            "docker builder build -t x .",
+            "docker --context default build .",
+            "cd backend && docker build .",
+            'sh -c "docker buildx build ."',
+        ],
+    )
+    def test_bare_docker_build_blocked(main_root, cmd):
+        # FOLLOWUP-210: the BuildKit base image metadata problem (5 November decision) is not
+        # compose-specific; images are built by `up --build --pull never`.
+>       assert_blocked(run_hook(bash(cmd), main_root), "PROSES-175")
+
+tests\hooks\test_guard.py:177: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\hook-egress-1\\.claude\\hooks\\ffcore_guard.py'], returncode=0, stdout='', stderr='')
+rule = 'PROSES-175'
+
+    def assert_blocked(proc, rule: str) -> None:
+>       assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+E       AssertionError: (0, '')
+E       assert 0 == 2
+E        +  where 0 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\hook-egress-1\\.claude\\hooks\\ffcore_guard.py'], returncode=0, stdout='', stderr='').returncode
+
+tests\hooks\test_guard.py:29: AssertionError
+______ test_bare_docker_build_blocked[docker buildx build --load -t x .] ______
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-85/test_bare_docker_build_blocked2/ffcore')
+cmd = 'docker buildx build --load -t x .'
+
+    @pytest.mark.parametrize(
+        "cmd",
+        [
+            "docker build -t x .",
+            "docker build --pull=false -f backend/Dockerfile backend",
+            "docker buildx build --load -t x .",
+            "docker image build -t x .",
+            "docker builder build -t x .",
+            "docker --context default build .",
+            "cd backend && docker build .",
+            'sh -c "docker buildx build ."',
+        ],
+    )
+    def test_bare_docker_build_blocked(main_root, cmd):
+        # FOLLOWUP-210: the BuildKit base image metadata problem (5 November decision) is not
+        # compose-specific; images are built by `up --build --pull never`.
+>       assert_blocked(run_hook(bash(cmd), main_root), "PROSES-175")
+
+tests\hooks\test_guard.py:177: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\hook-egress-1\\.claude\\hooks\\ffcore_guard.py'], returncode=0, stdout='', stderr='')
+rule = 'PROSES-175'
+
+    def assert_blocked(proc, rule: str) -> None:
+>       assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+E       AssertionError: (0, '')
+E       assert 0 == 2
+E        +  where 0 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\hook-egress-1\\.claude\\hooks\\ffcore_guard.py'], returncode=0, stdout='', stderr='').returncode
+
+tests\hooks\test_guard.py:29: AssertionError
+__________ test_bare_docker_build_blocked[docker image build -t x .] __________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-85/test_bare_docker_build_blocked3/ffcore')
+cmd = 'docker image build -t x .'
+
+    @pytest.mark.parametrize(
+        "cmd",
+        [
+            "docker build -t x .",
+            "docker build --pull=false -f backend/Dockerfile backend",
+            "docker buildx build --load -t x .",
+            "docker image build -t x .",
+            "docker builder build -t x .",
+            "docker --context default build .",
+            "cd backend && docker build .",
+            'sh -c "docker buildx build ."',
+        ],
+    )
+    def test_bare_docker_build_blocked(main_root, cmd):
+        # FOLLOWUP-210: the BuildKit base image metadata problem (5 November decision) is not
+        # compose-specific; images are built by `up --build --pull never`.
+>       assert_blocked(run_hook(bash(cmd), main_root), "PROSES-175")
+
+tests\hooks\test_guard.py:177: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\hook-egress-1\\.claude\\hooks\\ffcore_guard.py'], returncode=0, stdout='', stderr='')
+rule = 'PROSES-175'
+
+    def assert_blocked(proc, rule: str) -> None:
+>       assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+E       AssertionError: (0, '')
+E       assert 0 == 2
+E        +  where 0 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\hook-egress-1\\.claude\\hooks\\ffcore_guard.py'], returncode=0, stdout='', stderr='').returncode
+
+tests\hooks\test_guard.py:29: AssertionError
+_________ test_bare_docker_build_blocked[docker builder build -t x .] _________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-85/test_bare_docker_build_blocked4/ffcore')
+cmd = 'docker builder build -t x .'
+
+    @pytest.mark.parametrize(
+        "cmd",
+        [
+            "docker build -t x .",
+            "docker build --pull=false -f backend/Dockerfile backend",
+            "docker buildx build --load -t x .",
+            "docker image build -t x .",
+            "docker builder build -t x .",
+            "docker --context default build .",
+            "cd backend && docker build .",
+            'sh -c "docker buildx build ."',
+        ],
+    )
+    def test_bare_docker_build_blocked(main_root, cmd):
+        # FOLLOWUP-210: the BuildKit base image metadata problem (5 November decision) is not
+        # compose-specific; images are built by `up --build --pull never`.
+>       assert_blocked(run_hook(bash(cmd), main_root), "PROSES-175")
+
+tests\hooks\test_guard.py:177: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\hook-egress-1\\.claude\\hooks\\ffcore_guard.py'], returncode=0, stdout='', stderr='')
+rule = 'PROSES-175'
+
+    def assert_blocked(proc, rule: str) -> None:
+>       assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+E       AssertionError: (0, '')
+E       assert 0 == 2
+E        +  where 0 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\hook-egress-1\\.claude\\hooks\\ffcore_guard.py'], returncode=0, stdout='', stderr='').returncode
+
+tests\hooks\test_guard.py:29: AssertionError
+______ test_bare_docker_build_blocked[docker --context default build .] _______
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-85/test_bare_docker_build_blocked5/ffcore')
+cmd = 'docker --context default build .'
+
+    @pytest.mark.parametrize(
+        "cmd",
+        [
+            "docker build -t x .",
+            "docker build --pull=false -f backend/Dockerfile backend",
+            "docker buildx build --load -t x .",
+            "docker image build -t x .",
+            "docker builder build -t x .",
+            "docker --context default build .",
+            "cd backend && docker build .",
+            'sh -c "docker buildx build ."',
+        ],
+    )
+    def test_bare_docker_build_blocked(main_root, cmd):
+        # FOLLOWUP-210: the BuildKit base image metadata problem (5 November decision) is not
+        # compose-specific; images are built by `up --build --pull never`.
+>       assert_blocked(run_hook(bash(cmd), main_root), "PROSES-175")
+
+tests\hooks\test_guard.py:177: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\hook-egress-1\\.claude\\hooks\\ffcore_guard.py'], returncode=0, stdout='', stderr='')
+rule = 'PROSES-175'
+
+    def assert_blocked(proc, rule: str) -> None:
+>       assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+E       AssertionError: (0, '')
+E       assert 0 == 2
+E        +  where 0 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\hook-egress-1\\.claude\\hooks\\ffcore_guard.py'], returncode=0, stdout='', stderr='').returncode
+
+tests\hooks\test_guard.py:29: AssertionError
+________ test_bare_docker_build_blocked[cd backend && docker build .] _________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-85/test_bare_docker_build_blocked6/ffcore')
+cmd = 'cd backend && docker build .'
+
+    @pytest.mark.parametrize(
+        "cmd",
+        [
+            "docker build -t x .",
+            "docker build --pull=false -f backend/Dockerfile backend",
+            "docker buildx build --load -t x .",
+            "docker image build -t x .",
+            "docker builder build -t x .",
+            "docker --context default build .",
+            "cd backend && docker build .",
+            'sh -c "docker buildx build ."',
+        ],
+    )
+    def test_bare_docker_build_blocked(main_root, cmd):
+        # FOLLOWUP-210: the BuildKit base image metadata problem (5 November decision) is not
+        # compose-specific; images are built by `up --build --pull never`.
+>       assert_blocked(run_hook(bash(cmd), main_root), "PROSES-175")
+
+tests\hooks\test_guard.py:177: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\hook-egress-1\\.claude\\hooks\\ffcore_guard.py'], returncode=0, stdout='', stderr='')
+rule = 'PROSES-175'
+
+    def assert_blocked(proc, rule: str) -> None:
+>       assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+E       AssertionError: (0, '')
+E       assert 0 == 2
+E        +  where 0 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\hook-egress-1\\.claude\\hooks\\ffcore_guard.py'], returncode=0, stdout='', stderr='').returncode
+
+tests\hooks\test_guard.py:29: AssertionError
+________ test_bare_docker_build_blocked[sh -c "docker buildx build ."] ________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-85/test_bare_docker_build_blocked7/ffcore')
+cmd = 'sh -c "docker buildx build ."'
+
+    @pytest.mark.parametrize(
+        "cmd",
+        [
+            "docker build -t x .",
+            "docker build --pull=false -f backend/Dockerfile backend",
+            "docker buildx build --load -t x .",
+            "docker image build -t x .",
+            "docker builder build -t x .",
+            "docker --context default build .",
+            "cd backend && docker build .",
+            'sh -c "docker buildx build ."',
+        ],
+    )
+    def test_bare_docker_build_blocked(main_root, cmd):
+        # FOLLOWUP-210: the BuildKit base image metadata problem (5 November decision) is not
+        # compose-specific; images are built by `up --build --pull never`.
+>       assert_blocked(run_hook(bash(cmd), main_root), "PROSES-175")
+
+tests\hooks\test_guard.py:177: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\hook-egress-1\\.claude\\hooks\\ffcore_guard.py'], returncode=0, stdout='', stderr='')
+rule = 'PROSES-175'
+
+    def assert_blocked(proc, rule: str) -> None:
+>       assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+E       AssertionError: (0, '')
+E       assert 0 == 2
+E        +  where 0 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\hook-egress-1\\.claude\\hooks\\ffcore_guard.py'], returncode=0, stdout='', stderr='').returncode
+
+tests\hooks\test_guard.py:29: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/hooks/test_guard.py::test_bare_docker_build_blocked[docker build -t x .]
+FAILED tests/hooks/test_guard.py::test_bare_docker_build_blocked[docker build --pull=false -f backend/Dockerfile backend]
+FAILED tests/hooks/test_guard.py::test_bare_docker_build_blocked[docker buildx build --load -t x .]
+FAILED tests/hooks/test_guard.py::test_bare_docker_build_blocked[docker image build -t x .]
+FAILED tests/hooks/test_guard.py::test_bare_docker_build_blocked[docker builder build -t x .]
+FAILED tests/hooks/test_guard.py::test_bare_docker_build_blocked[docker --context default build .]
+FAILED tests/hooks/test_guard.py::test_bare_docker_build_blocked[cd backend && docker build .]
+FAILED tests/hooks/test_guard.py::test_bare_docker_build_blocked[sh -c "docker buildx build ."]
+8 failed, 8 passed, 146 deselected in 17.79s

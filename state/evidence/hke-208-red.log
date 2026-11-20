@@ -1,0 +1,810 @@
+FFFFFFFFFFFF...F.F.FFF.................................................. [ 91%]
+.......                                                                  [100%]
+=================================== FAILURES ===================================
+____________________ test_hke_208_setting_defaults_to_empty ____________________
+
+settings = Settings(deploy_profile='llmaas', inference_backend=None, offline=False, database_url=None, service_token=SecretStr('*...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+
+    def test_hke_208_setting_defaults_to_empty(settings):
+>       assert settings.egress_proxy_url == ""
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_hke_208_egress_proxy.py:130: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Settings(deploy_profile='llmaas', inference_backend=None, offline=False, database_url=None, service_token=SecretStr('*...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+item = 'egress_proxy_url'
+
+    def __getattr__(self, item: str) -> Any:
+        private_attributes = object.__getattribute__(self, '__private_attributes__')
+        if item in private_attributes:
+            attribute = private_attributes[item]
+            if hasattr(attribute, '__get__'):
+                return attribute.__get__(self, type(self))  # type: ignore
+    
+            try:
+                # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
+                return self.__pydantic_private__[item]  # type: ignore
+            except KeyError as exc:
+                raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}') from exc
+        else:
+            # `__pydantic_extra__` can fail to be set if the model is not yet fully initialized.
+            # See `BaseModel.__repr_args__` for more details
+            try:
+                pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
+            except AttributeError:
+                pydantic_extra = None
+    
+            if pydantic_extra and item in pydantic_extra:
+                return pydantic_extra[item]
+            else:
+                if hasattr(self.__class__, item):
+                    return super().__getattribute__(item)  # Raises AttributeError if appropriate
+                else:
+                    # this is the current error
+>                   raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+E                   AttributeError: 'Settings' object has no attribute 'egress_proxy_url'
+
+/opt/venv/lib/python3.12/site-packages/pydantic/main.py:1105: AttributeError
+_ test_hke_208_setting_refuses_anything_but_http_host_port[https://egress-proxy:3128] _
+
+settings = Settings(deploy_profile='llmaas', inference_backend=None, offline=False, database_url=None, service_token=SecretStr('*...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+value = 'https://egress-proxy:3128'
+
+    @pytest.mark.parametrize(
+        "value",
+        [
+            "https://egress-proxy:3128",
+            "http://user:pass@egress-proxy:3128",
+            "http://egress-proxy:3128/path",
+            "http://egress-proxy:3128?x=1",
+            "http://egress-proxy",
+            "socks5://egress-proxy:1080",
+            "egress-proxy:3128",
+        ],
+    )
+    def test_hke_208_setting_refuses_anything_but_http_host_port(settings, value):
+>       with pytest.raises(ValidationError, match="egress_proxy_url_invalid"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValidationError
+
+tests/unit/test_hke_208_egress_proxy.py:146: Failed
+_ test_hke_208_setting_refuses_anything_but_http_host_port[http://user:pass@egress-proxy:3128] _
+
+settings = Settings(deploy_profile='llmaas', inference_backend=None, offline=False, database_url=None, service_token=SecretStr('*...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+value = 'http://user:pass@egress-proxy:3128'
+
+    @pytest.mark.parametrize(
+        "value",
+        [
+            "https://egress-proxy:3128",
+            "http://user:pass@egress-proxy:3128",
+            "http://egress-proxy:3128/path",
+            "http://egress-proxy:3128?x=1",
+            "http://egress-proxy",
+            "socks5://egress-proxy:1080",
+            "egress-proxy:3128",
+        ],
+    )
+    def test_hke_208_setting_refuses_anything_but_http_host_port(settings, value):
+>       with pytest.raises(ValidationError, match="egress_proxy_url_invalid"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValidationError
+
+tests/unit/test_hke_208_egress_proxy.py:146: Failed
+_ test_hke_208_setting_refuses_anything_but_http_host_port[http://egress-proxy:3128/path] _
+
+settings = Settings(deploy_profile='llmaas', inference_backend=None, offline=False, database_url=None, service_token=SecretStr('*...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+value = 'http://egress-proxy:3128/path'
+
+    @pytest.mark.parametrize(
+        "value",
+        [
+            "https://egress-proxy:3128",
+            "http://user:pass@egress-proxy:3128",
+            "http://egress-proxy:3128/path",
+            "http://egress-proxy:3128?x=1",
+            "http://egress-proxy",
+            "socks5://egress-proxy:1080",
+            "egress-proxy:3128",
+        ],
+    )
+    def test_hke_208_setting_refuses_anything_but_http_host_port(settings, value):
+>       with pytest.raises(ValidationError, match="egress_proxy_url_invalid"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValidationError
+
+tests/unit/test_hke_208_egress_proxy.py:146: Failed
+_ test_hke_208_setting_refuses_anything_but_http_host_port[http://egress-proxy:3128?x=1] _
+
+settings = Settings(deploy_profile='llmaas', inference_backend=None, offline=False, database_url=None, service_token=SecretStr('*...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+value = 'http://egress-proxy:3128?x=1'
+
+    @pytest.mark.parametrize(
+        "value",
+        [
+            "https://egress-proxy:3128",
+            "http://user:pass@egress-proxy:3128",
+            "http://egress-proxy:3128/path",
+            "http://egress-proxy:3128?x=1",
+            "http://egress-proxy",
+            "socks5://egress-proxy:1080",
+            "egress-proxy:3128",
+        ],
+    )
+    def test_hke_208_setting_refuses_anything_but_http_host_port(settings, value):
+>       with pytest.raises(ValidationError, match="egress_proxy_url_invalid"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValidationError
+
+tests/unit/test_hke_208_egress_proxy.py:146: Failed
+_ test_hke_208_setting_refuses_anything_but_http_host_port[http://egress-proxy] _
+
+settings = Settings(deploy_profile='llmaas', inference_backend=None, offline=False, database_url=None, service_token=SecretStr('*...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+value = 'http://egress-proxy'
+
+    @pytest.mark.parametrize(
+        "value",
+        [
+            "https://egress-proxy:3128",
+            "http://user:pass@egress-proxy:3128",
+            "http://egress-proxy:3128/path",
+            "http://egress-proxy:3128?x=1",
+            "http://egress-proxy",
+            "socks5://egress-proxy:1080",
+            "egress-proxy:3128",
+        ],
+    )
+    def test_hke_208_setting_refuses_anything_but_http_host_port(settings, value):
+>       with pytest.raises(ValidationError, match="egress_proxy_url_invalid"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValidationError
+
+tests/unit/test_hke_208_egress_proxy.py:146: Failed
+_ test_hke_208_setting_refuses_anything_but_http_host_port[socks5://egress-proxy:1080] _
+
+settings = Settings(deploy_profile='llmaas', inference_backend=None, offline=False, database_url=None, service_token=SecretStr('*...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+value = 'socks5://egress-proxy:1080'
+
+    @pytest.mark.parametrize(
+        "value",
+        [
+            "https://egress-proxy:3128",
+            "http://user:pass@egress-proxy:3128",
+            "http://egress-proxy:3128/path",
+            "http://egress-proxy:3128?x=1",
+            "http://egress-proxy",
+            "socks5://egress-proxy:1080",
+            "egress-proxy:3128",
+        ],
+    )
+    def test_hke_208_setting_refuses_anything_but_http_host_port(settings, value):
+>       with pytest.raises(ValidationError, match="egress_proxy_url_invalid"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValidationError
+
+tests/unit/test_hke_208_egress_proxy.py:146: Failed
+_ test_hke_208_setting_refuses_anything_but_http_host_port[egress-proxy:3128] __
+
+settings = Settings(deploy_profile='llmaas', inference_backend=None, offline=False, database_url=None, service_token=SecretStr('*...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+value = 'egress-proxy:3128'
+
+    @pytest.mark.parametrize(
+        "value",
+        [
+            "https://egress-proxy:3128",
+            "http://user:pass@egress-proxy:3128",
+            "http://egress-proxy:3128/path",
+            "http://egress-proxy:3128?x=1",
+            "http://egress-proxy",
+            "socks5://egress-proxy:1080",
+            "egress-proxy:3128",
+        ],
+    )
+    def test_hke_208_setting_refuses_anything_but_http_host_port(settings, value):
+>       with pytest.raises(ValidationError, match="egress_proxy_url_invalid"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValidationError
+
+tests/unit/test_hke_208_egress_proxy.py:146: Failed
+_________________ test_hke_208_setting_accepts_http_host_port __________________
+
+settings = Settings(deploy_profile='llmaas', inference_backend=None, offline=False, database_url=None, service_token=SecretStr('*...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+
+    def test_hke_208_setting_accepts_http_host_port(settings):
+        configured = Settings(**{**settings.model_dump(), "egress_proxy_url": "http://egress-proxy:3128"})
+>       assert configured.egress_proxy_url == "http://egress-proxy:3128"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_hke_208_egress_proxy.py:152: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Settings(deploy_profile='llmaas', inference_backend=None, offline=False, database_url=None, service_token=SecretStr('*...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+item = 'egress_proxy_url'
+
+    def __getattr__(self, item: str) -> Any:
+        private_attributes = object.__getattribute__(self, '__private_attributes__')
+        if item in private_attributes:
+            attribute = private_attributes[item]
+            if hasattr(attribute, '__get__'):
+                return attribute.__get__(self, type(self))  # type: ignore
+    
+            try:
+                # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
+                return self.__pydantic_private__[item]  # type: ignore
+            except KeyError as exc:
+                raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}') from exc
+        else:
+            # `__pydantic_extra__` can fail to be set if the model is not yet fully initialized.
+            # See `BaseModel.__repr_args__` for more details
+            try:
+                pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
+            except AttributeError:
+                pydantic_extra = None
+    
+            if pydantic_extra and item in pydantic_extra:
+                return pydantic_extra[item]
+            else:
+                if hasattr(self.__class__, item):
+                    return super().__getattribute__(item)  # Raises AttributeError if appropriate
+                else:
+                    # this is the current error
+>                   raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+E                   AttributeError: 'Settings' object has no attribute 'egress_proxy_url'
+
+/opt/venv/lib/python3.12/site-packages/pydantic/main.py:1105: AttributeError
+__________ test_hke_208_external_host_goes_through_the_proxy_by_name ___________
+
+settings = Settings(deploy_profile='llmaas', inference_backend=None, offline=False, database_url=None, service_token=SecretStr('*...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+proxy = <socketserver.ThreadingTCPServer object at 0x7f3501d600b0>
+
+    def test_hke_208_external_host_goes_through_the_proxy_by_name(settings, proxy):
+        resolver = _resolver({"proxy.test": ["127.0.0.1"]})
+>       response = anyio.run(
+            _get, _client(_proxied(settings, proxy), resolver), "http://svc.example.com/v1/models"
+        )
+
+tests/unit/test_hke_208_egress_proxy.py:160: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/venv/lib/python3.12/site-packages/anyio/_core/_eventloop.py:83: in run
+    return async_backend.run(func, args, {}, backend_options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py:2548: in run
+    return runner.run(wrapper())
+           ^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py:2531: in wrapper
+    return await func(*args)
+           ^^^^^^^^^^^^^^^^^
+tests/unit/test_hke_208_egress_proxy.py:119: in _get
+    return await client.request("GET", url)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ffcore/core/egress.py:443: in request
+    return await self._follow(method, target, dict(headers or {}), params, body)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ffcore/core/egress.py:495: in _follow
+    response = await self._client.send(request, stream=stream)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1817: in send
+    response = await self._send_handling_auth(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1845: in _send_handling_auth
+    response = await self._send_handling_redirects(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1880: in _send_handling_redirects
+    response = await self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1914: in _send_single_request
+    response = await transport.handle_async_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_transports/default.py:388: in handle_async_request
+    resp = await self._pool.handle_async_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpcore2/_async/connection_pool.py:242: in handle_async_request
+    raise exc from None
+/opt/venv/lib/python3.12/site-packages/httpcore2/_async/connection_pool.py:224: in handle_async_request
+    response = await connection.handle_async_request(pool_request.request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpcore2/_async/connection.py:94: in handle_async_request
+    raise exc
+/opt/venv/lib/python3.12/site-packages/httpcore2/_async/connection.py:74: in handle_async_request
+    stream = await self._connect(request)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpcore2/_async/connection.py:117: in _connect
+    stream = await self._network_backend.connect_tcp(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ffcore.core.egress._PinnedBackend object at 0x7f3501be1550>
+host = 'svc.example.com', port = 80, timeout = 2, local_address = None
+socket_options = None
+
+    async def connect_tcp(
+        self, host, port, timeout=None, local_address=None, socket_options=None
+    ) -> httpcore2.AsyncNetworkStream:
+        # Defence in depth: the same host rules as the URL check, at the layer that dials.
+        self._policy.check_host(host, f"{host}:{port}")
+        literal = _parse_ip(host)
+        try:
+            addresses = [str(literal)] if literal is not None else await self._resolver(host, port)
+        except OSError:
+            # Name lookup failed (socket.gaierror and friends): a failed call like any other
+            # connection failure, not an unhandled error. The system text is not carried along.
+>           raise EgressRequestFailed(
+                "egress_dns_failed", f"{host}:{port}", "name does not resolve"
+            ) from None
+E           ffcore.core.egress.EgressRequestFailed: Outbound call to svc.example.com:80 failed: egress_dns_failed (name does not resolve).
+
+ffcore/core/egress.py:307: EgressRequestFailed
+____________ test_hke_208_https_target_is_a_connect_tunnel_by_name _____________
+
+settings = Settings(deploy_profile='llmaas', inference_backend=None, offline=False, database_url=None, service_token=SecretStr('*...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+proxy = <socketserver.ThreadingTCPServer object at 0x7f3501d600b0>
+
+    def test_hke_208_https_target_is_a_connect_tunnel_by_name(settings, proxy):
+        resolver = _resolver({"proxy.test": ["127.0.0.1"]})
+        with pytest.raises(EgressDenied) as exc:
+>           anyio.run(
+                _get, _client(_proxied(settings, proxy), resolver), "https://svc.example.com/v1/x"
+            )
+
+tests/unit/test_hke_208_egress_proxy.py:172: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/venv/lib/python3.12/site-packages/anyio/_core/_eventloop.py:83: in run
+    return async_backend.run(func, args, {}, backend_options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py:2548: in run
+    return runner.run(wrapper())
+           ^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py:2531: in wrapper
+    return await func(*args)
+           ^^^^^^^^^^^^^^^^^
+tests/unit/test_hke_208_egress_proxy.py:119: in _get
+    return await client.request("GET", url)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ffcore/core/egress.py:443: in request
+    return await self._follow(method, target, dict(headers or {}), params, body)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ffcore/core/egress.py:495: in _follow
+    response = await self._client.send(request, stream=stream)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1817: in send
+    response = await self._send_handling_auth(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1845: in _send_handling_auth
+    response = await self._send_handling_redirects(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1880: in _send_handling_redirects
+    response = await self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1914: in _send_single_request
+    response = await transport.handle_async_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_transports/default.py:388: in handle_async_request
+    resp = await self._pool.handle_async_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpcore2/_async/connection_pool.py:242: in handle_async_request
+    raise exc from None
+/opt/venv/lib/python3.12/site-packages/httpcore2/_async/connection_pool.py:224: in handle_async_request
+    response = await connection.handle_async_request(pool_request.request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpcore2/_async/connection.py:94: in handle_async_request
+    raise exc
+/opt/venv/lib/python3.12/site-packages/httpcore2/_async/connection.py:74: in handle_async_request
+    stream = await self._connect(request)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpcore2/_async/connection.py:117: in _connect
+    stream = await self._network_backend.connect_tcp(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ffcore.core.egress._PinnedBackend object at 0x7f35021ac890>
+host = 'svc.example.com', port = 443, timeout = 2, local_address = None
+socket_options = None
+
+    async def connect_tcp(
+        self, host, port, timeout=None, local_address=None, socket_options=None
+    ) -> httpcore2.AsyncNetworkStream:
+        # Defence in depth: the same host rules as the URL check, at the layer that dials.
+        self._policy.check_host(host, f"{host}:{port}")
+        literal = _parse_ip(host)
+        try:
+            addresses = [str(literal)] if literal is not None else await self._resolver(host, port)
+        except OSError:
+            # Name lookup failed (socket.gaierror and friends): a failed call like any other
+            # connection failure, not an unhandled error. The system text is not carried along.
+>           raise EgressRequestFailed(
+                "egress_dns_failed", f"{host}:{port}", "name does not resolve"
+            ) from None
+E           ffcore.core.egress.EgressRequestFailed: Outbound call to svc.example.com:443 failed: egress_dns_failed (name does not resolve).
+
+ffcore/core/egress.py:307: EgressRequestFailed
+__________ test_hke_208_proxy_refusal_of_a_plain_request_is_an_error ___________
+
+settings = Settings(deploy_profile='llmaas', inference_backend=None, offline=False, database_url=None, service_token=SecretStr('*...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+proxy = <socketserver.ThreadingTCPServer object at 0x7f3501d600b0>
+
+    def test_hke_208_proxy_refusal_of_a_plain_request_is_an_error(settings, proxy):
+        resolver = _resolver({"proxy.test": ["127.0.0.1"]})
+        with pytest.raises(EgressDenied) as exc:
+>           anyio.run(
+                _get, _client(_proxied(settings, proxy), resolver), "http://denied.example/v1/x"
+            )
+
+tests/unit/test_hke_208_egress_proxy.py:182: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/venv/lib/python3.12/site-packages/anyio/_core/_eventloop.py:83: in run
+    return async_backend.run(func, args, {}, backend_options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py:2548: in run
+    return runner.run(wrapper())
+           ^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py:2531: in wrapper
+    return await func(*args)
+           ^^^^^^^^^^^^^^^^^
+tests/unit/test_hke_208_egress_proxy.py:119: in _get
+    return await client.request("GET", url)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ffcore/core/egress.py:443: in request
+    return await self._follow(method, target, dict(headers or {}), params, body)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ffcore/core/egress.py:495: in _follow
+    response = await self._client.send(request, stream=stream)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1817: in send
+    response = await self._send_handling_auth(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1845: in _send_handling_auth
+    response = await self._send_handling_redirects(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1880: in _send_handling_redirects
+    response = await self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1914: in _send_single_request
+    response = await transport.handle_async_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_transports/default.py:388: in handle_async_request
+    resp = await self._pool.handle_async_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpcore2/_async/connection_pool.py:242: in handle_async_request
+    raise exc from None
+/opt/venv/lib/python3.12/site-packages/httpcore2/_async/connection_pool.py:224: in handle_async_request
+    response = await connection.handle_async_request(pool_request.request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpcore2/_async/connection.py:94: in handle_async_request
+    raise exc
+/opt/venv/lib/python3.12/site-packages/httpcore2/_async/connection.py:74: in handle_async_request
+    stream = await self._connect(request)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpcore2/_async/connection.py:117: in _connect
+    stream = await self._network_backend.connect_tcp(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ffcore.core.egress._PinnedBackend object at 0x7f35021b2000>
+host = 'denied.example', port = 80, timeout = 2, local_address = None
+socket_options = None
+
+    async def connect_tcp(
+        self, host, port, timeout=None, local_address=None, socket_options=None
+    ) -> httpcore2.AsyncNetworkStream:
+        # Defence in depth: the same host rules as the URL check, at the layer that dials.
+        self._policy.check_host(host, f"{host}:{port}")
+        literal = _parse_ip(host)
+        try:
+            addresses = [str(literal)] if literal is not None else await self._resolver(host, port)
+        except OSError:
+            # Name lookup failed (socket.gaierror and friends): a failed call like any other
+            # connection failure, not an unhandled error. The system text is not carried along.
+>           raise EgressRequestFailed(
+                "egress_dns_failed", f"{host}:{port}", "name does not resolve"
+            ) from None
+E           ffcore.core.egress.EgressRequestFailed: Outbound call to denied.example:80 failed: egress_dns_failed (name does not resolve).
+
+ffcore/core/egress.py:307: EgressRequestFailed
+____________ test_hke_208_redirect_hop_is_checked_before_the_proxy _____________
+
+settings = Settings(deploy_profile='llmaas', inference_backend=None, offline=False, database_url=None, service_token=SecretStr('*...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+proxy = <socketserver.ThreadingTCPServer object at 0x7f3501d600b0>
+
+    def test_hke_208_redirect_hop_is_checked_before_the_proxy(settings, proxy):
+        resolver = _resolver({"proxy.test": ["127.0.0.1"]})
+        with pytest.raises(EgressDenied) as exc:
+>           anyio.run(
+                _get, _client(_proxied(settings, proxy), resolver), "http://redirect.example/start"
+            )
+
+tests/unit/test_hke_208_egress_proxy.py:208: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/venv/lib/python3.12/site-packages/anyio/_core/_eventloop.py:83: in run
+    return async_backend.run(func, args, {}, backend_options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py:2548: in run
+    return runner.run(wrapper())
+           ^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py:2531: in wrapper
+    return await func(*args)
+           ^^^^^^^^^^^^^^^^^
+tests/unit/test_hke_208_egress_proxy.py:119: in _get
+    return await client.request("GET", url)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ffcore/core/egress.py:443: in request
+    return await self._follow(method, target, dict(headers or {}), params, body)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ffcore/core/egress.py:495: in _follow
+    response = await self._client.send(request, stream=stream)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1817: in send
+    response = await self._send_handling_auth(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1845: in _send_handling_auth
+    response = await self._send_handling_redirects(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1880: in _send_handling_redirects
+    response = await self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1914: in _send_single_request
+    response = await transport.handle_async_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_transports/default.py:388: in handle_async_request
+    resp = await self._pool.handle_async_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpcore2/_async/connection_pool.py:242: in handle_async_request
+    raise exc from None
+/opt/venv/lib/python3.12/site-packages/httpcore2/_async/connection_pool.py:224: in handle_async_request
+    response = await connection.handle_async_request(pool_request.request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpcore2/_async/connection.py:94: in handle_async_request
+    raise exc
+/opt/venv/lib/python3.12/site-packages/httpcore2/_async/connection.py:74: in handle_async_request
+    stream = await self._connect(request)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpcore2/_async/connection.py:117: in _connect
+    stream = await self._network_backend.connect_tcp(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ffcore.core.egress._PinnedBackend object at 0x7f3502197c50>
+host = 'redirect.example', port = 80, timeout = 2, local_address = None
+socket_options = None
+
+    async def connect_tcp(
+        self, host, port, timeout=None, local_address=None, socket_options=None
+    ) -> httpcore2.AsyncNetworkStream:
+        # Defence in depth: the same host rules as the URL check, at the layer that dials.
+        self._policy.check_host(host, f"{host}:{port}")
+        literal = _parse_ip(host)
+        try:
+            addresses = [str(literal)] if literal is not None else await self._resolver(host, port)
+        except OSError:
+            # Name lookup failed (socket.gaierror and friends): a failed call like any other
+            # connection failure, not an unhandled error. The system text is not carried along.
+>           raise EgressRequestFailed(
+                "egress_dns_failed", f"{host}:{port}", "name does not resolve"
+            ) from None
+E           ffcore.core.egress.EgressRequestFailed: Outbound call to redirect.example:80 failed: egress_dns_failed (name does not resolve).
+
+ffcore/core/egress.py:307: EgressRequestFailed
+________ test_hke_208_unreachable_proxy_fails_without_a_direct_fallback ________
+
+settings = Settings(deploy_profile='llmaas', inference_backend=None, offline=False, database_url=None, service_token=SecretStr('*...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+
+    def test_hke_208_unreachable_proxy_fails_without_a_direct_fallback(settings):
+        with socket.socket() as sock:
+            sock.bind(("127.0.0.1", 0))
+            closed_port = sock.getsockname()[1]
+        resolver = _resolver({"proxy.test": ["127.0.0.1"], "svc.example.com": ["93.184.216.34"]})
+        configured = settings.model_copy(
+            update={
+                "egress_proxy_url": f"http://proxy.test:{closed_port}",
+                "egress_allowlist": ["svc.example.com"],
+            }
+        )
+        with pytest.raises(EgressRequestFailed):
+            anyio.run(_get, _client(configured, resolver), "http://svc.example.com/x")
+>       assert resolver.calls == ["proxy.test"]
+E       AssertionError: assert ['svc.example.com'] == ['proxy.test']
+E         
+E         At index 0 diff: 'svc.example.com' != 'proxy.test'
+E         Use -v to get more diff
+
+tests/unit/test_hke_208_egress_proxy.py:238: AssertionError
+____________ test_hke_208_proxy_backend_dials_only_the_proxy_origin ____________
+
+    def test_hke_208_proxy_backend_dials_only_the_proxy_origin():
+        class _Inner(httpcore2.AsyncNetworkBackend):
+            dialed = []
+    
+            async def connect_tcp(self, host, port, **_):
+                self.dialed.append((host, port))
+                raise httpcore2.ConnectError("not dialing in this test")
+    
+            async def connect_unix_socket(self, *a, **k):
+                raise AssertionError
+    
+            async def sleep(self, seconds):
+                await anyio.sleep(seconds)
+    
+        inner = _Inner()
+>       backend = egress._ProxyOnlyBackend(
+                  ^^^^^^^^^^^^^^^^^^^^^^^^
+            "egress-proxy", 3128, _resolver({"egress-proxy": ["172.18.0.9"]}), inner
+        )
+E       AttributeError: module 'ffcore.core.egress' has no attribute '_ProxyOnlyBackend'
+
+tests/unit/test_hke_208_egress_proxy.py:266: AttributeError
+________________ test_hke_208_policy_http_client_uses_the_proxy ________________
+
+settings = Settings(deploy_profile='llmaas', inference_backend=None, offline=False, database_url=None, service_token=SecretStr('*...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+proxy = <socketserver.ThreadingTCPServer object at 0x7f3501d600b0>
+
+    def test_hke_208_policy_http_client_uses_the_proxy(settings, proxy):
+        resolver = _resolver({"proxy.test": ["127.0.0.1"]})
+    
+        async def call():
+            async with policy_http_client(
+                timeout=TIMEOUT, settings=_proxied(settings, proxy), resolver=resolver
+            ) as client:
+                return await client.get("http://svc.example.com/mcp")
+    
+>       assert anyio.run(call).content == b"via-proxy"
+               ^^^^^^^^^^^^^^^
+
+tests/unit/test_hke_208_egress_proxy.py:293: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/venv/lib/python3.12/site-packages/anyio/_core/_eventloop.py:83: in run
+    return async_backend.run(func, args, {}, backend_options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py:2548: in run
+    return runner.run(wrapper())
+           ^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py:2531: in wrapper
+    return await func(*args)
+           ^^^^^^^^^^^^^^^^^
+tests/unit/test_hke_208_egress_proxy.py:291: in call
+    return await client.get("http://svc.example.com/mcp")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1950: in get
+    return await self.request(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1634: in request
+    return await self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1817: in send
+    response = await self._send_handling_auth(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1845: in _send_handling_auth
+    response = await self._send_handling_redirects(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1880: in _send_handling_redirects
+    response = await self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1914: in _send_single_request
+    response = await transport.handle_async_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_transports/default.py:388: in handle_async_request
+    resp = await self._pool.handle_async_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpcore2/_async/connection_pool.py:242: in handle_async_request
+    raise exc from None
+/opt/venv/lib/python3.12/site-packages/httpcore2/_async/connection_pool.py:224: in handle_async_request
+    response = await connection.handle_async_request(pool_request.request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpcore2/_async/connection.py:94: in handle_async_request
+    raise exc
+/opt/venv/lib/python3.12/site-packages/httpcore2/_async/connection.py:74: in handle_async_request
+    stream = await self._connect(request)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpcore2/_async/connection.py:117: in _connect
+    stream = await self._network_backend.connect_tcp(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ffcore.core.egress._PinnedBackend object at 0x7f3501be7410>
+host = 'svc.example.com', port = 80, timeout = 2, local_address = None
+socket_options = None
+
+    async def connect_tcp(
+        self, host, port, timeout=None, local_address=None, socket_options=None
+    ) -> httpcore2.AsyncNetworkStream:
+        # Defence in depth: the same host rules as the URL check, at the layer that dials.
+        self._policy.check_host(host, f"{host}:{port}")
+        literal = _parse_ip(host)
+        try:
+            addresses = [str(literal)] if literal is not None else await self._resolver(host, port)
+        except OSError:
+            # Name lookup failed (socket.gaierror and friends): a failed call like any other
+            # connection failure, not an unhandled error. The system text is not carried along.
+>           raise EgressRequestFailed(
+                "egress_dns_failed", f"{host}:{port}", "name does not resolve"
+            ) from None
+E           ffcore.core.egress.EgressRequestFailed: Outbound call to svc.example.com:80 failed: egress_dns_failed (name does not resolve).
+
+ffcore/core/egress.py:307: EgressRequestFailed
+______ test_hke_208_check_http_destination_leaves_addresses_to_the_proxy _______
+
+settings = Settings(deploy_profile='llmaas', inference_backend=None, offline=False, database_url=None, service_token=SecretStr('*...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+proxy = <socketserver.ThreadingTCPServer object at 0x7f3501d600b0>
+
+    def test_hke_208_check_http_destination_leaves_addresses_to_the_proxy(settings, proxy):
+        resolver = _resolver({})
+        configured = _proxied(settings, proxy)
+>       assert anyio.run(lambda: check_http_destination(configured, "https://svc.example.com/x", resolver=resolver)) == []
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_hke_208_egress_proxy.py:300: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/venv/lib/python3.12/site-packages/anyio/_core/_eventloop.py:83: in run
+    return async_backend.run(func, args, {}, backend_options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py:2548: in run
+    return runner.run(wrapper())
+           ^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py:2531: in wrapper
+    return await func(*args)
+           ^^^^^^^^^^^^^^^^^
+ffcore/core/egress.py:264: in check_http_destination
+    return await _checked_addresses(policy, target.host, port, _origin(target), resolver)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+policy = <ffcore.core.egress.EgressPolicy object at 0x7f3501bb32c0>
+host = 'svc.example.com', port = 443, origin = 'https://svc.example.com'
+resolver = <function _resolver.<locals>.resolve at 0x7f3500ca1620>
+
+    async def _checked_addresses(
+        policy: EgressPolicy, host: str, port: int, origin: str, resolver: Resolver
+    ) -> list[str]:
+        """Every address `host` resolves to, each one through the policy (DNS rebinding: not only
+        the first). A name that does not resolve is a failed request, without the system text."""
+        literal = _parse_ip(host)
+        try:
+            addresses = [str(literal)] if literal is not None else await resolver(host, port)
+        except OSError:
+>           raise EgressRequestFailed("egress_dns_failed", origin, "name does not resolve") from None
+E           ffcore.core.egress.EgressRequestFailed: Outbound call to https://svc.example.com failed: egress_dns_failed (name does not resolve).
+
+ffcore/core/egress.py:238: EgressRequestFailed
+=========================== short test summary info ============================
+FAILED tests/unit/test_hke_208_egress_proxy.py::test_hke_208_setting_defaults_to_empty
+FAILED tests/unit/test_hke_208_egress_proxy.py::test_hke_208_setting_refuses_anything_but_http_host_port[https://egress-proxy:3128]
+FAILED tests/unit/test_hke_208_egress_proxy.py::test_hke_208_setting_refuses_anything_but_http_host_port[http://user:pass@egress-proxy:3128]
+FAILED tests/unit/test_hke_208_egress_proxy.py::test_hke_208_setting_refuses_anything_but_http_host_port[http://egress-proxy:3128/path]
+FAILED tests/unit/test_hke_208_egress_proxy.py::test_hke_208_setting_refuses_anything_but_http_host_port[http://egress-proxy:3128?x=1]
+FAILED tests/unit/test_hke_208_egress_proxy.py::test_hke_208_setting_refuses_anything_but_http_host_port[http://egress-proxy]
+FAILED tests/unit/test_hke_208_egress_proxy.py::test_hke_208_setting_refuses_anything_but_http_host_port[socks5://egress-proxy:1080]
+FAILED tests/unit/test_hke_208_egress_proxy.py::test_hke_208_setting_refuses_anything_but_http_host_port[egress-proxy:3128]
+FAILED tests/unit/test_hke_208_egress_proxy.py::test_hke_208_setting_accepts_http_host_port
+FAILED tests/unit/test_hke_208_egress_proxy.py::test_hke_208_external_host_goes_through_the_proxy_by_name
+FAILED tests/unit/test_hke_208_egress_proxy.py::test_hke_208_https_target_is_a_connect_tunnel_by_name
+FAILED tests/unit/test_hke_208_egress_proxy.py::test_hke_208_proxy_refusal_of_a_plain_request_is_an_error
+FAILED tests/unit/test_hke_208_egress_proxy.py::test_hke_208_redirect_hop_is_checked_before_the_proxy
+FAILED tests/unit/test_hke_208_egress_proxy.py::test_hke_208_unreachable_proxy_fails_without_a_direct_fallback
+FAILED tests/unit/test_hke_208_egress_proxy.py::test_hke_208_proxy_backend_dials_only_the_proxy_origin
+FAILED tests/unit/test_hke_208_egress_proxy.py::test_hke_208_policy_http_client_uses_the_proxy
+FAILED tests/unit/test_hke_208_egress_proxy.py::test_hke_208_check_http_destination_leaves_addresses_to_the_proxy
+17 failed, 62 passed in 5.84s

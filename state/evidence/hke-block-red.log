@@ -1,0 +1,92 @@
+...F....FFF..                                                            [100%]
+================================== FAILURES ===================================
+_________________________ test_settings_mode_is_block _________________________
+
+    def test_settings_mode_is_block():
+        """Dalga 8 (KARARLAR, user choice A): the warn day is over, settings.json ships block."""
+        settings = json.loads(SETTINGS_PATH.read_text(encoding="utf-8"))
+>       assert settings["env"]["FFCORE_GUARD_MODE"] == "block"
+E       AssertionError: assert 'warn' == 'block'
+E         
+E         - block
+E         + warn
+
+tests\hooks\test_guard.py:704: AssertionError
+_ test_settings_env_real_violations_blocked[py -3.12 -m pytest tests/hooks -q 2>&1 | tail -3-KAPI] _
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-90/test_settings_env_real_violati0/ffcore')
+cmd = 'py -3.12 -m pytest tests/hooks -q 2>&1 | tail -3', rule = 'KAPI'
+
+    @pytest.mark.parametrize(("cmd", "rule"), SETTINGS_BLOCKED)
+    def test_settings_env_real_violations_blocked(main_root, cmd, rule):
+        proc = run_hook(bash(cmd), main_root, **_settings_env(main_root))
+>       assert_blocked(proc, rule)
+
+tests\hooks\test_guard.py:735: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...FCORE-GUARD [KAPI] kapý/test çýktýsý tamamen dosyaya: ... 2>&1 | tee state/evidence/<paket>-<adým>.log (K-05a-0011)\n')
+rule = 'KAPI'
+
+    def assert_blocked(proc, rule: str) -> None:
+>       assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+E       AssertionError: (0, 'FFCORE-GUARD [KAPI] kapý/test çýktýsý tamamen dosyaya: ... 2>&1 | tee state/evidence/<paket>-<adým>.log (K-05a-0011)
+E         ')
+E       assert 0 == 2
+E        +  where 0 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...FCORE-GUARD [KAPI] kapý/test çýktýsý tamamen dosyaya: ... 2>&1 | tee state/evidence/<paket>-<adým>.log (K-05a-0011)\n').returncode
+
+tests\hooks\test_guard.py:29: AssertionError
+__ test_settings_env_real_violations_blocked[docker build -t x .-PROSES-175] __
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-90/test_settings_env_real_violati1/ffcore')
+cmd = 'docker build -t x .', rule = 'PROSES-175'
+
+    @pytest.mark.parametrize(("cmd", "rule"), SETTINGS_BLOCKED)
+    def test_settings_env_real_violations_blocked(main_root, cmd, rule):
+        proc = run_hook(bash(cmd), main_root, **_settings_env(main_root))
+>       assert_blocked(proc, rule)
+
+tests\hooks\test_guard.py:735: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...a'sý için docker.io/ghcr.io'ya baðlanýr); imaj `docker compose up --build --pull never` ile derlenir (FOLLOWUP-210)\n")
+rule = 'PROSES-175'
+
+    def assert_blocked(proc, rule: str) -> None:
+>       assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+E       AssertionError: (0, "FFCORE-GUARD [PROSES-175] çýplak docker build/buildx build yok (BuildKit base imaj metadata'sý için docker.io/ghcr.io'ya baðlanýr); imaj `docker compose up --build --pull never` ile derlenir (FOLLOWUP-210)
+E         ")
+E       assert 0 == 2
+E        +  where 0 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...a'sý için docker.io/ghcr.io'ya baðlanýr); imaj `docker compose up --build --pull never` ile derlenir (FOLLOWUP-210)\n").returncode
+
+tests\hooks\test_guard.py:29: AssertionError
+_ test_settings_env_real_violations_blocked[bash <<'EOF'\nmake test\nEOF-KAPI] _
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-90/test_settings_env_real_violati2/ffcore')
+cmd = "bash <<'EOF'\nmake test\nEOF", rule = 'KAPI'
+
+    @pytest.mark.parametrize(("cmd", "rule"), SETTINGS_BLOCKED)
+    def test_settings_env_real_violations_blocked(main_root, cmd, rule):
+        proc = run_hook(bash(cmd), main_root, **_settings_env(main_root))
+>       assert_blocked(proc, rule)
+
+tests\hooks\test_guard.py:735: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...FCORE-GUARD [KAPI] kapý/test çýktýsý tamamen dosyaya: ... 2>&1 | tee state/evidence/<paket>-<adým>.log (K-05a-0011)\n')
+rule = 'KAPI'
+
+    def assert_blocked(proc, rule: str) -> None:
+>       assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+E       AssertionError: (0, 'FFCORE-GUARD [KAPI] kapý/test çýktýsý tamamen dosyaya: ... 2>&1 | tee state/evidence/<paket>-<adým>.log (K-05a-0011)
+E         ')
+E       assert 0 == 2
+E        +  where 0 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...FCORE-GUARD [KAPI] kapý/test çýktýsý tamamen dosyaya: ... 2>&1 | tee state/evidence/<paket>-<adým>.log (K-05a-0011)\n').returncode
+
+tests\hooks\test_guard.py:29: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/hooks/test_guard.py::test_settings_mode_is_block - AssertionErro...
+FAILED tests/hooks/test_guard.py::test_settings_env_real_violations_blocked[py -3.12 -m pytest tests/hooks -q 2>&1 | tail -3-KAPI]
+FAILED tests/hooks/test_guard.py::test_settings_env_real_violations_blocked[docker build -t x .-PROSES-175]
+FAILED tests/hooks/test_guard.py::test_settings_env_real_violations_blocked[bash <<'EOF'\nmake test\nEOF-KAPI]
+4 failed, 9 passed, 167 deselected in 8.38s

@@ -21,3 +21,21 @@ Ayrıntı (semboller, log tablosu, A/B/C gerekçeleri): `state/pr/hook-egress-1.
 **Karar 1 (KAPI):** **A Önerilen**: komut kuralları (KAPI, PROSES-175) `strip_heredocs` sonrası metne bakar (veri ve yorumlayıcı gövdesi komut değil, sh/bash gövdesi komut); gerçek tee'siz kapı block'ta engel (S7 korunur) + TEK-YAZAR `<pr>-<n>` alt PR adı kabul. B: kanal/pr hedefli komutları toptan muaf (aynı zincirdeki gerçek kapı da geçer, red). C: yalnız `make` kapı (S7 tersine, red). Block'tan önce `tumu`'ya "hedefli pytest de `| tee`" duyurusu öneririm.
 **Karar 2 (208):** gerçek: egress profilinde uygulama ağında dış ad çözülmüyor (test_12 e1) → backend tarafında çözüp pinlemek proxy ile olmaz. **A Önerilen**: `EGRESS_PROXY_URL` doluyken iç olmayan hedefler httpcore2 proxy taşıyıcısıyla (https CONNECT host:port, http mutlak biçim); ad düzeyi kurallar backend'de (şema/port/OFFLINE/allowlist/platform hedefi/her yönlendirme), adres düzeyi (özel IP, rebinding) Squid `to_private`'ta (is_global hizalı, fark belgede); proxy bağlantısı yalnız proxy köküne pinli; iç hostlar bugünkü yol; SMTP proxy'lenmez (docs'ta açık); boşken davranış aynı. B: backend çözer + CONNECT ad (çözülmüyor; çift çözümleme = sahte güvence, red). C: CONNECT IP (aynı DNS engeli; Squid dstdomain işlevsiz, red).
 PLAN-ONAY bekliyorum; kod yok.
+
+### B-HKE-0003 · 2026-11-20 20:05 · → koordinator · YIGIN-AC
+Paket: hook-egress-1 · Cevap: K-HKE-0002 · Yigin: ffcore-hke
+Önce yığınsız birim koşuları: `docker run --rm --network none -v <worktree>:/work -w /work/backend ffcore/tools:0.0.0-main pytest …` (adlı konteyner `hke-unit`, compose projesi yok, volume yok; 213 initdb/preflight ve 208 birim testleri). Sonra 208 test-int için `ffcore-hke` egress+tls yığını (18880/13880, `--env-file .env.test`, `up --build --pull never`); açmadan önce bu mesaja DURUM ile haber vereceğim. Açık FF yığını şu an: ffcore-11. İlerleme: 212, 210, KAPI daraltma (+TEK-YAZAR `<pr>-<n>`, log 240), block commit'i (fcc2978), 213 commit'li; host hook testleri 409 passed (`hke-block-green.log`).
+
+### B-HKE-0004 · 2026-11-20 20:40 · → koordinator · DURUM
+Paket: hook-egress-1 · Cevap: - · Durum: IMPLEMENTED
+208 kodu commit'li (e498d3f'e kadar); yığınsız `make test` iki profil: llmaas 2145 passed, airgap 2150 passed + 1 zamanlama hatası (`test_08t_secrets_linear` 10.8 s > 8 s, yük altında; tek başına 7/7 yeşil, `hke-make-test-airgap-rerun.log`; dokunulmayan dosya). Şimdi `ffcore-hke` egress+tls yığınını açıyorum (hedefli `test_12_egress.py`, tam test-int değil; ENV-209 sırası gerekmez), sonunda `down -v` + YIGIN-KAPA. Açık FF yığını: ffcore-11.
+
+### B-HKE-0005 · 2026-11-20 20:49 · → koordinator · YIGIN-KAPA
+Paket: hook-egress-1 · Cevap: B-HKE-0003 · Yigin: ffcore-hke
+`down -v` exit 0 (20:43); ffcore-hke volume ve konteyneri kalmadı; `hke-unit*` konteynerleri `--rm`. Scratchpad'deki test TLS sertifikası depo dışında.
+
+### B-HKE-0006 · 2026-11-20 20:49 · → koordinator · PR-HAZIR
+Paket: hook-egress-1 · Cevap: K-HKE-0002 · SHA: 99bb7a39787a40ca053dade6611d1d4703d547cd
+PR notu `state/pr/hook-egress-1.md` ("Teslim"). Delta `1c0abcd..99bb7a3` (19 commit, 20 dosya, hepsi touch-zone; test/kod/docs ayrı; block commit'i fcc2978, 208'den önce). Kapı logları: `hke-hooks-final.log` (host 409 passed), `hke-make-test.log` (llmaas 2145 passed; airgap 2150 passed + 1 zamanlama hatası `test_08t_secrets_linear[API_KEY]` 10.8 s > 8 s, tek başına 7/7 `hke-make-test-airgap-rerun.log`), `hke-lint-r2.log` (make lint temiz), `hke-208-test-int.log` (egress+tls yığını `test_12_egress.py` 17 passed, Squid erişim logu), `hke-208-test-int-red-on-main.log` (main koduyla 5 kırmızı), `hke-lint-smoke.log` (smoke geçti). Tam test-int NOT_RUN (ENV-209; hedefli koşu).
+**Bilerek değişen testler:** `test_03b_2_transport_pool_uses_pinned_backend` (pinli havuz yönlendirici taşıyıcının altında), `test_log_truncates_to_120` → `_240`, `test_settings_command_runs_guard` (settings_hook_argv).
+**Notlar:** (1) `docs/takim/ajanlarla-gelistirme.md` 648/654 "120 karakter" ve `warn` örneği eskidi, touch-zone dışı. (2) Block'ta ENV'nin yorumlayıcı-gövdesi YP sınıfı (kararla kabul) artık engeller; bu oturumda 19:44'te bir ENV uyarısı var, komutu kesik kayıttan kurulamadı. (3) Merge sonrası açık oturumlar block'la denetlenir (K-GEN-0035 duyurusu yapıldı).

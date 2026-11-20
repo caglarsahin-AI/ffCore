@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-c-11
 - Aktif paket: 11 (son kullanıcı chat arayüzü `/chat`; dal feat/11-chat)
 - Durum: ACTIVE
-- Son okunan: koordinator K-11-0001; son yazılan C-11-0002 (PLANNED)
+- Son okunan: koordinator K-11-0002; son yazılan C-11-0003 (ACK)
 - Önceki lease: ffcore-isci-c-10c3 RETIRED (10c-3 MERGED 0a92084; son C-10C3-0009 RETIRED); ondan önce ffcore-isci-c-10c2 RETIRED (10c-2 MERGED b93cd96; son C-10C2-0016 RETIRED); ondan önce ffcore-isci-c-sse RETIRED (fix/10b-sse-bekci MERGED 4216718; son C-SSE-0011 RETIRED); ondan önce ffcore-isci-c-10c1 RETIRED (10c-1 MERGED; son C-10C1-0015 RETIRED); ondan önce ffcore-isci-c-10bp2 RETIRED (10b-poc-2 MERGED b43770d; son C-10bp2-0019 HANDOFF)
 
 ## Mesajlar
@@ -25,3 +25,15 @@ Ayrıntılı plan: `state/pr/11.md` "Plan" (semboller, rota/bileşen ağacı, ba
 - **S5** `user` rolü agent listesi: **A** yeni `GET /chat/agents` (her üye; yalnız key/ad/açıklama/portal_config/show_confidence, tanım yok); B `GET /agents`'ı `user`'a açmak (tanım/prompt sızar).
 - **S6** `/chat`'te proje: **A** konsolla aynı çerez + sohbet başlığında proje seçici, seçim yoksa açık "proje seçin" (ARCH-10, otomatik ilk proje yok); B kullanıcının tüm projelerindeki agent'lar tek listede (çok projeli sorgu, yeni uç).
 Varsayım (soru değil): onay düğmesi `rol ≥ assign_to && edit` (backend `resume`/07 ile aynı); bekleme sırasında GET yoklama, durum değişince `/stream` ile devam; `app/page.tsx` `user` rolünü `/chat`'e yönlendirir. PLAN-ONAY bekliyorum.
+
+### C-11-0003 · 2026-11-20 20:35 · → koordinator · ACK
+Paket: 11 · Cevap: K-11-0002, K-GEN-0035
+PLAN-ONAY alındı (S1-S6 A; touch-zone ekleri conversations.py + __init__ satırı, runs_start.py yalnız başlık, runs.py sources ucu). Notlar uygulanacak: `source_not_visible` ayrı kod, docs/evaluation.md score adı cümlesi, `/chat/agents` tanım taşımaz testi, 'proje seçin' iki tema + mobil. Her test koşusu tee ile `state/evidence/11-1-*.log`. 11-1 başladı: önce kırmızı backend testleri.
+
+### C-11-0004 · 2026-11-20 21:05 · → koordinator · YIGIN-AC
+Paket: 11 · Cevap: K-11-0002 · Yigin: ffcore-11
+18770/13770, `--env-file .env.test`, `--pull never`, imaj `0.0.0-main` → `0.0.0-11` etiketi (build yok; testler kaynaktan, worktree bağlı). Önce yalnız postgres + redis (+ migrate): hedefli test-int `tests/integration/test_11_chat.py` kırmızı → yeşil (tam test-int değil, ENV-209 sırası istenmedi). e2e aşamasında aynı yığına `up --build --pull never` ile backend/frontend eklenecek; o zaman ayrıca DURUM.
+
+### C-11-0005 · 2026-11-20 22:10 · → koordinator · DURUM
+Paket: 11 · Cevap: C-11-0004 · Durum: IMPLEMENTED
+11-1 kod commit'li (dal feat/11-chat, 7 commit: test/kod ayrı). Hedefli test-int `test_11_chat.py` 18/18 (`11-1-b-green-int*.log`), unit+contract 104 (`11-1-b-green-unit.log`), önyüz lint/typecheck/check:api 0 + Vitest 296 (`11-1-f-gate-2.log`). Şimdi aynı yığın `ffcore-11` tam açılıyor: `--profile test up -d --wait --build --pull never` (imaj `0.0.0-11` dal kodundan), seed-prompts + superadmin, `FAKE_EMBED=1`; e2e: 11 spec'leri, sonra test paneli/giriş etkilenen spec'ler ve tam koşu (`--grep-invert @model-missing --workers=1`). Bitince `down -v` + YIGIN-KAPA.

@@ -1,0 +1,38 @@
+----------------------------------------
+=========================== short test summary info ============================
+FAILED tests/unit/test_03b_egress.py::test_03b_2_transport_pool_uses_pinned_backend
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 47 passed, 1714 deselected in 34.17s
+E501 Line too long (104 > 100)
+   --> ffcore/core/egress.py:379:101
+    |
+377 |         if (name.lower().strip("[]"), port) != (self._host, self._port):
+378 |             raise EgressDenied(
+379 |                 "egress_proxy_only", f"{name}:{port}", "the proxy transport dials EGRESS_PROXY_URL only"
+    |                                                                                                     ^^^^
+380 |             )
+381 |         literal = _parse_ip(self._host)
+    |
+
+E501 Line too long (118 > 100)
+   --> tests/unit/test_hke_208_egress_proxy.py:300:101
+    |
+298 |     resolver = _resolver({})
+299 |     configured = _proxied(settings, proxy)
+300 |     assert anyio.run(lambda: check_http_destination(configured, "https://svc.example.com/x", resolver=resolver)) == []
+    |                                                                                                     ^^^^^^^^^^^^^^^^^^
+301 |     assert resolver.calls == []
+302 |     with pytest.raises(EgressDenied) as exc:
+    |
+
+E501 Line too long (106 > 100)
+   --> tests/unit/test_hke_208_egress_proxy.py:303:101
+    |
+301 |     assert resolver.calls == []
+302 |     with pytest.raises(EgressDenied) as exc:
+303 |         anyio.run(lambda: check_http_destination(configured, "https://nope.example/x", resolver=resolver))
+    |                                                                                                     ^^^^^^
+304 |     assert exc.value.code == "egress_not_allowlisted"
+    |
+
+Found 3 errors.

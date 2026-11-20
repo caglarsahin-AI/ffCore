@@ -1,0 +1,54 @@
+F.FFF                                                                    [100%]
+================================== FAILURES ===================================
+_____________ test_hke_213_initdb_refuses_a_password_without_user _____________
+
+tmp_path = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-94/test_hke_213_initdb_refuses_a_0')
+
+    def test_hke_213_initdb_refuses_a_password_without_user(tmp_path):
+        # FOLLOWUP-213: compose would connect as the owner with the role's password while initdb
+        # created ffcore_app; the first start stops instead.
+        result, calls = _initdb(tmp_path, APP_DB_USER="", APP_DB_PASSWORD="x")
+>       assert result.returncode != 0
+E       AssertionError: assert 0 != 0
+E        +  where 0 = CompletedProcess(args=['sh', 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\hook-egress-1\\deploy\\postgres\\initdb\\20-app-role.sh'], returncode=0, stdout='20-app-role: ffcore_app created with its grants\n', stderr='').returncode
+
+tests\unit\test_12_46_app_role_static.py:134: AssertionError
+__________ test_hke_213_initdb_half_pair_stops_when_sourced[no-user] __________
+
+tmp_path = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-94/test_hke_213_initdb_half_pair_1')
+user = '', password = 'x'
+
+    @pytest.mark.parametrize(
+        "user,password", [("ffcore_app", ""), ("", "x")], ids=["no-password", "no-user"]
+    )
+    def test_hke_213_initdb_half_pair_stops_when_sourced(tmp_path, user, password):
+        result = _initdb_sourced(tmp_path, APP_DB_USER=user, APP_DB_PASSWORD=password)
+>       assert result.returncode != 0
+E       assert 0 != 0
+E        +  where 0 = CompletedProcess(args=['sh', '-c', 'set -e; . "C:/ai_paycore/ffcore/.worktrees/fix/hook-egress-1/deploy/postgres/initd...h"; echo AFTER-INIT'], returncode=0, stdout='20-app-role: ffcore_app created with its grants\nAFTER-INIT\n', stderr='').returncode
+
+tests\unit\test_12_46_app_role_static.py:168: AssertionError
+_________ test_hke_213_env_example_says_initdb_stops_for_either_half __________
+
+    def test_hke_213_env_example_says_initdb_stops_for_either_half():
+        env = (REPO / ".env.example").read_text(encoding="utf-8")
+        block = env.split("Least-privileged database role", 1)[1].split("APP_DB_USER=", 1)[0]
+>       assert "APP_DB_USER without APP_DB_PASSWORD" in block
+E       AssertionError: assert 'APP_DB_USER without APP_DB_PASSWORD' in ' (package 12, FOLLOWUP-46) ---\n# Set both ('
+
+tests\unit\test_12_46_app_role_static.py:175: AssertionError
+_______________ test_hke_213_owner_message_names_both_settings ________________
+
+    def test_hke_213_owner_message_names_both_settings():
+        # FOLLOWUP-213: both are empty here; the fix is to set the pair, not the password alone.
+        _, message = error_code(env(APP_DB_USER="", APP_DB_PASSWORD=""))
+>       assert "set APP_DB_USER=ffcore_app and APP_DB_PASSWORD" in message
+E       AssertionError: assert 'set APP_DB_USER=ffcore_app and APP_DB_PASSWORD' in 'db_role_owner: APP_DB_USER/APP_DB_PASSWORD are empty: the application would connect as the owner (with DDL); set APP_DB_PASSWORD (docs/kurulum.md, database role)'
+
+tests\unit\test_12_compose_preflight.py:313: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/unit/test_12_46_app_role_static.py::test_hke_213_initdb_refuses_a_password_without_user
+FAILED tests/unit/test_12_46_app_role_static.py::test_hke_213_initdb_half_pair_stops_when_sourced[no-user]
+FAILED tests/unit/test_12_46_app_role_static.py::test_hke_213_env_example_says_initdb_stops_for_either_half
+FAILED tests/unit/test_12_compose_preflight.py::test_hke_213_owner_message_names_both_settings
+4 failed, 1 passed, 51 deselected in 6.74s

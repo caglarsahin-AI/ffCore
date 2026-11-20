@@ -1,0 +1,377 @@
+=== 20:39:00 hke_208 test-int against main ffcore package ()
+FFFFF...                                                                 [100%]
+=================================== FAILURES ===================================
+__ test_hke_208_backend_client_reaches_an_allowlisted_host_through_the_proxy ___
+
+    def test_hke_208_backend_client_reaches_an_allowlisted_host_through_the_proxy():
+>       response = _backend_get(f"{ALLOWED}/v1/models")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_12_egress.py:168: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_12_egress.py:164: in _backend_get
+    return anyio.run(call)
+           ^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/anyio/_core/_eventloop.py:83: in run
+    return async_backend.run(func, args, {}, backend_options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py:2548: in run
+    return runner.run(wrapper())
+           ^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py:2531: in wrapper
+    return await func(*args)
+           ^^^^^^^^^^^^^^^^^
+tests/integration/test_12_egress.py:162: in call
+    return await client.request("GET", url)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ffcore/core/egress.py:443: in request
+    return await self._follow(method, target, dict(headers or {}), params, body)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ffcore/core/egress.py:495: in _follow
+    response = await self._client.send(request, stream=stream)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1817: in send
+    response = await self._send_handling_auth(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1845: in _send_handling_auth
+    response = await self._send_handling_redirects(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1880: in _send_handling_redirects
+    response = await self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1914: in _send_single_request
+    response = await transport.handle_async_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_transports/default.py:388: in handle_async_request
+    resp = await self._pool.handle_async_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpcore2/_async/connection_pool.py:242: in handle_async_request
+    raise exc from None
+/opt/venv/lib/python3.12/site-packages/httpcore2/_async/connection_pool.py:224: in handle_async_request
+    response = await connection.handle_async_request(pool_request.request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpcore2/_async/connection.py:94: in handle_async_request
+    raise exc
+/opt/venv/lib/python3.12/site-packages/httpcore2/_async/connection.py:74: in handle_async_request
+    stream = await self._connect(request)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpcore2/_async/connection.py:117: in _connect
+    stream = await self._network_backend.connect_tcp(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ffcore.core.egress._PinnedBackend object at 0x7fbf4bbdb320>
+host = 'api.allowed.test', port = 9999, timeout = 5, local_address = None
+socket_options = None
+
+    async def connect_tcp(
+        self, host, port, timeout=None, local_address=None, socket_options=None
+    ) -> httpcore2.AsyncNetworkStream:
+        # Defence in depth: the same host rules as the URL check, at the layer that dials.
+        self._policy.check_host(host, f"{host}:{port}")
+        literal = _parse_ip(host)
+        try:
+            addresses = [str(literal)] if literal is not None else await self._resolver(host, port)
+        except OSError:
+            # Name lookup failed (socket.gaierror and friends): a failed call like any other
+            # connection failure, not an unhandled error. The system text is not carried along.
+>           raise EgressRequestFailed(
+                "egress_dns_failed", f"{host}:{port}", "name does not resolve"
+            ) from None
+E           ffcore.core.egress.EgressRequestFailed: Outbound call to api.allowed.test:9999 failed: egress_dns_failed (name does not resolve).
+
+ffcore/core/egress.py:307: EgressRequestFailed
+_ test_hke_208_proxy_refusal_reaches_the_backend_as_egress_proxy_denied[http://api.denied.test:9999/v1/models] _
+
+url = 'http://api.denied.test:9999/v1/models'
+
+    @pytest.mark.parametrize("url", [f"{DENIED}/v1/models", f"{REBIND}/v1/models", f"{BENCH}/v1/models"])
+    def test_hke_208_proxy_refusal_reaches_the_backend_as_egress_proxy_denied(url):
+        from ffcore.core.egress import EgressDenied
+    
+        with pytest.raises(EgressDenied) as exc:
+>           _backend_get(url)
+
+tests/integration/test_12_egress.py:178: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_12_egress.py:164: in _backend_get
+    return anyio.run(call)
+           ^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/anyio/_core/_eventloop.py:83: in run
+    return async_backend.run(func, args, {}, backend_options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py:2548: in run
+    return runner.run(wrapper())
+           ^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py:2531: in wrapper
+    return await func(*args)
+           ^^^^^^^^^^^^^^^^^
+tests/integration/test_12_egress.py:162: in call
+    return await client.request("GET", url)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ffcore/core/egress.py:443: in request
+    return await self._follow(method, target, dict(headers or {}), params, body)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ffcore/core/egress.py:495: in _follow
+    response = await self._client.send(request, stream=stream)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1817: in send
+    response = await self._send_handling_auth(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1845: in _send_handling_auth
+    response = await self._send_handling_redirects(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1880: in _send_handling_redirects
+    response = await self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1914: in _send_single_request
+    response = await transport.handle_async_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_transports/default.py:388: in handle_async_request
+    resp = await self._pool.handle_async_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpcore2/_async/connection_pool.py:242: in handle_async_request
+    raise exc from None
+/opt/venv/lib/python3.12/site-packages/httpcore2/_async/connection_pool.py:224: in handle_async_request
+    response = await connection.handle_async_request(pool_request.request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpcore2/_async/connection.py:94: in handle_async_request
+    raise exc
+/opt/venv/lib/python3.12/site-packages/httpcore2/_async/connection.py:74: in handle_async_request
+    stream = await self._connect(request)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpcore2/_async/connection.py:117: in _connect
+    stream = await self._network_backend.connect_tcp(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ffcore.core.egress._PinnedBackend object at 0x7fbf45709730>
+host = 'api.denied.test', port = 9999, timeout = 5, local_address = None
+socket_options = None
+
+    async def connect_tcp(
+        self, host, port, timeout=None, local_address=None, socket_options=None
+    ) -> httpcore2.AsyncNetworkStream:
+        # Defence in depth: the same host rules as the URL check, at the layer that dials.
+        self._policy.check_host(host, f"{host}:{port}")
+        literal = _parse_ip(host)
+        try:
+            addresses = [str(literal)] if literal is not None else await self._resolver(host, port)
+        except OSError:
+            # Name lookup failed (socket.gaierror and friends): a failed call like any other
+            # connection failure, not an unhandled error. The system text is not carried along.
+>           raise EgressRequestFailed(
+                "egress_dns_failed", f"{host}:{port}", "name does not resolve"
+            ) from None
+E           ffcore.core.egress.EgressRequestFailed: Outbound call to api.denied.test:9999 failed: egress_dns_failed (name does not resolve).
+
+ffcore/core/egress.py:307: EgressRequestFailed
+_ test_hke_208_proxy_refusal_reaches_the_backend_as_egress_proxy_denied[http://rebind.test:9999/v1/models] _
+
+url = 'http://rebind.test:9999/v1/models'
+
+    @pytest.mark.parametrize("url", [f"{DENIED}/v1/models", f"{REBIND}/v1/models", f"{BENCH}/v1/models"])
+    def test_hke_208_proxy_refusal_reaches_the_backend_as_egress_proxy_denied(url):
+        from ffcore.core.egress import EgressDenied
+    
+        with pytest.raises(EgressDenied) as exc:
+            _backend_get(url)
+>       assert exc.value.code == "egress_proxy_denied"
+E       AssertionError: assert 'egress_private_address' == 'egress_proxy_denied'
+E         
+E         - egress_proxy_denied
+E         + egress_private_address
+
+tests/integration/test_12_egress.py:179: AssertionError
+_ test_hke_208_proxy_refusal_reaches_the_backend_as_egress_proxy_denied[http://bench.test:9999/v1/models] _
+
+url = 'http://bench.test:9999/v1/models'
+
+    @pytest.mark.parametrize("url", [f"{DENIED}/v1/models", f"{REBIND}/v1/models", f"{BENCH}/v1/models"])
+    def test_hke_208_proxy_refusal_reaches_the_backend_as_egress_proxy_denied(url):
+        from ffcore.core.egress import EgressDenied
+    
+        with pytest.raises(EgressDenied) as exc:
+>           _backend_get(url)
+
+tests/integration/test_12_egress.py:178: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_12_egress.py:164: in _backend_get
+    return anyio.run(call)
+           ^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/anyio/_core/_eventloop.py:83: in run
+    return async_backend.run(func, args, {}, backend_options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py:2548: in run
+    return runner.run(wrapper())
+           ^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py:2531: in wrapper
+    return await func(*args)
+           ^^^^^^^^^^^^^^^^^
+tests/integration/test_12_egress.py:162: in call
+    return await client.request("GET", url)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ffcore/core/egress.py:443: in request
+    return await self._follow(method, target, dict(headers or {}), params, body)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ffcore/core/egress.py:495: in _follow
+    response = await self._client.send(request, stream=stream)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1817: in send
+    response = await self._send_handling_auth(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1845: in _send_handling_auth
+    response = await self._send_handling_redirects(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1880: in _send_handling_redirects
+    response = await self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1914: in _send_single_request
+    response = await transport.handle_async_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_transports/default.py:388: in handle_async_request
+    resp = await self._pool.handle_async_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpcore2/_async/connection_pool.py:242: in handle_async_request
+    raise exc from None
+/opt/venv/lib/python3.12/site-packages/httpcore2/_async/connection_pool.py:224: in handle_async_request
+    response = await connection.handle_async_request(pool_request.request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpcore2/_async/connection.py:94: in handle_async_request
+    raise exc
+/opt/venv/lib/python3.12/site-packages/httpcore2/_async/connection.py:74: in handle_async_request
+    stream = await self._connect(request)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpcore2/_async/connection.py:117: in _connect
+    stream = await self._network_backend.connect_tcp(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ffcore.core.egress._PinnedBackend object at 0x7fbf4689b5f0>
+host = 'bench.test', port = 9999, timeout = 5, local_address = None
+socket_options = None
+
+    async def connect_tcp(
+        self, host, port, timeout=None, local_address=None, socket_options=None
+    ) -> httpcore2.AsyncNetworkStream:
+        # Defence in depth: the same host rules as the URL check, at the layer that dials.
+        self._policy.check_host(host, f"{host}:{port}")
+        literal = _parse_ip(host)
+        try:
+            addresses = [str(literal)] if literal is not None else await self._resolver(host, port)
+        except OSError:
+            # Name lookup failed (socket.gaierror and friends): a failed call like any other
+            # connection failure, not an unhandled error. The system text is not carried along.
+>           raise EgressRequestFailed(
+                "egress_dns_failed", f"{host}:{port}", "name does not resolve"
+            ) from None
+E           ffcore.core.egress.EgressRequestFailed: Outbound call to bench.test:9999 failed: egress_dns_failed (name does not resolve).
+
+ffcore/core/egress.py:307: EgressRequestFailed
+__________ test_hke_208_refused_connect_tunnel_is_egress_proxy_denied __________
+
+    def test_hke_208_refused_connect_tunnel_is_egress_proxy_denied():
+        # https target: a CONNECT by name; bench.test is in the benchmark range, Squid answers 403.
+        from ffcore.core.egress import EgressDenied
+    
+        with pytest.raises(EgressDenied) as exc:
+>           _backend_get("https://bench.test:9999/v1/models")
+
+tests/integration/test_12_egress.py:187: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_12_egress.py:164: in _backend_get
+    return anyio.run(call)
+           ^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/anyio/_core/_eventloop.py:83: in run
+    return async_backend.run(func, args, {}, backend_options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py:2548: in run
+    return runner.run(wrapper())
+           ^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py:2531: in wrapper
+    return await func(*args)
+           ^^^^^^^^^^^^^^^^^
+tests/integration/test_12_egress.py:162: in call
+    return await client.request("GET", url)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ffcore/core/egress.py:443: in request
+    return await self._follow(method, target, dict(headers or {}), params, body)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ffcore/core/egress.py:495: in _follow
+    response = await self._client.send(request, stream=stream)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1817: in send
+    response = await self._send_handling_auth(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1845: in _send_handling_auth
+    response = await self._send_handling_redirects(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1880: in _send_handling_redirects
+    response = await self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1914: in _send_single_request
+    response = await transport.handle_async_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_transports/default.py:388: in handle_async_request
+    resp = await self._pool.handle_async_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpcore2/_async/connection_pool.py:242: in handle_async_request
+    raise exc from None
+/opt/venv/lib/python3.12/site-packages/httpcore2/_async/connection_pool.py:224: in handle_async_request
+    response = await connection.handle_async_request(pool_request.request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpcore2/_async/connection.py:94: in handle_async_request
+    raise exc
+/opt/venv/lib/python3.12/site-packages/httpcore2/_async/connection.py:74: in handle_async_request
+    stream = await self._connect(request)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpcore2/_async/connection.py:117: in _connect
+    stream = await self._network_backend.connect_tcp(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ffcore.core.egress._PinnedBackend object at 0x7fbf4689a1e0>
+host = 'bench.test', port = 9999, timeout = 5, local_address = None
+socket_options = None
+
+    async def connect_tcp(
+        self, host, port, timeout=None, local_address=None, socket_options=None
+    ) -> httpcore2.AsyncNetworkStream:
+        # Defence in depth: the same host rules as the URL check, at the layer that dials.
+        self._policy.check_host(host, f"{host}:{port}")
+        literal = _parse_ip(host)
+        try:
+            addresses = [str(literal)] if literal is not None else await self._resolver(host, port)
+        except OSError:
+            # Name lookup failed (socket.gaierror and friends): a failed call like any other
+            # connection failure, not an unhandled error. The system text is not carried along.
+>           raise EgressRequestFailed(
+                "egress_dns_failed", f"{host}:{port}", "name does not resolve"
+            ) from None
+E           ffcore.core.egress.EgressRequestFailed: Outbound call to bench.test:9999 failed: egress_dns_failed (name does not resolve).
+
+ffcore/core/egress.py:307: EgressRequestFailed
+=========================== short test summary info ============================
+FAILED tests/integration/test_12_egress.py::test_hke_208_backend_client_reaches_an_allowlisted_host_through_the_proxy
+FAILED tests/integration/test_12_egress.py::test_hke_208_proxy_refusal_reaches_the_backend_as_egress_proxy_denied[http://api.denied.test:9999/v1/models]
+FAILED tests/integration/test_12_egress.py::test_hke_208_proxy_refusal_reaches_the_backend_as_egress_proxy_denied[http://rebind.test:9999/v1/models]
+FAILED tests/integration/test_12_egress.py::test_hke_208_proxy_refusal_reaches_the_backend_as_egress_proxy_denied[http://bench.test:9999/v1/models]
+FAILED tests/integration/test_12_egress.py::test_hke_208_refused_connect_tunnel_is_egress_proxy_denied
+5 failed, 3 passed, 9 deselected in 43.35s
+(main HEAD 3ab3eff; the rev-parse above ran from a wrong directory)

@@ -1,0 +1,22 @@
+...........F...........                                                  [100%]
+=================================== FAILURES ===================================
+__________ test_hke_208_proxy_refusal_of_a_plain_request_is_an_error ___________
+
+settings = Settings(deploy_profile='llmaas', inference_backend=None, offline=False, database_url=None, service_token=SecretStr('*...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+proxy = <socketserver.ThreadingTCPServer object at 0x7f928a5fab70>
+
+    def test_hke_208_proxy_refusal_of_a_plain_request_is_an_error(settings, proxy):
+        resolver = _resolver({"proxy.test": ["127.0.0.1"]})
+        with pytest.raises(EgressDenied) as exc:
+            anyio.run(
+                _get, _client(_proxied(settings, proxy), resolver), "http://denied.example/v1/x"
+            )
+        assert exc.value.code == "egress_proxy_denied"
+>       assert "ERR_ACCESS_DENIED" in exc.value.detail
+                                      ^^^^^^^^^^^^^^^^
+E       AttributeError: 'EgressDenied' object has no attribute 'detail'
+
+tests/unit/test_hke_208_egress_proxy.py:186: AttributeError
+=========================== short test summary info ============================
+FAILED tests/unit/test_hke_208_egress_proxy.py::test_hke_208_proxy_refusal_of_a_plain_request_is_an_error
+1 failed, 22 passed in 2.94s
