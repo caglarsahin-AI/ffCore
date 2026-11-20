@@ -12,6 +12,8 @@ incoherent combination and the fix. It runs first in `make smoke`, and on the ho
 Pure Python, standard library only. Exit 0 and one line per check, or exit 1 and the error.
 """
 
+from __future__ import annotations  # runs on the server's own Python 3.8+
+
 import argparse
 import os
 import re
@@ -49,7 +51,8 @@ def _compose_files(value: str, separator: str | None) -> list[str]:
     if separator is None:
         # Compose uses the host's path separator: ';' on Windows, ':' elsewhere.
         separator = ";" if ";" in value else ":"
-    return [Path(item.strip()).as_posix().removeprefix("./") for item in value.split(separator)]
+    paths = [Path(item.strip()).as_posix() for item in value.split(separator)]
+    return [path[2:] if path.startswith("./") else path for path in paths]
 
 
 def _allowlist(value: str) -> list[str]:
