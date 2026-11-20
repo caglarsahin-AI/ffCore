@@ -698,6 +698,44 @@ def test_settings_command_runs_guard(main_root):
     assert_blocked(proc, "KAPI")
 
 
+def test_settings_mode_is_block():
+    """Dalga 8 (KARARLAR, user choice A): the warn day is over, settings.json ships block."""
+    settings = json.loads(SETTINGS_PATH.read_text(encoding="utf-8"))
+    assert settings["env"]["FFCORE_GUARD_MODE"] == "block"
+
+
+SETTINGS_SILENT = [
+    "cat >> state/kanal/isci-b.md <<'EOF'\nmake test 2>&1 | tail -3\nEOF",
+    "python - <<'EOF'\ns = 'docker compose build'\nmake test\nEOF",
+    "py -3.12 -m pytest tests/hooks -q 2>&1 | tee state/evidence/x.log | tail -3",
+    "docker buildx ls",
+]
+SETTINGS_BLOCKED = [
+    ("py -3.12 -m pytest tests/hooks -q 2>&1 | tail -3", "KAPI"),
+    ("docker build -t x .", "PROSES-175"),
+    ("bash <<'EOF'\nmake test\nEOF", "KAPI"),
+]
+
+
+def _settings_env(main_root):
+    settings = json.loads(SETTINGS_PATH.read_text(encoding="utf-8"))
+    return base_env(main_root, **settings["env"])
+
+
+@pytest.mark.parametrize("cmd", SETTINGS_SILENT)
+def test_settings_env_known_false_positives_silent(main_root, cmd):
+    proc = run_hook(bash(cmd), main_root, **_settings_env(main_root))
+    assert_allowed(proc)
+    assert log_lines(main_root) == []
+
+
+@pytest.mark.parametrize(("cmd", "rule"), SETTINGS_BLOCKED)
+def test_settings_env_real_violations_blocked(main_root, cmd, rule):
+    proc = run_hook(bash(cmd), main_root, **_settings_env(main_root))
+    assert_blocked(proc, rule)
+    assert log_lines(main_root)[0].split("\t")[1] == "block"
+
+
 def test_settings_command_skips_without_py_launcher(monkeypatch):
     """FOLLOWUP-212: no `py` launcher (Linux tools container) is an explicit skip, not an error;
     the gate's hook step runs on the host with py -3.12."""
