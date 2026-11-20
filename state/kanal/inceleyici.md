@@ -3,7 +3,7 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-inceleyici-04b (önceki: ffcore-inceleyici-10c3; 10c-3 r2 metin teyidi bu oturumda)
-- Aktif paket: bekleme; hke-mcp-settings merge f088aa8; ffmain kapısı bitene kadar yığın yok; sıradaki 11-2 ya da yeni dalga
+- Aktif paket: bekleme; hook-egress-1 + fix MERGED; 11-1 merge 15f1da9, ffmain kapısı (e2e dahil) bitene kadar yığın yok; sıradaki 11-2 ya da yeni dalga
 - Durum: ACTIVE
 - Son okunan: koordinator K-HKE-0015
 
@@ -41,18 +41,6 @@ Docker Desktop'ı açmak kullanıcının işi; ben açmıyorum. Motor gelince s�
 1. 05b r2: rv05b hafif yığını, YIGIN-AC, probe'lar (P1-P9) ve hedefli testler, rapor, YIGIN-KAPA.
 2. 10c-2: rv10c2, test-int (qdrant) ve probe'lar.
 
-### R-HKE-0001 · 2026-11-20 21:02 · → koordinator · YIGIN-AC
-Paket: hook-egress-1 · Cevap: K-HKE-0003 · Yigin: ffcore-rv (18540/13540; compose + egress + tls + test overlay, imaj 0.0.0-hke, --no-build --pull never) + atılabilir initdb konteynerleri `rv-hke1-initdb-*` (--network none)
-hook-egress-1 r1 başladı (SHA 99bb7a3). Hook probe'ları hostta bitti (yığınsız). Şimdi 213 initdb (gerçek postgres) ve 208 overlay yığını: hedefli `test_12_egress` + proxy probe'ları. Tam test-int yok (ENV-209).
-
-### R-HKE-0002 · 2026-11-20 21:36 · → koordinator · YIGIN-KAPA
-Paket: hook-egress-1 · Cevap: K-HKE-0003 · Yigin: ffcore-rv
-`down -v --remove-orphans` exit 0; ffcore-rv konteyner, volume ve ağ 0. initdb konteynerleri `rv-hke1-initdb-*` silindi, 0 kaldı (`hook-egress-1-r1-rv-down.log`, `-initdb.log`).
-
-### R-HKE-0003 · 2026-11-20 21:36 · → koordinator · REVIEW-SONUC
-Paket: hook-egress-1 · Cevap: K-HKE-0003 · SHA: 99bb7a39787a40ca053dade6611d1d4703d547cd · Sonuc: ONAY · Bulgu: B0 M0 m2 N3
-Rapor `state/reviews/hook-egress-1-r1.md`. Block kipi gerçek ihlalleri engelliyor (KAPI, ENV, PROSES-175, PUSH, TEK-YAZAR); kanal heredoc yanlış pozitifleri sessiz. 210 dokuz biçimde, 212 skip gerekçesi, 213 gerçek postgres'te iki yarım durum exit 1, 208 gerçek backend'den Squid üç durum + proxy kökü dışı `egress_proxy_only` + iç host doğrudan: hepsi kanıtlı. **Özel probe (MINOR-1 `yorumlayici-govdesi-env-metni`):** `.env.example`/`.env.test` heredoc düzenlemeleri geçiyor (8/8); ama gövdede çıplak `.env` kelimesi geçen Python düzenlemesi engelleniyor (4/4; `.env.example`'ın kendi satırları 1, 2, 328, 338). A (önerim): eşleşme aynı, mesaj Write+`py dosya` yolunu söyler. B: boşluk öneki kalkar (K-HOOK2-0007 MINOR-2 geri alınır). **MINOR-2 `kabuk-govdesi-sarmalayici` (regresyon):** `env X=1 bash`, `compose run -T tools sh`, `compose exec -T backend bash`, `docker exec -i c sh` heredoc'larında tee'siz `pytest` dalda geçiyor, main engelliyordu. İkisini de merge öncesi öneriyorum. NOTE: docs/takim 648/654; proxy reddi kodu; `run -d` deseninde tee `sh -c` içine. YIGIN-KAPA R-HKE-0002.
-
 ### R-11-0001 · 2026-11-20 21:55 · → koordinator · YIGIN-AC
 Paket: 11 · Cevap: K-11-0003 · Yigin: ffcore-rv (18540/13540; test + e2e profili, imaj 0.0.0-11, FAKE_EMBED=1, --no-build --pull never)
 11-1 r1 başladı (SHA d31574b). Delta okundu; önyüz lint/typecheck/check:api/Vitest yığınsız bitti (0/0/0, 296/296). Şimdi hedefli test-int (`test_11_chat` + probe) ve 11 e2e spec'leri. node_modules `ffcore-10a-nm-pw` kopyasından, `npm ci` yok. Tam test-int yok (ENV-209).
@@ -65,10 +53,6 @@ Paket: 11 · Cevap: K-11-0003 · Yigin: ffcore-rv
 Paket: 11 · Cevap: K-11-0003 · SHA: d31574b385e1a590ab8727983ac7a5542be55820 · Sonuc: ONAY · Bulgu: B0 M0 m1 N3
 Rapor `state/reviews/11-1-r1.md`. Sekiz odak kanıtlı: yalnız yayınlanmış agent ve tanımsız yanıt; konuşmalar yalnız kendi (silinmiş/çapraz proje/devam 404); sources ucu ACL çağırana, atıfsız chunk `source_not_found`; başlık 60 model çağrısız; read üye sorup kendi konuşmasını siliyor; iki tema + telefon; UI metni json (1682/1682). Kapı: önyüz 0/0/0 + Vitest 296/296, hedefli test 29 + probe 8, e2e 11 7/8. **MINOR-1 `axe-gecis-kararsiz`:** `test_11_4` light mobile 4 koşuda 3 kez düştü; axe sheet'in 200 ms opacity geçişinde koşuyor (renk çifti tek başına ~6:1 geçiyor). Öneri: axe'den önce opacity 1'i bekle. NOTE: sohbete özel kopuş testi yok (11-2'de); ACL kapanınca mesaj listesinde belge adı kalıyor (docs cümlesi); docs'ta `source_not_found` eksik. e2e: ortak node_modules eski olduğundan `npm ci` yerine yığının frontend servisine bağlanan webServer'sız config kullandım (raporda). YIGIN-KAPA R-11-0002.
 
-### R-HKE-0004 · 2026-11-20 22:16 · → koordinator · REVIEW-SONUC
-Paket: hook-egress-1 · Cevap: K-HKE-0007 · SHA: 3da0bfb38bc37f41ef5be2fcd677f32b02c02f3c · Sonuc: ONAY · Bulgu: B0 M0 m0 N2
-Rapor `state/reviews/hook-egress-1-r2.md` (yığınsız). r1 MINOR-2 kapandı: beş sarmalayıcı biçimi ve değerli seçenekli varyantları engel; psql/python gövdeleri ve `| tee`'li karşılıklar sessiz. İşçinin tırnak içi `sh -c` heredoc düzeltmesi doğru. MINOR-1 A: eşleşme aynı, kod gövdesi mesajı nedeni ve Write + `py dosya` yolunu söylüyor; gerçek yol eski mesajı veriyor. NOTE-2: reddedilen proxy `egress_proxy_unreachable` (birim). docs/takim 240 + block, handbook ayrık koşu örneği yerinde. Hook 432 passed (host), egress birim 84, ruff temiz. Yeni NOTE (ikisi de main'de de var): (1) kesme işaretli `#` yorumu sonraki `pytest`/`git push`/`docker build`'i komut kurallarından saklıyor (main ve r1 aynı; FOLLOWUP önerisi); (2) handbook `timeout` cümlesi iki anlamlı, doğrudan `timeout 600 pytest` sessiz.
-
 ### R-11-0004 · 2026-11-20 22:53 · → koordinator · YIGIN-AC
 Paket: 11 · Cevap: K-11-0008 · Yigin: ffcore-rv (18540/13540; test + e2e profili, imaj 0.0.0-11 (uygulama kodu r1'den beri değişmedi), FAKE_EMBED=1, --no-build --pull never)
 11-1 r2 teyidi (SHA f9d213f): `test_11_4` dört koşu, r1'deki webServer'sız inceleyici config'iyle. Kısa yığın.
@@ -80,7 +64,3 @@ Paket: 11 · Cevap: K-11-0008 · Yigin: ffcore-rv
 ### R-11-0006 · 2026-11-20 22:59 · → koordinator · REVIEW-SONUC
 Paket: 11 · Cevap: K-11-0008 · SHA: f9d213fdded017f843b5e7120e0ad6526a4e8d40 · Sonuc: ONAY · Bulgu: B0 M0 m0 N0
 Rapor `state/reviews/11-1-r2.md`. `test_11_4 --repeat-each 4` 16/16; açık telefon 4/4 (r1'de 4 koşuda 3 kez ✘). Bekleme sabit süre değil durum: sheet ve overlay'de `data-starting-style` yok, `opacity: 1`, koşan animasyon yok; seçiciler `sheet.tsx`'te var. docs/chat.md: `source_not_found` ve kapanan ACL cümlesi doğru. r1 dışı değişiklik yok; uygulama ve backend kodu r1'den beri aynı. YIGIN-KAPA R-11-0005.
-
-### R-HKE-0005 · 2026-11-20 23:09 · → koordinator · REVIEW-SONUC
-Paket: hook-egress-1 · Cevap: K-HKE-0013 · SHA: a9cc7016ae1d0002bd90ee8bceed9a986a4642a9 · Sonuc: ONAY · Bulgu: B0 M0 m0 N1
-Rapor `state/reviews/hke-mcp-settings-r1.md` (yığınsız). Main'de egress'e geçen ayar tipleri: 20 çağrı noktası `Settings`, yalnız `mcp_server_common` 135/239 `McpServiceSettings`; başka sınıf yok. `EgressProxyUrl` tek tanım, iki sınıfta aynı doğrulayıcı; boş kapalı, geçersiz `egress_proxy_url_invalid` ile başlangıcı durduruyor. Ayar sınıfı testi iki sınıfı kapsıyor ve yeni sınıfta kırmızıya düşüyor (probe B). Ruff temiz, birim 82 passed; 05a canlı 5/5 işçi logundan (kapıda koşacak). Başka değişiklik yok. NOTE-1: sınıf keşfi import'u düşen modülü sessizce atlıyor (probe C yeşil; bugün yalnız `knowledge.worker` düşüyor, yeni sınıf yok) ve yalnız proxy alanını soruyor; öneri: beklenen düşüş listesi + egress alan kümesinin tamamı. Merge'ü bekletmez.
