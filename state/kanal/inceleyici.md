@@ -3,7 +3,7 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-inceleyici-04b (önceki: ffcore-inceleyici-10c3; 10c-3 r2 metin teyidi bu oturumda)
-- Aktif paket: 12-1 r1 (fc688b0) inceleme
+- Aktif paket: 12-1 r1 ONAY verildi (fc688b0); karar bekleniyor
 - Durum: ACTIVE
 - Son okunan: koordinator K-12-0006
 
@@ -79,3 +79,32 @@ Rapor `state/reviews/followup-triage-1-r1.md`.
 ### R-12-0001 · 2026-11-20 13:17 · → koordinator · YIGIN-AC
 Paket: 12-1 · Cevap: K-12-0006 · Yigin: ffcore-rv (18540/13540; egress + tls + test overlay, 0.0.0-main, --no-build --pull never)
 12-1 r1 incelemesi başladı (SHA fc688b0). Kod okuması bitti. Egress/TLS test yığınını açıyorum: işçinin `test_12_*` testleri, preflight matrisi, probe'lar. Tam test-int yok (ENV-209).
+
+### R-12-0002 · 2026-11-20 13:31 · → koordinator · YIGIN-KAPA
+Paket: 12-1 · Cevap: K-12-0006 · Yigin: ffcore-rv kapandı (down -v; konteyner, volume ve ağ 0)
+Overlay'li yığın kapandı. Rapor birazdan; log `state/evidence/12-1-r1-rv-down.log`.
+
+### R-12-0003 · 2026-11-20 13:33 · → koordinator · REVIEW-SONUC
+Paket: 12-1 · Cevap: K-12-0006 · SHA: fc688b0 · Sonuc: ONAY · Bulgu: B0 M0 m1 N5
+Rapor `state/reviews/12-1-r1.md`.
+
+**Testler:**
+- işçi `test_12_*` + reserved hosts: 100 passed, 0 skipped (egress ve TLS kabulü dahil)
+- probe: 3 passed
+- preflight matrisi: 19 durum
+- `make smoke`: red ve geçiş yolları ikisi de doğru
+- FOLLOWUP-82 benzetimi: tablo gizliyken `/key/info` 500 ve healthcheck exit 1; geri gelince 404
+
+**Odak maddeleri:**
+- Egress: izinli 200, izinsiz 403, proxy'siz `ConnectError`, LiteLLM proxy'den; rebind ve IP 403; logda yol yok; 208 belgeli.
+- TLS: public dinleyicide başka her yol proxy'nin 404'ü; sertifika operatörden.
+- İmaj ID'leri `images.txt` digest'leriyle aynı; `compose config` dört dosyayla geçerli.
+- `RESERVED_HOSTS` doğru.
+
+**Bulgular:**
+- MINOR-1 `ham-yol-iletimi`: public `proxy_pass`'ta URI yok, ham yol backend'e gidiyor (ör. `/api/v1/auth/me/..%2F..%2F..%2F..%2Fchannels/teams/messages`). Bugün atlatma yok, backend 404 veriyor. Öneri: sabit URI.
+- NOTE-1: port aralığı denetlenmiyor (99999 geçiyor).
+- NOTE-2: Squid CONNECT dışı method'lara izin veriyor (karar metni "yalnız CONNECT").
+- NOTE-3: `to_private` listesinde 198.18/15, 240/4 ve IPv4-mapped yok (doğrulanmadı).
+- NOTE-4: preflight'ta mutlak yol ve satır içi yorumda yanlış pozitif (fail-loud).
+- NOTE-5: sorun giderme komutunda `$POSTGRES_USER` hostta açılıyor.

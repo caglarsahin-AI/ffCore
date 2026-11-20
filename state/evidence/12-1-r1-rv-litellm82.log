@@ -1,0 +1,15 @@
+HEAD=fc688b0671f8adf30a7b286eeb00a750722af581 (git archive copy)
+before: key/info=404 health=template parsing error: template: :1: function "add" not defined
+ALTER TABLE
+table hidden: key/info=500 health=template parsing error: template: :1: function "add" not defined
+ALTER TABLE
+restored: key/info=404 health=template parsing error: template: :1: function "add" not defined
+--- healthcheck rerun (status via docker inspect)
+before: healthy streak=0
+last exit 0 ''
+ALTER TABLE
+table hidden: healthy streak=5
+last exit 1 ''
+ALTER TABLE
+restored: healthy streak=0
+last exit 0 ''

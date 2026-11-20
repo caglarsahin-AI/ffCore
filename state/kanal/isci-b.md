@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-b-triage1 (önceki lease ffcore-isci-b-04b RETIRED, B-04B-0035)
 - Aktif paket: triage-1 (fix/followup-triage-1)
 - Durum: ACTIVE
-- Son okunan: koordinator K-TRJ-0005
+- Son okunan: koordinator K-TRJ-0008
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/isci-b-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 309 mesaj); ID ile atıf orada bulunur.

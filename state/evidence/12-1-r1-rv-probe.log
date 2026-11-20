@@ -1,0 +1,43 @@
+HEAD=fc688b0671f8adf30a7b286eeb00a750722af581 (git archive copy)
+
+no tests ran in 0.00s
+ERROR: file or directory not found: tests/unit/test_06b2_external_config.py
+
+worker-tests exit 4
+PROBE T public '/channels/teams/messages': HTTP/1.1 404 Not Found edge=False body=b'{"error":{"message":"Not Found","type":"not_found_error","code":"not_found"}}'
+PROBE T public '/channels/teams/messages?x=1': HTTP/1.1 404 Not Found edge=False body=b'{"error":{"message":"Not Found","type":"not_found_error","code":"not_found"}}'
+PROBE T public '/channels/teams/messages/': HTTP/1.1 404 Not Found edge=True body=b'<html>\r\n<head><title>404 Not Found</title></head>\r\n<body>\r\n<center><h1>404 Not Found</h1></center>\r\n<hr><center>nginx</center>\r\n</body>\r\n</html>\r\n'
+PROBE T public '/CHANNELS/teams/messages': HTTP/1.1 404 Not Found edge=True body=b'<html>\r\n<head><title>404 Not Found</title></head>\r\n<body>\r\n<center><h1>404 Not Found</h1></center>\r\n<hr><center>nginx</center>\r\n</body>\r\n</html>\r\n'
+PROBE T public '//channels/teams/messages': HTTP/1.1 404 Not Found edge=False body=b'{"error":{"message":"Not Found","type":"not_found_error","code":"not_found"}}'
+PROBE T public '/foo/../channels/teams/messages': HTTP/1.1 404 Not Found edge=False body=b'{"error":{"message":"Not Found","type":"not_found_error","code":"not_found"}}'
+PROBE T public '/api/v1/auth/me/../../../../channels/teams/messages': HTTP/1.1 404 Not Found edge=False body=b'{"error":{"message":"Not Found","type":"not_found_error","code":"not_found"}}'
+PROBE T public '/api/v1/auth/me/..%2F..%2F..%2F..%2Fchannels/teams/messages': HTTP/1.1 404 Not Found edge=False body=b'{"error":{"message":"Not Found","type":"not_found_error","code":"not_found"}}'
+PROBE T public '/channels/teams/messages/../../../api/v1/auth/me': HTTP/1.1 404 Not Found edge=True body=b'<html>\r\n<head><title>404 Not Found</title></head>\r\n<body>\r\n<center><h1>404 Not Found</h1></center>\r\n<hr><center>nginx</center>\r\n</body>\r\n</html>\r\n'
+PROBE T public '/channels/teams/messages%2F..%2F..%2F..%2Fapi/v1/auth/me': HTTP/1.1 404 Not Found edge=True body=b'<html>\r\n<head><title>404 Not Found</title></head>\r\n<body>\r\n<center><h1>404 Not Found</h1></center>\r\n<hr><center>nginx</center>\r\n</body>\r\n</html>\r\n'
+PROBE T public '/channels/teams/%6dessages': HTTP/1.1 404 Not Found edge=False body=b'{"error":{"message":"Not Found","type":"not_found_error","code":"not_found"}}'
+PROBE T public '/healthz/../channels/teams/messages': HTTP/1.1 404 Not Found edge=False body=b'{"error":{"message":"Not Found","type":"not_found_error","code":"not_found"}}'
+PROBE T internal '/healthz': HTTP/1.1 307 Temporary Redirect body=b'8cd\r\n<!DOCTYPE html><html id="__next_error__"><head><meta charSet="utf-8"/><meta'
+PROBE T internal '/api/v1/auth/me': HTTP/1.1 401 Unauthorized body=b'{"error":{"message":"Authentication required.","type":"authentication_error","co'
+PROBE T internal '/v1/models': HTTP/1.1 401 Unauthorized body=b'{"error":{"message":"Authentication required.","type":"authentication_error","co'
+PROBE T internal '/readyz': HTTP/1.1 307 Temporary Redirect body=b'8cd\r\n<!DOCTYPE html><html id="__next_error__"><head><meta charSet="utf-8"/><meta'
+PROBE T internal '/docs': HTTP/1.1 307 Temporary Redirect body=b'8cd\r\n<!DOCTYPE html><html id="__next_error__"><head><meta charSet="utf-8"/><meta'
+PROBE T internal '/openapi.json': HTTP/1.1 307 Temporary Redirect body=b'8cd\r\n<!DOCTYPE html><html id="__next_error__"><head><meta charSet="utf-8"/><meta'
+.PROBE S GET http://api.allowed.test:9999/v1/models?secret=q1: 404 '{"error": "not found"}'
+PROBE S GET http://api.denied.test:9999/v1/models: 403 '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/st'
+PROBE S GET http://198.51.100.10:9999/v1/models: 403 '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/st'
+PROBE S GET http://api.allowed.test:80/: 403 '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/st'
+PROBE S GET http://rebind.test:9999/v1/models: 403 '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/st'
+PROBE S GET http://API.ALLOWED.TEST:9999/v1/models: 200 '{"object": "list", "data": []}'
+PROBE S GET http://api.allowed.test.:9999/v1/models: 200 '{"object": "list", "data": []}'
+PROBE S CONNECT api.allowed.test:9999: b'HTTP/1.1 200 Connection established'
+PROBE S CONNECT api.denied.test:9999: b'HTTP/1.1 403 Forbidden'
+PROBE S CONNECT api.allowed.test:22: b'HTTP/1.1 403 Forbidden'
+PROBE S CONNECT rebind.test:9999: b'HTTP/1.1 403 Forbidden'
+PROBE S direct (no proxy) from tools: ConnectError
+.PROBE L probe key, master: 404 '{"error":{"message":"Key not found in database","type":"not_found_error","param":"key","code":"404"}}'
+PROBE L probe key, wrong master: 401 '{"error":{"message":"Authentication Error, Invalid proxy server token passed. Received API Key = sk-...rong, Key Hash (T'
+PROBE L no key param: 404 '{"error":{"message":"Key not found in database","type":"not_found_error","param":"key","code":"404"}}'
+.
+3 passed in 9.60s
+probe exit 0
+exit 0

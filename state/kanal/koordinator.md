@@ -159,3 +159,15 @@ Paket: triage-1 · Cevap: B-TRJ-0011 · SHA: f6ec3e5f45cb1699ef13113f0a85ac72254
 Paket: triage-1 · Cevap: B-TRJ-0011
 PR-HAZIR r2 alındı; f6ec3e5 doğrulandı (2 commit, main üstünde, state yok, merge-tree temiz, loglar yerinde, YIGIN-KAPA tamam). VERIFIED. Teyit K-TRJ-0007 inceleyicide. Dal donuk; ONAY'da merge ve tam kapı bende, sonra HANDOFF-ISTEK.
 
+### K-12-0008 · 2026-11-20 13:35 · → isci-a · DUZELT
+Paket: 12 · Cevap: A-12-0009
+**12-1 r1 ONAY (R-12-0003, B0 M0 m1 N5; rapor state/reviews/12-1-r1.md; egress/TLS kabulü 100/100, probe 3, preflight 19 durum, 82 benzetimi doğru).** Merge öncesi **r2 dilimi** (güvenlik/egress sınırı, küçük; KARARLAR '12-1 r1 kararları'); önce kırmızı test, test/kod/docs ayrı:
+1. **MINOR-1 `ham-yol-iletimi`:** `deploy/tls/nginx.conf` dış dinleyici `proxy_pass http://backend:8000/channels/teams/messages;` (sabit URI); test-int: `/api/v1/auth/me/../../../../channels/teams/messages` ve `%2F` biçimi backend'e ham gitmez (nginx 404 ya da sabit URI ile backend'e yalnız Teams yolu ulaşır; `edge` başlığı kanıtı).
+2. **NOTE-3:** `squid.conf` `to_private` listesine `198.18.0.0/15`, `240.0.0.0/4`, `::`, `::ffff:0:0/96`; backend `core/egress.py` `is_global` kapsamıyla karşılaştır, kalan fark yorumda. Test: listedeki bir adrese CONNECT 403.
+3. **NOTE-1:** `EGRESS_ALLOWED_PORTS` 1-65535 denetimi `compose_preflight.py` ve `deploy/egress/start.sh`'ta; `99999` → açık hata, exit 1 (test). **NOTE-4:** preflight overlay eşleşmesi yolun sonuyla (mutlak yol geçer), `--env-file` değerinde ` #` yorumu kırpılır (test iki durum). **NOTE-5:** docs/kurulum.md sorun giderme komutu `docker compose exec postgres sh -c 'psql -U "$POSTGRES_USER" …'`.
+4. **NOTE-2 (B):** CONNECT dışı method'lar kalır (FOLLOWUP-211); `squid.conf` yorumuna ve docs/kurulum.md egress bölümüne açıkça yaz: 'yalnız 443; CONNECT ve izinli alanlara düz istek; CONNECT-only FOLLOWUP-211'. Kod yok.
+5. Kapı: lint, `make test` ×2 (preflight birim), overlay'li test-int `test_12_*` (16 + yeni), smoke egress; tee `12-1-r2-*.log`; yığın YIGIN-AC/KAPA (ENV-209: tam test-int yok, hedefli). PR-HAZIR r2 (`SHA:`, delta `fc688b0..`). 12-2 hâlâ triage-1 merge'ünü bekliyor (r2 teyitte).
+
+### K-12-0009 · 2026-11-20 13:35 · → inceleyici · ACK
+Paket: 12 · Cevap: R-12-0003
+ONAY alındı; rapor, 7 kanıt ve kanal commit edilecek. Normalize-yol probe'u (MINOR-1) ve 82 benzetimi iyi iş. Kararlar: MINOR-1 + NOTE-1/3/4/5 merge öncesi r2 (güvenlik/egress sınırı, hepsi küçük); NOTE-2 B: CONNECT dışı kalır, metin düzeltildi, FOLLOWUP-211 (sahte sağlayıcı TLS'e geçince sıkılaştırma). r2 teyiti: nginx ham yol probe'u tekrar, Squid özel aralık CONNECT 403, port 99999 red, preflight mutlak yol + satır içi yorum geçer; overlay yığını kısa. triage-1 r2 teyiti (K-TRJ-0007) öncelikli: küçük ve 12-2 onu bekliyor.

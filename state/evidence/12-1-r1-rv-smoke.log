@@ -1,0 +1,25 @@
+HEAD=fc688b0671f8adf30a7b286eeb00a750722af581 (git archive copy) · COMPOSE_PROFILES='' COMPOSE_FILE=compose.yaml:deploy/docker-compose.egress.yml:deploy/docker-compose.tls.yml
+python scripts/smoke.py
+FAIL  check_preflight: profile_overlay_mismatch: deploy/docker-compose.egress.yml is in COMPOSE_FILE but profile egress is not in COMPOSE_PROFILES; add egress to COMPOSE_PROFILES or remove the file
+ok    backend /healthz 200
+ok    litellm /health/liveliness 200, /key/info 404 (schema present)
+ok    langfuse /api/public/health 200, /api/public/projects 200
+ok    mcp-search /healthz 200
+ok    mcp-sql /healthz 200
+ok    skipped: ollama profile inactive
+smoke: FAILED
+make: *** [Makefile:54: smoke] Error 1
+exit 2
+HEAD=fc688b0671f8adf30a7b286eeb00a750722af581 (git archive copy) · COMPOSE_PROFILES='egress,tls,test' COMPOSE_FILE=compose.yaml:deploy/docker-compose.egress.yml:deploy/docker-compose.tls.yml
+python scripts/smoke.py
+ok    DEPLOY_PROFILE=llmaas INFERENCE_BACKEND=ollama
+ok    egress: forward proxy, 2 hosts in EGRESS_ALLOWLIST
+ok    tls: reverse proxy (internal 8443, public Teams path 9443)
+ok    backend /healthz 200
+ok    litellm /health/liveliness 200, /key/info 404 (schema present)
+ok    langfuse /api/public/health 200, /api/public/projects 200
+ok    mcp-search /healthz 200
+ok    mcp-sql /healthz 200
+ok    skipped: ollama profile inactive
+smoke: passed
+exit 0
