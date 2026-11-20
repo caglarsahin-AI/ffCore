@@ -124,7 +124,9 @@ describe("test_11_2_chat_screen", () => {
     await waitFor(() => expect(screen.getByTestId("chat-live-answer").textContent).toBe("30 gün [1]."));
     const sent = fetchMock.mock.calls.find(([u]) => urlOf(u as RequestInfo) === `${P}/agents/asistan/runs`)!;
     expect(JSON.parse(String((sent[1] as RequestInit).body))).toEqual({ input: "Fesih süresi?", channel: "chat" });
-    expect(screen.getByTestId("chat-tool-card").textContent).toContain("Running SQL");
+    // The SQL call has its result: the card says it ran (while running it says "Running SQL…").
+    expect(screen.getByTestId("chat-tool-card").textContent).toContain("Ran SQL");
+    expect(screen.getByTestId("chat-tool-card").dataset.state).toBe("done");
     expect(replace).toHaveBeenCalledWith("/chat/asistan/c9");
     const card = screen.getByTestId("chat-source-card");
     expect(card.textContent).toContain("hizmet.pdf");
