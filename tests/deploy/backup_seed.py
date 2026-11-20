@@ -40,6 +40,11 @@ def main() -> None:
     members = [{"email": ANALYST, "role": "analyst", "access": "edit"}]
     seed.seed_members(admin, {"projects": [{**PROJECT, "members": members}]}, ids, member_password)
     seed.seed_models(admin, ids)
+    # Agent runs read the platform prompts from Langfuse (make seed-prompts); they are in the
+    # Langfuse database, so the backup carries them too.
+    done = seed.cli("seed-prompts", "--path", "prompts")
+    if done.returncode != 0:
+        raise seed.SeedError(f"seed-prompts: {done.stderr.strip() or done.stdout.strip()}")
 
     base = f"/projects/{pid}/knowledge-bases"
     kb = admin.create(base, {"key": KB, "name": KB}, lambda: admin.find(base, KB))
