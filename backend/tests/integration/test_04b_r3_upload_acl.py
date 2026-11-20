@@ -52,7 +52,10 @@ def test_04b_r3_u1_same_bytes_other_acl_refused_for_analyst(world, pg):
     assert refused.json()["error"]["code"] == "insufficient_role"
     assert state(world, doc_id) == before
     assert world["queue"].jobs == []
-    assert audit_rows(pg, "upload_documents", "denied", project=world["project"])
+    # FOLLOWUP-203 (A): exactly one denied row, the decorator's, with authorize()'s reason.
+    denied = audit_rows(pg, "upload_documents", "denied", project=world["project"])
+    assert len(denied) == 1
+    assert (denied[0][2]["code"], denied[0][2]["min_role"]) == ("insufficient_role", "admin")
     assert search(world, world["peer"])["hits"]  # the ACL reached nobody: peer still reads
 
 
@@ -122,7 +125,9 @@ def test_04b_r3_admin_reuploads_a_user_only_document(world):
     first = upload(world, world["admin"], "kisi.md", BODY, acl_users=world["analyst_id"])
     doc_id = first.json()["data"][0]["document"]["id"]
     drain(world)
-    assert document(world, world["admin"], doc_id).status_code == 404
+    # FOLLOWUP-202: the admin now reads it through the single document GET (_manages_acl).
+    assert document(world, world["admin"], doc_id).status_code == 200
+    assert document(world, world["peer"], doc_id).status_code == 404
     again = upload(world, world["admin"], "kisi.md", OTHER, acl_users=world["admin_id"])
     assert again.status_code == 202, again.text
     assert again.json()["data"][0]["outcome"] == "new_version"
