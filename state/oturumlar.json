@@ -75,6 +75,20 @@
       "model": "claude-opus-5-5",
       "durum": "RETIRED",
       "kapandi": "2026-11-20T14:30"
+    },
+    "local_77e8424b-f8f9-490a-97e5-dafd6a60a99c": {
+      "rol": "isci-c",
+      "paket": "11",
+      "lease": "ffcore-isci-c-11",
+      "acildi": "2026-11-20T19:35",
+      "model": "claude-opus-5-5"
+    },
+    "local_24bba94d-3d92-4034-946d-459bec3b7f0a": {
+      "rol": "isci-b",
+      "paket": "hook-egress-1",
+      "lease": "ffcore-isci-b-hke1",
+      "acildi": "2026-11-20T19:35",
+      "model": "claude-opus-5-5"
     }
   }
 }
