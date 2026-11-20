@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-inceleyici-04b (önceki: ffcore-inceleyici-10c3; 10c-3 r2 metin teyidi bu oturumda)
-- Aktif paket: bekleme; 11-1 r2 ONAY (R-11-0006); fix/hke-mcp-settings PR-HAZIR bekleniyor (birim + 05a canlı 5/5)
+- Aktif paket: bekleme; hke-mcp-settings r1 ONAY (R-HKE-0005)
 - Durum: ACTIVE
-- Son okunan: koordinator K-11-0010
+- Son okunan: koordinator K-HKE-0013
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/inceleyici-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 335 mesaj); ID ile atıf orada bulunur.
@@ -80,3 +80,7 @@ Paket: 11 · Cevap: K-11-0008 · Yigin: ffcore-rv
 ### R-11-0006 · 2026-11-20 22:59 · → koordinator · REVIEW-SONUC
 Paket: 11 · Cevap: K-11-0008 · SHA: f9d213fdded017f843b5e7120e0ad6526a4e8d40 · Sonuc: ONAY · Bulgu: B0 M0 m0 N0
 Rapor `state/reviews/11-1-r2.md`. `test_11_4 --repeat-each 4` 16/16; açık telefon 4/4 (r1'de 4 koşuda 3 kez ✘). Bekleme sabit süre değil durum: sheet ve overlay'de `data-starting-style` yok, `opacity: 1`, koşan animasyon yok; seçiciler `sheet.tsx`'te var. docs/chat.md: `source_not_found` ve kapanan ACL cümlesi doğru. r1 dışı değişiklik yok; uygulama ve backend kodu r1'den beri aynı. YIGIN-KAPA R-11-0005.
+
+### R-HKE-0005 · 2026-11-20 23:09 · → koordinator · REVIEW-SONUC
+Paket: hook-egress-1 · Cevap: K-HKE-0013 · SHA: a9cc7016ae1d0002bd90ee8bceed9a986a4642a9 · Sonuc: ONAY · Bulgu: B0 M0 m0 N1
+Rapor `state/reviews/hke-mcp-settings-r1.md` (yığınsız). Main'de egress'e geçen ayar tipleri: 20 çağrı noktası `Settings`, yalnız `mcp_server_common` 135/239 `McpServiceSettings`; başka sınıf yok. `EgressProxyUrl` tek tanım, iki sınıfta aynı doğrulayıcı; boş kapalı, geçersiz `egress_proxy_url_invalid` ile başlangıcı durduruyor. Ayar sınıfı testi iki sınıfı kapsıyor ve yeni sınıfta kırmızıya düşüyor (probe B). Ruff temiz, birim 82 passed; 05a canlı 5/5 işçi logundan (kapıda koşacak). Başka değişiklik yok. NOTE-1: sınıf keşfi import'u düşen modülü sessizce atlıyor (probe C yeşil; bugün yalnız `knowledge.worker` düşüyor, yeni sınıf yok) ve yalnız proxy alanını soruyor; öneri: beklenen düşüş listesi + egress alan kümesinin tamamı. Merge'ü bekletmez.

@@ -1,0 +1,37 @@
+HEAD=a9cc7016ae1d0002bd90ee8bceed9a986a4642a9 (git archive copy) tools image, --network none, source mounted
+=== A: fix as is: settings-class test + egress unit + ruff
+All checks passed!
+3 files already formatted
+..........                                                               [100%]
+82 passed in 15.61s
+python: can't open file '/p/list_failed_imports.py': [Errno 2] No such file or directory
+=== B: + module with egress-shaped class lacking egress_proxy_url (want red)
+        assert {c.__name__ for c in egress} >= {"Settings", "McpServiceSettings"}
+>       assert missing == []
+E       AssertionError: assert ['RvProbeSettings'] == []
+1 failed, 3 passed in 2.96s
+=== C: same class in a module that fails to import (silent skip?)
+4 passed in 3.04s
+exit 0
+=== D: modules that fail to import in the tools image today (scope of the silent skip)
+Traceback (most recent call last):
+  File "/p/list_failed_imports.py", line 1, in <module>
+    import importlib, pkgutil, ffcore
+ModuleNotFoundError: No module named 'ffcore'
+=== E: worker 05a live log
+tests/integration/test_05a_live_services.py::test_05a_live_discovery[mcp-sql-actions1] PASSED [ 40%]
+tests/integration/test_05a_live_services.py::test_05a_live_token_for_another_tool_refused PASSED [ 60%]
+tests/integration/test_05a_live_services.py::test_05a_live_run_sql_on_demo_database PASSED [ 80%]
+tests/integration/test_05a_live_services.py::test_05a_live_forged_token_refused_by_mcp_sql PASSED [100%]
+============================== 5 passed in 5.90s ===============================
+mcp-sql-1     | 2026-11-20 19:59:40,154 INFO ffcore.mcp_sql run_sql outcome=ok
+state/evidence/hke-mcp-gate-summary.log:============================== 5 passed in 5.90s ===============================
+state/evidence/hke-mcp-gate-summary.log:All checks passed!
+state/evidence/hke-mcp-gate-summary.log:======================= 2156 passed in 170.13s (0:02:50) =======================
+state/evidence/hke-mcp-red.log:4 failed in 11.90s
+=== D (rerun with PYTHONPATH=/work/backend)
+modules failing to import: 1
+   ('ffcore.knowledge.worker', 'ValidationError', '7 validation errors for Settings\ndeploy_profile\n  Field required [type=missing]\n')
+=== 22:58:15 HEAD=a9cc7016ae1d0002bd90ee8bceed9a986a4642a9 up
+#0 building with "default" instance using docker driver
+
