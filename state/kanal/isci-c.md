@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-c-11
 - Aktif paket: 11 (son kullanıcı chat arayüzü `/chat`; dal feat/11-chat)
 - Durum: ACTIVE
-- Son okunan: koordinator K-11-0002; son yazılan C-11-0003 (ACK)
+- Son okunan: koordinator K-11-0002; son yazılan C-11-0007 (PR-HAZIR 11-1 d31574b)
 - Önceki lease: ffcore-isci-c-10c3 RETIRED (10c-3 MERGED 0a92084; son C-10C3-0009 RETIRED); ondan önce ffcore-isci-c-10c2 RETIRED (10c-2 MERGED b93cd96; son C-10C2-0016 RETIRED); ondan önce ffcore-isci-c-sse RETIRED (fix/10b-sse-bekci MERGED 4216718; son C-SSE-0011 RETIRED); ondan önce ffcore-isci-c-10c1 RETIRED (10c-1 MERGED; son C-10C1-0015 RETIRED); ondan önce ffcore-isci-c-10bp2 RETIRED (10b-poc-2 MERGED b43770d; son C-10bp2-0019 HANDOFF)
 
 ## Mesajlar
@@ -37,3 +37,13 @@ Paket: 11 · Cevap: K-11-0002 · Yigin: ffcore-11
 ### C-11-0005 · 2026-11-20 22:10 · → koordinator · DURUM
 Paket: 11 · Cevap: C-11-0004 · Durum: IMPLEMENTED
 11-1 kod commit'li (dal feat/11-chat, 7 commit: test/kod ayrı). Hedefli test-int `test_11_chat.py` 18/18 (`11-1-b-green-int*.log`), unit+contract 104 (`11-1-b-green-unit.log`), önyüz lint/typecheck/check:api 0 + Vitest 296 (`11-1-f-gate-2.log`). Şimdi aynı yığın `ffcore-11` tam açılıyor: `--profile test up -d --wait --build --pull never` (imaj `0.0.0-11` dal kodundan), seed-prompts + superadmin, `FAKE_EMBED=1`; e2e: 11 spec'leri, sonra test paneli/giriş etkilenen spec'ler ve tam koşu (`--grep-invert @model-missing --workers=1`). Bitince `down -v` + YIGIN-KAPA.
+
+### C-11-0006 · 2026-11-20 23:05 · → koordinator · YIGIN-KAPA
+Paket: 11 · Cevap: C-11-0004 · Yigin: ffcore-11
+`down -v` (profiller test, e2e, tools) + elle açılan `ffcore-11_e2e_node_modules` silindi; konteyner 0, volume 0 (`state/evidence/11-1-down.log`). `ffcore/{backend,tools,frontend}:0.0.0-11` etiketleri duruyor.
+
+### C-11-0007 · 2026-11-20 23:06 · → koordinator · PR-HAZIR
+Paket: 11 · Cevap: K-11-0002 · SHA: d31574b385e1a590ab8727983ac7a5542be55820
+**11-1** (sohbet çekirdeği) hazır: dal `feat/11-chat`, delta `main...d31574b` (merge-base 1c0abcd) 11 commit, 52 dosya (40 + 12 görüntü), state/ yok. PR notu `state/pr/11.md` "PR 11-1" bölümü (kabul→test, komutlar, bilerek değişen testler, varsayımlar).
+Kapı: backend `make lint && make test` 2120×2 (llmaas/airgap); hedefli test-int `test_11_chat.py` 18/18; önyüz lint/typecheck/check:api 0 + Vitest 296; e2e 11 spec'leri 8/8; tam e2e 186 passed + düşen 11'in tekrarı: 10c3 9/9 (sahte upstream'le), `test_11_1` ve `test_10ab_2` geçti; kalan tek `test_10bp1_10` stand-in ready = `/readyz` `ollama_runtime_context` (yığında Ollama yok, ENV-204, dokunulmayan kod). Loglar `state/evidence/11-1-*.log`.
+Bilerek değişen testler: `test_06a_openapi` EXPECTED (+5 yol), `test_03a_write_flag` (`delete_conversation` muaf). Not: GOREV'deki "bir satır" `api/__init__.py`'de import + liste = iki satır; 404 `source_reindexed` ek kod (belge duruyor, parça yeniden indekslenmiş). Tam test-int koşulmadı (ENV-209; istenirse sıra rica ederim). 11-2'ye REVIEW sonrası ya da onayınla geçerim.

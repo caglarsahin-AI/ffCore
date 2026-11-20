@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-inceleyici-04b (önceki: ffcore-inceleyici-10c3; 10c-3 r2 metin teyidi bu oturumda)
-- Aktif paket: bekleme; dalga 8 (11 chat arayüzü + fix/hook-egress-1); ilk PR-HAZIR bekleniyor
+- Aktif paket: hook-egress-1 r1 bitti (ONAY m2 N3); karar bekleniyor
 - Durum: ACTIVE
-- Son okunan: koordinator K-GEN-0034
+- Son okunan: koordinator K-HKE-0003
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/inceleyici-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 335 mesaj); ID ile atıf orada bulunur.
@@ -40,3 +40,15 @@ K-GEN-0022 alındı. Ama Docker motoru şu an çalışmıyor:
 Docker Desktop'ı açmak kullanıcının işi; ben açmıyorum. Motor gelince sıra şöyle:
 1. 05b r2: rv05b hafif yığını, YIGIN-AC, probe'lar (P1-P9) ve hedefli testler, rapor, YIGIN-KAPA.
 2. 10c-2: rv10c2, test-int (qdrant) ve probe'lar.
+
+### R-HKE-0001 · 2026-11-20 21:02 · → koordinator · YIGIN-AC
+Paket: hook-egress-1 · Cevap: K-HKE-0003 · Yigin: ffcore-rv (18540/13540; compose + egress + tls + test overlay, imaj 0.0.0-hke, --no-build --pull never) + atılabilir initdb konteynerleri `rv-hke1-initdb-*` (--network none)
+hook-egress-1 r1 başladı (SHA 99bb7a3). Hook probe'ları hostta bitti (yığınsız). Şimdi 213 initdb (gerçek postgres) ve 208 overlay yığını: hedefli `test_12_egress` + proxy probe'ları. Tam test-int yok (ENV-209).
+
+### R-HKE-0002 · 2026-11-20 21:36 · → koordinator · YIGIN-KAPA
+Paket: hook-egress-1 · Cevap: K-HKE-0003 · Yigin: ffcore-rv
+`down -v --remove-orphans` exit 0; ffcore-rv konteyner, volume ve ağ 0. initdb konteynerleri `rv-hke1-initdb-*` silindi, 0 kaldı (`hook-egress-1-r1-rv-down.log`, `-initdb.log`).
+
+### R-HKE-0003 · 2026-11-20 21:36 · → koordinator · REVIEW-SONUC
+Paket: hook-egress-1 · Cevap: K-HKE-0003 · SHA: 99bb7a39787a40ca053dade6611d1d4703d547cd · Sonuc: ONAY · Bulgu: B0 M0 m2 N3
+Rapor `state/reviews/hook-egress-1-r1.md`. Block kipi gerçek ihlalleri engelliyor (KAPI, ENV, PROSES-175, PUSH, TEK-YAZAR); kanal heredoc yanlış pozitifleri sessiz. 210 dokuz biçimde, 212 skip gerekçesi, 213 gerçek postgres'te iki yarım durum exit 1, 208 gerçek backend'den Squid üç durum + proxy kökü dışı `egress_proxy_only` + iç host doğrudan: hepsi kanıtlı. **Özel probe (MINOR-1 `yorumlayici-govdesi-env-metni`):** `.env.example`/`.env.test` heredoc düzenlemeleri geçiyor (8/8); ama gövdede çıplak `.env` kelimesi geçen Python düzenlemesi engelleniyor (4/4; `.env.example`'ın kendi satırları 1, 2, 328, 338). A (önerim): eşleşme aynı, mesaj Write+`py dosya` yolunu söyler. B: boşluk öneki kalkar (K-HOOK2-0007 MINOR-2 geri alınır). **MINOR-2 `kabuk-govdesi-sarmalayici` (regresyon):** `env X=1 bash`, `compose run -T tools sh`, `compose exec -T backend bash`, `docker exec -i c sh` heredoc'larında tee'siz `pytest` dalda geçiyor, main engelliyordu. İkisini de merge öncesi öneriyorum. NOTE: docs/takim 648/654; proxy reddi kodu; `run -d` deseninde tee `sh -c` içine. YIGIN-KAPA R-HKE-0002.

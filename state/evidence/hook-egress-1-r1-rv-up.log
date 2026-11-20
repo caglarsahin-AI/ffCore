@@ -1,0 +1,18 @@
+HEAD=99bb7a39787a40ca053dade6611d1d4703d547cd (git archive copy) image 0.0.0-hke (backend .py == source)
+config exit 0
+ Container ffcore-rv-langfuse-redis-1  Healthy
+ Container ffcore-rv-langfuse-clickhouse-1  Healthy
+ Container ffcore-rv-migrate-1  Exited
+ Container ffcore-rv-langfuse-postgres-1  Healthy
+ Container ffcore-rv-langfuse-worker-1  Healthy
+ Container ffcore-rv-worker-1  Healthy
+ Container ffcore-rv-langfuse-web-1  Healthy
+ Container ffcore-rv-postgres-1  Healthy
+ Container ffcore-rv-egress-bench-1  Healthy
+ Container ffcore-rv-redis-1  Healthy
+ Container ffcore-rv-langfuse-minio-1  Healthy
+ Container ffcore-rv-litellm-1  Healthy
+ Container ffcore-rv-mcp-sql-1  Healthy
+ Container ffcore-rv-mcp-search-1  Healthy
+ Container ffcore-rv-tls-proxy-1  Healthy
+up exit 0

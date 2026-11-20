@@ -1,0 +1,19 @@
+HEAD=99bb7a39787a40ca053dade6611d1d4703d547cd vs main 41cd04b559cb7fd77ec8c96a15de96e5b6c350ee host py -3.12
+mode=block rol=isci-b; branch=99bb7a3 guard, main=main guard (comparison)
+OK  data heredoc then real pytest: branch exit 2 ['KAPI'] | main exit 2 ['KAPI'] | want 2
+OK  python heredoc then make test: branch exit 2 ['KAPI'] | main exit 2 ['KAPI'] | want 2
+OK  two heredocs, second bash pytest: branch exit 2 ['KAPI'] | main exit 2 ['KAPI'] | want 2
+OK  <<- tab delimiter bash pytest: branch exit 2 ['KAPI'] | main exit 2 ['KAPI'] | want 2
+OK  bash -s heredoc pytest: branch exit 2 ['KAPI'] | main exit 2 ['KAPI'] | want 2
+OK  cat heredoc | sh -s pytest: branch exit 2 ['KAPI'] | main exit 2 ['KAPI'] | want 2
+BAD env X=1 bash heredoc pytest: branch exit 0 [] | main exit 2 ['KAPI'] | want 2
+BAD timeout 600 bash heredoc pytest: branch exit 0 [] | main exit 2 ['KAPI'] | want 2
+BAD compose run -T tools sh heredoc pytest: branch exit 0 [] | main exit 2 ['KAPI'] | want 2
+BAD compose exec -T backend bash heredoc pytest: branch exit 0 [] | main exit 2 ['KAPI'] | want 2
+BAD docker exec -i c sh heredoc pytest: branch exit 0 [] | main exit 2 ['KAPI'] | want 2
+BAD compose run tools sh heredoc docker build: branch exit 0 [] | main exit 0 [] | want 2
+OK  compose run tools sh heredoc pytest | tee: branch exit 0 [] | main exit 2 ['KAPI'] | want 0
+OK  compose exec psql heredoc (data): branch exit 0 [] | main exit 0 [] | want 0
+OK  bash heredoc nested python heredoc mentions pytest: branch exit 0 [] | main exit 2 ['KAPI'] | want 0
+OK  sh -c with heredoc inside: branch exit 2 ['KAPI'] | main exit 2 ['KAPI'] | want 2
+exit 0

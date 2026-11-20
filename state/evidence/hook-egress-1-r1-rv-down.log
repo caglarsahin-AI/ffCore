@@ -1,0 +1,8 @@
+HEAD=99bb7a39787a40ca053dade6611d1d4703d547cd
+ Network ffcore-rv_default  Removed
+ Network ffcore-rv_ingress  Removed
+ Volume ffcore-rv_langfuse_clickhouse_data  Removed
+ Volume ffcore-rv_langfuse_minio_data  Removed
+ Volume ffcore-rv_langfuse_clickhouse_logs  Removed
+down exit 0
+containers: 0 volumes: 0 networks: 0

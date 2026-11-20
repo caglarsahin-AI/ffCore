@@ -99,3 +99,4 @@
 2026-11-20T19:37:18	warn	isci-b	Bash	KAPI	py -3.12 - <<'EOF' from pathlib import Path p = Path("tests/hooks/test_guard.py") s = p.read_text(encoding="utf-8") anch
 2026-11-20T19:38:12	warn	isci-b	Bash	KAPI	git add tests/hooks/test_guard.py && git commit -q -m "test(hooks): red test for the settings hook test without a py lau
 2026-11-20T19:44:05	warn	isci-b	Bash	ENV	py -3.12 - <<'EOF' from pathlib import Path p = Path("tests/hooks/test_guard.py") s = p.read_text(encoding="utf-8") s = 
+2026-11-20T21:35:59	warn	isci-c	Bash	KAPI	cat >> state/pr/11.md <<'EOF' --- # PR 11-1 · [B] feat(11): end user chat core (`/chat`) **Branch:** feat/11-chat · **Ba

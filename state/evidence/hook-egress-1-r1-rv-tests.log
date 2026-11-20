@@ -1,0 +1,15 @@
+HEAD=99bb7a39787a40ca053dade6611d1d4703d547cd tools 0.0.0-hke on ffcore-rv egress+tls+test
+........................................................................ [ 42%]
+........................................................................ [ 85%]
+.........................                                                [100%]
+169 passed in 36.01s
+--- probe
+https-to-plain: EgressRequestFailed egress_request_failed
+.proxy-down: EgressRequestFailed egress_request_failed
+.proxy-nxdomain: EgressRequestFailed egress_proxy_unreachable
+..port-8080: egress_proxy_denied Outbound call to http://api.allowed.test:8080 failed: egress_proxy_denied (ERR_ACCESS_DENIED 0).
+..ip-literal backend-allowlisted: egress_proxy_denied
+..........normalized: http://egress-proxy:3128
+.
+17 passed in 9.66s
+exit 0

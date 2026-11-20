@@ -142,3 +142,14 @@ Paket: hook-egress-1 · Cevap: B-HKE-0006 · SHA: 99bb7a39787a40ca053dade6611d1d
 Paket: hook-egress-1 · Cevap: B-HKE-0006
 PR-HAZIR alındı; 99bb7a3 doğrulandı (19 commit, 20 dosya touch-zone, block commit'i ayrı ve 208'den önce, main üstünde, state yok, merge-tree temiz, loglar yerinde, YIGIN-KAPA tamam). VERIFIED. İnceleme K-HKE-0003 inceleyicide; notun (2) için inceleyiciye özel probe istedim (`.env.example`/`.env.test` heredoc düzenlemeleri block'ta engellenmemeli; engelliyorsa merge öncesi küçük düzeltme gelir). Notun (1) docs/takim 648/654 metinleri: r1 bulgusu olarak gelirse aynı turda, touch-zone eki verildi. Dal donuk; bekle.
 
+### K-HKE-0005 · 2026-11-20 21:38 · → isci-b · DUZELT
+Paket: hook-egress-1 · Cevap: B-HKE-0006
+**hook-egress-1 r1 ONAY (R-HKE-0003, B0 M0 m2 N3; rapor state/reviews/hook-egress-1-r1.md).** Merge öncesi **r2 kısa dilim** (KARARLAR 'hook-egress-1 r1 kararları'); önce kırmızı test, test/kod/docs ayrı:
+1. **MINOR-2 `kabuk-govdesi-sarmalayici` (regresyon, güvenlik):** `heredoc_reader` sarmalayıcı ardındaki kabuğu bulsun: `env X=1 bash`, `timeout 600 bash`, `docker compose run --rm -T tools sh|bash`, `docker compose exec -T backend bash`, `docker exec -i c sh` (ve mevcut `| sh`): gövde komut sayılır, tee'siz `pytest` engel (inceleyicinin probe2 beş biçimi kırmızı test olarak; `python - <<EOF` ve `cat >> <<EOF` gövdeleri sessiz kalmaya devam, test).
+2. **MINOR-1 `yorumlayici-govdesi-env-metni` (A):** eşleşme aynı; ENV mesajı nedenini ve çıkış yolunu söyler: 'yorumlayıcı gövdesinde çıplak `.env` geçiyor (kod = komut); dosyayı Write ile yaz ya da betiği `py dosya.py` ile koş'; handbook kabul edilen yanlış pozitif satırına bu mesaj.
+3. **NOTE-1** docs/takim/ajanlarla-gelistirme.md 648/654: 240 ve `block`. **NOTE-2** proxy bağlantıyı reddederse de `egress_proxy_unreachable` (`_ProxyOnlyBackend.connect_tcp` `OSError`), test. **NOTE-3** handbook/ENVIRONMENT_AND_COMMANDS.md'ye ayrık koşu örneği: `compose run -d … sh -c 'pytest … 2>&1 | tee /tmp/x.log'` + `docker logs`.
+4. Kapı: hook testleri host, lint, `make test` tek profil yeter (hook + egress birim; airgap yalnız egress dosyaları), 208 test-int tekrar gerekmez (NOTE-2 birim testiyle); tee `hke-r2-*.log`. PR-HAZIR r2 (`SHA:`, delta `99bb7a3..`).
+
+### K-HKE-0006 · 2026-11-20 21:38 · → inceleyici · ACK
+Paket: hook-egress-1 · Cevap: R-HKE-0003
+ONAY alındı; rapor, 9 kanıt ve kanal commit edilecek. Sarmalayıcı kabuk probe'u (main engelliyor, dal geçiriyor) tam yerinde: K1 A'nın 'sh/bash gövdesi komut' cümlesinin uygulaması eksikti; güvenlik regresyonu olarak merge öncesi r2. MINOR-1 A (mesaj), NOTE-1/2/3 aynı turda. r2 teyiti: probe2 beş biçim block'ta engel, yorumlayıcı/veri gövdeleri sessiz, ENV mesajı metni, proxy red kodu birim testi, docs; yığınsız (hook host + birim).

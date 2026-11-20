@@ -1,0 +1,8 @@
+HEAD=99bb7a39787a40ca053dade6611d1d4703d547cd tools 0.0.0-hke --network none (Linux, no py launcher)
+........................................................................ [ 72%]
+........................................................................ [ 90%]
+......................................                                   [100%]
+=========================== short test summary info ============================
+SKIPPED [1] tests/hooks/conftest.py:127: 'py' launcher not found (Linux container); the hook step of the gate runs on the host with py -3.12 (FOLLOWUP-212)
+397 passed, 1 skipped in 24.35s
+exit 0
