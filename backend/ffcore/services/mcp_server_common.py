@@ -37,7 +37,7 @@ from ffcore.core.auth import (
     service_authorization,
     unverified_on_behalf_of_claims,
 )
-from ffcore.core.config import Settings
+from ffcore.core.config import EgressProxyUrl, Settings
 from ffcore.core.egress import EgressError, EgressTimeout, SafeOutboundClient
 from ffcore.core.logging import configure_logging
 
@@ -56,6 +56,8 @@ class McpServiceSettings(BaseSettings):
     offline: bool
     egress_allowlist: Annotated[list[str], NoDecode] = []
     allowed_internal_hosts: Annotated[list[str], NoDecode] = []
+    # FOLLOWUP-208 (K-HKE-0010): read by SafeOutboundClient; same field as Settings.
+    egress_proxy_url: EgressProxyUrl = ""
     internal_api_url: str = "http://backend:8000"
     log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = "INFO"
     # mcp-sql only.
