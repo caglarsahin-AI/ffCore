@@ -645,13 +645,13 @@ NER gecikme kabulü (boşta P95 < 300 ms) geliştirme dizüstünde ölçüldü. 
 
 `rol` ve `acildi` zorunlu; işçi rollerinde `paket` (yoksa `state/pr` yazımı engellenir); `pr` yalnız dosya adı paket kodundan farklıysa. Tek yazarı koordinatör.
 
-**Kip ve kayıt.** `FFCORE_GUARD_MODE=block` (varsayılan) çıkış 2; `warn` çıkış 0 + stderr + kullanıcıya görünen `systemMessage` (çıkış 0'da ne stderr ne `systemMessage` modele gider: oturum kendi uyarısını görmez, kayıttan ya da koordinatörden öğrenir; B-HOOK2-0005); bilinmeyen değer `block` + uyarı. İlk gün `.claude/settings.json` `env.FFCORE_GUARD_MODE=warn` ile gönderilir; `block`'a geçiş ayrı küçük commit. Her tetiklenme `state/evidence/hook-guard.log`'a tek satır: zaman, kip, rol, araç, kural, komutun ya da yolun **maskelenmiş** ilk 120 karakteri (dosya içeriği yazılmaz). Maske kesmeden önce uygulanır: URL kimliği (`https://***@…`), adı `key`, `token`, `secret`, `pass(word)`, `auth`, `credential` içeren `=` atamaları ve `--opt=` değerleri (`=***`), `Authorization:` ve `Bearer` değerleri (`***`). `-u`/`--user kullanıcı:parola` (`-u ***`) ve JSON gövdesindeki `"token|secret|password|api_key|key": "…"` (`"…":"***"`) de maskelenir. Boşlukla ayrılmış değer (`--token abc`) maskelenmez; secret komut satırına zaten yazılmaz (SECURITY_AND_PERMISSIONS). Dalga raporu madde 7 bu dosyayı sayar.
+**Kip ve kayıt.** `FFCORE_GUARD_MODE=block` (varsayılan) çıkış 2; `warn` çıkış 0 + stderr + kullanıcıya görünen `systemMessage` (çıkış 0'da ne stderr ne `systemMessage` modele gider: oturum kendi uyarısını görmez, kayıttan ya da koordinatörden öğrenir; B-HOOK2-0005); bilinmeyen değer `block` + uyarı. İlk gün `.claude/settings.json` `env.FFCORE_GUARD_MODE=warn` ile gönderildi (16 Kasım); `block`'a geçiş ayrı küçük commit (fix/hook-egress-1, dalga 8): depodaki ayar `block`. Her tetiklenme `state/evidence/hook-guard.log`'a tek satır: zaman, kip, rol, araç, kural, komutun ya da yolun **maskelenmiş** ilk 240 karakteri (fix/hook-egress-1; önce 120) (dosya içeriği yazılmaz). Maske kesmeden önce uygulanır: URL kimliği (`https://***@…`), adı `key`, `token`, `secret`, `pass(word)`, `auth`, `credential` içeren `=` atamaları ve `--opt=` değerleri (`=***`), `Authorization:` ve `Bearer` değerleri (`***`). `-u`/`--user kullanıcı:parola` (`-u ***`) ve JSON gövdesindeki `"token|secret|password|api_key|key": "…"` (`"…":"***"`) de maskelenir. Boşlukla ayrılmış değer (`--token abc`) maskelenmez; secret komut satırına zaten yazılmaz (SECURITY_AND_PERMISSIONS). Dalga raporu madde 7 bu dosyayı sayar.
 
 **Ayar** (`.claude/settings.json`; komut betiği dosya olarak değil modül olarak yükler, çünkü içe aktarılan modül önbellekli `.pyc`'den gelir ve geliştirme makinesinde çağrı başına maliyeti ~2,2 sn'den ~1,1 sn'ye indirir):
 
 ```json
 {
-  "env": { "FFCORE_GUARD_MODE": "warn" },
+  "env": { "FFCORE_GUARD_MODE": "block" },
   "permissions": { "deny": [
     "Read(**/.env)", "Edit(**/.env)",
     "Read(//c/ai_paycore/paycoreLLM/.env)", "Edit(//c/ai_paycore/paycoreLLM/.env)",
