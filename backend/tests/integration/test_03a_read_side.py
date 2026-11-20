@@ -98,6 +98,9 @@ PARITY_EXEMPT_PREFIXES = (
     # 05b: single MCP server GETs need a server in the world; their parity is
     # test_05b_read_mode_get_parity (the /mcp-servers list stays checked here).
     f"{API}/projects/{{project_id}}/mcp-servers/{{server_id}}",
+    # 11-1: a conversation's messages need the caller's own conversation in the world; their
+    # parity is test_11_4_read_mode_get_parity (/chat/agents and /conversations stay checked here).
+    f"{API}/projects/{{project_id}}/conversations/{{conversation_id}}",
 )
 
 

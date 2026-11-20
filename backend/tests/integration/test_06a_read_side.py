@@ -73,6 +73,10 @@ def test_06a_read_mode_get_parity(
             or path.startswith(f"{API}/projects/{{project_id}}/runs/{{run_id}}")
         ):
             continue
+        # 11-1: a run's cited chunk needs a knowledge-base chunk the run cited; its parity is
+        # test_11_4_read_mode_get_parity.
+        if path.endswith("/sources/{chunk_id}"):
+            continue
         here = dict(world, agent_id=str(external_id)) if path.endswith("/external") else world
         url = re.sub(r"\{(\w+)\}", lambda m, here=here: here[m.group(1)], path)
         a, b = edit.get(url), read.get(url)
