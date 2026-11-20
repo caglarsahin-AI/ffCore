@@ -303,8 +303,22 @@ def test_12_2_vllm_needs_airgap_and_the_vllm_backend():
 
 
 def test_12_2_llmaas_refuses_the_owner_as_application_user():
-    code, message = error_code(env(APP_DB_PASSWORD=""))
+    code, message = error_code(env(APP_DB_USER="", APP_DB_PASSWORD=""))
     assert code == "db_role_owner" and "APP_DB_PASSWORD" in message
+
+
+@pytest.mark.parametrize("profile", ["llmaas", "airgap"])
+@pytest.mark.parametrize(
+    "user,password", [("ffcore_app", ""), ("", "dummy-not-secret")], ids=["no-password", "no-user"]
+)
+def test_12_r2_half_a_role_pair_is_refused_in_every_profile(profile, user, password):
+    # 12-2 r1 MAJOR-2: the user alone would make compose connect as ffcore_app with the
+    # owner's password, a role initdb never created; the password alone, the owner with it.
+    code, message = error_code(
+        env(DEPLOY_PROFILE=profile, APP_DB_USER=user, APP_DB_PASSWORD=password)
+    )
+    assert code == "db_role_incomplete"
+    assert "APP_DB_USER" in message and "APP_DB_PASSWORD" in message
 
 
 def test_12_2_app_db_user_must_be_ffcore_app():

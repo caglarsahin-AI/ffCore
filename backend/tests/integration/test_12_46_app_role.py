@@ -131,3 +131,62 @@ def test_12_46_running_backend_connects_as_the_role():
             )
         }
     assert APP_USER in users
+
+
+# --- 12-2 r1 MAJOR-1 `denetim-bolum-kapisi`: the role cannot take recent audit away ---
+
+
+def _current_partition(pg):
+    return pg.execute("SELECT ffcore_audit_ensure_partition(current_date)").fetchone()[0]
+
+
+def test_12_r2_current_month_cannot_be_detached_or_dropped(app_conn, pg):
+    name = _current_partition(pg)
+    for function in ("ffcore_audit_detach_partition", "ffcore_audit_drop_partition"):
+        with pytest.raises(psycopg.errors.RaiseException) as caught:
+            app_conn.execute(f"SELECT {function}(%s)", (name,))
+        assert "audit_partition_too_recent" in str(caught.value)
+
+
+def test_12_r2_a_partition_younger_than_365_days_is_refused(app_conn, pg):
+    # Ten months back: older than retention's default but inside the 365-day floor.
+    name = pg.execute(
+        "SELECT ffcore_audit_ensure_partition((current_date - interval '10 months')::date)"
+    ).fetchone()[0]
+    with pytest.raises(psycopg.errors.RaiseException) as caught:
+        app_conn.execute("SELECT ffcore_audit_detach_partition(%s)", (name,))
+    assert "audit_partition_too_recent" in str(caught.value)
+
+
+def test_12_r2_older_than_365_days_still_detaches_and_drops(app_conn, pg):
+    name = pg.execute(
+        "SELECT ffcore_audit_ensure_partition((current_date - interval '14 months')::date)"
+    ).fetchone()[0]
+    app_conn.execute("SELECT ffcore_audit_detach_partition(%s)", (name,))
+    app_conn.execute("SELECT ffcore_audit_drop_partition(%s)", (name,))
+    assert pg.execute("SELECT to_regclass(%s)", (name,)).fetchone() == (None,)
+
+
+def test_12_r2_role_has_only_insert_and_select_on_audit_partitions(app_conn, pg):
+    current = _current_partition(pg)
+    old = pg.execute("SELECT ffcore_audit_ensure_partition(date '2003-03-01')").fetchone()[0]
+    app_conn.execute("SELECT ffcore_audit_detach_partition(%s)", (old,))  # detached: no trigger
+    for table in (current, old):
+        for privilege, has in (("INSERT", current == table), ("SELECT", True)):
+            row = pg.execute(
+                "SELECT has_table_privilege(%s, %s, %s)", (APP_USER, table, privilege)
+            ).fetchone()
+            assert row == (has,), (table, privilege)
+        _denied(app_conn, f"UPDATE \"{table}\" SET actor_id = 'tampered'")
+        _denied(app_conn, f'DELETE FROM "{table}"')
+        _denied(app_conn, f'TRUNCATE "{table}"')
+    app_conn.execute("SELECT ffcore_audit_drop_partition(%s)", (old,))
+
+
+def test_12_r2_ensure_refuses_a_detached_partition(app_conn, pg):
+    old = pg.execute("SELECT ffcore_audit_ensure_partition(date '2004-04-01')").fetchone()[0]
+    app_conn.execute("SELECT ffcore_audit_detach_partition(%s)", (old,))
+    with pytest.raises(psycopg.errors.RaiseException) as caught:
+        app_conn.execute("SELECT ffcore_audit_ensure_partition(date '2004-04-01')")
+    assert "audit_partition_detached" in str(caught.value)
+    app_conn.execute("SELECT ffcore_audit_drop_partition(%s)", (old,))

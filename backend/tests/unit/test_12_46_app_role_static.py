@@ -82,3 +82,63 @@ def test_12_46_env_test_runs_stacks_as_the_app_role():
     env = (REPO / ".env.test").read_text(encoding="utf-8")
     assert re.search(r"^APP_DB_USER=ffcore_app$", env, re.M)
     assert re.search(r"^APP_DB_PASSWORD=\S+$", env, re.M)
+
+
+def _initdb(tmp_path, **env):
+    import os
+    import subprocess
+
+    bin_dir = tmp_path / "bin"
+    bin_dir.mkdir(exist_ok=True)
+    calls = tmp_path / "psql-calls"
+    psql = bin_dir / "psql"
+    psql.write_text(f'#!/bin/sh\necho "$*" >> {calls}\ncat > /dev/null\n', encoding="utf-8")
+    psql.chmod(0o755)
+    result = subprocess.run(
+        ["sh", str(DEPLOY / "postgres" / "initdb" / "20-app-role.sh")],
+        capture_output=True,
+        text=True,
+        env={
+            "PATH": f"{bin_dir}:{os.environ['PATH']}",
+            "POSTGRES_USER": "o",
+            "POSTGRES_DB": "d",
+            **env,
+        },
+    )
+    return result, (calls.read_text(encoding="utf-8") if calls.exists() else "")
+
+
+def test_12_r2_initdb_refuses_a_user_without_password(tmp_path):
+    result, calls = _initdb(tmp_path, APP_DB_USER="ffcore_app", APP_DB_PASSWORD="")
+    assert result.returncode != 0 and "APP_DB_PASSWORD" in result.stderr
+    assert calls == ""
+
+
+def test_12_r2_initdb_skips_when_both_are_empty(tmp_path):
+    result, calls = _initdb(tmp_path, APP_DB_USER="", APP_DB_PASSWORD="")
+    assert result.returncode == 0 and "owner" in result.stdout
+    assert calls == ""
+
+
+def test_12_r2_initdb_creates_the_role_with_both(tmp_path):
+    result, calls = _initdb(tmp_path, APP_DB_USER="ffcore_app", APP_DB_PASSWORD="x")
+    assert result.returncode == 0, result.stderr
+    assert "/ffcore/app-role.sql" in calls
+
+
+def test_12_r2_env_example_keeps_the_pair_empty_together():
+    env = (REPO / ".env.example").read_text(encoding="utf-8")
+    assert re.search(r"^APP_DB_USER=$", env, re.M)
+    assert re.search(r"^APP_DB_PASSWORD=$", env, re.M)
+
+
+def test_12_r2_role_sql_keeps_audit_partitions_insert_and_select_only():
+    sql = (DEPLOY / "postgres" / "app-role.sql").read_text(encoding="utf-8")
+    assert "audit_events_%" in sql or "audit_events_" in sql
+    assert re.search(r"REVOKE UPDATE, DELETE, TRUNCATE ON %I FROM ffcore_app", sql)
+
+
+def test_12_r2_lint_covers_tests_deploy():
+    makefile = (REPO / "Makefile").read_text(encoding="utf-8")
+    lint = makefile.split("lint:\n", 1)[1].split("\n\n", 1)[0]
+    assert lint.count("tests/deploy") == 2
