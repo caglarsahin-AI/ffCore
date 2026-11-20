@@ -1,0 +1,76 @@
+......FFF.F...................                                           [100%]
+================================== FAILURES ===================================
+____________________ test_compose_build_pull_false_blocked ____________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-72/test_compose_build_pull_false_0/ffcore')
+
+    def test_compose_build_pull_false_blocked(main_root):
+        # FOLLOWUP-207: a standalone build reaches the registry for base image metadata even with
+        # --pull=false (5 November decision); images are built by `up --build --pull never`.
+        proc = run_hook(bash("docker compose -p x build --pull=false backend"), main_root)
+>       assert_blocked(proc, "PROSES-175")
+
+tests\hooks\test_guard.py:151: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\followup-triage-1\\.claude\\hooks\\ffcore_guard.py'], returncode=0, stdout='', stderr='')
+rule = 'PROSES-175'
+
+    def assert_blocked(proc, rule: str) -> None:
+>       assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+E       AssertionError: (0, '')
+E       assert 0 == 2
+E        +  where 0 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\followup-triage-1\\.claude\\hooks\\ffcore_guard.py'], returncode=0, stdout='', stderr='').returncode
+
+tests\hooks\test_guard.py:29: AssertionError
+__________________ test_compose_build_message_names_up_build __________________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\followup-triage-1\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-72/test_compose_build_message_nam0/ffcore')
+
+    def test_compose_build_message_names_up_build(guard, main_root):
+        violations = guard.check_compose(["docker", "compose", "build", "--pull=false"])
+>       assert [v.rule for v in violations] == ["PROSES-175"]
+E       AssertionError: assert [] == ['PROSES-175']
+E         
+E         Right contains one more item: 'PROSES-175'
+E         Use -v to get more diff
+
+tests\hooks\test_guard.py:156: AssertionError
+__________________ test_compose_up_build_pull_never_allowed ___________________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\followup-triage-1\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-72/test_compose_up_build_pull_nev0/ffcore')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001E7519FDF40>
+
+    def test_compose_up_build_pull_never_allowed(guard, main_root, monkeypatch):
+        monkeypatch.setattr(guard, "running_ff_stacks", lambda: [])
+        cmd = "docker compose -p ffcore-x --env-file .env.test up -d --wait --build --pull never"
+>       assert rules(guard, bash(cmd), main_root) == []
+E       AssertionError: assert ['PROSES-175'] == []
+E         
+E         Left contains one more item: 'PROSES-175'
+E         Use -v to get more diff
+
+tests\hooks\test_guard.py:163: AssertionError
+_____________________ test_compose_up_build_counts_stacks _____________________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\followup-triage-1\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-72/test_compose_up_build_counts_s0/ffcore')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001E7519FF320>
+
+    def test_compose_up_build_counts_stacks(guard, main_root, monkeypatch):
+        monkeypatch.setattr(guard, "running_ff_stacks", lambda: ["ffcore-a", "ffcore-b", "ffcore-c"])
+        cmd = "docker compose -p ffcore-x up -d --build --pull never"
+>       assert "YIGIN" in rules(guard, bash(cmd), main_root)
+E       AssertionError: assert 'YIGIN' in ['PROSES-175']
+E        +  where ['PROSES-175'] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\followup-triage-1\\.claude\\hooks\\ffcore_guard.py'>, {'hook_event_name': 'PreToolUse', 'session_id': '11111111-2222-3333-4444-555555555555', 'tool_input': {'command': 'docker compose -p ffcore-x up -d --build --pull never'}, 'tool_name': 'Bash'}, WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-72/test_compose_up_build_counts_s0/ffcore'))
+E        +    where {'hook_event_name': 'PreToolUse', 'session_id': '11111111-2222-3333-4444-555555555555', 'tool_input': {'command': 'docker compose -p ffcore-x up -d --build --pull never'}, 'tool_name': 'Bash'} = bash('docker compose -p ffcore-x up -d --build --pull never')
+
+tests\hooks\test_guard.py:174: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/hooks/test_guard.py::test_compose_build_pull_false_blocked - Ass...
+FAILED tests/hooks/test_guard.py::test_compose_build_message_names_up_build
+FAILED tests/hooks/test_guard.py::test_compose_up_build_pull_never_allowed - ...
+FAILED tests/hooks/test_guard.py::test_compose_up_build_counts_stacks - Asser...
+4 failed, 26 passed, 317 deselected in 8.29s

@@ -1,0 +1,12 @@
+     14 E       assert 201 == 400
+     14 E        +  where 201 = <Response [201 Created]>.status_code
+     12 E       assert 200 == 400
+     12 E        +  where 200 = <Response [200 OK]>.status_code
+      1 FAILED tests/integration/test_trj_194_platform_registration.py::test_trj_194_provider_update_refused[allowed-http://ffcore-api.internal:8443/v1]
+      1 FAILED tests/integration/test_trj_194_platform_registration.py::test_trj_194_provider_update_refused[allowed-http://backend:9000/v1]
+      1 FAILED tests/integration/test_trj_194_platform_registration.py::test_trj_194_provider_update_refused[allowed-http://127.0.0.1:8000/v1]
+      1 FAILED tests/integration/test_trj_194_platform_registration.py::test_trj_194_provider_update_refused[-http://ffcore-api.internal:8443/v1]
+      1 FAILED tests/integration/test_trj_194_platform_registration.py::test_trj_194_provider_update_refused[-http://backend:9000/v1]
+      1 FAILED tests/integration/test_trj_194_platform_registration.py::test_trj_194_provider_update_refused[-http://127.0.0.1:8000/v1]
+      1 FAILED tests/integration/test_trj_194_platform_registration.py::test_trj_194_provider_create_refused[allowed-http://ffcore-api.internal:8443/v1]
+      1 FAILED tests/integration/test_trj_194_platform_registration.py::test_trj_194_provider_create_refused[allowed-http://backend:9000/v1]

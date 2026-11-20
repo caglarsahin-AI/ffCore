@@ -1,0 +1,6 @@
+/opt/venv/lib/python3.12/site-packages/starlette/middleware/errors.py:151: in __call__
+            raise TracingConfigError(f"Langfuse is half configured; not set: {', '.join(missing)}")
+>           raise TracingConfigError(
+E           ffcore.core.tracing.TracingConfigError: LANGFUSE_HOST must be an http(s) URL of a host in ALLOWED_INTERNAL_HOSTS
+ffcore/core/tracing.py:65: TracingConfigError
+26 deselected, 1 error in 12.90s

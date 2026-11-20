@@ -1,0 +1,20 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.10, pytest-9.2.0, pluggy-1.7.0
+rootdir: /work/backend
+configfile: pyproject.toml
+plugins: Faker-40.43.0, anyio-4.15.1, langsmith-0.14.8
+collected 79 items
+
+tests/integration/test_01_events.py ...                                  [  3%]
+tests/integration/test_01_reconcile.py ...........                       [ 17%]
+tests/integration/test_01_seed.py ...                                    [ 21%]
+tests/integration/test_02_langfuse.py ....                               [ 26%]
+tests/integration/test_02_pricing.py .                                   [ 27%]
+tests/integration/test_03c_run_quota.py .......                          [ 36%]
+tests/integration/test_06a_adapters.py ..                                [ 39%]
+tests/integration/test_06b_direct.py ..............................      [ 77%]
+tests/integration/test_08t_c17_facade_direct.py ....                     [ 82%]
+tests/integration/test_08t_r2_paths.py ............                      [ 97%]
+tests/integration/test_134_provider_request.py ..                        [100%]
+
+======================== 79 passed in 154.21s (0:02:34) ========================

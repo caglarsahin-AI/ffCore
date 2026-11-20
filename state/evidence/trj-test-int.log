@@ -1,0 +1,38 @@
+cd backend && QDRANT_URL=http://qdrant:6333 RUN_QDRANT_TESTS=1 pytest tests/integration
+============================= test session starts ==============================
+platform linux -- Python 3.12.10, pytest-9.2.0, pluggy-1.7.0
+rootdir: /work/backend
+configfile: pyproject.toml
+plugins: Faker-40.43.0, anyio-4.15.1, langsmith-0.14.8
+collected 1133 items
+
+tests/integration/test_01_client.py .......                              [  0%]
+tests/integration/test_01_events.py ..F                                  [  0%]
+tests/integration/test_01_reconcile.py EEEEEEEEEEE                       [  1%]
+tests/integration/test_01_reconcile_shutdown.py ...                      [  2%]
+tests/integration/test_01_seed.py EEE                                    [  2%]
+tests/integration/test_02_langfuse.py EEEE                               [  2%]
+tests/integration/test_02_pricing.py E                                   [  2%]
+tests/integration/test_02_r1_worker_logging.py .                         [  2%]
+tests/integration/test_03a_access.py ............                        [  3%]
+tests/integration/test_03a_auth.py ..............                        [  5%]
+tests/integration/test_03a_models.py ...........                         [  6%]
+tests/integration/test_03a_nonmember_404.py ............................ [  8%]
+............................................FEEE........................ [ 15%]
+............F.............F                                              [ 17%]
+tests/integration/test_03a_obo_scope.py ........F..E....                 [ 18%]
+tests/integration/test_03a_providers.py ................                 [ 20%]
+tests/integration/test_03a_read_side.py .......                          [ 20%]
+tests/integration/test_03a_schema.py .......                             [ 21%]
+tests/integration/test_03b_audit.py ............                         [ 22%]
+tests/integration/test_03b_egress_dns.py s                               [ 22%]
+tests/integration/test_03c_alerts.py F..E...F....FE..                    [ 24%]
+tests/integration/test_03c_keys.py .......................F......        [ 26%]
+tests/integration/test_03c_quota_engine.py ............                  [ 27%]
+tests/integration/test_03c_quotas_api.py .....E.                         [ 28%]
+tests/integration/test_03c_r1_audit_throttle.py .....                    [ 28%]
+tests/integration/test_03c_retention_content.py ...........              [ 29%]
+tests/integration/test_03c_retention_document_delete.py .F               [ 29%]
+tests/integration/test_03c_retention_job.py ...............              [ 31%]
+tests/integration/test_03c_run_quota.py EEEEEEE                          [ 31%]
+tests/integration/test_04a_api.py .time="2026-11-20T11:05:36+03:00" level=error msg="error waiting for container: "

@@ -64,3 +64,13 @@
 2026-11-19T21:23:24	warn	isci-b	Bash	KAPI	S=/c/Users/CAGLAR~1.SAH/AppData/Local/Temp/claude/9398d5fca5badfb5/da227946-030e-46be-9a89-b38124d016bd/scratchpad/pr04b
 2026-11-19T22:27:28	warn	inceleyici	Bash	PROSES-175	S=C:/Users/CAGLAR~1.SAH/AppData/Local/Temp/claude/9398d5fca5badfb5/ecb79a59-6471-4590-b997-842940d7a702/scratchpad docke
 2026-11-19T22:30:50	warn	inceleyici	Bash	KAPI	S=C:/Users/CAGLAR~1.SAH/AppData/Local/Temp/claude/9398d5fca5badfb5/ecb79a59-6471-4590-b997-842940d7a702/scratchpad; E=C:
+2026-11-20T09:42:07	warn	isci-b	Write	TEK-YAZAR	C:\ai_paycore\ffcore\state\pr\followup-triage-1.md
+2026-11-20T09:47:50	warn	isci-a	Bash	PROSES-175	cat >> /c/ai_paycore/ffcore/state/kanal/isci-a.md <<'EOF' ### A-12-0003 · 2026-11-20 11:10 · → koordinator · YIGIN-AC Pa
+2026-11-20T09:56:33	warn	isci-a	Bash	ENV	python - <<'EOF' from pathlib import Path p = Path("scripts/smoke.py") s = p.read_text(encoding="utf-8") s = s.replace('
+2026-11-20T10:09:10	warn	isci-a	Bash	ENV	py -3.12 - <<'EOF' from pathlib import Path p = Path("Makefile"); s = p.read_text(encoding="utf-8") old = "seed-eval rec
+2026-11-20T10:15:54	warn	isci-a	Bash	KAPI	py -3.12 - <<'EOF' from pathlib import Path def sub(path, old, new):     p = Path(path); s = p.read_text(encoding="utf-8
+2026-11-20T10:26:54	warn	isci-b	Bash	PROSES-175	py -3.12 - <<'EOF' p='docs/degisiklikler.md' s=open(p,encoding='utf-8').read() anchor='## 2026-11-19 · 04b-2 ·' entry=''
+2026-11-20T10:40:29	warn	isci-b	Edit	TEK-YAZAR	C:\ai_paycore\ffcore\state\pr\followup-triage-1.md
+2026-11-20T11:24:32	warn	isci-b	Bash	KAPI	cd /c/ai_paycore/ffcore/.worktrees/fix/followup-triage-1 && FILES=$(sed 's#tests/#tests/#g' /tmp/trj_rerun_files.txt) &&
+2026-11-20T11:30:26	warn	isci-b	Bash	KAPI	docker restart ffcore-trj-litellm-1 >/dev/null && for i in $(seq 1 30); do s=$(docker inspect -f '{{.State.Health.Status
+2026-11-20T11:36:22	warn	isci-b	Bash	KAPI	cd /c/ai_paycore/ffcore && py -3.12 - <<'EOF' p='state/pr/followup-triage-1.md' s=open(p,encoding='utf-8').read() s=s.re

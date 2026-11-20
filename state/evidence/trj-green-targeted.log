@@ -1,0 +1,25 @@
+E       AssertionError: {"error":{"message":"Invalid request: body.domains, body.key, body.label, body.project_ids","type":"invalid_request_error","code":"validation_error"}}
+E       assert 422 == 400
+E        +  where 422 = <Response [422 Unprocessable Content]>.status_code
+E       AssertionError: {"error":{"message":"Invalid request: body.domains, body.key, body.label, body.project_ids","type":"invalid_request_error","code":"validation_error"}}
+E       assert 422 == 400
+E        +  where 422 = <Response [422 Unprocessable Content]>.status_code
+E       AssertionError: {"error":{"message":"Invalid request: body.domains, body.key, body.label, body.project_ids","type":"invalid_request_error","code":"validation_error"}}
+E       assert 422 == 400
+E        +  where 422 = <Response [422 Unprocessable Content]>.status_code
+E       AssertionError: {"error":{"message":"Invalid request: body.domains, body.key, body.label, body.project_ids","type":"invalid_request_error","code":"validation_error"}}
+E       assert 422 == 400
+E        +  where 422 = <Response [422 Unprocessable Content]>.status_code
+E       AssertionError: {"error":{"message":"Invalid request: body.domains, body.key, body.label, body.project_ids","type":"invalid_request_error","code":"validation_error"}}
+E       assert 422 == 400
+E        +  where 422 = <Response [422 Unprocessable Content]>.status_code
+E       AssertionError: {"error":{"message":"Invalid request: body.domains, body.key, body.label, body.project_ids","type":"invalid_request_error","code":"validation_error"}}
+E       assert 422 == 400
+E        +  where 422 = <Response [422 Unprocessable Content]>.status_code
+FAILED tests/integration/test_trj_194_platform_registration.py::test_trj_194_provider_create_refused[-http://ffcore-api.internal:8443/v1]
+FAILED tests/integration/test_trj_194_platform_registration.py::test_trj_194_provider_create_refused[-http://backend:9000/v1]
+FAILED tests/integration/test_trj_194_platform_registration.py::test_trj_194_provider_create_refused[-http://127.0.0.1:8000/v1]
+FAILED tests/integration/test_trj_194_platform_registration.py::test_trj_194_provider_create_refused[allowed-http://ffcore-api.internal:8443/v1]
+FAILED tests/integration/test_trj_194_platform_registration.py::test_trj_194_provider_create_refused[allowed-http://backend:9000/v1]
+FAILED tests/integration/test_trj_194_platform_registration.py::test_trj_194_provider_create_refused[allowed-http://127.0.0.1:8000/v1]
+6 failed, 135 passed in 202.60s (0:03:22)

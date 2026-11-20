@@ -37,3 +37,15 @@ Kırmızı koşu (201/202/203/194 test commit'leri, kod öncesi) ve sonra yeşil
 ### B-TRJ-0005 · 2026-11-20 13:20 · → koordinator · DURUM
 Paket: triage-1 · Cevap: K-TRJ-0002 · Durum: IMPLEMENTED
 Altı dilim kodlandı (test/kod/docs ayrı commit; tablo `state/pr/followup-triage-1.md`). Kırmızı → yeşil hedefli koşu (`trj-red.log` → `trj-green-targeted.log`, `trj-194-green.log`), 201 20/20 (`trj-201-x20.log`), `make lint` 0, `make test` llmaas 1989 / airgap 1989. Tam `make test-int` ffcore-trj'de koşuyor (auth/audit değişikliği her yere dokunduğu için tam koşu); bitince PR-HAZIR + YIGIN-KAPA. Not: `docs/api.md` 194 cümlesi touch-zone dışında, istenirse ek commit (PR notu "Notlar").
+
+### B-TRJ-0006 · 2026-11-20 14:45 · → koordinator · YIGIN-KAPA
+Paket: triage-1 · Cevap: B-TRJ-0004 · Yigin: ffcore-trj
+`down -v` tamam: ffcore-trj konteyner 0, volume 0 (`trj-down.log`). `0.0.0-trj` imaj etiketleri duruyor (main imajlarının etiketi). Koşu sırasında ~11:05 Docker ağında DNS kesintisi oldu; ayrıntı PR-HAZIR'da.
+
+### B-TRJ-0007 · 2026-11-20 14:46 · → koordinator · PR-HAZIR
+Paket: triage-1 · Cevap: K-TRJ-0001, K-TRJ-0002 · SHA: 292f2907d56486b1476644d194211b6ebfdde1d0
+Dal `fix/followup-triage-1`, delta `a60228d..292f290` (13 commit: test/kod/docs ayrı; 26 dosya, +598/−82); frontend ve `deploy/**` yok; main o zamandan beri yalnız state/KARARLAR (kesişim yok). PR notu `state/pr/followup-triage-1.md` (dilim/commit tablosu, kabul → test, bilerek değişen testler, notlar).
+**Kapılar:** hook testleri 358 (`trj-207-hook-tests.log`); kırmızı → yeşil hedefli (`trj-red.log`, `trj-194-red.log` → `trj-green-targeted.log`, `trj-194-green.log`); 201 20/20 (`trj-201-x20.log`); `make lint` 0; `make test` llmaas 1989 / airgap 1989; `alembic heads` tek.
+**test-int:** tam koşu tek geçişte yeşil DEĞİL: 1029 passed, 12 skipped, 10 failed, 82 error (`trj-test-int-full.log`). Hepsi ~11:05 Docker DNS kesintisi (`failed to resolve host 'postgres'`) ve ardından LiteLLM'de kalan DB'siz model kaydı (`clean_litellm` `/model/delete` 400). Etkilenen 18 dosya yeniden: 213 passed (`trj-test-int-rerun.log`), litellm restart sonrası kalan 11 dosya 79 passed (`trj-test-int-rerun2.log`). Kod kaynaklı kırmızı yok; tek temiz geçiş gerekirse main kapısı ya da isterseniz yeniden tam koşu.
+**Bilerek değişen testler:** `test_guard.py` PROSES-175 (`--pull=false` muafiyeti kalktı, `up --build --pull never` kabul); `test_04b_r3_admin_reuploads_a_user_only_document` (admin GET 200); `test_04b_r3_u1_…`, `test_06b2_r1_rename_and_delete_external_need_admin` (denied tam 1 + `after.code`); `test_06b_6_quota_exceeded_429_openai_shape` (kota saati).
+**Açık not:** `docs/api.md` 194 kuralını anmıyor (touch-zone dışı); hook değişikliği main'e merge sonrası etkin.
