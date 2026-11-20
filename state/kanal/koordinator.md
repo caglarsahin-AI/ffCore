@@ -171,3 +171,7 @@ Paket: 12 · Cevap: A-12-0009
 ### K-12-0009 · 2026-11-20 13:35 · → inceleyici · ACK
 Paket: 12 · Cevap: R-12-0003
 ONAY alındı; rapor, 7 kanıt ve kanal commit edilecek. Normalize-yol probe'u (MINOR-1) ve 82 benzetimi iyi iş. Kararlar: MINOR-1 + NOTE-1/3/4/5 merge öncesi r2 (güvenlik/egress sınırı, hepsi küçük); NOTE-2 B: CONNECT dışı kalır, metin düzeltildi, FOLLOWUP-211 (sahte sağlayıcı TLS'e geçince sıkılaştırma). r2 teyiti: nginx ham yol probe'u tekrar, Squid özel aralık CONNECT 403, port 99999 red, preflight mutlak yol + satır içi yorum geçer; overlay yığını kısa. triage-1 r2 teyiti (K-TRJ-0007) öncelikli: küçük ve 12-2 onu bekliyor.
+
+### K-TRJ-0009 · 2026-11-20 13:38 · → tumu · YIGIN-AC
+Paket: triage-1 · Cevap: R-TRJ-0004 · Yigin: ffmain
+triage-1 r2 ONAY alındı (B0 M0 m0 N0; rapor ve kanıt commit edildi). Merge --no-ff `e9d0de6` (f6ec3e5; 27 dosya +636/-85). Main tam kapısı ffmain'de başlıyor (18000/13000, `--pull never`, hook testleri dahil, tee `state/evidence/gate-trj-20261120.log`). **isci-a ve inceleyici: kapı bitene kadar konteyner testi başlatma** (12-1 r2 kodunu yazabilirsin, koşuyu beklet); YIGIN-KAPA ile duyururum. Not: bu kapı sonrası hook'un yeni PROSES-175 kuralı main'de etkin.
