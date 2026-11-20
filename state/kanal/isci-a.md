@@ -40,3 +40,19 @@ Paket: 12 · Cevap: K-12-0003 · Yigin: ffcore-12
 ### A-12-0006 · 2026-11-20 12:16 · → koordinator · SORU
 Paket: 12 · Cevap: -
 ENV-209 kuralına göre tam test-int için sıra istiyorum (rv test-int şu an koşuyor). Sıra gelince: yığın ffcore-12 tek başına, test-int ayrık konteynerde (`compose run -d` + `docker wait`, CLI bağlantısı koparsa test sürsün) + smoke; ardından PR-HAZIR 12-1. Sıra bana gelince YIGIN-AC ile başlarım; "başla" mesajını bekliyorum.
+
+### A-12-0007 · 2026-11-20 12:50 · → koordinator · YIGIN-AC
+Paket: 12 · Cevap: K-12-0005 · Yigin: ffcore-12
+Başladı: ffcore-12 tek başına (test,qdrant), HEAD fc688b0; tam test-int ayrık konteynerde (`ffcore-12-tools-testint`, `docker wait`) + smoke; log `state/evidence/12-1-test-int-r3.log`. Bitince down -v + YIGIN-KAPA.
+
+### A-12-0008 · 2026-11-20 13:15 · → koordinator · YIGIN-KAPA
+Paket: 12 · Cevap: K-12-0005 · Yigin: ffcore-12
+`down -v` yapıldı; ffcore-12 konteyner 0, volume 0 (doğrulandı). Test-int r3 geçti (1076 passed, 28 skipped), smoke geçti (`state/evidence/12-1-test-int-r3.log`). Tam test-int sırası boş.
+
+### A-12-0009 · 2026-11-20 13:16 · → koordinator · PR-HAZIR
+Paket: 12 · Cevap: K-12-0002, K-12-0003, K-12-0005 · SHA: fc688b0671f8adf30a7b286eeb00a750722af581
+**12-1 [B]** dal `feat/12-kurulum`, baz a60228d; delta `git diff main...fc688b0` 22 dosya (+1474/−5), frontend ve state yok. 7 commit: test ×3, feat, docs, style, fix (`RESERVED_HOSTS`). PR notu `state/pr/12.md` "PR 12-1" bölümü.
+**İçerik:** egress overlay (Squid pinli, uygulama ağı `internal`, LiteLLM proxy'den, özel hedef reddi, yolsuz erişim logu), TLS overlay (nginx pinli; iç dinleyici + yalnız `/channels/teams/messages` dış), `scripts/compose_preflight.py` (FOLLOWUP-35; `make preflight`, `make egress-list`; smoke önce koşar), LiteLLM healthcheck + smoke `/key/info` (FOLLOWUP-82), FOLLOWUP-66 belgesi, `docs/kurulum.md` (12-1 bölümleri), `docs/veri-isleme.md`, images.txt +2.
+**Kapı logları:** `12-1-red-unit.log` (kırmızı), `12-1-test-int-egress-tls.log` (16/16, iki koşu), `12-1-smoke-egress.log`, `12-1-gate.log` (r1: E501 + reserved hosts kırmızı → düzeltildi), `12-1-gate-r2.log` (lint 0, test 2006×2, heads `04b_0001`, smoke), `12-1-test-int-r3.log` (test-int 1076 passed/28 skipped, smoke).
+**Bilerek değişen test:** yok. **NOT_RUN (PENDING_ENV):** yarım LiteLLM şemasının gerçek üretimi ve onarım komutu; kurumsal CA sertifikası; gerçek Teams trafiği (15 yok); gerçek sağlayıcıya proxy'den çıkış (dış ağ yok, belgeleme alt ağıyla sahte dış ağ).
+**İnceleme notu:** egress/TLS test-int'i taban yığında skip; overlay'li yığın komutu `test_12_egress.py` docstring'inde (`backend/tests/compose/egress-tls.test.yml`). Bilinen sınır FOLLOWUP-208 belgelendi. 12-2 triage-1 merge'ünü bekliyor.

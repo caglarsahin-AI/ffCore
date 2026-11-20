@@ -1,0 +1,63 @@
+ Network ffcore-12_default  Creating
+ Network ffcore-12_default  Created
+ Volume "ffcore-12_model_cache"  Creating
+ Volume "ffcore-12_model_cache"  Created
+ Volume "ffcore-12_knowledge_storage"  Creating
+ Volume "ffcore-12_knowledge_storage"  Created
+ Volume "ffcore-12_postgres_data"  Creating
+ Volume "ffcore-12_postgres_data"  Created
+ Volume "ffcore-12_redis_data"  Creating
+ Volume "ffcore-12_redis_data"  Created
+ Volume "ffcore-12_langfuse_clickhouse_data"  Creating
+ Volume "ffcore-12_langfuse_clickhouse_data"  Created
+ Volume "ffcore-12_langfuse_clickhouse_logs"  Creating
+ Volume "ffcore-12_langfuse_clickhouse_logs"  Created
+ Volume "ffcore-12_langfuse_minio_data"  Creating
+ Volume "ffcore-12_langfuse_minio_data"  Created
+ Volume "ffcore-12_langfuse_postgres_data"  Creating
+ Volume "ffcore-12_langfuse_postgres_data"  Created
+==================================== ERRORS ====================================
+___________ ERROR collecting tests/unit/test_12_compose_preflight.py ___________
+tests/unit/test_12_compose_preflight.py:18: in <module>
+    spec.loader.exec_module(preflight)
+<frozen importlib._bootstrap_external>:995: in exec_module
+    ???
+<frozen importlib._bootstrap_external>:1132: in get_code
+    ???
+<frozen importlib._bootstrap_external>:1190: in get_data
+    ???
+E   FileNotFoundError: [Errno 2] No such file or directory: '/work/scripts/compose_preflight.py'
+=========================== short test summary info ============================
+ERROR tests/unit/test_12_compose_preflight.py - FileNotFoundError: [Errno 2] ...
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+1 error in 1.63s
+tests/unit/test_12_smoke.py:83: Failed
+=========================== short test summary info ============================
+FAILED tests/unit/test_12_compose_overlays.py::test_12_egress_overlay_proxy_service
+FAILED tests/unit/test_12_compose_overlays.py::test_12_egress_overlay_makes_the_app_network_internal
+FAILED tests/unit/test_12_compose_overlays.py::test_12_egress_overlay_sends_litellm_through_the_proxy
+FAILED tests/unit/test_12_compose_overlays.py::test_12_squid_config_denies_private_targets_and_logs_no_path
+FAILED tests/unit/test_12_compose_overlays.py::test_12_squid_start_translates_the_allowlist
+FAILED tests/unit/test_12_compose_overlays.py::test_12_squid_start_refuses_empty_or_malformed[]
+FAILED tests/unit/test_12_compose_overlays.py::test_12_squid_start_refuses_empty_or_malformed[ , ]
+FAILED tests/unit/test_12_compose_overlays.py::test_12_squid_start_refuses_empty_or_malformed[https://api.anthropic.com]
+FAILED tests/unit/test_12_compose_overlays.py::test_12_squid_start_refuses_empty_or_malformed[api.*.com]
+FAILED tests/unit/test_12_compose_overlays.py::test_12_squid_start_refuses_empty_or_malformed[a b]
+FAILED tests/unit/test_12_compose_overlays.py::test_12_squid_start_refuses_empty_or_malformed[host:443]
+FAILED tests/unit/test_12_compose_overlays.py::test_12_squid_start_refuses_malformed_ports
+FAILED tests/unit/test_12_compose_overlays.py::test_12_tls_overlay_service - ...
+FAILED tests/unit/test_12_compose_overlays.py::test_12_nginx_public_listener_opens_only_the_teams_path
+FAILED tests/unit/test_12_compose_overlays.py::test_12_new_images_are_pinned_in_images_txt
+FAILED tests/unit/test_12_compose_overlays.py::test_12_82_litellm_healthcheck_detects_a_half_migrated_schema
+FAILED tests/unit/test_12_compose_overlays.py::test_12_tools_gets_compose_file_for_the_preflight
+FAILED tests/unit/test_12_smoke.py::test_12_smoke_runs_the_preflight_first - ...
+FAILED tests/unit/test_12_smoke.py::test_12_35_smoke_fails_on_incoherent_profiles
+FAILED tests/unit/test_12_smoke.py::test_12_smoke_fails_on_egress_without_allowlist
+FAILED tests/unit/test_12_smoke.py::test_12_82_smoke_fails_on_half_migrated_litellm
+FAILED tests/unit/test_12_smoke.py::test_12_82_smoke_fails_on_rejected_master_key[401]
+FAILED tests/unit/test_12_smoke.py::test_12_82_smoke_fails_on_rejected_master_key[403]
+FAILED tests/unit/test_12_smoke.py::test_12_82_smoke_passes_when_the_key_table_answers[200]
+FAILED tests/unit/test_12_smoke.py::test_12_82_smoke_passes_when_the_key_table_answers[400]
+FAILED tests/unit/test_12_smoke.py::test_12_82_smoke_passes_when_the_key_table_answers[404]
+FAILED tests/unit/test_12_smoke.py::test_12_82_smoke_needs_the_master_key - F...
+27 failed, 1 passed in 1.73s

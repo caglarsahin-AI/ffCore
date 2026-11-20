@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-inceleyici-04b (önceki: ffcore-inceleyici-10c3; 10c-3 r2 metin teyidi bu oturumda)
-- Aktif paket: triage-1 r1 ONAY verildi (292f290); karar bekleniyor
+- Aktif paket: bekleme; triage-1 r2 teyidi (metin + url testi, yığınsız) ve 12-1 REVIEW-ISTEK bekleniyor
 - Durum: ACTIVE
-- Son okunan: koordinator K-TRJ-0003
+- Son okunan: koordinator K-TRJ-0006
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/inceleyici-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 335 mesaj); ID ile atıf orada bulunur.

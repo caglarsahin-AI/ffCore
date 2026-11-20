@@ -1,0 +1,55 @@
+=== gate12-1 r3 fc688b0671f8adf30a7b286eeb00a750722af581 2026-11-20 12:47:39
+
+=== 12:47:41 up -d --wait --pull never
+ Container ffcore-12-langfuse-worker-1  Healthy
+ Container ffcore-12-worker-1  Healthy
+ Container ffcore-12-langfuse-postgres-1  Healthy
+ Container ffcore-12-mcp-sql-1  Healthy
+ Container ffcore-12-mcp-search-1  Healthy
+up exit=0
+
+=== 12:49:16 test-int (detached: ffcore-12-tools-testint)
+aee9fa4afe1b9d6cfc64eaf83d49022a84d563f739c852d43ab01fc499b34e32
+........................................................................ [  6%]
+........................................................................ [ 13%]
+........................................................................ [ 19%]
+.......................................s................................ [ 26%]
+........................................................................ [ 32%]
+..............................s......................................... [ 39%]
+........................................................................ [ 45%]
+...........................s............................................ [ 52%]
+........................................................................ [ 58%]
+........................................................................ [ 65%]
+........................................................................ [ 71%]
+........................................................................ [ 78%]
+........................................................................ [ 84%]
+...............................................ssssssss................. [ 91%]
+.......................................ssssssssssssssss............s.... [ 97%]
+........................                                                 [100%]
+=============================== warnings summary ===============================
+tests/integration/test_04a_worker.py::test_04a_upload_job_runs_in_worker
+tests/integration/test_04a_worker.py::test_04a_job_for_missing_row_retries_then_fails_loud
+  /opt/venv/lib/python3.12/site-packages/arq/worker.py:877: DeprecationWarning: Call to deprecated close. (Use aclose() instead) -- Deprecated since version 5.0.1.
+    await self.pool.close(close_connection_pool=True)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1076 passed, 28 skipped, 2 warnings in 1127.29s (0:18:47)
+test-int exit=0
+
+=== 13:08:54 smoke
+python scripts/smoke.py
+ok    DEPLOY_PROFILE=llmaas INFERENCE_BACKEND=ollama
+ok    backend /healthz 200
+ok    litellm /health/liveliness 200, /key/info 404 (schema present)
+ok    langfuse /api/public/health 200, /api/public/projects 200
+ok    mcp-search /healthz 200
+ok    mcp-sql /healthz 200
+ok    skipped: ollama profile inactive
+smoke: passed
+smoke exit=0
+
+=== 13:09:07 down -v
+ Volume ffcore-12_qdrant_data  Removed
+ Volume ffcore-12_redis_data  Removed
+
+=== 13:09:29 done

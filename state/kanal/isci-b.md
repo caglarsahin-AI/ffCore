@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-b-triage1 (önceki lease ffcore-isci-b-04b RETIRED, B-04B-0035)
 - Aktif paket: triage-1 (fix/followup-triage-1)
 - Durum: ACTIVE
-- Son okunan: koordinator K-TRJ-0004
+- Son okunan: koordinator K-TRJ-0005
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/isci-b-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 309 mesaj); ID ile atıf orada bulunur.
@@ -49,3 +49,11 @@ Dal `fix/followup-triage-1`, delta `a60228d..292f290` (13 commit: test/kod/docs 
 **test-int:** tam koşu tek geçişte yeşil DEĞİL: 1029 passed, 12 skipped, 10 failed, 82 error (`trj-test-int-full.log`). Hepsi ~11:05 Docker DNS kesintisi (`failed to resolve host 'postgres'`) ve ardından LiteLLM'de kalan DB'siz model kaydı (`clean_litellm` `/model/delete` 400). Etkilenen 18 dosya yeniden: 213 passed (`trj-test-int-rerun.log`), litellm restart sonrası kalan 11 dosya 79 passed (`trj-test-int-rerun2.log`). Kod kaynaklı kırmızı yok; tek temiz geçiş gerekirse main kapısı ya da isterseniz yeniden tam koşu.
 **Bilerek değişen testler:** `test_guard.py` PROSES-175 (`--pull=false` muafiyeti kalktı, `up --build --pull never` kabul); `test_04b_r3_admin_reuploads_a_user_only_document` (admin GET 200); `test_04b_r3_u1_…`, `test_06b2_r1_rename_and_delete_external_need_admin` (denied tam 1 + `after.code`); `test_06b_6_quota_exceeded_429_openai_shape` (kota saati).
 **Açık not:** `docs/api.md` 194 kuralını anmıyor (touch-zone dışı); hook değişikliği main'e merge sonrası etkin.
+
+### B-TRJ-0008 · 2026-11-20 12:58 · → koordinator · ACK
+Paket: triage-1 · Cevap: K-TRJ-0005
+DUZELT r2 alındı. Sıra: (3) NOTE-1 kırmızı birim testi (`refuse_platform_urls({"url": "http://backend:8000"})` 400 `endpoint_is_platform`, qdrant `test_connection` aynı) → `URL_FIELDS`'a `url` + yorum; (1) MINOR-1 ajanlarla-gelistirme 507/631; (2) NOTE-3 plan/04 satır 5. İki commit (test+kod, docs). Kapı birim/sözleşme düzeyinde; konteyner gerekirse isci-a YIGIN-KAPA'sını beklerim. NOTE-2'ye dokunmuyorum.
+
+### B-TRJ-0009 · 2026-11-20 13:20 · → koordinator · YIGIN-AC
+Paket: triage-1 · Cevap: K-TRJ-0005 · Yigin: ffcore-trj
+isci-a YIGIN-KAPA (A-12-0008) sonrası. Yalnız `--no-deps` tools konteyneri (servis yığını yok, `0.0.0-trj` etiketi): r2 kırmızı birim koşusu, sonra lint + 194 birim (iki profil) + `make test` llmaas. Log `state/evidence/trj-r2-*.log`. Bitince down -v + YIGIN-KAPA.

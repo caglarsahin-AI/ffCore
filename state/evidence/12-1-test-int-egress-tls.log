@@ -1,0 +1,33 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.10, pytest-9.2.0, pluggy-1.7.0 -- /opt/venv/bin/python
+cachedir: .pytest_cache
+rootdir: /work/backend
+configfile: pyproject.toml
+plugins: Faker-40.43.0, anyio-4.15.1, langsmith-0.14.8
+collecting ... collected 16 items
+
+tests/integration/test_12_egress.py::test_12_e1_allowlisted_host_passes_the_proxy PASSED [  6%]
+tests/integration/test_12_egress.py::test_12_e1_host_outside_the_allowlist_is_refused PASSED [ 12%]
+tests/integration/test_12_egress.py::test_12_e1_allowlisted_name_on_a_private_address_is_refused PASSED [ 18%]
+tests/integration/test_12_egress.py::test_12_e1_no_direct_way_out_without_the_proxy PASSED [ 25%]
+tests/integration/test_12_egress.py::test_12_e1_outside_names_do_not_resolve_on_the_app_network PASSED [ 31%]
+tests/integration/test_12_egress.py::test_12_e1_litellm_reaches_an_allowlisted_provider_through_the_proxy PASSED [ 37%]
+tests/integration/test_12_egress.py::test_12_e1_litellm_cannot_reach_a_provider_outside_the_allowlist PASSED [ 43%]
+tests/integration/test_12_tls.py::test_12_tls_internal_listener_serves_the_console PASSED [ 50%]
+tests/integration/test_12_tls.py::test_12_tls_internal_listener_reaches_the_backend_api PASSED [ 56%]
+tests/integration/test_12_tls.py::test_12_tls_plain_http_is_not_served_on_the_tls_port PASSED [ 62%]
+tests/integration/test_12_tls.py::test_12_tls_public_listener_refuses_every_other_path[/] PASSED [ 68%]
+tests/integration/test_12_tls.py::test_12_tls_public_listener_refuses_every_other_path[/v1/models] PASSED [ 75%]
+tests/integration/test_12_tls.py::test_12_tls_public_listener_refuses_every_other_path[/api/v1/auth/me] PASSED [ 81%]
+tests/integration/test_12_tls.py::test_12_tls_public_listener_refuses_every_other_path[/healthz] PASSED [ 87%]
+tests/integration/test_12_tls.py::test_12_tls_public_listener_refuses_every_other_path[/mcp/x/] PASSED [ 93%]
+tests/integration/test_12_tls.py::test_12_tls_public_listener_forwards_the_teams_path_to_the_backend PASSED [100%]
+
+============================== 16 passed in 9.30s ==============================
+=== rerun 2026-11-20T07:10:35Z after squid log/healthcheck change ===
+compose config egress+tls+test: OK
+................                                                         [100%]
+16 passed in 9.59s
+ok    mcp-sql /healthz 200
+ok    skipped: ollama profile inactive
+smoke: passed

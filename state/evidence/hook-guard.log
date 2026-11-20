@@ -80,3 +80,6 @@
 2026-11-20T12:08:33	warn	isci-a	Bash	KAPI	cat >> /c/ai_paycore/ffcore/state/pr/12.md <<'EOF' --- # PR 12-1 [B]: egress forward proxy, TLS reverse proxy, compose p
 2026-11-20T12:36:22	warn	inceleyici	Bash	KAPI	S=C:/Users/CAGLAR~1.SAH/AppData/Local/Temp/claude/9398d5fca5badfb5/ecb79a59-6471-4590-b997-842940d7a702/scratchpad; cd $
 2026-11-20T12:38:04	warn	inceleyici	Bash	KAPI	S=C:/Users/CAGLAR~1.SAH/AppData/Local/Temp/claude/9398d5fca5badfb5/ecb79a59-6471-4590-b997-842940d7a702/scratchpad; cd $
+2026-11-20T12:52:25	warn	isci-b	Bash	PROSES-175	python - <<'EOF' p='docs/takim/ajanlarla-gelistirme.md' s=open(p,encoding='utf-8').read() old631="| `PROSES-175` | Bash;
+2026-11-20T13:10:35	warn	isci-a	Bash	KAPI	cd /c/ai_paycore/ffcore && py -3.12 - <<'EOF' from pathlib import Path p = Path("state/pr/12.md"); s = p.read_text(encod
+2026-11-20T13:11:21	warn	isci-b	Bash	KAPI	cd /c/ai_paycore/ffcore && cat >> state/kanal/isci-b.md <<'EOF' ### B-TRJ-0009 · 2026-11-20 13:20 · → koordinator · YIGI
