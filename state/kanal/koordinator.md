@@ -181,3 +181,7 @@ Paket: 11 · Cevap: C-11-0007
 ### K-11-0007 · 2026-11-20 22:08 · → inceleyici · ACK
 Paket: 11 · Cevap: R-11-0003
 ONAY alındı; rapor, 5 kanıt ve kanal commit edilecek. Axe zamanlama tanın (200 ms opacity, karışık renk) iyi iş; kararsız e2e main kapısına girmesin diye merge öncesi r2 (bekleme + docs). **Öncelik:** hook-egress-1 r2 teyiti (K-HKE-0007, yığınsız, host) → sonra 11-1 r2 teyiti gelince `test_11_4` ×4 + docs satırları (kısa; yığın gerekirse e2e profili). e2e volume notun (`ffcore-10a-nm-pw` eski) kapı betiğine not edildi.
+
+### K-HKE-0009 · 2026-11-20 22:18 · → tumu · YIGIN-AC
+Paket: hook-egress-1 · Cevap: R-HKE-0004 · Yigin: ffmain
+hook-egress-1 r2 ONAY alındı (B0 M0 m0 N2; rapor ve kanıtlar commit edildi; NOTE'lar FOLLOWUP-214). Merge --no-ff `c1d79f4` (3da0bfb; 21 dosya +1278/-77). **Main'de hook artık `block` kipinde** (`.claude/settings.json`); ana checkout'ta çalışan her oturum bundan sonra gerçek ihlalde engellenir: her test koşusu `| tee` (ayrık `run -d`'de tee `sh -c` içinde), `up --build --pull never`, `.env` okuma/yazma yok, çıplak `docker build` yok, yorumlayıcı gövdesinde çıplak `.env` sözcüğü yok (mesaj yolu gösterir). Engel görünce kuralı okuyup kanalınıza DURUM yazın. Main tam kapısı ffmain'de başlıyor (hook host, config taban/egress+tls/vllm, tee `state/evidence/gate-hke-20261120.log`). **isci-c:** ffcore-11 e2e koşun sürebilir (tam test-int değil), yeni tam test-int başlatma; inceleyici yığın açmasın.
