@@ -122,6 +122,27 @@ def test_11_2_review_is_still_the_default_source(answered, pg, scores, make_user
     assert [s["name"] for s in scores.scores] == ["expert_feedback"]
 
 
+@pytest.mark.parametrize("body", [{"vote": "correct"}, {"vote": "correct", "source": "review"}])
+def test_11_2_r2_user_member_cannot_write_the_expert_review(
+    answered, pg, scores, make_user, client_factory, body
+):
+    # 11-2 r1 MINOR-1 (A): a `user` member's default (review) vote is refused, so it can neither
+    # take the run out of F9's pending list nor show as an expert score; the chat vote stays open.
+    project_id, client, run_id = answered
+    response = client.post(_url(project_id, f"/runs/{run_id}/feedback"), json=body)
+    assert response.status_code == 403
+    assert response.json()["error"]["code"] == "not_reviewer"
+    assert _columns(pg, run_id) == (None, None)
+    assert scores.scores == []
+    _, email = make_user(memberships={project_id: ("analyst", "edit")})
+    pending = client_factory(email).get(_url(project_id, "/runs"), params={"feedback": "pending"})
+    assert [r["id"] for r in pending.json()["items"]] == [run_id]
+    chat = client.post(
+        _url(project_id, f"/runs/{run_id}/feedback"), json={"vote": "correct", "source": "chat"}
+    )
+    assert chat.status_code == 200
+
+
 def test_11_2_chat_vote_only_by_the_runs_user(answered, make_user, client_factory):
     project_id, _, run_id = answered
     _, email = make_user(memberships={project_id: ("admin", "edit")})
