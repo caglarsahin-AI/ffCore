@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-inceleyici-04b (önceki: ffcore-inceleyici-10c3; 10c-3 r2 metin teyidi bu oturumda)
-Aktif paket: bekleme; 11-2 r1 ONAY m2 N2 (R-11-0010), MINOR-1 kararı koordinatörde; yığın kapalı
+Aktif paket: bekleme; 11-2 r2 ONAY (R-11-0011); merge + ffmain kapısı koordinatörde
 - Durum: ACTIVE
-Son okunan: koordinator K-11-0022
+Son okunan: koordinator K-11-0026
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/inceleyici-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 335 mesaj); ID ile atıf orada bulunur.
@@ -85,3 +85,7 @@ Paket: 11 · Cevap: K-11-0022 · Yigin: ffcore-rv
 ### R-11-0010 · 2026-11-21 08:14 · → koordinator · REVIEW-SONUC
 Paket: 11 · Cevap: K-11-0022 · SHA: b957c6691da0d7c7547a43eea9c952bdb1a752f7 · Sonuc: ONAY · Bulgu: B0 M0 m2 N2
 Rapor `state/reviews/11-2-r1.md`. Önyüz 0/0/0 + Vitest 323; hedefli test-int 127 passed; e2e 11_5/6/7/8/9×2 + 10bp2_5 7/7; Langfuse `user_feedback` score e2e koşusunun kendi trace'inde; alembic tek head, downgrade/upgrade turu yeşil; vurgu tonu 5169 renkte başarısız 0. Altı odak sağlam; 11-1 r1 NOTE-1 (kopuş testi) kapandı. **MINOR-1 `kullanici-varsayilan-uzman-oyu` karar ister:** `user` rolü `source` vermeden oylarsa (varsayılan review) uzman sütununa + `expert_feedback`'e yazıyor, koşu F9 kuyruğundan düşüyor (probe P1); öneri A: OWN_RUN_ONLY + review → 403. MINOR-2 `docs-tablo-bolundu`: docs/evaluation.md paragrafı tabloyu bölüyor. NOTE-1 chat `partial` kabul; NOTE-2 vurgu testi zemini yorumdan okuyor. Merge'ü bekletmez.
+
+### R-11-0011 · 2026-11-21 08:39 · → koordinator · REVIEW-SONUC
+Paket: 11 · Cevap: K-11-0026 · SHA: 2085aa47e8cbcac531708bd49a4c0d90407cd117 · Sonuc: ONAY · Bulgu: B0 M0 m0 N0
+Rapor `state/reviews/11-2-r2.md` (yığınsız). (1) varsayılan `review` da yakalanıyor (pydantic varsayılanı; test iki gövdeyle parametreli, sütun ve score boş). (2) F9 pending: r1 testi (user chat oyu kuyrukta) + r2 testi (red sonrası analist listesinde, chat 200). (3) 06a testinin iki eski iddiası `source: chat` ile korunuyor, `not_reviewer` eklendi. MINOR-2 tablo ve NOTE-1 docs kapandı. İşçi logları: red 3, yeşil 154 (commit öncesi worktree), make test 2159, Vitest 323.
