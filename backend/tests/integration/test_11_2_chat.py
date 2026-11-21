@@ -92,14 +92,19 @@ def test_11_2_chat_vote_leaves_the_expert_review_queue_alone(
     # S1: a chat vote does not take the run out of F9's pending list, and the expert's later
     # vote does not overwrite it.
     project_id, client, run_id = answered
-    client.post(_url(project_id, f"/runs/{run_id}/feedback"), json={"vote": "correct", "source": "chat"})
+    client.post(
+        _url(project_id, f"/runs/{run_id}/feedback"), json={"vote": "correct", "source": "chat"}
+    )
     _, email = make_user(memberships={project_id: ("analyst", "edit")})
     expert = client_factory(email)
     pending = expert.get(_url(project_id, "/runs"), params={"feedback": "pending"}).json()["items"]
     assert [r["id"] for r in pending] == [run_id]
-    assert expert.post(
-        _url(project_id, f"/runs/{run_id}/feedback"), json={"vote": "partial"}
-    ).status_code == 200
+    assert (
+        expert.post(
+            _url(project_id, f"/runs/{run_id}/feedback"), json={"vote": "partial"}
+        ).status_code
+        == 200
+    )
     stored_expert, stored_user = _columns(pg, run_id)
     assert (stored_expert["vote"], stored_user["vote"]) == ("partial", "correct")
     assert [s["name"] for s in scores.scores] == ["user_feedback", "expert_feedback"]
@@ -127,7 +132,9 @@ def test_11_2_chat_vote_only_by_the_runs_user(answered, make_user, client_factor
     assert response.json()["error"]["code"] == "not_run_user"
 
 
-def test_11_2_chat_vote_needs_edit_access(make_project, make_user, client_factory, pg, harness, use_queue):
+def test_11_2_chat_vote_needs_edit_access(
+    make_project, make_user, client_factory, pg, harness, use_queue
+):
     project_id = make_project()
     _, email = make_user(memberships={project_id: ("analyst", "read")})
     publish(pg, project_id, definition())
@@ -151,7 +158,9 @@ def test_11_2_chat_vote_source_is_a_closed_list(answered):
 
 def test_11_2_messages_carry_the_user_vote(answered, scores):
     project_id, client, run_id = answered
-    client.post(_url(project_id, f"/runs/{run_id}/feedback"), json={"vote": "correct", "source": "chat"})
+    client.post(
+        _url(project_id, f"/runs/{run_id}/feedback"), json={"vote": "correct", "source": "chat"}
+    )
     (conversation,) = client.get(_url(project_id, "/conversations")).json()["items"]
     items = client.get(_url(project_id, f"/conversations/{conversation['id']}/messages")).json()[
         "items"
@@ -209,7 +218,11 @@ def test_11_2_portal_config_fields_are_optional(portal):
         _url(project_id, f"/agents/{agent_id}"), json={"portal_config": {"welcome": "Merhaba."}}
     )
     assert response.status_code == 200, response.text
-    assert response.json()["portal_config"] == {"welcome": "Merhaba.", "examples": [], "accent": None}
+    assert response.json()["portal_config"] == {
+        "welcome": "Merhaba.",
+        "examples": [],
+        "accent": None,
+    }
 
 
 @pytest.mark.parametrize(
