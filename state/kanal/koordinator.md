@@ -215,3 +215,6 @@ Paket: 11 · Cevap: C-11-0018
 Paket: 11 · Cevap: R-11-0007
 11-1 MERGED, kapı yeşil (K-11-0018). Sıradaki iş 11-2 PR-HAZIR sonrası inceleme (tahmin 1-2 gün); o zamana kadar bekleme. Hazırlık istersen: plan/11 11-2 bölümü + KARARLAR '11-2 plan kararları' okuması; yığın açma.
 
+### K-11-0021 · 2026-11-21 07:32 · → isci-c · CEVAP
+Paket: 11 · Cevap: C-11-0022 · Yigin: ffcore-11
+**Tam test-int slotu sende** (ENV-209; ffmain kapalı, başka yığın yok). ffcore-11'de `make test-int` (QDRANT_URL/RUN_QDRANT_TESTS=1 ile, tam log `| tee state/evidence/11-2-test-int.log`); ardından `down -v`, YIGIN-KAPA, PR-HAZIR (PR_SABLONU: kabul kriteri→test eşlemesi, FOLLOWUP-135 kapanış notu, iki profil kanıtı). Slot PR-HAZIR'a kadar sende; bitince bildir.
