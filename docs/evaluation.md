@@ -9,11 +9,11 @@ tells you per question *where* it failed: retrieval, reranking, the model, or no
 |---|---|
 | Questions (dataset items), exam runs, per-question scores | Langfuse (datasets, dataset runs, scores) |
 | Suite (which dataset, scorers, threshold, gated agent), exam run summary | FFCore (`eval_suites`, `eval_runs`) |
+| The answering itself | ordinary agent runs, `channel=test`, background class (`llm-background`) |
 
 Votes on ordinary runs are other Langfuse scores and never count in an exam: `expert_feedback` is an
 expert's review (F9, the runs screen), `user_feedback` the chat user's own vote on their answer
 (11-2, docs/chat.md). Filter on the score name to keep the two apart.
-| The answering itself | ordinary agent runs, `channel=test`, background class (`llm-background`) |
 
 FFCore keeps no copy of the questions: edit them in Langfuse (its own CSV/JSON import) or seed
 them with `make seed-eval`. One Langfuse project serves every FFCore project, so a suite's

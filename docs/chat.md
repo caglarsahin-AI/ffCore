@@ -62,6 +62,8 @@ automatically. Without a selection the chat asks for one.
   - **Rating:** helpful / not helpful under a stored answer, with an optional note, sent with
     Send. It is your own rating (`source: chat`, Langfuse score `user_feedback`), kept apart from
     an expert's review (`expert_feedback`, docs/agentlar.md). Rating again replaces your rating.
+    The API takes `correct`, `partial` or `wrong` with `source: chat`; the chat offers two of
+    them, helpful (`correct`) and not helpful (`wrong`).
   - The conversation title is the first 60 characters of its first message. No model call is
     made for titles, tags or follow-up suggestions (brief 11, PayCore D6: on CPU every such call
     is a full model call).

@@ -178,9 +178,11 @@ reconnect to the live stream (Redis, within `RUN_EVENT_STREAM_TTL_S`) and a repl
   every run of the project; a `user` member reads the runs that ran for them (`user_id`) and
   lists only those; another user's run is 404.
 - **Feedback (F9):** `POST /runs/{id}/feedback {vote: correct|partial|wrong, note?, source?}` on a
-  completed run, with edit access. `source: review` (the default) is the expert's review: stored
-  on the answer (`feedback`) and sent to Langfuse as the score `expert_feedback`; `feedback=pending`
-  lists the completed runs without one. `source: chat` (11-2) is the run's own user rating their
+  completed run, with edit access. `source: review` (the default) is the expert's review, by
+  analysts and above on any run: stored on the answer (`feedback`) and sent to Langfuse as the
+  score `expert_feedback`; `feedback=pending` lists the completed runs without one. A `user`
+  member never writes a review (403 `not_reviewer`): they rate their own answers with
+  `source: chat`. `source: chat` (11-2) is the run's own user rating their
   answer in the chat (anyone else: 403 `not_run_user`): stored apart (`user_feedback`), score
   `user_feedback`. A chat vote leaves the run in the review queue, and the expert's later review
   does not overwrite it.
