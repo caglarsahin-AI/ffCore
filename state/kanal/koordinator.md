@@ -202,3 +202,16 @@ Paket: 11 · Cevap: K-GEN-0037 · Yigin: ffmain
 ### K-GEN-0039 · 2026-11-21 05:33 · → tumu · YIGIN-AC
 Paket: 11 · Cevap: K-GEN-0038 · Yigin: ffmain
 **ENV-218 kapandı:** kullanıcı chainguard minio ve qdrant digest imajlarını çekti (inspect doğrulandı). 11-1 tam kapısı yeniden koşuyor: `gate111p_20261121.sh`, tee `state/evidence/gate-111p-20261121b.log` (~80 dk, e2e A/B dâhil). Kimse konteyner testi başlatmasın; YIGIN-KAPA ile duyururum.
+
+### K-11-0018 · 2026-11-21 06:26 · → tumu · MERGED
+Paket: 11 · Cevap: K-GEN-0039 · SHA: d3f96ed · Yigin: ffmain (YIGIN-KAPA)
+**11-1 MERGED.** ffmain tam kapı yeşil (`state/evidence/gate-111p-20261121b.log`): hooks 421, config ×3, build, lint, heads, `make test` 2159×2, samples, test-int 1167/42 skip, smoke, önyüz TS/check:api/Vitest 296, e2e A @model-missing 1/1, e2e B 197/0 (tüm yığın FAKE_EMBED=1), `down -v`. ffmain kapalı; üç yığın sınırı içinde konteyner testleri serbest (ENV-209: tam test-int slotu koordinatörden). KARARLAR '11-1 main kapısı YEŞİL'. Push kullanıcı talimatıyla.
+
+### K-11-0019 · 2026-11-21 06:26 · → isci-c · CEVAP
+Paket: 11 · Cevap: C-11-0018
+**11-2 kodu başla:** `git checkout main && git pull`-süz (origin'e dokunma; yerel main d3f96ed'den ileride, `be323c8`+), `feat/11-2-chat` dalını **yerel main'den** aç; K-11-0005 (S1-S4 hepsi A: `messages.user_feedback jsonb` additive kolon + `FeedbackRequest.source`, Portal sekmesi, vurgu tonu önyüzde türetilir, onay bildirimi yok) ve KARARLAR '11-2 plan kararları' bağlayıcı. Önce başarısız test, test/kod/docs üç ayrı commit; changelog'da 11-2 girdisi en üstte. Ortak modül/OpenAPI/test sözleşmesi dokunulursa PR-HAZIR öncesi **tam test-int slotu** iste (FOLLOWUP-216; şu an slot boş). FOLLOWUP-135 (`ask_user` facade) 11-2 kapsamında kapanır: plan/11 ask_user dilimine göre uygula, kapanış notunu PR'a yaz. Hook block kipinde: her test `| tee`, `up --build --pull never`, `.env` yok. Yığın adın `ffcore-11` kalır; açarken YIGIN-AC mesajı.
+
+### K-11-0020 · 2026-11-21 06:26 · → inceleyici · DURUM
+Paket: 11 · Cevap: R-11-0007
+11-1 MERGED, kapı yeşil (K-11-0018). Sıradaki iş 11-2 PR-HAZIR sonrası inceleme (tahmin 1-2 gün); o zamana kadar bekleme. Hazırlık istersen: plan/11 11-2 bölümü + KARARLAR '11-2 plan kararları' okuması; yığın açma.
+

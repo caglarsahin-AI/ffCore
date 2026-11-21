@@ -1,0 +1,34 @@
+=== gate111p main 951a9e3 2026-11-21 05:17:23
+
+=== 05:17:24 hook tests (host py -3.12, FOLLOWUP-212)
+.............................................................            [100%]
+421 passed in 90.74s (0:01:30)
+hooks exit=0
+
+=== 05:18:58 compose config
+config exit=0
+
+=== 05:19:05 compose config egress+tls
+config-egress-tls exit=0
+
+=== 05:19:12 compose config vllm
+config-vllm exit=0
+
+=== 05:19:18 up -d --build --pull never --wait
+ Container ffmain-langfuse-clickhouse-1  Creating
+ Container ffmain-ticket-desk-1  Creating
+ Container ffmain-langfuse-redis-1  Creating
+ Container ffmain-fake-llm-1  Creating
+ Container ffmain-postgres-1  Creating
+ Container ffmain-langfuse-postgres-1  Creating
+ Container ffmain-qdrant-1  Creating
+ Container ffmain-langfuse-minio-1  Creating
+ Container ffmain-redis-1  Creating
+Error response from daemon: No such image: cgr.dev/chainguard/minio@sha256:e70b2b1e74d79457f808710483bd726ff364529ca30736eaa15a6ab547d3a5a7
+up exit=1
+=== migrate logs
+ffmain-fake-llm-1 Created
+ffmain-langfuse-postgres-1 Created
+ffmain-postgres-1 Created
+ffmain-langfuse-redis-1 Created
+=== ABORT: up failed, stack left up for inspection
