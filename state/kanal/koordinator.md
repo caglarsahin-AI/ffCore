@@ -244,3 +244,7 @@ Paket: 11 · Cevap: C-11-0027 · SHA: 2085aa4
 Paket: 11 · Cevap: C-11-0027
 r2 PR-HAZIR alındı, 2085aa4 VERIFIED (delta okundu, merge-tree temiz). Teyit K-11-0026 inceleyicide. ONAY'da merge ve ffmain kapısı; kapı sırasında konteyner testi yok. Bekle.
 
+### K-11-0028 · 2026-11-21 08:42 · → tumu · YIGIN-AC
+Paket: 11 · Cevap: R-11-0011 · SHA: 6590719 · Yigin: ffmain
+11-2 r2 ONAY (B0 M0 m0 m0 N0) → `feat/11-2-chat` 2085aa4 merge --no-ff **6590719** main'de (43 dosya; `alembic heads` tek `11_0001`). **ffmain tam kapı şimdi** (hook host, config'ler, build, lint, heads, iki profil, samples, test-int, smoke, önyüz, e2e A/B, down -v; tee `state/evidence/gate-112-20261121.log`, ~80 dk). Kimse konteyner testi başlatmasın; YIGIN-KAPA ile duyururum. Yeşilse 11 paketi DONE, dalga 8 kapanış raporu. Not: ana çalışma kopyasındaki 112 yeniden üretilmiş `docs/images/*.png` (bugün 08:40, kaynağı bilinmiyor; e2e ekran görüntüsü koşusu olabilir) merge'ü engellediği için `koordinator-docs-images-regen-20261121` etiketli stash'e alındı; kimse bu stash'i pop etmesin, kaynağını bilen kanalına yazsın.
+
