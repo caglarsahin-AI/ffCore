@@ -4,6 +4,24 @@ Behaviour and configuration changes that a deployment or an API client notices, 
 (handbook/RELEASE_AND_ROLLBACK.md, CHANGE_CONTROL.md). Each entry names the package and what to do,
 if anything.
 
+## 2026-11-21 · 11-2 · Chat approval, question, rating and portal settings
+
+- **What:** the chat (docs/chat.md) approves or rejects an action inline for a member with `edit`
+  access and role >= the approver role, and says who approves to anyone else; it answers an
+  agent's `ask_user` question; it rates an answer (helpful / not helpful, optional note). The
+  console's agent screen gets a Portal tab: welcome text, up to three example questions and an
+  accent colour, shown by the chat (docs/agentlar.md, "Chat portal settings").
+- **API (additive):** `POST …/runs/{id}/feedback` takes `source` (`review`, the default and the
+  old behaviour, or `chat`: the run's own user only, stored in `messages.user_feedback`, Langfuse
+  score `user_feedback`). `PATCH …/agents/{id}` takes `portal_config`; `AgentOut`,
+  `GET …/chat/agents` and the conversation messages (`user_feedback`) return the new fields.
+- **Migration:** `11_0001` adds two nullable `jsonb` columns, `messages.user_feedback` and
+  `agents.portal_config` (no data change; `alembic downgrade 12_0002` removes them).
+- **Changed:** the console test panel's approval and answer texts moved to the shared
+  `RunCards` messages; the panel looks and behaves as before.
+- **Action:** none beyond the usual upgrade: the `migrate` service applies `11_0001` at `make up`. Regenerated
+  `frontend/lib/api/schema-06a.d.ts` and `schema-06b.d.ts` for API clients that use them.
+
 ## 2026-11-20 · 11-1 · End user chat (`/chat`)
 
 - **What:** the console serves `/chat` (docs/chat.md): the selected project's published agents,
