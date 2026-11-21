@@ -1087,6 +1087,10 @@ components:
           type: string
           format: date-time
           title: Updated At
+        portal_config:
+          anyOf:
+          - $ref: '#/components/schemas/PortalConfig'
+          - type: 'null'
         external:
           $ref: '#/components/schemas/ExternalEndpoint'
       type: object
@@ -1461,6 +1465,35 @@ components:
       required:
       - data
       title: ModelList
+    PortalConfig:
+      properties:
+        welcome:
+          anyOf:
+          - type: string
+            maxLength: 500
+          - type: 'null'
+          title: Welcome
+        examples:
+          items:
+            type: string
+            maxLength: 200
+          type: array
+          maxItems: 3
+          title: Examples
+        accent:
+          anyOf:
+          - type: string
+            pattern: ^#[0-9a-fA-F]{6}$
+          - type: 'null'
+          title: Accent
+      additionalProperties: false
+      type: object
+      title: PortalConfig
+      description: 'What the chat shows for this agent (11-2, K-11-0005 S2): a welcome text, up to three
+
+        example questions (a click fills the message box; the user sends) and an accent colour. The
+
+        server checks the hex form only; the console derives readable light and dark tones (S3).'
     SearchFilters:
       properties:
         document_ids:

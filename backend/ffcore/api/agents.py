@@ -127,6 +127,7 @@ async def agent_out(session, agent: Agent) -> AgentOut:
         latest_version=await _latest(session, agent.id),
         created_at=agent.created_at,
         updated_at=agent.updated_at,
+        portal_config=agent.portal_config,
     )
 
 
@@ -262,7 +263,8 @@ async def update_agent(
     actor: Editor,
     session: SessionDep,
 ):
-    """Name and description; the definition changes through versions."""
+    """Name, description and chat portal settings (11-2); the definition changes through
+    versions. The portal settings are agent level: a published agent's are edited here too."""
     agent = await _agent(session, project_id, agent_id)
     await _admin_if_external(request, actor, project_id, agent)
     for field, value in body.model_dump(exclude_unset=True).items():

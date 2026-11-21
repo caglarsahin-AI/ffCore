@@ -8,7 +8,7 @@ from datetime import datetime
 from typing import Annotated, Any, Literal
 from uuid import UUID
 
-from pydantic import BaseModel, Field, SecretStr
+from pydantic import AfterValidator, BaseModel, Field, SecretStr
 
 from ffcore.api.schemas import Patch, Strict
 from ffcore.runtime.contracts import (
@@ -37,9 +37,33 @@ class AgentCreate(Strict):
     model: str = Field(description="Project model key, e.g. chat-default.")
 
 
+def _not_blank(value: str) -> str:
+    if not value.strip():
+        raise ValueError("must not be blank")
+    return value
+
+
+PortalText = Annotated[str, AfterValidator(_not_blank)]
+
+
+class PortalConfig(Strict):
+    """What the chat shows for this agent (11-2, K-11-0005 S2): a welcome text, up to three
+    example questions (a click fills the message box; the user sends) and an accent colour. The
+    server checks the hex form only; the console derives readable light and dark tones (S3)."""
+
+    welcome: PortalText | None = Field(default=None, max_length=500)
+    examples: list[Annotated[PortalText, Field(max_length=200)]] = Field(
+        default_factory=list, max_length=3
+    )
+    accent: str | None = Field(default=None, pattern=r"^#[0-9a-fA-F]{6}$")
+
+
 class AgentUpdate(Patch):
     name: str = Field(default=None, min_length=1, max_length=200)
     description: str = Field(default=None, max_length=2000)
+    portal_config: PortalConfig | None = Field(
+        default=None, description="Chat portal settings; null clears them (11-2)."
+    )
 
 
 class AgentOut(BaseModel):
@@ -54,6 +78,7 @@ class AgentOut(BaseModel):
     latest_version: int = Field(description="Highest version number (draft or published).")
     created_at: datetime
     updated_at: datetime
+    portal_config: PortalConfig | None = None
 
 
 class AgentList(BaseModel):
@@ -119,10 +144,17 @@ class RunCreate(Strict):
 
 
 class FeedbackRequest(Strict):
-    """Expert review of a completed run (F9, K-06a-0005)."""
+    """Expert review of a completed run (F9, K-06a-0005), or the chat user's vote on their own
+    answer (11-2, K-11-0005 S1)."""
 
     vote: Literal["correct", "partial", "wrong"]
     note: str | None = Field(default=None, max_length=2000)
+    source: Literal["review", "chat"] = Field(
+        default="review",
+        description="review: the expert's review (messages.feedback, score expert_feedback). "
+        "chat: the run's own user rating the answer (messages.user_feedback, score "
+        "user_feedback); it leaves the review queue (feedback=pending) as it is.",
+    )
 
 
 class FeedbackOut(BaseModel):
@@ -284,6 +316,7 @@ class ChatAgentOut(BaseModel):
     key: AgentKey
     name: str
     description: str
+    portal_config: PortalConfig | None
 
 
 class ChatAgentList(BaseModel):
@@ -316,6 +349,9 @@ class ChatMessageOut(BaseModel):
         ".../runs/{run_id}/sources/{chunk_id} returns it)."
     )
     feedback: dict[str, Any] | None
+    user_feedback: dict[str, Any] | None = Field(
+        description="The chat user's own vote (source chat); feedback is the expert's review."
+    )
     low_confidence: bool | None = Field(
         description="Set only when the run's version has show_confidence and a "
         "confidence_threshold: true below the threshold. Null otherwise (badge off by default)."

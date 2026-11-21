@@ -500,6 +500,7 @@ export interface components {
              * Format: date-time
              */
             updated_at: string;
+            portal_config?: components["schemas"]["PortalConfig"] | null;
             external: components["schemas"]["ExternalEndpoint"];
         };
         /** ExternalAgentUpdate */
@@ -722,6 +723,20 @@ export interface components {
             object: "list";
             /** Data */
             data: components["schemas"]["ModelEntry"][];
+        };
+        /**
+         * PortalConfig
+         * @description What the chat shows for this agent (11-2, K-11-0005 S2): a welcome text, up to three
+         *     example questions (a click fills the message box; the user sends) and an accent colour. The
+         *     server checks the hex form only; the console derives readable light and dark tones (S3).
+         */
+        PortalConfig: {
+            /** Welcome */
+            welcome?: string | null;
+            /** Examples */
+            examples?: string[];
+            /** Accent */
+            accent?: string | null;
         };
         /** SearchFilters */
         SearchFilters: {

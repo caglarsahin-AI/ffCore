@@ -143,6 +143,8 @@ class Message(Base):
     content: Mapped[str] = mapped_column(Text)
     sources: Mapped[list | None] = mapped_column(JSONB)
     feedback: Mapped[dict | None] = mapped_column(JSONB)
+    # 11-2: the chat user's own vote; `feedback` stays the expert's review (F9, K-11-0005 S1).
+    user_feedback: Mapped[dict | None] = mapped_column(JSONB)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=sql_text("now()")
     )

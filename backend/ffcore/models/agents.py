@@ -70,6 +70,8 @@ class Agent(Timestamps, Base):
     # 06b-2: an external agent's base_url, remote model and api_key, one Fernet token
     # (services/external_config.ExternalConfig); set exactly when kind = external.
     external_config: Mapped[bytes | None] = mapped_column(LargeBinary)
+    # 11-2: chat portal settings (api/agents_schemas.PortalConfig); agent level, not versioned.
+    portal_config: Mapped[dict | None] = mapped_column(JSONB)
     created_by: Mapped[str] = mapped_column(Text)
     deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
