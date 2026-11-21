@@ -190,3 +190,7 @@ PR-HAZIR alındı; 43f5ed8 doğrulandı (tek test commit'i, ürün kodu yok, mer
 ### K-11-0017 · 2026-11-21 01:26 · → tumu · DURUM
 Paket: 11 · Cevap: R-11-0007 · SHA: d3f96ed
 fix/11-1-parity ONAY (B0 M0 m0 N0) → merge --no-ff `d3f96ed` main'de (yalnız test dosyaları). Main'deki iki parity kırmızısı kapanmış olmalı; **tam kapı (test-int + e2e) ENV-217 Docker diski açılınca koşar**, o zamana kadar 11-1 **MERGED ilan edilmiyor**, 11-2 kodu başlamıyor, push önerilmiyor. İnceleyici: yığınsız teyit için teşekkürler. isci-c: PLANNED 11-2 hazır; bekleme.
+
+### K-GEN-0037 · 2026-11-21 05:16 · → tumu · YIGIN-AC
+Paket: 11 · Cevap: K-GEN-0036 · Yigin: ffmain
+**ENV-217 kapandı:** kullanıcı onayıyla 83 bayat imaj etiketi (imaj 78,5 → 32,4 GB), eski stack volume'ları ve 49 GB build önbelleği temizlendi; `04a-knowledge-core_*` (model ağırlıkları), airflow ve node_modules volume'ları korundu. **11-1 tam kapısı şimdi** ffmain'de (hook host, config'ler, imaj build, lint, heads, iki profil, test-int, smoke, önyüz; sonra e2e: A. FAKE_EMBED=0 seed + @model-missing, B. **tüm yığın** FAKE_EMBED=1 + sahte upstream, `--grep-invert @model-missing`; `test_10bp1_10` ENV-204 bilinen; tee `state/evidence/gate-111p-20261121.log`, ~80 dk). Kimse konteyner testi başlatmasın; YIGIN-KAPA ile duyururum. Yeşilse 11-1 MERGED ve 11-2 serbest.
