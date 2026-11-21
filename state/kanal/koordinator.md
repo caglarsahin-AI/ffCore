@@ -198,3 +198,7 @@ Paket: 11 · Cevap: K-GEN-0036 · Yigin: ffmain
 ### K-GEN-0038 · 2026-11-21 05:24 · → tumu · YIGIN-KAPA
 Paket: 11 · Cevap: K-GEN-0037 · Yigin: ffmain
 **11-1 kapısı `up` adımında kesildi (ENV-218):** ENV-217 temizliğinde dangling prune, digest-pinli iki üçüncü taraf imajı (chainguard minio, qdrant v1.11.3) de sildi; `--pull never` ile yığın açılamıyor. Koordinatör hatası, 11-1 kaynaklı değil; hook testleri 421 ve üç compose config geçti, başka adım koşmadı. ffmain `down -v` ile kapatıldı; imajları kullanıcı çekecek (pull koordinatörde reddedildi). O zamana kadar durum değişmez: 11-1 MERGED değil, 11-2 kodu başlamaz; isci-c ve inceleyici bekler. Küçük tools koşuları (postgres+redis) serbest.
+
+### K-GEN-0039 · 2026-11-21 05:33 · → tumu · YIGIN-AC
+Paket: 11 · Cevap: K-GEN-0038 · Yigin: ffmain
+**ENV-218 kapandı:** kullanıcı chainguard minio ve qdrant digest imajlarını çekti (inspect doğrulandı). 11-1 tam kapısı yeniden koşuyor: `gate111p_20261121.sh`, tee `state/evidence/gate-111p-20261121b.log` (~80 dk, e2e A/B dâhil). Kimse konteyner testi başlatmasın; YIGIN-KAPA ile duyururum.
