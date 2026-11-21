@@ -1,0 +1,27 @@
+HEAD=b957c6691da0d7c7547a43eea9c952bdb1a752f7 (git archive copy) image 0.0.0-11b
+ Container ffcore-rv-langfuse-minio-1  Waiting
+ Container ffcore-rv-langfuse-web-1  Waiting
+ Container ffcore-rv-agent-worker-1  Waiting
+ Container ffcore-rv-ticket-desk-1  Waiting
+ Container ffcore-rv-langfuse-worker-1  Waiting
+ Container ffcore-rv-migrate-1  Waiting
+ Container ffcore-rv-migrate-1  Exited
+ Container ffcore-rv-agent-worker-bg-1  Healthy
+ Container ffcore-rv-langfuse-worker-1  Healthy
+ Container ffcore-rv-redis-1  Healthy
+ Container ffcore-rv-litellm-1  Healthy
+ Container ffcore-rv-worker-1  Healthy
+ Container ffcore-rv-postgres-1  Healthy
+ Container ffcore-rv-langfuse-redis-1  Healthy
+ Container ffcore-rv-agent-worker-1  Healthy
+ Container ffcore-rv-frontend-1  Healthy
+ Container ffcore-rv-ticket-desk-1  Healthy
+ Container ffcore-rv-fake-llm-1  Healthy
+ Container ffcore-rv-langfuse-minio-1  Healthy
+ Container ffcore-rv-langfuse-clickhouse-1  Healthy
+ Container ffcore-rv-langfuse-web-1  Healthy
+ Container ffcore-rv-backend-1  Healthy
+ Container ffcore-rv-langfuse-postgres-1  Healthy
+ Container ffcore-rv-mcp-search-1  Healthy
+ Container ffcore-rv-mcp-sql-1  Healthy
+up exit 0

@@ -1,0 +1,22 @@
+HEAD=b957c6691da0d7c7547a43eea9c952bdb1a752f7 alembic round trip on ffcore-rv
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+11_0001 (head)
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running downgrade 11_0001 -> 12_0002, 11-2: the end user's vote on an answer and an agent's chat portal settings
+downgrade exit 0
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+12_0002
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade 12_0002 -> 11_0001, 11-2: the end user's vote on an answer and an agent's chat portal settings
+upgrade exit 0
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+11_0001 (head)
+exit 0
+== columns after
+agents.portal_config
+messages.user_feedback

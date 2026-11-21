@@ -228,3 +228,11 @@ Paket: 11 · Cevap: C-11-0024 · SHA: b957c6691da0d7c7547a43eea9c952bdb1a752f7
 Paket: 11 · Cevap: C-11-0024
 PR-HAZIR alındı, b957c66 VERIFIED (delta, merge-tree, heads tek, kanıt logları okundu). REVIEW-ISTEK K-11-0022 inceleyicide. Slot geri alındı. Bekle; r1 bulguları gelince DUZELT/ONAY. Bekleyen dosyaların (state/pr/11.md, kanalın, 11-2-*.log) koordinatör state commit'ine girer.
 
+### K-11-0024 · 2026-11-21 08:16 · → isci-c · DUZELT
+Paket: 11 · Cevap: R-11-0010 · SHA: b957c66
+**11-2 r1 ONAY (B0 M0 m2 N2); merge öncesi r2 kısa dilim** (KARARLAR '11-2 r1 kararları'), `feat/11-2-chat` üstüne: (1) MINOR-1 `kullanici-varsayilan-uzman-oyu` **A**: `give_feedback`'te `OWN_RUN_ONLY` rolü + `source=review` (varsayılan dâhil) → 403 `not_reviewer`; önce kırmızı test (user+review 403, user+chat 200, analyst+review 200; F9 `feedback=pending` listesi user oyundan etkilenmez), sonra koşul; docs/agentlar.md'deki 'user kendi koşusunu oylar' cümlesi `source: chat` ile; OpenAPI 06a'ya 403 yanıt satırı additive. (2) MINOR-2: docs/evaluation.md 'Votes on ordinary runs' paragrafını tablonun altına (`| The answering itself |` sonrası). NOTE-1/2 değişiklik istemez (NOTE-1 için docs'ta tek cümle: chat oyu `partial` da alabilir, önyüz iki düğme). Üç ayrı commit (test/kod/docs), hedefli test-int (`test_11_2_chat`, `test_06a_feedback`, `test_11_chat`) + `make test` tek profil yeter; tam test-int gerekmez (ortak sözleşme değişmiyor, yalnız yeni red). PR-HAZIR'da yeni SHA; state/pr/11.md r2 satırı.
+
+### K-11-0025 · 2026-11-21 08:16 · → inceleyici · CEVAP
+Paket: 11 · Cevap: R-11-0010
+ONAY alındı, teşekkürler; MINOR-1 için **A** (403 `not_reviewer`), gerekçe KARARLAR. r2 kısa dilim isci-c'de; yeni SHA gelince yığınsız teyit (diff + işçi test logu; istersen küçük tools koşusu). Kopuş testinin kapanmasını not ettim. Bekleyen rapor/loglar koordinatör state commit'ine girdi.
+

@@ -1,0 +1,21 @@
+HEAD=b957c6691da0d7c7547a43eea9c952bdb1a752f7 image 0.0.0-11b (reviewer playwright config, no webServer)
+forward ready
+
+Running 7 tests using 1 worker
+
+  ✓  1 [chromium] › tests/e2e/test_10bp2_5_inline_approval.spec.ts:18:5 › test_10bp2_5_inline_approval: approve continues the run and calls the tool; reject continues without it (6.0s)
+  ✓  2 [chromium] › tests/e2e/test_11_5_chat_approval.spec.ts:33:5 › test_11_5_chat_approval: a read member sees who approves and the answer arrives after someone else decides (5.0s)
+  ✓  3 [chromium] › tests/e2e/test_11_5_chat_approval.spec.ts:59:5 › test_11_6_inline_approval: an analyst with edit access approves in the chat and the run goes on (3.1s)
+  ✓  4 [chromium] › tests/e2e/test_11_7_chat_ask_vote.spec.ts:12:5 › test_11_7_ask_user: a read member answers the agent's question and the run goes on (2.3s)
+test_11_8 run_id=29b9f0eb-5756-4bcc-9c1a-5ecd378ee02c
+  ✓  5 [chromium] › tests/e2e/test_11_7_chat_ask_vote.spec.ts:32:5 › test_11_8_feedback: the vote is stored as the user's (score_sent) and shown again; read access cannot vote (5.7s)
+  ✓  6 [chromium] › tests/e2e/test_11_9_portal.spec.ts:21:7 › test_11_9_portal: light (5.5s)
+  ✓  7 [chromium] › tests/e2e/test_11_9_portal.spec.ts:21:7 › test_11_9_portal: dark (4.2s)
+
+  7 passed (38.0s)
+npm notice
+npm notice New major version of npm available! 11.19.1 -> 12.2.3
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.3
+npm notice To update run: npm install -g npm@12.2.3
+npm notice
+exit 0

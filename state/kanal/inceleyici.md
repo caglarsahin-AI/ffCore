@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-inceleyici-04b (önceki: ffcore-inceleyici-10c3; 10c-3 r2 metin teyidi bu oturumda)
-Aktif paket: bekleme; ENV-217 kapandı; 11-1 tam kapısı (e2e dahil) ffmain'de koşuyor, bitene kadar yığın yok; sıradaki 11-2 PR-HAZIR
+Aktif paket: bekleme; 11-2 r1 ONAY m2 N2 (R-11-0010), MINOR-1 kararı koordinatörde; yığın kapalı
 - Durum: ACTIVE
-Son okunan: koordinator K-GEN-0037
+Son okunan: koordinator K-11-0022
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/inceleyici-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 335 mesaj); ID ile atıf orada bulunur.
@@ -73,3 +73,15 @@ Paket: 11 · Cevap: K-11-0015 · SHA: 43f5ed86021b41f2d54b192afed3181677e7be0f �
 - test_11_4 dört 11-1 GET'inde edit 200, read aynı durum+gövde. Erişim kipi her istekte DB'den okunuyor (core/auth.py 432-438), kip değişikliği etkili.
 - Yığınsız (ENV-217); test koşmadım. İşçi logları: red 2 KeyError, green 27 passed (commit öncesi worktree, diff stat aynı), make test 2159.
 - Bekleyen: rapor + bu kanal satırları.
+
+### R-11-0008 · 2026-11-21 07:59 · → koordinator · YIGIN-AC
+Paket: 11 · Cevap: K-11-0022 · Yigin: ffcore-rv (18540/13540; test + e2e profili, imaj 0.0.0-11b (işçi imajı; backend .py 203/203 ve frontend app/components/lib/messages kaynakla aynı), FAKE_EMBED=1, --no-build --pull never)
+11-2 r1 (SHA b957c66): hedefli test-int (11_2, 11, 03a, 06a, 06b) + e2e 11_5/11_7/11_9 + probe. Tam test-int yok (ENV-209).
+
+### R-11-0009 · 2026-11-21 08:14 · → koordinator · YIGIN-KAPA
+Paket: 11 · Cevap: K-11-0022 · Yigin: ffcore-rv
+`down -v --remove-orphans` exit 0; ffcore-rv konteyner, volume ve ağ 0; e2e node_modules kopyası silindi (`11-2-r1-rv-down.log`).
+
+### R-11-0010 · 2026-11-21 08:14 · → koordinator · REVIEW-SONUC
+Paket: 11 · Cevap: K-11-0022 · SHA: b957c6691da0d7c7547a43eea9c952bdb1a752f7 · Sonuc: ONAY · Bulgu: B0 M0 m2 N2
+Rapor `state/reviews/11-2-r1.md`. Önyüz 0/0/0 + Vitest 323; hedefli test-int 127 passed; e2e 11_5/6/7/8/9×2 + 10bp2_5 7/7; Langfuse `user_feedback` score e2e koşusunun kendi trace'inde; alembic tek head, downgrade/upgrade turu yeşil; vurgu tonu 5169 renkte başarısız 0. Altı odak sağlam; 11-1 r1 NOTE-1 (kopuş testi) kapandı. **MINOR-1 `kullanici-varsayilan-uzman-oyu` karar ister:** `user` rolü `source` vermeden oylarsa (varsayılan review) uzman sütununa + `expert_feedback`'e yazıyor, koşu F9 kuyruğundan düşüyor (probe P1); öneri A: OWN_RUN_ONLY + review → 403. MINOR-2 `docs-tablo-bolundu`: docs/evaluation.md paragrafı tabloyu bölüyor. NOTE-1 chat `partial` kabul; NOTE-2 vurgu testi zemini yorumdan okuyor. Merge'ü bekletmez.

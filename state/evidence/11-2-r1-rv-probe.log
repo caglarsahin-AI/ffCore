@@ -1,0 +1,115 @@
+HEAD=b957c6691da0d7c7547a43eea9c952bdb1a752f7 image 0.0.0-11b + reviewer probe test_rv_11_2_probe.py (not in branch)
+2026-11-21 05:05:47,061 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-21 05:05:47,084 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=249
+2026-11-21 05:05:47,592 INFO ffcore.access access method=POST path=/api/v1/projects/c9c598c4-c4e5-4a0c-9cc0-3fe22a3fcc80/agents/asistan/runs status=200 ms=505
+2026-11-21 05:05:47,649 INFO ffcore.access access method=POST path=/api/v1/projects/c9c598c4-c4e5-4a0c-9cc0-3fe22a3fcc80/runs/5d9cd12d-ac8d-4359-9f4d-4514aba6dfbb/feedback status=200 ms=49
+2026-11-21 05:05:47,697 INFO ffcore.access access method=GET path=/api/v1/projects/c9c598c4-c4e5-4a0c-9cc0-3fe22a3fcc80/runs status=200 ms=43
+P1 200 {'at': '2026-11-21T05:05:47.641368+00:00', 'by': '1256ffaf-717c-4d5a-a556-b47d47a273db', 'note': None, 'vote': 'wrong'} None ['expert_feedback'] pending: []
+.2026-11-21 05:05:47,992 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-21 05:05:48,005 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=103
+2026-11-21 05:05:48,322 INFO ffcore.access access method=POST path=/api/v1/projects/23a0c1d6-e1b3-4696-a6dd-4f36d8082ca6/agents/asistan/runs status=200 ms=315
+2026-11-21 05:05:48,384 INFO ffcore.access access method=POST path=/api/v1/projects/23a0c1d6-e1b3-4696-a6dd-4f36d8082ca6/runs/2d11c3e8-de0c-436f-b937-68104545268c/feedback status=200 ms=52
+2026-11-21 05:05:48,436 INFO ffcore.access access method=POST path=/api/v1/projects/23a0c1d6-e1b3-4696-a6dd-4f36d8082ca6/runs/2d11c3e8-de0c-436f-b937-68104545268c/feedback status=200 ms=48
+P2 200 200 None {'at': '2026-11-21T05:05:48.428924+00:00', 'by': 'f6007a12-d761-41a8-bc9e-77844ed6d775', 'note': 'ok', 'vote': 'correct'}
+.2026-11-21 05:05:48,719 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-21 05:05:48,734 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=116
+2026-11-21 05:05:48,794 INFO ffcore.access access method=PATCH path=/api/v1/projects/0d77c143-6b75-4e34-a221-8d78f3e04ea8/agents/afecc272-60bb-4b40-94e7-b5d59037b75a status=200 ms=56
+P3 welcome 500 200 {'welcome': 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', 'examples': [], 'accent': None}
+2026-11-21 05:05:48,827 INFO ffcore.access access method=PATCH path=/api/v1/projects/0d77c143-6b75-4e34-a221-8d78f3e04ea8/agents/afecc272-60bb-4b40-94e7-b5d59037b75a status=422 ms=29
+P3 welcome 501 422 validation_error
+2026-11-21 05:05:48,882 INFO ffcore.access access method=PATCH path=/api/v1/projects/0d77c143-6b75-4e34-a221-8d78f3e04ea8/agents/afecc272-60bb-4b40-94e7-b5d59037b75a status=200 ms=51
+P3 example 200 200 {'welcome': None, 'examples': ['yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy'], 'accent': None}
+2026-11-21 05:05:48,914 INFO ffcore.access access method=PATCH path=/api/v1/projects/0d77c143-6b75-4e34-a221-8d78f3e04ea8/agents/afecc272-60bb-4b40-94e7-b5d59037b75a status=422 ms=27
+P3 example 201 422 validation_error
+2026-11-21 05:05:48,945 INFO ffcore.access access method=PATCH path=/api/v1/projects/0d77c143-6b75-4e34-a221-8d78f3e04ea8/agents/afecc272-60bb-4b40-94e7-b5d59037b75a status=422 ms=28
+P3 examples 4 422 validation_error
+2026-11-21 05:05:48,976 INFO ffcore.access access method=PATCH path=/api/v1/projects/0d77c143-6b75-4e34-a221-8d78f3e04ea8/agents/afecc272-60bb-4b40-94e7-b5d59037b75a status=422 ms=26
+P3 example blank 422 validation_error
+2026-11-21 05:05:49,007 INFO ffcore.access access method=PATCH path=/api/v1/projects/0d77c143-6b75-4e34-a221-8d78f3e04ea8/agents/afecc272-60bb-4b40-94e7-b5d59037b75a status=422 ms=27
+P3 example empty 422 validation_error
+2026-11-21 05:05:49,037 INFO ffcore.access access method=PATCH path=/api/v1/projects/0d77c143-6b75-4e34-a221-8d78f3e04ea8/agents/afecc272-60bb-4b40-94e7-b5d59037b75a status=422 ms=26
+P3 welcome empty 422 validation_error
+2026-11-21 05:05:49,090 INFO ffcore.access access method=PATCH path=/api/v1/projects/0d77c143-6b75-4e34-a221-8d78f3e04ea8/agents/afecc272-60bb-4b40-94e7-b5d59037b75a status=200 ms=50
+P3 accent upper 200 {'welcome': None, 'examples': [], 'accent': '#0F766E'}
+2026-11-21 05:05:49,122 INFO ffcore.access access method=PATCH path=/api/v1/projects/0d77c143-6b75-4e34-a221-8d78f3e04ea8/agents/afecc272-60bb-4b40-94e7-b5d59037b75a status=422 ms=28
+P3 accent short 422 validation_error
+2026-11-21 05:05:49,155 INFO ffcore.access access method=PATCH path=/api/v1/projects/0d77c143-6b75-4e34-a221-8d78f3e04ea8/agents/afecc272-60bb-4b40-94e7-b5d59037b75a status=422 ms=28
+P3 accent name 422 validation_error
+2026-11-21 05:05:49,186 INFO ffcore.access access method=PATCH path=/api/v1/projects/0d77c143-6b75-4e34-a221-8d78f3e04ea8/agents/afecc272-60bb-4b40-94e7-b5d59037b75a status=422 ms=28
+P3 accent alpha 422 validation_error
+2026-11-21 05:05:49,218 INFO ffcore.access access method=PATCH path=/api/v1/projects/0d77c143-6b75-4e34-a221-8d78f3e04ea8/agents/afecc272-60bb-4b40-94e7-b5d59037b75a status=422 ms=28
+P3 accent newline 422 validation_error
+2026-11-21 05:05:49,248 INFO ffcore.access access method=PATCH path=/api/v1/projects/0d77c143-6b75-4e34-a221-8d78f3e04ea8/agents/afecc272-60bb-4b40-94e7-b5d59037b75a status=422 ms=27
+P3 extra key 422 validation_error
+2026-11-21 05:05:49,279 INFO ffcore.access access method=PATCH path=/api/v1/projects/0d77c143-6b75-4e34-a221-8d78f3e04ea8/agents/afecc272-60bb-4b40-94e7-b5d59037b75a status=422 ms=27
+P3 examples null 422 validation_error
+2026-11-21 05:05:49,335 INFO ffcore.access access method=PATCH path=/api/v1/projects/0d77c143-6b75-4e34-a221-8d78f3e04ea8/agents/afecc272-60bb-4b40-94e7-b5d59037b75a status=200 ms=52
+P3 empty object 200 {'welcome': None, 'examples': [], 'accent': None}
+2026-11-21 05:05:49,389 INFO ffcore.access access method=PATCH path=/api/v1/projects/0d77c143-6b75-4e34-a221-8d78f3e04ea8/agents/afecc272-60bb-4b40-94e7-b5d59037b75a status=200 ms=50
+P3 null 200 None
+2026-11-21 05:05:49,445 INFO ffcore.access access method=PATCH path=/api/v1/projects/0d77c143-6b75-4e34-a221-8d78f3e04ea8/agents/afecc272-60bb-4b40-94e7-b5d59037b75a status=200 ms=52
+P3 name-only keeps 200 None
+.
+3 passed in 10.72s
+exit 0
+
+== probe source (scratchpad copy, not in branch)
+"""Reviewer probes for 11-2 r1 (not part of the branch)."""
+
+from tests.integration.runs_fixtures import *  # noqa: F403 - fixtures
+from tests.integration.test_11_2_chat import _columns, _url, answered, portal, scores  # noqa: F401
+
+
+def test_rv_p1_user_role_default_source_writes_the_expert_column(answered, pg, scores):
+    # A `user` member's own vote without `source` (the default `review`): where does it land?
+    project_id, client, run_id = answered
+    response = client.post(_url(project_id, f"/runs/{run_id}/feedback"), json={"vote": "wrong"})
+    expert, user = _columns(pg, run_id)
+    pending = client.get(_url(project_id, "/runs"), params={"feedback": "pending"}).json()["items"]
+    print("P1", response.status_code, expert, user, [s["name"] for s in scores.scores],
+          "pending:", [r["id"] for r in pending])
+
+
+def test_rv_p2_chat_vote_partial_and_second_vote(answered, pg, scores):
+    project_id, client, run_id = answered
+    a = client.post(_url(project_id, f"/runs/{run_id}/feedback"),
+                    json={"vote": "partial", "source": "chat"})
+    b = client.post(_url(project_id, f"/runs/{run_id}/feedback"),
+                    json={"vote": "correct", "source": "chat", "note": "ok"})
+    expert, user = _columns(pg, run_id)
+    print("P2", a.status_code, b.status_code, expert, user)
+
+
+def test_rv_p3_portal_edges(portal):
+    project_id, agent_id, client = portal
+    url = _url(project_id, f"/agents/{agent_id}")
+    cases = {
+        "welcome 500": {"welcome": "x" * 500},
+        "welcome 501": {"welcome": "x" * 501},
+        "example 200": {"examples": ["y" * 200]},
+        "example 201": {"examples": ["y" * 201]},
+        "examples 4": {"examples": ["a", "b", "c", "d"]},
+        "example blank": {"examples": ["  "]},
+        "example empty": {"examples": [""]},
+        "welcome empty": {"welcome": ""},
+        "accent upper": {"accent": "#0F766E"},
+        "accent short": {"accent": "#abc"},
+        "accent name": {"accent": "teal"},
+        "accent alpha": {"accent": "#0f766e80"},
+        "accent newline": {"accent": "#0f766e\n"},
+        "extra key": {"theme": "dark"},
+        "examples null": {"examples": None},
+        "empty object": {},
+    }
+    for name, config in cases.items():
+        r = client.patch(url, json={"portal_config": config})
+        body = r.json()
+        print("P3", name, r.status_code,
+              body.get("portal_config") if r.status_code == 200 else body["error"]["code"])
+    r = client.patch(url, json={"portal_config": None})
+    print("P3 null", r.status_code, r.json().get("portal_config"))
+    r = client.patch(url, json={"name": "only name"})
+    print("P3 name-only keeps", r.status_code, r.json().get("portal_config"))
+
+== accent probe (host py -3.12, port of lib/portal-accent.ts tone())
+colours=5169 fails=0 kept={'light': 1879, 'dark': 3109} maxmix={'light': 0.5400000000000001, 'dark': 0.5000000000000001}

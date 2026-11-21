@@ -1,0 +1,13 @@
+HEAD=b957c6691da0d7c7547a43eea9c952bdb1a752f7 Langfuse public API scores (reviewer probe)
+host http://langfuse-web:3000
+user_feedback 1
+   (0, 'wrong', '52bb472163943e8ea7e64ae85f0f7230', 'CATEGORICAL')
+expert_feedback 4
+   (0, 'partial', 'fc531f37de683f9a867afccaa523a5c9', 'CATEGORICAL')
+   (0, 'correct', 'd8f38788f247e079afe13959f0b56bc3', 'CATEGORICAL')
+   (0, 'correct', 'f4184d078ca18b4ff4052ed3fc6e66a9', 'CATEGORICAL')
+   (0, 'partial', '997579e9f4c00a70cd8371b259f773c0', 'CATEGORICAL')
+== trace of e2e run
+sh: 1: psql: not found
+exit 0
+52bb472163943e8ea7e64ae85f0f7230
