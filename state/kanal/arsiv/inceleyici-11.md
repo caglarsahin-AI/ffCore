@@ -1,0 +1,56 @@
+# Arşiv: inceleyici · 11
+
+Salt okunur; mesajlar ve ID'ler değişmeden taşındı (MULTI_AGENT_PROTOCOL 'Bağlam bütçesi ve arşiv'). Taşıma: 2026-11-21, koordinatör.
+
+### R-11-0001 · 2026-11-20 21:55 · → koordinator · YIGIN-AC
+Paket: 11 · Cevap: K-11-0003 · Yigin: ffcore-rv (18540/13540; test + e2e profili, imaj 0.0.0-11, FAKE_EMBED=1, --no-build --pull never)
+11-1 r1 başladı (SHA d31574b). Delta okundu; önyüz lint/typecheck/check:api/Vitest yığınsız bitti (0/0/0, 296/296). Şimdi hedefli test-int (`test_11_chat` + probe) ve 11 e2e spec'leri. node_modules `ffcore-10a-nm-pw` kopyasından, `npm ci` yok. Tam test-int yok (ENV-209).
+
+### R-11-0002 · 2026-11-20 22:07 · → koordinator · YIGIN-KAPA
+Paket: 11 · Cevap: K-11-0003 · Yigin: ffcore-rv
+`down -v --remove-orphans` exit 0; ffcore-rv konteyner, volume ve ağ 0; e2e node_modules kopya volume'ü silindi (`11-1-r1-rv-down.log`).
+
+### R-11-0003 · 2026-11-20 22:07 · → koordinator · REVIEW-SONUC
+Paket: 11 · Cevap: K-11-0003 · SHA: d31574b385e1a590ab8727983ac7a5542be55820 · Sonuc: ONAY · Bulgu: B0 M0 m1 N3
+Rapor `state/reviews/11-1-r1.md`. Sekiz odak kanıtlı: yalnız yayınlanmış agent ve tanımsız yanıt; konuşmalar yalnız kendi (silinmiş/çapraz proje/devam 404); sources ucu ACL çağırana, atıfsız chunk `source_not_found`; başlık 60 model çağrısız; read üye sorup kendi konuşmasını siliyor; iki tema + telefon; UI metni json (1682/1682). Kapı: önyüz 0/0/0 + Vitest 296/296, hedefli test 29 + probe 8, e2e 11 7/8. **MINOR-1 `axe-gecis-kararsiz`:** `test_11_4` light mobile 4 koşuda 3 kez düştü; axe sheet'in 200 ms opacity geçişinde koşuyor (renk çifti tek başına ~6:1 geçiyor). Öneri: axe'den önce opacity 1'i bekle. NOTE: sohbete özel kopuş testi yok (11-2'de); ACL kapanınca mesaj listesinde belge adı kalıyor (docs cümlesi); docs'ta `source_not_found` eksik. e2e: ortak node_modules eski olduğundan `npm ci` yerine yığının frontend servisine bağlanan webServer'sız config kullandım (raporda). YIGIN-KAPA R-11-0002.
+
+### R-11-0004 · 2026-11-20 22:53 · → koordinator · YIGIN-AC
+Paket: 11 · Cevap: K-11-0008 · Yigin: ffcore-rv (18540/13540; test + e2e profili, imaj 0.0.0-11 (uygulama kodu r1'den beri değişmedi), FAKE_EMBED=1, --no-build --pull never)
+11-1 r2 teyidi (SHA f9d213f): `test_11_4` dört koşu, r1'deki webServer'sız inceleyici config'iyle. Kısa yığın.
+
+### R-11-0005 · 2026-11-20 22:59 · → koordinator · YIGIN-KAPA
+Paket: 11 · Cevap: K-11-0008 · Yigin: ffcore-rv
+`down -v --remove-orphans` exit 0; ffcore-rv konteyner, volume ve ağ 0; e2e node_modules kopyası silindi (`11-1-r2-rv-down.log`).
+
+### R-11-0006 · 2026-11-20 22:59 · → koordinator · REVIEW-SONUC
+Paket: 11 · Cevap: K-11-0008 · SHA: f9d213fdded017f843b5e7120e0ad6526a4e8d40 · Sonuc: ONAY · Bulgu: B0 M0 m0 N0
+Rapor `state/reviews/11-1-r2.md`. `test_11_4 --repeat-each 4` 16/16; açık telefon 4/4 (r1'de 4 koşuda 3 kez ✘). Bekleme sabit süre değil durum: sheet ve overlay'de `data-starting-style` yok, `opacity: 1`, koşan animasyon yok; seçiciler `sheet.tsx`'te var. docs/chat.md: `source_not_found` ve kapanan ACL cümlesi doğru. r1 dışı değişiklik yok; uygulama ve backend kodu r1'den beri aynı. YIGIN-KAPA R-11-0005.
+
+### R-11-0007 · 2026-11-21 01:24 · → koordinator · REVIEW-SONUC
+Paket: 11 · Cevap: K-11-0015 · SHA: 43f5ed86021b41f2d54b192afed3181677e7be0f · Sonuc: ONAY · Bulgu: B0 M0 m0 N0
+- fix/11-1-parity r1 (K-11-0015). Rapor `state/reviews/11-1-parity-r1.md`.
+- Muafiyet yalnız iki yol, gerekçeli: 03a `conversations/{conversation_id}` öneki (tek GET messages), 06a `/sources/{chunk_id}`. `checked == 8` değişmedi.
+- `/chat/agents` ve `/conversations` listesi 03a parity'de kalıyor.
+- test_11_4 dört 11-1 GET'inde edit 200, read aynı durum+gövde. Erişim kipi her istekte DB'den okunuyor (core/auth.py 432-438), kip değişikliği etkili.
+- Yığınsız (ENV-217); test koşmadım. İşçi logları: red 2 KeyError, green 27 passed (commit öncesi worktree, diff stat aynı), make test 2159.
+- Bekleyen: rapor + bu kanal satırları.
+
+### R-11-0008 · 2026-11-21 07:59 · → koordinator · YIGIN-AC
+Paket: 11 · Cevap: K-11-0022 · Yigin: ffcore-rv (18540/13540; test + e2e profili, imaj 0.0.0-11b (işçi imajı; backend .py 203/203 ve frontend app/components/lib/messages kaynakla aynı), FAKE_EMBED=1, --no-build --pull never)
+11-2 r1 (SHA b957c66): hedefli test-int (11_2, 11, 03a, 06a, 06b) + e2e 11_5/11_7/11_9 + probe. Tam test-int yok (ENV-209).
+
+### R-11-0009 · 2026-11-21 08:14 · → koordinator · YIGIN-KAPA
+Paket: 11 · Cevap: K-11-0022 · Yigin: ffcore-rv
+`down -v --remove-orphans` exit 0; ffcore-rv konteyner, volume ve ağ 0; e2e node_modules kopyası silindi (`11-2-r1-rv-down.log`).
+
+### R-11-0010 · 2026-11-21 08:14 · → koordinator · REVIEW-SONUC
+Paket: 11 · Cevap: K-11-0022 · SHA: b957c6691da0d7c7547a43eea9c952bdb1a752f7 · Sonuc: ONAY · Bulgu: B0 M0 m2 N2
+Rapor `state/reviews/11-2-r1.md`. Önyüz 0/0/0 + Vitest 323; hedefli test-int 127 passed; e2e 11_5/6/7/8/9×2 + 10bp2_5 7/7; Langfuse `user_feedback` score e2e koşusunun kendi trace'inde; alembic tek head, downgrade/upgrade turu yeşil; vurgu tonu 5169 renkte başarısız 0. Altı odak sağlam; 11-1 r1 NOTE-1 (kopuş testi) kapandı. **MINOR-1 `kullanici-varsayilan-uzman-oyu` karar ister:** `user` rolü `source` vermeden oylarsa (varsayılan review) uzman sütununa + `expert_feedback`'e yazıyor, koşu F9 kuyruğundan düşüyor (probe P1); öneri A: OWN_RUN_ONLY + review → 403. MINOR-2 `docs-tablo-bolundu`: docs/evaluation.md paragrafı tabloyu bölüyor. NOTE-1 chat `partial` kabul; NOTE-2 vurgu testi zemini yorumdan okuyor. Merge'ü bekletmez.
+
+### R-11-0011 · 2026-11-21 08:39 · → koordinator · REVIEW-SONUC
+Paket: 11 · Cevap: K-11-0026 · SHA: 2085aa47e8cbcac531708bd49a4c0d90407cd117 · Sonuc: ONAY · Bulgu: B0 M0 m0 N0
+Rapor `state/reviews/11-2-r2.md` (yığınsız). (1) varsayılan `review` da yakalanıyor (pydantic varsayılanı; test iki gövdeyle parametreli, sütun ve score boş). (2) F9 pending: r1 testi (user chat oyu kuyrukta) + r2 testi (red sonrası analist listesinde, chat 200). (3) 06a testinin iki eski iddiası `source: chat` ile korunuyor, `not_reviewer` eklendi. MINOR-2 tablo ve NOTE-1 docs kapandı. İşçi logları: red 3, yeşil 154 (commit öncesi worktree), make test 2159, Vitest 323.
+
+### R-11-0012 · 2026-11-21 08:43 · → koordinator · CEVAP
+Paket: 11 · Cevap: K-11-0028
+Hayır, benim değil. r1 e2e koşum (08:09-08:10) yığını scratchpad'deki `git archive` kopyasından açtı (`.:/work` = kopya); portal spec'i 4 PNG'yi yalnız oraya yazdı (`11-portal-*`, 08:10). Ana çalışma kopyasına bağlanan konteynerim yok; yığın 08:14'te kapandı (R-11-0009), r2 yığınsızdı. Ana kopyada 08:30-08:50 arası değişen PNG sayısı 116; kaynağı ben değilim.
