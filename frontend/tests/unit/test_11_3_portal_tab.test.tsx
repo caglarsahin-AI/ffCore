@@ -35,7 +35,7 @@ describe("test_11_3_portal_tab", () => {
     vi.stubGlobal("fetch", fetchMock);
     renderAs("analyst", "edit", <PortalTab projectId="p1" agent={AGENT} />, client());
     fireEvent.change(screen.getByTestId("portal-welcome"), { target: { value: "Sözleşmeler hakkında sorun." } });
-    fireEvent.change(screen.getByTestId("portal-example-1"), { target: { value: "Cezai şart var mı?" } });
+    fireEvent.change(screen.getByTestId("portal-example-2"), { target: { value: "Cezai şart var mı?" } });
     fireEvent.change(screen.getByTestId("portal-accent"), { target: { value: "#0F766E" } });
     await act(async () => {
       fireEvent.click(screen.getByTestId("portal-save"));
@@ -51,7 +51,7 @@ describe("test_11_3_portal_tab", () => {
   });
 
   it("offers three example fields at most and drops empty ones on save", async () => {
-    const fetchMock = vi.fn(async (_url: RequestInfo | URL, _init?: RequestInit) => json(AGENT));
+    const fetchMock = vi.fn(async (...args: [RequestInfo | URL, RequestInit?]) => json({ ...AGENT, url: String(args[0]) }));
     vi.stubGlobal("fetch", fetchMock);
     renderAs("analyst", "edit", <PortalTab projectId="p1" agent={{ ...AGENT, portal_config: null }} />, client());
     expect(screen.getAllByTestId(/^portal-example-\d$/)).toHaveLength(3);

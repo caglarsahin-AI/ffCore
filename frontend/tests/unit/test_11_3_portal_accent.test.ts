@@ -1,3 +1,6 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+
 import { describe, expect, it } from "vitest";
 
 import { PAGE_BACKGROUND, accentTones, contrast } from "@/lib/portal-accent";
@@ -36,6 +39,12 @@ describe("test_11_3_portal_accent", () => {
 
   it("is deterministic and case-insensitive", () => {
     expect(accentTones("#0F766E")).toEqual(accentTones("#0f766e"));
+  });
+
+  it("computes against the page backgrounds of styles/tokens.css", () => {
+    const tokens = readFileSync(join(__dirname, "../../styles/tokens.css"), "utf8");
+    const backgrounds = [...tokens.matchAll(/--background: [^;]+; \/\* (#[0-9A-Fa-f]{6})/g)].map((m) => m[1].toLowerCase());
+    expect(backgrounds).toEqual([PAGE_BACKGROUND.light, PAGE_BACKGROUND.dark]);
   });
 
   it("refuses a value that is not a #rrggbb colour (no silent default)", () => {
