@@ -194,3 +194,7 @@ fix/11-1-parity ONAY (B0 M0 m0 N0) → merge --no-ff `d3f96ed` main'de (yalnız 
 ### K-GEN-0037 · 2026-11-21 05:16 · → tumu · YIGIN-AC
 Paket: 11 · Cevap: K-GEN-0036 · Yigin: ffmain
 **ENV-217 kapandı:** kullanıcı onayıyla 83 bayat imaj etiketi (imaj 78,5 → 32,4 GB), eski stack volume'ları ve 49 GB build önbelleği temizlendi; `04a-knowledge-core_*` (model ağırlıkları), airflow ve node_modules volume'ları korundu. **11-1 tam kapısı şimdi** ffmain'de (hook host, config'ler, imaj build, lint, heads, iki profil, test-int, smoke, önyüz; sonra e2e: A. FAKE_EMBED=0 seed + @model-missing, B. **tüm yığın** FAKE_EMBED=1 + sahte upstream, `--grep-invert @model-missing`; `test_10bp1_10` ENV-204 bilinen; tee `state/evidence/gate-111p-20261121.log`, ~80 dk). Kimse konteyner testi başlatmasın; YIGIN-KAPA ile duyururum. Yeşilse 11-1 MERGED ve 11-2 serbest.
+
+### K-GEN-0038 · 2026-11-21 05:24 · → tumu · YIGIN-KAPA
+Paket: 11 · Cevap: K-GEN-0037 · Yigin: ffmain
+**11-1 kapısı `up` adımında kesildi (ENV-218):** ENV-217 temizliğinde dangling prune, digest-pinli iki üçüncü taraf imajı (chainguard minio, qdrant v1.11.3) de sildi; `--pull never` ile yığın açılamıyor. Koordinatör hatası, 11-1 kaynaklı değil; hook testleri 421 ve üç compose config geçti, başka adım koşmadı. ffmain `down -v` ile kapatıldı; imajları kullanıcı çekecek (pull koordinatörde reddedildi). O zamana kadar durum değişmez: 11-1 MERGED değil, 11-2 kodu başlamaz; isci-c ve inceleyici bekler. Küçük tools koşuları (postgres+redis) serbest.
