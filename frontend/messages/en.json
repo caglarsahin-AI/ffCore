@@ -810,7 +810,8 @@
         "tools": "Tools",
         "limits": "Safety and limits",
         "output": "Output",
-        "versions": "Publish"
+        "versions": "Publish",
+        "portal": "Portal"
       },
       "editingVersion": "Version {version}",
       "publishedReadOnly": "This version is published and cannot be changed. Open a new draft on the Publish tab.",
@@ -908,7 +909,26 @@
       "versionDraft": "Draft",
       "rollbackTo": "Use version {version} again",
       "versionExam": "Exam",
-      "versionExamLink": "Exam that opened the gate"
+      "versionExamLink": "Exam that opened the gate",
+      "portal": {
+        "title": "Chat portal",
+        "intro": "What the chat shows for this agent. These settings belong to the agent, not to a version, so they can be changed while it is published.",
+        "welcome": "Welcome text",
+        "welcomeHint": "Shown above an empty conversation instead of the description. Up to 500 characters.",
+        "example": "Example question {n}",
+        "examplesHint": "Up to three. A click puts the question in the message box; the user sends it.",
+        "accent": "Accent colour",
+        "accentHint": "#rrggbb. Used for the user's messages and the send button. Empty: the product colour.",
+        "accentInvalid": "Use the form #rrggbb, for example #0F766E.",
+        "preview": "Preview",
+        "previewLight": "Light theme",
+        "previewDark": "Dark theme",
+        "previewQuestion": "What is the notice period?",
+        "adjusted": "The tone shown is derived from your colour so that its text stays readable (contrast 4.5:1); it is not exactly the colour you picked.",
+        "save": "Save portal settings",
+        "saved": "Portal settings saved.",
+        "accentPlaceholder": "#0F766E"
+      }
     }
   },
   "TestPanel": {
@@ -935,15 +955,6 @@
     },
     "note": "Note: {detail}",
     "fallback": "A fallback model answered: {detail}",
-    "approvalTitle": "Approval needed",
-    "approvalRole": "Can be approved by: {role} or above",
-    "approvalNote": "Note (shown to the model on reject)",
-    "approve": "Approve",
-    "reject": "Reject",
-    "approvalNoId": "The approval cannot be decided here because the event did not name it.",
-    "openApprovals": "Open Approvals",
-    "answer": "Your answer",
-    "sendAnswer": "Answer",
     "answerTitle": "Answer",
     "runError": "The run ended with {code}: {message}",
     "openRun": "Open this run"
@@ -1933,7 +1944,17 @@
     },
     "sourceUpdated": "updated {date}",
     "sourceLoading": "Loading the passage…",
-    "sourceError": "The passage cannot be shown: {message} (code: {code})"
+    "sourceError": "The passage cannot be shown: {message} (code: {code})",
+    "approvalTitle": "Approval needed",
+    "approvalRole": "Can be approved by: {role} or above",
+    "approve": "Approve",
+    "reject": "Reject",
+    "approvalNote": "Note (shown to the model on reject)",
+    "approvalNoId": "The approval cannot be decided here because the event did not name it.",
+    "openApprovals": "Open Approvals",
+    "answer": "Your answer",
+    "sendAnswer": "Answer",
+    "approvalWaiting": "Waiting for approval by {role} or above. The answer continues here once it is decided."
   },
   "Chat": {
     "title": "Chat",
@@ -1975,6 +1996,14 @@
     "badges": {
       "declined": "Not found in the sources",
       "lowConfidence": "Low confidence"
-    }
+    },
+    "examples": "Example questions",
+    "voteLabel": "Rate this answer",
+    "voteUp": "Helpful",
+    "voteDown": "Not helpful",
+    "voteNote": "Note (optional)",
+    "voteSend": "Send rating",
+    "voteThanks": "Thanks, your rating was saved.",
+    "pollFailed": "Could not read the run: {message} ({code}). Trying again."
   }
 }

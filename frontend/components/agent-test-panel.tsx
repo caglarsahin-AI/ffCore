@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useEffect, useReducer, useRef, useState } from "react";
 
+import { ApprovalPrompt } from "@/components/chat/approval-prompt";
+import { QuestionBox } from "@/components/chat/question-box";
 import { SourceCards } from "@/components/chat/source-cards";
 import { ToolCallCard } from "@/components/chat/tool-call-card";
 import { TextField } from "@/components/form-parts";
@@ -59,8 +61,6 @@ export function AgentTestPanel({
   const [stream, setStream] = useState<StreamState | null>(null);
   const [ended, setEnded] = useState<StreamEnd | null>(null);
   const [startError, setStartError] = useState<string | null>(null);
-  const [note, setNote] = useState("");
-  const [answer, setAnswer] = useState("");
   const lastId = useRef<string | null>(null);
   const abort = useRef<AbortController | null>(null);
   useEffect(() => () => abort.current?.abort(), []);
@@ -108,26 +108,23 @@ export function AgentTestPanel({
     void follow((signal) => startRun(projectId, agentKey, { input: input.trim(), variables: given, channel: "test", version }, signal));
   }
 
-  async function onDecide(decision: Decision) {
+  async function onDecide(decision: Decision, note: string | null) {
     const runId = view.runId;
     const approvalId = view.approval?.approvalId;
     if (!runId || !approvalId) return;
     try {
-      const decided = await decide.mutateAsync({ id: approvalId, decision, note: note.trim() || null });
-      setNote("");
+      const decided = await decide.mutateAsync({ id: approvalId, decision, note });
       void follow((signal) => reconnectRun(projectId, runId, decided.stream_after ?? lastId.current, signal));
     } catch (error) {
       report(error);
     }
   }
 
-  async function onAnswer(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  async function onAnswer(answer: string) {
     const runId = view.runId;
-    if (!runId || !answer.trim()) return;
+    if (!runId) return;
     try {
-      await answerQuestion(projectId, runId, answer.trim());
-      setAnswer("");
+      await answerQuestion(projectId, runId, answer);
       void follow((signal) => reconnectRun(projectId, runId, lastId.current, signal));
     } catch (error) {
       report(error);
@@ -199,48 +196,17 @@ export function AgentTestPanel({
         <ToolCallCard key={tool.id} tool={tool} variant="panel" />
       ))}
       {view.approval && (
-        <div className="flex flex-col gap-3 rounded-lg border border-primary p-3" role="group" aria-label={t("approvalTitle")} data-testid="test-approval">
-          <p className="text-sm font-medium">{t("approvalTitle")}</p>
-          <p className="font-mono text-sm">{view.approval.action}</p>
-          <pre tabIndex={0} className="overflow-auto rounded bg-muted p-2 text-xs">{JSON.stringify(view.approval.arguments, null, 2)}</pre>
-          {view.approval.assignTo && <p className="text-sm text-muted-foreground">{t("approvalRole", { role: view.approval.assignTo })}</p>}
-          {view.approval.approvalId ? (
-            <>
-              <TextField id="test-approval-note" label={t("approvalNote")} value={note} onChange={setNote} />
-              <div className="flex gap-2">
-                <WriteGate projectId={projectId}>
-                  <Button type="button" onClick={() => void onDecide("approve")} disabled={decide.isPending} data-testid="test-approve">
-                    {t("approve")}
-                  </Button>
-                </WriteGate>
-                <WriteGate projectId={projectId}>
-                  <Button type="button" variant="outline" onClick={() => void onDecide("reject")} disabled={decide.isPending} data-testid="test-reject">
-                    {t("reject")}
-                  </Button>
-                </WriteGate>
-              </div>
-            </>
-          ) : (
-            <p className="text-sm text-destructive" data-testid="test-approval-no-id">
-              {t("approvalNoId")}{" "}
-              <Link href="/approvals" className="underline">
-                {t("openApprovals")}
-              </Link>
-            </p>
-          )}
-        </div>
+        <ApprovalPrompt
+          approval={view.approval}
+          projectId={projectId}
+          variant="panel"
+          canDecide
+          approverRole={view.approval.assignTo ?? ""}
+          pending={decide.isPending}
+          onDecide={(decision, note) => void onDecide(decision, note)}
+        />
       )}
-      {view.phase === "waiting_user" && (
-        <form className="flex flex-col gap-2 rounded-lg border border-primary p-3" onSubmit={onAnswer} noValidate data-testid="test-question">
-          <p className="text-sm font-medium">{view.question}</p>
-          <TextField id="test-answer" label={t("answer")} value={answer} onChange={setAnswer} />
-          <div>
-            <Button type="submit" disabled={!answer.trim()} data-testid="test-answer-send">
-              {t("sendAnswer")}
-            </Button>
-          </div>
-        </form>
-      )}
+      {view.phase === "waiting_user" && <QuestionBox question={view.question ?? ""} variant="panel" pending={false} onAnswer={(text) => void onAnswer(text)} />}
       {view.answer && (
         <div className="flex flex-col gap-1">
           <span className="text-sm font-medium">{t("answerTitle")}</span>

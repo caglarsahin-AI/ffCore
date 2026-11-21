@@ -9,6 +9,7 @@ import { InstructionsTab } from "@/components/agent-wizard/instructions-tab";
 import { KnowledgeTab } from "@/components/agent-wizard/knowledge-tab";
 import { LimitsTab } from "@/components/agent-wizard/limits-tab";
 import { OutputTab } from "@/components/agent-wizard/output-tab";
+import { PortalTab } from "@/components/agent-wizard/portal-tab";
 import { ToolsTab } from "@/components/agent-wizard/tools-tab";
 import { VersionsTab } from "@/components/agent-wizard/versions-tab";
 import { FieldShell, SELECT, TextField } from "@/components/form-parts";
@@ -25,7 +26,7 @@ import { ApiError } from "@/lib/api/client";
 import { errorMessageKey } from "@/lib/api/errors";
 import { useModels } from "@/lib/api/queries";
 
-const TABS = ["identity", "instructions", "knowledge", "tools", "limits", "output", "versions"] as const;
+const TABS = ["identity", "instructions", "knowledge", "tools", "limits", "output", "portal", "versions"] as const;
 
 // The agent wizard (brief 10 steps 1-6 and 8). It edits the latest draft's definition in place
 // and saves it with one PUT; a published latest version is shown read-only until a new draft is
@@ -118,6 +119,10 @@ function Wizard({
             <OutputTab definition={definition} onChange={change} onValidity={setOutputValid} />
           </TabsContent>
         </fieldset>
+        {/* 11-2: agent level, not versioned: outside the version fieldset, its own save. */}
+        <TabsContent value="portal" className="pt-2">
+          <PortalTab projectId={projectId} agent={agent} />
+        </TabsContent>
         <TabsContent value="versions" className="pt-2">
           <VersionsTab projectId={projectId} agent={agent} versions={versions} dirty={dirty} />
         </TabsContent>
