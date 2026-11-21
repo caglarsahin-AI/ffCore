@@ -1,0 +1,46 @@
+HEAD=137f4e9e3cf995cee7cc84fdb98f8fffca997aad + e2e specs (uncommitted; test_11_8 reader in its own context)
+ Container ffcore-11-redis-1  Running
+ Container ffcore-11-postgres-1  Running
+ Container ffcore-11-litellm-1  Running
+ Container ffcore-11-migrate-1  Created
+ Container ffcore-11-backend-1  Running
+ Container ffcore-11-postgres-1  Waiting
+ Container ffcore-11-postgres-1  Waiting
+ Container ffcore-11-postgres-1  Healthy
+ Container ffcore-11-postgres-1  Healthy
+ Container ffcore-11-migrate-1  Starting
+ Container ffcore-11-migrate-1  Started
+ Container ffcore-11-postgres-1  Waiting
+ Container ffcore-11-redis-1  Waiting
+ Container ffcore-11-litellm-1  Waiting
+ Container ffcore-11-migrate-1  Waiting
+ Container ffcore-11-redis-1  Healthy
+ Container ffcore-11-postgres-1  Healthy
+ Container ffcore-11-litellm-1  Healthy
+ Container ffcore-11-migrate-1  Exited
+
+Running 14 tests using 1 worker
+
+  ✓   1 [chromium] › tests/e2e/test_11_1_ask_and_source_card.spec.ts:10:5 › test_11_1_ask_and_source_card: ask in /chat, open the cited passage, find the conversation again (5.9s)
+  ✓   2 [chromium] › tests/e2e/test_11_2_unpublished_hidden.spec.ts:10:5 › test_11_2_unpublished_hidden: a draft agent is not listed and its URL is not available (1.5s)
+  ✓   3 [chromium] › tests/e2e/test_11_2_unpublished_hidden.spec.ts:26:5 › test_11_2_no_project: /chat without a selected project asks for one (850ms)
+  ✓   4 [chromium] › tests/e2e/test_11_3_read_only.spec.ts:9:5 › test_11_3_read_only: a read-only member asks, sees the answer and deletes the conversation (2.3s)
+  ✓   5 [chromium] › tests/e2e/test_11_4_screens_themes_axe.spec.ts:23:9 › test_11_4_screens_themes_axe: light desktop (3.5s)
+  ✓   6 [chromium] › tests/e2e/test_11_4_screens_themes_axe.spec.ts:23:9 › test_11_4_screens_themes_axe: light mobile (4.2s)
+  ✓   7 [chromium] › tests/e2e/test_11_4_screens_themes_axe.spec.ts:23:9 › test_11_4_screens_themes_axe: dark desktop (3.6s)
+  ✓   8 [chromium] › tests/e2e/test_11_4_screens_themes_axe.spec.ts:23:9 › test_11_4_screens_themes_axe: dark mobile (4.3s)
+  ✓   9 [chromium] › tests/e2e/test_11_5_chat_approval.spec.ts:33:5 › test_11_5_chat_approval: a read member sees who approves and the answer arrives after someone else decides (5.0s)
+  ✓  10 [chromium] › tests/e2e/test_11_5_chat_approval.spec.ts:59:5 › test_11_6_inline_approval: an analyst with edit access approves in the chat and the run goes on (3.0s)
+  ✓  11 [chromium] › tests/e2e/test_11_7_chat_ask_vote.spec.ts:12:5 › test_11_7_ask_user: a read member answers the agent's question and the run goes on (2.8s)
+test_11_8 run_id=21ef5398-08a1-4090-a5be-38a29055b68a
+  ✓  12 [chromium] › tests/e2e/test_11_7_chat_ask_vote.spec.ts:32:5 › test_11_8_feedback: the vote is stored as the user's (score_sent) and shown again; read access cannot vote (4.0s)
+  ✓  13 [chromium] › tests/e2e/test_11_9_portal.spec.ts:21:7 › test_11_9_portal: light (4.3s)
+  ✓  14 [chromium] › tests/e2e/test_11_9_portal.spec.ts:21:7 › test_11_9_portal: dark (4.5s)
+
+  14 passed (2.4m)
+npm notice
+npm notice New major version of npm available! 11.19.1 -> 12.2.3
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.3
+npm notice To update run: npm install -g npm@12.2.3
+npm notice
+e2e exit=0

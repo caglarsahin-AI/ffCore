@@ -1,0 +1,60 @@
+HEAD=137f4e9e3cf995cee7cc84fdb98f8fffca997aad (test panel uses the shared approval/question components)
+ Container ffcore-11-redis-1  Running
+ Container ffcore-11-postgres-1  Running
+ Container ffcore-11-litellm-1  Running
+ Container ffcore-11-migrate-1  Created
+ Container ffcore-11-backend-1  Running
+ Container ffcore-11-postgres-1  Waiting
+ Container ffcore-11-postgres-1  Waiting
+ Container ffcore-11-postgres-1  Healthy
+ Container ffcore-11-postgres-1  Healthy
+ Container ffcore-11-migrate-1  Starting
+ Container ffcore-11-migrate-1  Started
+ Container ffcore-11-redis-1  Waiting
+ Container ffcore-11-litellm-1  Waiting
+ Container ffcore-11-migrate-1  Waiting
+ Container ffcore-11-postgres-1  Waiting
+ Container ffcore-11-redis-1  Healthy
+ Container ffcore-11-postgres-1  Healthy
+ Container ffcore-11-litellm-1  Healthy
+ Container ffcore-11-migrate-1  Exited
+
+Running 29 tests using 1 worker
+
+  ✓   1 [chromium] › tests/e2e/test_10bp2_1_tool_crud_and_errors.spec.ts:8:5 › test_10bp2_1_tool_crud_and_errors: an admin registers, edits and deletes a tool; backend field errors land on their field (3.2s)
+  ✓   2 [chromium] › tests/e2e/test_10bp2_10_read_only.spec.ts:10:5 › test_10bp2_10_read_only: admin+read gets the four screens with every change control and field disabled (3.5s)
+  ✓   3 [chromium] › tests/e2e/test_10bp2_11_roles.spec.ts:8:5 › test_10bp2_11_roles: an analyst has agents, runs and approvals but no tools menu, and gets no-access by URL (1.3s)
+  ✓   4 [chromium] › tests/e2e/test_10bp2_11_roles.spec.ts:25:5 › test_10bp2_11_roles: a project admin sees the tools menu and can register (1.0s)
+  ✓   5 [chromium] › tests/e2e/test_10bp2_12_screens_themes_axe.spec.ts:56:9 › test_10bp2_12_screens_themes_axe: tools light (2.4s)
+  ✓   6 [chromium] › tests/e2e/test_10bp2_12_screens_themes_axe.spec.ts:56:9 › test_10bp2_12_screens_themes_axe: tools dark (2.5s)
+  ✓   7 [chromium] › tests/e2e/test_10bp2_12_screens_themes_axe.spec.ts:56:9 › test_10bp2_12_screens_themes_axe: tool-detail light (2.4s)
+  ✓   8 [chromium] › tests/e2e/test_10bp2_12_screens_themes_axe.spec.ts:56:9 › test_10bp2_12_screens_themes_axe: tool-detail dark (2.3s)
+  ✓   9 [chromium] › tests/e2e/test_10bp2_12_screens_themes_axe.spec.ts:56:9 › test_10bp2_12_screens_themes_axe: agents light (2.2s)
+  ✓  10 [chromium] › tests/e2e/test_10bp2_12_screens_themes_axe.spec.ts:56:9 › test_10bp2_12_screens_themes_axe: agents dark (2.2s)
+  ✓  11 [chromium] › tests/e2e/test_10bp2_12_screens_themes_axe.spec.ts:56:9 › test_10bp2_12_screens_themes_axe: agent-wizard-tools light (2.5s)
+  ✓  12 [chromium] › tests/e2e/test_10bp2_12_screens_themes_axe.spec.ts:56:9 › test_10bp2_12_screens_themes_axe: agent-wizard-tools dark (2.5s)
+  ✓  13 [chromium] › tests/e2e/test_10bp2_12_screens_themes_axe.spec.ts:56:9 › test_10bp2_12_screens_themes_axe: runs light (2.4s)
+  ✓  14 [chromium] › tests/e2e/test_10bp2_12_screens_themes_axe.spec.ts:56:9 › test_10bp2_12_screens_themes_axe: runs dark (2.3s)
+  ✓  15 [chromium] › tests/e2e/test_10bp2_12_screens_themes_axe.spec.ts:56:9 › test_10bp2_12_screens_themes_axe: run-detail light (3.1s)
+  ✓  16 [chromium] › tests/e2e/test_10bp2_12_screens_themes_axe.spec.ts:56:9 › test_10bp2_12_screens_themes_axe: run-detail dark (2.5s)
+  ✓  17 [chromium] › tests/e2e/test_10bp2_12_screens_themes_axe.spec.ts:56:9 › test_10bp2_12_screens_themes_axe: approvals light (2.4s)
+  ✓  18 [chromium] › tests/e2e/test_10bp2_12_screens_themes_axe.spec.ts:56:9 › test_10bp2_12_screens_themes_axe: approvals dark (2.3s)
+  ✓  19 [chromium] › tests/e2e/test_10bp2_12_screens_themes_axe.spec.ts:56:9 › test_10bp2_12_screens_themes_axe: approval-detail light (2.4s)
+  ✓  20 [chromium] › tests/e2e/test_10bp2_12_screens_themes_axe.spec.ts:56:9 › test_10bp2_12_screens_themes_axe: approval-detail dark (2.3s)
+  ✓  21 [chromium] › tests/e2e/test_10bp2_13_query_failures.spec.ts:9:5 › test_10bp2_13_query_failures: a missing record or a failed list is an error, never an empty screen (2.9s)
+  ✓  22 [chromium] › tests/e2e/test_10bp2_2_discover_actions_invoke.spec.ts:8:5 › test_10bp2_2_discover_actions_invoke: discovery lists the actions off and needing approval; an admin switches one on and tries it (2.6s)
+  ✓  23 [chromium] › tests/e2e/test_10bp2_3_agent_wizard_lifecycle.spec.ts:11:5 › test_10bp2_3_agent_wizard_lifecycle: create, a placeholder without a variable is refused, save, publish, new draft, roll back (4.3s)
+  ✓  24 [chromium] › tests/e2e/test_10bp2_4_contract_assistant_cited.spec.ts:16:5 › test_10bp2_4_contract_assistant_cited: an analyst builds the contract assistant and gets an answer with sources (5.8s)
+  ✓  25 [chromium] › tests/e2e/test_10bp2_5_inline_approval.spec.ts:18:5 › test_10bp2_5_inline_approval: approve continues the run and calls the tool; reject continues without it (4.9s)
+  ✓  26 [chromium] › tests/e2e/test_10bp2_7_runs_list_detail.spec.ts:8:5 › test_10bp2_7_runs_list_detail: a run is listed under its filters and its detail shows the stored events (2.1s)
+  ✓  27 [chromium] › tests/e2e/test_10bp2_8_run_feedback.spec.ts:8:5 › test_10bp2_8_run_feedback: an expert votes on a completed run; the run moves from pending to given feedback (3.0s)
+  ✓  28 [chromium] › tests/e2e/test_10bp2_9_approvals_queue.spec.ts:8:5 › test_10bp2_9_approvals_queue: the queue opens on waiting approvals and says so when there are none (1.2s)
+  ✓  29 [chromium] › tests/e2e/test_10bp2_9_approvals_queue.spec.ts:19:5 › test_10bp2_9_approvals_queue: a waiting approval is listed and counted, read access cannot decide, approve once, a second decision is 409 (3.9s)
+
+  29 passed (2.9m)
+npm notice
+npm notice New major version of npm available! 11.19.1 -> 12.2.3
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.3
+npm notice To update run: npm install -g npm@12.2.3
+npm notice
+e2e exit=0

@@ -1,0 +1,4 @@
+ Volume ffcore-11_model_cache  Removed
+ Volume ffcore-11_postgres_data  Removed
+ Volume ffcore-11_redis_data  Removed
+containers=0 volumes=0

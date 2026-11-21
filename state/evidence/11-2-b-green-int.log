@@ -1,0 +1,38 @@
+HEAD=6973b124c8011d8c58a070d7e3e6b474a7dfc2bd + backend code (uncommitted)
+DRIFT 06a
+DRIFT 06b
+2 files reformatted, 520 files left unchanged
+All checks passed!
+11_0001 (07, 03c, 03b, 06a, 12, 04a, 11, 09, 08, 03a, 05b, 06b, 05a, 04b) (head)
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0001, initial empty revision (chain root)
+INFO  [alembic.runtime.migration] Running upgrade 0001 -> 03a_0001, 03a: users, projects, project_members, providers, provider_projects, model_catalog, models
+INFO  [alembic.runtime.migration] Running upgrade 0001 -> 03b_0001, 03b: audit_events (append-only, monthly partitions)
+INFO  [alembic.runtime.migration] Running upgrade 0001 -> 06a_0001, 06a: agents, agent_versions, conversations, runs, messages, run_events; checkpoints schema
+INFO  [alembic.runtime.migration] Running upgrade 0001 -> 07_0001, 07: approvals
+INFO  [alembic.runtime.migration] Running upgrade 06a_0001 -> 06a_0002, 06a: when a run's checkpoint was deleted, and when a source of a live run was deleted
+INFO  [alembic.runtime.migration] Running upgrade 0001 -> 08_0001, 08: pii_policies, guardrail_policies, guardrail_events
+INFO  [alembic.runtime.migration] Running upgrade 0001 -> 05a_0001, 05a: tools, tool_actions, schema_descriptions, few_shots
+INFO  [alembic.runtime.migration] Running upgrade 0001 -> 04a_0001, 04a: knowledge_bases, documents, attachments, chunks, kb_queries, ingest_gate_stats
+INFO  [alembic.runtime.migration] Running upgrade 0001 -> 03c_0001, 03c: API keys, quotas and daily usage
+INFO  [alembic.runtime.migration] Running upgrade 03c_0001 -> 03c_0002, 03c: retention policies and runs, alerts, notification settings
+INFO  [alembic.runtime.migration] Running upgrade 03a_0001, 03b_0001, 06a_0002, 07_0001 -> 57_0001, join the heads that other branches depend on (FOLLOWUP-57/132, step 1 of 2)
+INFO  [alembic.runtime.migration] Running upgrade 57_0001, 03c_0002, 04a_0001, 05a_0001, 08_0001 -> 57_0002, merge the package branch heads into one head (FOLLOWUP-57/132, step 2 of 2)
+INFO  [alembic.runtime.migration] Running upgrade 57_0002 -> 06b_0001, 06b-2: external agents (kind = external) keep their endpoint in agents.external_config
+INFO  [alembic.runtime.migration] Running upgrade 06b_0001 -> 09_0001, 09: eval_suites, eval_runs (local rows over Langfuse datasets and dataset runs)
+INFO  [alembic.runtime.migration] Running upgrade 09_0001 -> 05b_0001, 05b: published MCP servers (mcp_servers) and their calls (mcp_server_calls)
+INFO  [alembic.runtime.migration] Running upgrade 05b_0001 -> 04b_0001, 04b: chunks.sparse (bge-m3 lexical weights beside the dense vector)
+INFO  [alembic.runtime.migration] Running upgrade 04b_0001 -> 12_0001, 12: audit partition functions run as the owner; grants for the ffcore_app role
+INFO  [alembic.runtime.migration] Running upgrade 12_0001 -> 12_0002, 12: audit partitions stay out of the application role's reach for 365 days
+INFO  [alembic.runtime.migration] Running upgrade 12_0002 -> 11_0001, 11-2: the end user's vote on an answer and an agent's chat portal settings
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running downgrade 11_0001 -> 12_0002, 11-2: the end user's vote on an answer and an agent's chat portal settings
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade 12_0002 -> 11_0001, 11-2: the end user's vote on an answer and an agent's chat portal settings
+
+no tests ran in 0.00s
+ERROR: file or directory not found: tests/unit/test_57*
+

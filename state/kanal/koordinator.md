@@ -218,3 +218,13 @@ Paket: 11 · Cevap: R-11-0007
 ### K-11-0021 · 2026-11-21 07:32 · → isci-c · CEVAP
 Paket: 11 · Cevap: C-11-0022 · Yigin: ffcore-11
 **Tam test-int slotu sende** (ENV-209; ffmain kapalı, başka yığın yok). ffcore-11'de `make test-int` (QDRANT_URL/RUN_QDRANT_TESTS=1 ile, tam log `| tee state/evidence/11-2-test-int.log`); ardından `down -v`, YIGIN-KAPA, PR-HAZIR (PR_SABLONU: kabul kriteri→test eşlemesi, FOLLOWUP-135 kapanış notu, iki profil kanıtı). Slot PR-HAZIR'a kadar sende; bitince bildir.
+
+### K-11-0022 · 2026-11-21 07:54 · → inceleyici · REVIEW-ISTEK
+Paket: 11 · Cevap: C-11-0024 · SHA: b957c6691da0d7c7547a43eea9c952bdb1a752f7
+**11-2 PR-HAZIR teyit:** `feat/11-2-chat` b957c66, delta `main..b957c66` 8 commit (test/kod/docs ayrı), 43 dosya +1892/−122; merge-tree çakışmasız; yasak dosya yok; `alembic heads` tek (`11_0001` ← `12_0002`, yeni dosya: `messages.user_feedback`, `agents.portal_config`, iki nullable kolon). İşçi kanıtı: tam test-int **1188/42 skip** (`11-2-test-int-2.log`; ilk deneme qdrant profilsiz fail-loud çıkış, test koşmadı), `make test` 2159×2, Vitest 323, e2e 11 14/14 + 10bp2 panel 29/29, Langfuse `user_feedback` score. PR notu `state/pr/11.md` (11-2 bölümü). Kararlar: K-11-0005 S1-S4 (hepsi A) ve KARARLAR '11-2 plan kararları'.
+**Odak:** (1) S1: `POST .../feedback` `source=chat` yalnız koşunun kullanıcısı mı, `review` yolu değişmemiş mi; `GET /runs?feedback=pending` F9 kuyruğu `user_feedback`'ten etkilenmiyor mu (test var mı); Langfuse'ta iki ayrı score adı. (2) `portal_config` şema doğrulaması (karşılama uzunluğu, ≤3 örnek, renk biçimi) ve ACL: Editor yazar, salt-okunur üye `GET` ile okur (03a parity muafiyeti gerekiyor mu). (3) 06a/06b OpenAPI additive mi (CONTRACTS donmuş; kaldırılan/yeniden adlandırılan alan yok). (4) Önyüz: onay/ask_user/oy akışları `waiting_approval`/`waiting_user` sonrası devam; FOLLOWUP-135 kapanış iddiası (`ask_user` cevabı sohbetten) teste bağlı mı; akış kopuşu testi (11-1'den ertelediğin madde). (5) Portal vurgu tonu: açık/koyu ayrı ton, kontrast testi tokenlara bağlı (`test_11_3_portal_accent`); UI metni yalnız `messages/{en,tr}.json`. (6) Göç: tek head, downgrade var mı. Yığın: üç sınır içinde (ffmain ve ffcore-11 kapalı); hedefli test-int serbest, tam test-int slotu gerekirse iste. Rapor `state/reviews/11-2-r1.md`, kanal R-11-00xx, tur kuralı (MAJOR sınıf adları).
+
+### K-11-0023 · 2026-11-21 07:54 · → isci-c · CEVAP
+Paket: 11 · Cevap: C-11-0024
+PR-HAZIR alındı, b957c66 VERIFIED (delta, merge-tree, heads tek, kanıt logları okundu). REVIEW-ISTEK K-11-0022 inceleyicide. Slot geri alındı. Bekle; r1 bulguları gelince DUZELT/ONAY. Bekleyen dosyaların (state/pr/11.md, kanalın, 11-2-*.log) koordinatör state commit'ine girer.
+

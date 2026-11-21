@@ -1,0 +1,426 @@
+HEAD=2f9a25e0dcf96753943b1028f5d744b97a7ff84c + red tests
+FFFF..FFFF..........FF                                                   [100%]
+=================================== FAILURES ===================================
+_________ test_11_2_chat_vote_goes_to_user_feedback_and_its_own_score __________
+
+answered = (UUID('d677d976-5b77-4a64-a337-3f7ffc046789'), <starlette.testclient.TestClient object at 0x7fbaa1a53200>, 'e888e8e9-13c6-422c-ab9c-1edafdc19b06')
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_3f6d68c45774) at 0x7fbaa3dcf080>
+scores = <tests.integration.test_11_2_chat.FakeScores object at 0x7fba8021c9e0>
+
+    def test_11_2_chat_vote_goes_to_user_feedback_and_its_own_score(answered, pg, scores):
+        project_id, client, run_id = answered
+        response = client.post(
+            _url(project_id, f"/runs/{run_id}/feedback"),
+            json={"vote": "wrong", "note": "Madde yanlış.", "source": "chat"},
+        )
+>       assert response.status_code == 200, response.text
+E       AssertionError: {"error":{"message":"Invalid request: body.source","type":"invalid_request_error","code":"validation_error"}}
+E       assert 422 == 200
+E        +  where 422 = <Response [422 Unprocessable Content]>.status_code
+
+tests/integration/test_11_2_chat.py:77: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-21 03:30:56,002 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=384
+2026-11-21 03:30:56,915 INFO ffcore.access access method=POST path=/api/v1/projects/d677d976-5b77-4a64-a337-3f7ffc046789/agents/asistan/runs status=200 ms=908
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=384
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/d677d976-5b77-4a64-a337-3f7ffc046789/agents/asistan/runs status=200 ms=908
+----------------------------- Captured stderr call -----------------------------
+2026-11-21 03:30:56,961 INFO ffcore.access access method=POST path=/api/v1/projects/d677d976-5b77-4a64-a337-3f7ffc046789/runs/e888e8e9-13c6-422c-ab9c-1edafdc19b06/feedback status=422 ms=35
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/d677d976-5b77-4a64-a337-3f7ffc046789/runs/e888e8e9-13c6-422c-ab9c-1edafdc19b06/feedback status=422 ms=35
+--------------------------- Captured stderr teardown ---------------------------
+2026-11-21 03:31:02,265 ERROR ffcore.tracing trace_delivery_failed spans=7 reason=deadline
+---------------------------- Captured log teardown -----------------------------
+ERROR    ffcore.tracing:tracing.py:116 trace_delivery_failed spans=7 reason=deadline
+___________ test_11_2_chat_vote_leaves_the_expert_review_queue_alone ___________
+
+answered = (UUID('67b946a2-b5a2-4b66-afcb-e1d8118ff494'), <starlette.testclient.TestClient object at 0x7fba021d0f80>, '40d20b1b-1ec4-430e-b2ba-24b7df371e7f')
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_3f6d68c45774) at 0x7fba02b55610>
+scores = <tests.integration.test_11_2_chat.FakeScores object at 0x7fba01faa9f0>
+make_user = <function make_user.<locals>.make at 0x7fbaa3c309a0>
+client_factory = <function client_factory.<locals>.make at 0x7fba803b5620>
+
+    def test_11_2_chat_vote_leaves_the_expert_review_queue_alone(
+        answered, pg, scores, make_user, client_factory
+    ):
+        # S1: a chat vote does not take the run out of F9's pending list, and the expert's later
+        # vote does not overwrite it.
+        project_id, client, run_id = answered
+        client.post(_url(project_id, f"/runs/{run_id}/feedback"), json={"vote": "correct", "source": "chat"})
+        _, email = make_user(memberships={project_id: ("analyst", "edit")})
+        expert = client_factory(email)
+        pending = expert.get(_url(project_id, "/runs"), params={"feedback": "pending"}).json()["items"]
+        assert [r["id"] for r in pending] == [run_id]
+        assert expert.post(
+            _url(project_id, f"/runs/{run_id}/feedback"), json={"vote": "partial"}
+        ).status_code == 200
+>       stored_expert, stored_user = _columns(pg, run_id)
+                                     ^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_11_2_chat.py:103: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_11_2_chat.py:62: in _columns
+    return pg.execute(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_3f6d68c45774) at 0x7fba02b55610>
+query = "SELECT feedback, user_feedback FROM messages WHERE run_id = %s AND role = 'assistant'"
+params = ('40d20b1b-1ec4-430e-b2ba-24b7df371e7f',), prepare = None
+binary = False
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool = False,
+    ) -> Cursor[Row]:
+        """Execute a query and return a cursor to read its results."""
+        try:
+            cur = self.cursor()
+            if binary:
+                cur.format = BINARY
+    
+            if isinstance(query, Template):
+                if params is not None:
+                    raise TypeError(
+                        "'execute()' with string template query doesn't support parameters"
+                    )
+                return cur.execute(query, prepare=prepare)
+            else:
+                return cur.execute(query, params, prepare=prepare)
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.UndefinedColumn: column "user_feedback" does not exist
+E           LINE 1: SELECT feedback, user_feedback FROM messages WHERE run_id = ...
+E                                    ^
+
+/opt/venv/lib/python3.12/site-packages/psycopg/connection.py:304: UndefinedColumn
+---------------------------- Captured stderr setup -----------------------------
+2026-11-21 03:31:02,438 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-21 03:31:02,552 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=108
+2026-11-21 03:31:02,876 INFO ffcore.access access method=POST path=/api/v1/projects/67b946a2-b5a2-4b66-afcb-e1d8118ff494/agents/asistan/runs status=200 ms=321
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:71 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=108
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/67b946a2-b5a2-4b66-afcb-e1d8118ff494/agents/asistan/runs status=200 ms=321
+----------------------------- Captured stderr call -----------------------------
+2026-11-21 03:31:02,913 INFO ffcore.access access method=POST path=/api/v1/projects/67b946a2-b5a2-4b66-afcb-e1d8118ff494/runs/40d20b1b-1ec4-430e-b2ba-24b7df371e7f/feedback status=422 ms=28
+2026-11-21 03:31:05,272 ERROR opentelemetry.exporter.otlp.proto.http.trace_exporter Failed to export spans batch due to timeout, max retries or shutdown.
+2026-11-21 03:31:07,928 ERROR ffcore.tracing trace_delivery_failed spans=7 reason=deadline
+2026-11-21 03:31:07,989 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-21 03:31:08,098 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=105
+2026-11-21 03:31:08,144 INFO ffcore.access access method=GET path=/api/v1/projects/67b946a2-b5a2-4b66-afcb-e1d8118ff494/runs status=200 ms=43
+2026-11-21 03:31:08,195 INFO ffcore.access access method=POST path=/api/v1/projects/67b946a2-b5a2-4b66-afcb-e1d8118ff494/runs/40d20b1b-1ec4-430e-b2ba-24b7df371e7f/feedback status=200 ms=48
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/67b946a2-b5a2-4b66-afcb-e1d8118ff494/runs/40d20b1b-1ec4-430e-b2ba-24b7df371e7f/feedback status=422 ms=28
+ERROR    opentelemetry.exporter.otlp.proto.http.trace_exporter:http.py:222 Failed to export spans batch due to timeout, max retries or shutdown.
+ERROR    ffcore.tracing:tracing.py:116 trace_delivery_failed spans=7 reason=deadline
+ERROR    ffcore.readiness:readiness.py:71 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=105
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/67b946a2-b5a2-4b66-afcb-e1d8118ff494/runs status=200 ms=43
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/67b946a2-b5a2-4b66-afcb-e1d8118ff494/runs/40d20b1b-1ec4-430e-b2ba-24b7df371e7f/feedback status=200 ms=48
+--------------------------- Captured stderr teardown ---------------------------
+2026-11-21 03:31:10,932 ERROR opentelemetry.exporter.otlp.proto.http.trace_exporter Failed to export spans batch due to timeout, max retries or shutdown.
+---------------------------- Captured log teardown -----------------------------
+ERROR    opentelemetry.exporter.otlp.proto.http.trace_exporter:http.py:222 Failed to export spans batch due to timeout, max retries or shutdown.
+_________________ test_11_2_review_is_still_the_default_source _________________
+
+answered = (UUID('dbd9dbef-7c77-4529-a1d4-56409bfc011b'), <starlette.testclient.TestClient object at 0x7fba020e96a0>, '148e2430-2694-41dd-899f-cb9753ab4592')
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_3f6d68c45774) at 0x7fba01faa5a0>
+scores = <tests.integration.test_11_2_chat.FakeScores object at 0x7fba02156270>
+make_user = <function make_user.<locals>.make at 0x7fba02173600>
+client_factory = <function client_factory.<locals>.make at 0x7fba01fd3560>
+
+    def test_11_2_review_is_still_the_default_source(answered, pg, scores, make_user, client_factory):
+        project_id, _, run_id = answered
+        _, email = make_user(memberships={project_id: ("analyst", "edit")})
+        response = client_factory(email).post(
+            _url(project_id, f"/runs/{run_id}/feedback"), json={"vote": "correct"}
+        )
+        assert response.status_code == 200, response.text
+>       expert, user = _columns(pg, run_id)
+                       ^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_11_2_chat.py:115: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_11_2_chat.py:62: in _columns
+    return pg.execute(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_3f6d68c45774) at 0x7fba01faa5a0>
+query = "SELECT feedback, user_feedback FROM messages WHERE run_id = %s AND role = 'assistant'"
+params = ('148e2430-2694-41dd-899f-cb9753ab4592',), prepare = None
+binary = False
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool = False,
+    ) -> Cursor[Row]:
+        """Execute a query and return a cursor to read its results."""
+        try:
+            cur = self.cursor()
+            if binary:
+                cur.format = BINARY
+    
+            if isinstance(query, Template):
+                if params is not None:
+                    raise TypeError(
+                        "'execute()' with string template query doesn't support parameters"
+                    )
+                return cur.execute(query, prepare=prepare)
+            else:
+                return cur.execute(query, params, prepare=prepare)
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.UndefinedColumn: column "user_feedback" does not exist
+E           LINE 1: SELECT feedback, user_feedback FROM messages WHERE run_id = ...
+E                                    ^
+
+/opt/venv/lib/python3.12/site-packages/psycopg/connection.py:304: UndefinedColumn
+---------------------------- Captured stderr setup -----------------------------
+2026-11-21 03:31:16,196 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-21 03:31:16,307 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=107
+2026-11-21 03:31:16,636 INFO ffcore.access access method=POST path=/api/v1/projects/dbd9dbef-7c77-4529-a1d4-56409bfc011b/agents/asistan/runs status=200 ms=326
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:71 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=107
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/dbd9dbef-7c77-4529-a1d4-56409bfc011b/agents/asistan/runs status=200 ms=326
+----------------------------- Captured stderr call -----------------------------
+2026-11-21 03:31:21,657 ERROR ffcore.tracing trace_delivery_failed spans=7 reason=deadline
+2026-11-21 03:31:21,727 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-21 03:31:21,831 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=100
+2026-11-21 03:31:21,882 INFO ffcore.access access method=POST path=/api/v1/projects/dbd9dbef-7c77-4529-a1d4-56409bfc011b/runs/148e2430-2694-41dd-899f-cb9753ab4592/feedback status=200 ms=47
+------------------------------ Captured log call -------------------------------
+ERROR    ffcore.tracing:tracing.py:116 trace_delivery_failed spans=7 reason=deadline
+ERROR    ffcore.readiness:readiness.py:71 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=100
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/dbd9dbef-7c77-4529-a1d4-56409bfc011b/runs/148e2430-2694-41dd-899f-cb9753ab4592/feedback status=200 ms=47
+__________________ test_11_2_chat_vote_only_by_the_runs_user ___________________
+
+answered = (UUID('d85bcb95-b1a0-4d1c-8198-367e8259e6c7'), <starlette.testclient.TestClient object at 0x7fba02088230>, 'f008cc95-d3ab-4a05-93e0-4b229fa56adb')
+make_user = <function make_user.<locals>.make at 0x7fba2e7d3560>
+client_factory = <function client_factory.<locals>.make at 0x7fba01ff00e0>
+
+    def test_11_2_chat_vote_only_by_the_runs_user(answered, make_user, client_factory):
+        project_id, _, run_id = answered
+        _, email = make_user(memberships={project_id: ("admin", "edit")})
+        response = client_factory(email).post(
+            _url(project_id, f"/runs/{run_id}/feedback"), json={"vote": "correct", "source": "chat"}
+        )
+>       assert response.status_code == 403
+E       assert 422 == 403
+E        +  where 422 = <Response [422 Unprocessable Content]>.status_code
+
+tests/integration/test_11_2_chat.py:126: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-21 03:31:24,639 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-21 03:31:24,660 ERROR opentelemetry.exporter.otlp.proto.http.trace_exporter Failed to export spans batch due to timeout, max retries or shutdown.
+2026-11-21 03:31:24,752 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=108
+2026-11-21 03:31:25,091 INFO ffcore.access access method=POST path=/api/v1/projects/d85bcb95-b1a0-4d1c-8198-367e8259e6c7/agents/asistan/runs status=200 ms=336
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:71 warmup failed: ModelMissing
+ERROR    opentelemetry.exporter.otlp.proto.http.trace_exporter:http.py:222 Failed to export spans batch due to timeout, max retries or shutdown.
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=108
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/d85bcb95-b1a0-4d1c-8198-367e8259e6c7/agents/asistan/runs status=200 ms=336
+----------------------------- Captured stderr call -----------------------------
+2026-11-21 03:31:27,427 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-21 03:31:30,112 ERROR ffcore.tracing trace_delivery_failed spans=7 reason=deadline
+2026-11-21 03:31:30,167 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-21 03:31:30,274 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=104
+2026-11-21 03:31:30,302 INFO ffcore.access access method=POST path=/api/v1/projects/d85bcb95-b1a0-4d1c-8198-367e8259e6c7/runs/f008cc95-d3ab-4a05-93e0-4b229fa56adb/feedback status=422 ms=25
+------------------------------ Captured log call -------------------------------
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+ERROR    ffcore.tracing:tracing.py:116 trace_delivery_failed spans=7 reason=deadline
+ERROR    ffcore.readiness:readiness.py:71 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=104
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/d85bcb95-b1a0-4d1c-8198-367e8259e6c7/runs/f008cc95-d3ab-4a05-93e0-4b229fa56adb/feedback status=422 ms=25
+--------------------------- Captured stderr teardown ---------------------------
+2026-11-21 03:31:33,116 ERROR opentelemetry.exporter.otlp.proto.http.trace_exporter Failed to export spans batch due to timeout, max retries or shutdown.
+---------------------------- Captured log teardown -----------------------------
+ERROR    opentelemetry.exporter.otlp.proto.http.trace_exporter:http.py:222 Failed to export spans batch due to timeout, max retries or shutdown.
+____________________ test_11_2_messages_carry_the_user_vote ____________________
+
+answered = (UUID('0f3e37ab-d419-4300-8337-daa0248e1812'), <starlette.testclient.TestClient object at 0x7fba0261e240>, 'da1f4eda-a596-459a-adc5-e88bbd886fdc')
+scores = <tests.integration.test_11_2_chat.FakeScores object at 0x7fba005bbb60>
+
+    def test_11_2_messages_carry_the_user_vote(answered, scores):
+        project_id, client, run_id = answered
+        client.post(_url(project_id, f"/runs/{run_id}/feedback"), json={"vote": "correct", "source": "chat"})
+        (conversation,) = client.get(_url(project_id, "/conversations")).json()["items"]
+        items = client.get(_url(project_id, f"/conversations/{conversation['id']}/messages")).json()[
+            "items"
+        ]
+        answer = next(m for m in items if m["role"] == "assistant")
+>       assert answer["user_feedback"]["vote"] == "correct"
+               ^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'user_feedback'
+
+tests/integration/test_11_2_chat.py:160: KeyError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-21 03:31:53,491 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-21 03:31:53,603 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=108
+2026-11-21 03:31:53,943 INFO ffcore.access access method=POST path=/api/v1/projects/0f3e37ab-d419-4300-8337-daa0248e1812/agents/asistan/runs status=200 ms=337
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:71 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=108
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/0f3e37ab-d419-4300-8337-daa0248e1812/agents/asistan/runs status=200 ms=337
+----------------------------- Captured stderr call -----------------------------
+2026-11-21 03:31:53,979 INFO ffcore.access access method=POST path=/api/v1/projects/0f3e37ab-d419-4300-8337-daa0248e1812/runs/da1f4eda-a596-459a-adc5-e88bbd886fdc/feedback status=422 ms=26
+2026-11-21 03:31:54,035 INFO ffcore.access access method=GET path=/api/v1/projects/0f3e37ab-d419-4300-8337-daa0248e1812/conversations status=200 ms=53
+2026-11-21 03:31:54,083 INFO ffcore.access access method=GET path=/api/v1/projects/0f3e37ab-d419-4300-8337-daa0248e1812/conversations/e22f4cc2-ff97-4828-8645-888e6df3d36b/messages status=200 ms=44
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/0f3e37ab-d419-4300-8337-daa0248e1812/runs/da1f4eda-a596-459a-adc5-e88bbd886fdc/feedback status=422 ms=26
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/0f3e37ab-d419-4300-8337-daa0248e1812/conversations status=200 ms=53
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/0f3e37ab-d419-4300-8337-daa0248e1812/conversations/e22f4cc2-ff97-4828-8645-888e6df3d36b/messages status=200 ms=44
+--------------------------- Captured stderr teardown ---------------------------
+2026-11-21 03:31:55,070 ERROR opentelemetry.exporter.otlp.proto.http.trace_exporter Failed to export spans batch due to timeout, max retries or shutdown.
+2026-11-21 03:31:59,094 ERROR ffcore.tracing trace_delivery_failed spans=7 reason=deadline
+---------------------------- Captured log teardown -----------------------------
+ERROR    opentelemetry.exporter.otlp.proto.http.trace_exporter:http.py:222 Failed to export spans batch due to timeout, max retries or shutdown.
+ERROR    ffcore.tracing:tracing.py:116 trace_delivery_failed spans=7 reason=deadline
+___________ test_11_2_portal_config_saved_audited_and_shown_in_chat ____________
+
+portal = (UUID('a610442a-097f-4d43-82c3-bcbb26d9db64'), '4c9a5a59-d16e-426d-9913-e72c7d2c18de', <starlette.testclient.TestClient object at 0x7fba005f1d90>)
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_3f6d68c45774) at 0x7fba025ccbf0>
+make_user = <function make_user.<locals>.make at 0x7fba2e629b20>
+client_factory = <function client_factory.<locals>.make at 0x7fba005eba60>
+
+    def test_11_2_portal_config_saved_audited_and_shown_in_chat(portal, pg, make_user, client_factory):
+        project_id, agent_id, editor = portal
+        response = editor.patch(_url(project_id, f"/agents/{agent_id}"), json={"portal_config": PORTAL})
+>       assert response.status_code == 200, response.text
+E       AssertionError: {"error":{"message":"Invalid request: body.portal_config","type":"invalid_request_error","code":"validation_error"}}
+E       assert 422 == 200
+E        +  where 422 = <Response [422 Unprocessable Content]>.status_code
+
+tests/integration/test_11_2_chat.py:189: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-21 03:32:01,683 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-21 03:32:01,795 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=108
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:71 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=108
+----------------------------- Captured stderr call -----------------------------
+2026-11-21 03:32:01,834 INFO ffcore.access access method=PATCH path=/api/v1/projects/a610442a-097f-4d43-82c3-bcbb26d9db64/agents/4c9a5a59-d16e-426d-9913-e72c7d2c18de status=422 ms=34
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=PATCH path=/api/v1/projects/a610442a-097f-4d43-82c3-bcbb26d9db64/agents/4c9a5a59-d16e-426d-9913-e72c7d2c18de status=422 ms=34
+--------------------------- Captured stderr teardown ---------------------------
+2026-11-21 03:32:02,096 ERROR opentelemetry.exporter.otlp.proto.http.trace_exporter Failed to export spans batch due to timeout, max retries or shutdown.
+---------------------------- Captured log teardown -----------------------------
+ERROR    opentelemetry.exporter.otlp.proto.http.trace_exporter:http.py:222 Failed to export spans batch due to timeout, max retries or shutdown.
+________ test_11_2_portal_config_is_empty_until_set_and_null_clears_it _________
+
+portal = (UUID('9a795951-ba83-42b3-b252-53c036a913e2'), '31ffdf89-ee24-4ed0-bfcc-7b8f40de5b97', <starlette.testclient.TestClient object at 0x7fba006a9310>)
+
+    def test_11_2_portal_config_is_empty_until_set_and_null_clears_it(portal):
+        project_id, agent_id, editor = portal
+>       assert editor.get(_url(project_id, f"/agents/{agent_id}")).json()["portal_config"] is None
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'portal_config'
+
+tests/integration/test_11_2_chat.py:200: KeyError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-21 03:32:09,874 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-21 03:32:09,987 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=109
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:71 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=109
+----------------------------- Captured stderr call -----------------------------
+2026-11-21 03:32:10,033 INFO ffcore.access access method=GET path=/api/v1/projects/9a795951-ba83-42b3-b252-53c036a913e2/agents/31ffdf89-ee24-4ed0-bfcc-7b8f40de5b97 status=200 ms=42
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/9a795951-ba83-42b3-b252-53c036a913e2/agents/31ffdf89-ee24-4ed0-bfcc-7b8f40de5b97 status=200 ms=42
+_________________ test_11_2_portal_config_fields_are_optional __________________
+
+portal = (UUID('de6b2bb2-20f7-4d77-9d23-3d163ba149cc'), 'b3e948e8-65cc-4893-9219-383e65053af0', <starlette.testclient.TestClient object at 0x7fba69917380>)
+
+    def test_11_2_portal_config_fields_are_optional(portal):
+        project_id, agent_id, editor = portal
+        response = editor.patch(
+            _url(project_id, f"/agents/{agent_id}"), json={"portal_config": {"welcome": "Merhaba."}}
+        )
+>       assert response.status_code == 200, response.text
+E       AssertionError: {"error":{"message":"Invalid request: body.portal_config","type":"invalid_request_error","code":"validation_error"}}
+E       assert 422 == 200
+E        +  where 422 = <Response [422 Unprocessable Content]>.status_code
+
+tests/integration/test_11_2_chat.py:211: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-21 03:32:18,075 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-21 03:32:18,190 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=111
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:71 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=111
+----------------------------- Captured stderr call -----------------------------
+2026-11-21 03:32:18,221 INFO ffcore.access access method=PATCH path=/api/v1/projects/de6b2bb2-20f7-4d77-9d23-3d163ba149cc/agents/b3e948e8-65cc-4893-9219-383e65053af0 status=422 ms=27
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=PATCH path=/api/v1/projects/de6b2bb2-20f7-4d77-9d23-3d163ba149cc/agents/b3e948e8-65cc-4893-9219-383e65053af0 status=422 ms=27
+__________________ test_11_2_portal_config_of_a_missing_agent __________________
+
+portal = (UUID('70cdf943-6ab7-47d9-ba90-c2400c4349a2'), '0cf41151-b151-43a5-b655-5ed639e1a33b', <starlette.testclient.TestClient object at 0x7fba6a7bb8c0>)
+
+    def test_11_2_portal_config_of_a_missing_agent(portal):
+        project_id, _, editor = portal
+        response = editor.patch(
+            _url(project_id, f"/agents/{uuid.uuid4()}"), json={"portal_config": PORTAL}
+        )
+>       assert response.status_code == 404
+E       assert 422 == 404
+E        +  where 422 = <Response [422 Unprocessable Content]>.status_code
+
+tests/integration/test_11_2_chat.py:250: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-21 03:33:27,795 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-21 03:33:27,960 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=162
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:71 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=162
+----------------------------- Captured stderr call -----------------------------
+2026-11-21 03:33:28,006 INFO ffcore.access access method=PATCH path=/api/v1/projects/70cdf943-6ab7-47d9-ba90-c2400c4349a2/agents/d0f82d3c-68e7-4503-a86a-a99e3b11b239 status=422 ms=39
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=PATCH path=/api/v1/projects/70cdf943-6ab7-47d9-ba90-c2400c4349a2/agents/d0f82d3c-68e7-4503-a86a-a99e3b11b239 status=422 ms=39
+__________________ test_11_1_chat_agents_carry_no_definition ___________________
+
+chatting = (UUID('4260884a-d9a8-4192-aef5-39ebc7521be2'), UUID('85edbd11-e59c-455d-bf76-d7dfd17e9e56'), <starlette.testclient.TestClient object at 0x7fba6a653d40>, <tests.integration.runtime_support.ScriptedModel object at 0x7fba6a653c80>)
+
+    def test_11_1_chat_agents_carry_no_definition(chatting):
+        # K-11-0002 S5: no definition, prompt, model or tool list reaches the chat.
+        project_id, _, client, _ = chatting
+        (agent,) = client.get(_url(project_id, "/chat/agents")).json()["items"]
+        # 11-2 (K-11-0005 S2): the portal settings are added on purpose; still no definition.
+>       assert set(agent) == {"id", "key", "name", "description", "portal_config"}
+E       AssertionError: assert {'description...'key', 'name'} == {'description...ortal_config'}
+E         
+E         Extra items in the right set:
+E         'portal_config'
+E         Use -v to get more diff
+
+tests/integration/test_11_chat.py:68: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-21 03:33:35,764 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-21 03:33:35,873 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=105
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:71 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=105
+----------------------------- Captured stderr call -----------------------------
+2026-11-21 03:33:35,919 INFO ffcore.access access method=GET path=/api/v1/projects/4260884a-d9a8-4192-aef5-39ebc7521be2/chat/agents status=200 ms=43
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/4260884a-d9a8-4192-aef5-39ebc7521be2/chat/agents status=200 ms=43
+=========================== short test summary info ============================
+FAILED tests/integration/test_11_2_chat.py::test_11_2_chat_vote_goes_to_user_feedback_and_its_own_score
+FAILED tests/integration/test_11_2_chat.py::test_11_2_chat_vote_leaves_the_expert_review_queue_alone
+FAILED tests/integration/test_11_2_chat.py::test_11_2_review_is_still_the_default_source
+FAILED tests/integration/test_11_2_chat.py::test_11_2_chat_vote_only_by_the_runs_user
+FAILED tests/integration/test_11_2_chat.py::test_11_2_messages_carry_the_user_vote
+FAILED tests/integration/test_11_2_chat.py::test_11_2_portal_config_saved_audited_and_shown_in_chat
+FAILED tests/integration/test_11_2_chat.py::test_11_2_portal_config_is_empty_until_set_and_null_clears_it
+FAILED tests/integration/test_11_2_chat.py::test_11_2_portal_config_fields_are_optional
+FAILED tests/integration/test_11_2_chat.py::test_11_2_portal_config_of_a_missing_agent
+FAILED tests/integration/test_11_chat.py::test_11_1_chat_agents_carry_no_definition
+10 failed, 12 passed in 176.75s (0:02:56)

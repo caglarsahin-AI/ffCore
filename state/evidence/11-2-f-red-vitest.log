@@ -1,0 +1,2297 @@
+HEAD=0c0ec0b7f0ad689ba710fa27829f39f00d508625 + frontend red tests
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.12 [39m[90m/w/frontend[39m
+
+ [31m❯[39m tests/unit/test_11_3_portal_accent.test.ts [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m tests/unit/test_11_3_portal_tab.test.tsx [2m([22m[2m0 test[22m[2m)[22m
+[90mstderr[2m | tests/unit/test_11_3_chat_actions.test.tsx[2m > [22m[2mtest_11_3_chat_actions[2m > [22m[2msends the user's vote as source chat, with an optional note
+[22m[39mThe current testing environment is not configured to support act(...)
+
+[90mstderr[2m | tests/unit/test_11_3_chat_actions.test.tsx[2m > [22m[2mtest_11_3_chat_actions[2m > [22m[2msends the user's vote as source chat, with an optional note
+[22m[39mThe current testing environment is not configured to support act(...)
+
+[90mstderr[2m | tests/unit/test_11_3_chat_actions.test.tsx[2m > [22m[2mtest_11_3_chat_actions[2m > [22m[2msends the user's vote as source chat, with an optional note
+[22m[39mThe current testing environment is not configured to support act(...)
+
+ [31m❯[39m tests/unit/test_11_3_chat_actions.test.tsx [2m([22m[2m9 tests[22m[2m | [22m[31m8 failed[39m[2m)[22m[33m 10373[2mms[22m[39m
+[31m     [31m×[31m lets an authorized member approve inline and follows the run from stream_after[39m[33m 1187[2mms[22m[39m
+[31m     [31m×[31m shows analyst/read who approves instead of buttons, then goes on when someone else decides[39m[33m 1035[2mms[22m[39m
+[31m     [31m×[31m shows user/edit who approves instead of buttons, then goes on when someone else decides[39m[33m 1030[2mms[22m[39m
+[31m     [31m×[31m says so when reading a waiting run fails (no silent stop)[39m[33m 4027[2mms[22m[39m
+[31m     [31m×[31m answers the agent's question and follows the run on[39m[32m 26[2mms[22m[39m
+     [33m[2m✓[22m[39m finishes an answer once after the stream drops mid-answer (Last-Event-ID) [33m 1033[2mms[22m[39m
+[31m     [31m×[31m sends the user's vote as source chat, with an optional note[39m[33m 1009[2mms[22m[39m
+[31m     [31m×[31m shows the stored vote and disables voting in read-only access with the reason[39m[33m 1006[2mms[22m[39m
+[31m     [31m×[31m shows the portal welcome and example questions; an example fills the box, never sends[39m[32m 18[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Suites 2 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m tests/unit/test_11_3_portal_accent.test.ts[2m [ tests/unit/test_11_3_portal_accent.test.ts ][22m
+[31m[1mError[22m: Cannot find package '@/lib/portal-accent' imported from /w/frontend/tests/unit/test_11_3_portal_accent.test.ts[39m
+[36m [2m❯[22m tests/unit/test_11_3_portal_accent.test.ts:[2m3:1[22m[39m
+    [90m  1|[39m [35mimport[39m { describe[33m,[39m expect[33m,[39m it } [35mfrom[39m [32m"vitest"[39m[33m;[39m
+    [90m  2|[39m
+    [90m  3|[39m import { PAGE_BACKGROUND, accentTones, contrast } from "@/lib/portal-a…
+    [90m   |[39m [31m^[39m
+    [90m  4|[39m
+    [90m  5|[39m // 11-2 (K-11-0005 S3): one accent hex gives a light and a dark tone f…
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/10]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/test_11_3_portal_tab.test.tsx[2m [ tests/unit/test_11_3_portal_tab.test.tsx ][22m
+[31m[1mError[22m: Failed to resolve import "@/components/agent-wizard/portal-tab" from "tests/unit/test_11_3_portal_tab.test.tsx". Does the file exist?[39m
+  Plugin: [35mvite:import-analysis[39m
+  File: [36m/w/frontend/tests/unit/test_11_3_portal_tab.test.tsx[39m:6:26
+[33m  3  |  import { act, cleanup, fireEvent, screen, waitFor } from "@testing-library/react";
+  4  |  import { afterEach, describe, expect, it, vi } from "vitest";
+  5  |  import { PortalTab } from "@/components/agent-wizard/portal-tab";
+     |                             ^
+  6  |  import { renderAs } from "./eval-support";
+  7  |  var _jsxFileName = "/w/frontend/tests/unit/test_11_3_portal_tab.test.tsx";[39m
+[90m [2m❯[22m TransformPluginContext._formatLog node_modules/vite/dist/node/chunks/node.js:[2m8803:39[22m[39m
+[90m [2m❯[22m TransformPluginContext.error node_modules/vite/dist/node/chunks/node.js:[2m8800:14[22m[39m
+[90m [2m❯[22m resolveId node_modules/vite/dist/node/chunks/node.js:[2m26594:18[22m[39m
+[90m [2m❯[22m node_modules/vite/dist/node/chunks/node.js:[2m26693:23[22m[39m
+[90m [2m❯[22m TransformPluginContext.transform node_modules/vite/dist/node/chunks/node.js:[2m26666:4[22m[39m
+[90m [2m❯[22m EnvironmentPluginContainer.transform node_modules/vite/dist/node/chunks/node.js:[2m8582:14[22m[39m
+[90m [2m❯[22m loadAndTransform node_modules/vite/dist/node/chunks/node.js:[2m20155:26[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/10]⎯[22m[39m
+
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 8 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m tests/unit/test_11_3_chat_actions.test.tsx[2m > [22mtest_11_3_chat_actions[2m > [22mlets an authorized member approve inline and follows the run from stream_after
+[31m[1mTestingLibraryElementError[22m[39m: Unable to find an element by: [data-testid="chat-approval"]
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"flex min-h-0 flex-1"[39m
+      [33mdata-testid[39m=[32m"chat-screen"[39m
+    [36m>[39m
+      [36m<aside[39m
+        [33maria-label[39m=[32m"Conversations"[39m
+        [33mclass[39m=[32m"hidden w-72 shrink-0 flex-col border-r md:flex"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex min-h-0 flex-1 flex-col"[39m
+          [33mdata-testid[39m=[32m"chat-conversations"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"p-3"[39m
+          [36m>[39m
+            [36m<a[39m
+              [33mclass[39m=[32m"inline-flex w-full items-center justify-center gap-2 rounded-md border px-3 py-2 text-sm hover:bg-muted"[39m
+              [33mdata-testid[39m=[32m"chat-new"[39m
+              [33mhref[39m=[32m"/chat/asistan"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-hidden[39m=[32m"true"[39m
+                [33mclass[39m=[32m"lucide lucide-plus size-4"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"24"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"24"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M5 12h14"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M12 5v14"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [0mNew conversation[0m
+            [36m</a>[39m
+          [36m</div>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"px-3 text-sm text-muted-foreground"[39m
+          [36m>[39m
+            [0mNo conversations yet.[0m
+          [36m</p>[39m
+          [36m<ul[39m
+            [33mclass[39m=[32m"flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto px-2 pb-3"[39m
+          [36m/>[39m
+        [36m</div>[39m
+      [36m</aside>[39m
+      [36m<section[39m
+        [33maria-label[39m=[32m"Contract assistant"[39m
+        [33mclass[39m=[32m"flex min-w-0 flex-1 flex-col"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex items-center gap-2 border-b px-4 py-2"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"Show conversations"[39m
+            [33mclass[39m=[32m"group/button inline-flex shrink-0 items-center justify-center border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50 size-7 rounded-[min(var(--radius-md),12px)] in-data-[slot=button-group]:rounded-lg md:hidden"[39m
+            [33mdata-slot[39m=[32m"button"[39m
+            [33mdata-testid[39m=[32m"chat-open-list"[39m
+            [33mtabindex[39m=[32m"0"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-menu"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M4 5h16"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M4 12h16"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M4 19h16"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+          [36m<h1[39m
+            [33mclass[39m=[32m"truncate font-medium"[39m
+          [36m>[39m
+            [0mContract assistant[0m
+          [36m</h1>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33maria-live[39m=[32m"polite"[39m
+          [33mclass[39m=[32m"flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 py-4"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex justify-end"[39m
+            [33mdata-role[39m=[32m"user"[39m
+            [33mdata-testid[39m=[32m"chat-message"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex max-w-[85%] flex-col gap-2 rounded-2xl px-4 py-2 text-sm bg-primary text-primary-foreground"[39m
+            [36m>[39m
+              [36m<p[39m
+                [33mclass[39m=[32m"whitespace-pre-wrap"[39m
+              [36m>[39m
+                [0mBileti güncelle[0m
+              [36m</p>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex justify-start"[39m
+            [33mdata-role[39m=[32m"assistant"[39m
+            [33mdata-testid[39m=[32m"chat-live"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex max-w-[85%] flex-col gap-2 rounded-2xl px-4 py-2 text-sm border bg-card text-card-foreground"[39m
+            [36m>[39m
+              [36m<p[39m
+                [33mclass[39m=[32m"text-xs text-muted-foreground"[39m
+                [33mdata-phase[39m=[32m"waiting_approval"[39m
+                [33mdata-testid[39m=[32m"chat-status"[39m
+                [33mrole[39m=[32m"status"[39m
+              [36m>[39m
+                [0mWaiting for an approval[0m
+              [36m</p>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+        [36m<form[39m
+          [33mclass[39m=[32m"flex items-end gap-2 border-t p-3"[39m
+          [33mnovalidate[39m=[32m""[39m
+        [36m>[39m
+          [36m<label[39m
+            [33mclass[39m=[32m"sr-only"[39m
+            [33mfor[39m=[32m"chat-input"[39m
+          [36m>[39m
+            [0mYour message[0m
+          [36m</label>[39m
+          [36m<textarea[39m
+            [33mclass[39m=[32m"flex field-sizing-content w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 max-h-40 min-h-11 flex-1 resize-none"[39m
+            [33mdata-slot[39m=[32m"textarea"[39m
+            [33mdata-testid[39m=[32m"chat-input"[39m
+            [33mid[39m=[32m"chat-input"[39m
+            [33mplaceholder[39m=[32m"Write a question…"[39m
+          [36m/>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"Send"[39m
+            [33mclass[39m=[32m"group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 bg-primary text-primary-foreground hover:bg-primary/80 h-8 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2"[39m
+            [33mdata-disabled[39m=[32m""[39m
+            [33mdata-slot[39m=[32m"button"[39m
+            [33mdata-testid[39m=[32m"chat-send"[39m
+            [33mdisabled[39m=[32m""[39m
+            [33mtabindex[39m=[32m"0"[39m
+            [33mtype[39m=[32m"submit"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-send"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m21.854 2.147-10.94 10.939"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+        [36m</form>[39m
+      [36m</section>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"flex min-h-0 flex-1"[39m
+      [33mdata-testid[39m=[32m"chat-screen"[39m
+    [36m>[39m
+      [36m<aside[39m
+        [33maria-label[39m=[32m"Conversations"[39m
+        [33mclass[39m=[32m"hidden w-72 shrink-0 flex-col border-r md:flex"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex min-h-0 flex-1 flex-col"[39m
+          [33mdata-testid[39m=[32m"chat-conversations"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"p-3"[39m
+          [36m>[39m
+            [36m<a[39m
+              [33mclass[39m=[32m"inline-flex w-full items-center justify-center gap-2 rounded-md border px-3 py-2 text-sm hover:bg-muted"[39m
+              [33mdata-testid[39m=[32m"chat-new"[39m
+              [33mhref[39m=[32m"/chat/asistan"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-hidden[39m=[32m"true"[39m
+                [33mclass[39m=[32m"lucide lucide-plus size-4"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"24"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"24"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M5 12h14"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M12 5v14"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [0mNew conversation[0m
+            [36m</a>[39m
+          [36m</div>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"px-3 text-sm text-muted-foreground"[39m
+          [36m>[39m
+            [0mNo conversations yet.[0m
+          [36m</p>[39m
+          [36m<ul[39m
+            [33mclass[39m=[32m"flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto px-2 pb-3"[39m
+          [36m/>[39m
+        [36m</div>[39m
+      [36m</aside>[39m
+      [36m<section[39m
+        [33maria-label[39m=[32m"Contract assistant"[39m
+        [33mclass[39m=[32m"flex min-w-0 flex-1 flex-col"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex items-center gap-2 border-b px-4 py-2"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"Show conversations"[39m
+            [33mclass[39m=[32m"group/button inline-flex shrink-0 items-center justify-center border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50 size-7 rounded-[min(var(--radius-md),12px)] in-data-[slot=button-group]:rounded-lg md:hidden"[39m
+            [33mdata-slot[39m=[32m"button"[39m
+            [33mdata-testid[39m=[32m"chat-open-list"[39m
+            [33mtabindex[39m=[32m"0"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-menu"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M4 5h16"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M4 12h16"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M4 19h16"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+          [36m<h1[39m
+            [33mclass[39m=[32m"truncate font-medium"[39m
+          [36m>[39m
+            [0mContract assistant[0m
+          [36m</h1>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33maria-live[39m=[32m"polite"[39m
+          [33mclass[39m=[32m"flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 py-4"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex justify-end"[39m
+            [33mdata-role[39m=[32m"user"[39m
+            [33mdata-testid[39m=[32m"chat-message"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex max-w-[85%] flex-col gap-2 rounded-2xl px-4 py-2 text-sm bg-primary text-primary-foreground"[39m
+            [36m>[39m
+              [36m<p[39m
+                [33mclass[39m=[32m"whitespace-pre-wrap"[39m
+              [36m>[39m
+                [0mBileti güncelle[0m
+              [36m</p>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex justify-start"[39m
+            [33mdata-role[39m=[32m"assistant"[39m
+            [33mdata-testid[39m=[32m"chat-live"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex max-w-[85%] flex-col gap-2 rounded-2xl px-4 py-2 text-sm border bg-card text-card-foreground"[39m
+            [36m>[39m
+              [36m<p[39m
+                [33mclass[39m=[32m"text-xs text-muted-foreground"[39m
+                [33mdata-phase[39m=[32m"waiting_approval"[39m
+                [33mdata-testid[39m=[32m"chat-status"[39m
+                [33mrole[39m=[32m"status"[39m
+              [36m>[39m
+                [0mWaiting for an approval[0m
+              [36m</p>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+        [36m<form[39m
+          [33mclass[39m=[32m"flex items-end gap-2 border-t p-3"[39m
+          [33mnovalidate[39m=[32m""[39m
+        [36m>[39m
+          [36m<label[39m
+            [33mclass[39m=[32m"sr-only"[39m
+            [33mfor[39m=[32m"chat-input"[39m
+          [36m>[39m
+            [0mYour message[0m
+          [36m</label>[39m
+          [36m<textarea[39m
+            [33mclass[39m=[32m"flex field-sizing-content w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 max-h-40 min-h-11 flex-1 resize-none"[39m
+            [33mdata-slot[39m=[32m"textarea"[39m
+            [33mdata-testid[39m=[32m"chat-input"[39m
+            [33mid[39m=[32m"chat-input"[39m
+            [33mplaceholder[39m=[32m"Write a question…"[39m
+          [36m/>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"Send"[39m
+            [33mclass[39m=[32m"group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 bg-primary text-primary-foreground hover:bg-primary/80 h-8 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2"[39m
+            [33mdata-disabled[39m=[32m""[39m
+            [33mdata-slot[39m=[32m"button"[39m
+            [33mdata-testid[39m=[32m"chat-send"[39m
+            [33mdisabled[39m=[32m""[39m
+            [33mtabindex[39m=[32m"0"[39m
+            [33mtype[39m=[32m"submit"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-send"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m21.854 2.147-10.94 10.939"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+        [36m</form>[39m
+      [36m</section>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+[90m [2m❯[22m waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:[2m163:27[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m86:33[22m[39m
+[36m [2m❯[22m tests/unit/test_11_3_chat_actions.test.tsx:[2m96:33[22m[39m
+    [90m 94|[39m     renderAs("analyst", "edit", <ChatScreen projectId="p1" agentKey="a…
+    [90m 95|[39m     [35mawait[39m [34mask[39m()[33m;[39m
+    [90m 96|[39m     [35mconst[39m prompt [33m=[39m [35mawait[39m screen[33m.[39m[34mfindByTestId[39m([32m"chat-approval"[39m)[33m;[39m
+    [90m   |[39m                                 [31m^[39m
+    [90m 97|[39m     [34mexpect[39m(prompt[33m.[39mtextContent)[33m.[39m[34mtoContain[39m([32m"crm__update_ticket"[39m)[33m;[39m
+    [90m 98|[39m     fireEvent.change(screen.getByLabelText(/Note/), { target: { value:…
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/10]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/test_11_3_chat_actions.test.tsx[2m > [22mtest_11_3_chat_actions[2m > [22mshows analyst/read who approves instead of buttons, then goes on when someone else decides
+[41m[1m FAIL [22m[49m tests/unit/test_11_3_chat_actions.test.tsx[2m > [22mtest_11_3_chat_actions[2m > [22mshows user/edit who approves instead of buttons, then goes on when someone else decides
+[31m[1mTestingLibraryElementError[22m[39m: Unable to find an element by: [data-testid="chat-approval-waiting"]
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"flex min-h-0 flex-1"[39m
+      [33mdata-testid[39m=[32m"chat-screen"[39m
+    [36m>[39m
+      [36m<aside[39m
+        [33maria-label[39m=[32m"Conversations"[39m
+        [33mclass[39m=[32m"hidden w-72 shrink-0 flex-col border-r md:flex"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex min-h-0 flex-1 flex-col"[39m
+          [33mdata-testid[39m=[32m"chat-conversations"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"p-3"[39m
+          [36m>[39m
+            [36m<a[39m
+              [33mclass[39m=[32m"inline-flex w-full items-center justify-center gap-2 rounded-md border px-3 py-2 text-sm hover:bg-muted"[39m
+              [33mdata-testid[39m=[32m"chat-new"[39m
+              [33mhref[39m=[32m"/chat/asistan"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-hidden[39m=[32m"true"[39m
+                [33mclass[39m=[32m"lucide lucide-plus size-4"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"24"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"24"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M5 12h14"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M12 5v14"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [0mNew conversation[0m
+            [36m</a>[39m
+          [36m</div>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"px-3 text-sm text-muted-foreground"[39m
+          [36m>[39m
+            [0mNo conversations yet.[0m
+          [36m</p>[39m
+          [36m<ul[39m
+            [33mclass[39m=[32m"flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto px-2 pb-3"[39m
+          [36m/>[39m
+        [36m</div>[39m
+      [36m</aside>[39m
+      [36m<section[39m
+        [33maria-label[39m=[32m"Contract assistant"[39m
+        [33mclass[39m=[32m"flex min-w-0 flex-1 flex-col"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex items-center gap-2 border-b px-4 py-2"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"Show conversations"[39m
+            [33mclass[39m=[32m"group/button inline-flex shrink-0 items-center justify-center border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50 size-7 rounded-[min(var(--radius-md),12px)] in-data-[slot=button-group]:rounded-lg md:hidden"[39m
+            [33mdata-slot[39m=[32m"button"[39m
+            [33mdata-testid[39m=[32m"chat-open-list"[39m
+            [33mtabindex[39m=[32m"0"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-menu"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M4 5h16"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M4 12h16"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M4 19h16"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+          [36m<h1[39m
+            [33mclass[39m=[32m"truncate font-medium"[39m
+          [36m>[39m
+            [0mContract assistant[0m
+          [36m</h1>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33maria-live[39m=[32m"polite"[39m
+          [33mclass[39m=[32m"flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 py-4"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex justify-end"[39m
+            [33mdata-role[39m=[32m"user"[39m
+            [33mdata-testid[39m=[32m"chat-message"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex max-w-[85%] flex-col gap-2 rounded-2xl px-4 py-2 text-sm bg-primary text-primary-foreground"[39m
+            [36m>[39m
+              [36m<p[39m
+                [33mclass[39m=[32m"whitespace-pre-wrap"[39m
+              [36m>[39m
+                [0mBileti güncelle[0m
+              [36m</p>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex justify-start"[39m
+            [33mdata-role[39m=[32m"assistant"[39m
+            [33mdata-testid[39m=[32m"chat-live"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex max-w-[85%] flex-col gap-2 rounded-2xl px-4 py-2 text-sm border bg-card text-card-foreground"[39m
+            [36m>[39m
+              [36m<p[39m
+                [33mclass[39m=[32m"text-xs text-muted-foreground"[39m
+                [33mdata-phase[39m=[32m"waiting_approval"[39m
+                [33mdata-testid[39m=[32m"chat-status"[39m
+                [33mrole[39m=[32m"status"[39m
+              [36m>[39m
+                [0mWaiting for an approval[0m
+              [36m</p>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+        [36m<form[39m
+          [33mclass[39m=[32m"flex items-end gap-2 border-t p-3"[39m
+          [33mnovalidate[39m=[32m""[39m
+        [36m>[39m
+          [36m<label[39m
+            [33mclass[39m=[32m"sr-only"[39m
+            [33mfor[39m=[32m"chat-input"[39m
+          [36m>[39m
+            [0mYour message[0m
+          [36m</label>[39m
+          [36m<textarea[39m
+            [33mclass[39m=[32m"flex field-sizing-content w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 max-h-40 min-h-11 flex-1 resize-none"[39m
+            [33mdata-slot[39m=[32m"textarea"[39m
+            [33mdata-testid[39m=[32m"chat-input"[39m
+            [33mid[39m=[32m"chat-input"[39m
+            [33mplaceholder[39m=[32m"Write a question…"[39m
+          [36m/>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"Send"[39m
+            [33mclass[39m=[32m"group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 bg-primary text-primary-foreground hover:bg-primary/80 h-8 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2"[39m
+            [33mdata-disabled[39m=[32m""[39m
+            [33mdata-slot[39m=[32m"button"[39m
+            [33mdata-testid[39m=[32m"chat-send"[39m
+            [33mdisabled[39m=[32m""[39m
+            [33mtabindex[39m=[32m"0"[39m
+            [33mtype[39m=[32m"submit"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-send"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m21.854 2.147-10.94 10.939"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+        [36m</form>[39m
+      [36m</section>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"flex min-h-0 flex-1"[39m
+      [33mdata-testid[39m=[32m"chat-screen"[39m
+    [36m>[39m
+      [36m<aside[39m
+        [33maria-label[39m=[32m"Conversations"[39m
+        [33mclass[39m=[32m"hidden w-72 shrink-0 flex-col border-r md:flex"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex min-h-0 flex-1 flex-col"[39m
+          [33mdata-testid[39m=[32m"chat-conversations"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"p-3"[39m
+          [36m>[39m
+            [36m<a[39m
+              [33mclass[39m=[32m"inline-flex w-full items-center justify-center gap-2 rounded-md border px-3 py-2 text-sm hover:bg-muted"[39m
+              [33mdata-testid[39m=[32m"chat-new"[39m
+              [33mhref[39m=[32m"/chat/asistan"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-hidden[39m=[32m"true"[39m
+                [33mclass[39m=[32m"lucide lucide-plus size-4"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"24"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"24"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M5 12h14"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M12 5v14"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [0mNew conversation[0m
+            [36m</a>[39m
+          [36m</div>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"px-3 text-sm text-muted-foreground"[39m
+          [36m>[39m
+            [0mNo conversations yet.[0m
+          [36m</p>[39m
+          [36m<ul[39m
+            [33mclass[39m=[32m"flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto px-2 pb-3"[39m
+          [36m/>[39m
+        [36m</div>[39m
+      [36m</aside>[39m
+      [36m<section[39m
+        [33maria-label[39m=[32m"Contract assistant"[39m
+        [33mclass[39m=[32m"flex min-w-0 flex-1 flex-col"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex items-center gap-2 border-b px-4 py-2"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"Show conversations"[39m
+            [33mclass[39m=[32m"group/button inline-flex shrink-0 items-center justify-center border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50 size-7 rounded-[min(var(--radius-md),12px)] in-data-[slot=button-group]:rounded-lg md:hidden"[39m
+            [33mdata-slot[39m=[32m"button"[39m
+            [33mdata-testid[39m=[32m"chat-open-list"[39m
+            [33mtabindex[39m=[32m"0"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-menu"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M4 5h16"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M4 12h16"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M4 19h16"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+          [36m<h1[39m
+            [33mclass[39m=[32m"truncate font-medium"[39m
+          [36m>[39m
+            [0mContract assistant[0m
+          [36m</h1>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33maria-live[39m=[32m"polite"[39m
+          [33mclass[39m=[32m"flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 py-4"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex justify-end"[39m
+            [33mdata-role[39m=[32m"user"[39m
+            [33mdata-testid[39m=[32m"chat-message"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex max-w-[85%] flex-col gap-2 rounded-2xl px-4 py-2 text-sm bg-primary text-primary-foreground"[39m
+            [36m>[39m
+              [36m<p[39m
+                [33mclass[39m=[32m"whitespace-pre-wrap"[39m
+              [36m>[39m
+                [0mBileti güncelle[0m
+              [36m</p>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex justify-start"[39m
+            [33mdata-role[39m=[32m"assistant"[39m
+            [33mdata-testid[39m=[32m"chat-live"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex max-w-[85%] flex-col gap-2 rounded-2xl px-4 py-2 text-sm border bg-card text-card-foreground"[39m
+            [36m>[39m
+              [36m<p[39m
+                [33mclass[39m=[32m"text-xs text-muted-foreground"[39m
+                [33mdata-phase[39m=[32m"waiting_approval"[39m
+                [33mdata-testid[39m=[32m"chat-status"[39m
+                [33mrole[39m=[32m"status"[39m
+              [36m>[39m
+                [0mWaiting for an approval[0m
+              [36m</p>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+        [36m<form[39m
+          [33mclass[39m=[32m"flex items-end gap-2 border-t p-3"[39m
+          [33mnovalidate[39m=[32m""[39m
+        [36m>[39m
+          [36m<label[39m
+            [33mclass[39m=[32m"sr-only"[39m
+            [33mfor[39m=[32m"chat-input"[39m
+          [36m>[39m
+            [0mYour message[0m
+          [36m</label>[39m
+          [36m<textarea[39m
+            [33mclass[39m=[32m"flex field-sizing-content w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 max-h-40 min-h-11 flex-1 resize-none"[39m
+            [33mdata-slot[39m=[32m"textarea"[39m
+            [33mdata-testid[39m=[32m"chat-input"[39m
+            [33mid[39m=[32m"chat-input"[39m
+            [33mplaceholder[39m=[32m"Write a question…"[39m
+          [36m/>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"Send"[39m
+            [33mclass[39m=[32m"group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 bg-primary text-primary-foreground hover:bg-primary/80 h-8 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2"[39m
+            [33mdata-disabled[39m=[32m""[39m
+            [33mdata-slot[39m=[32m"button"[39m
+            [33mdata-testid[39m=[32m"chat-send"[39m
+            [33mdisabled[39m=[32m""[39m
+            [33mtabindex[39m=[32m"0"[39m
+            [33mtype[39m=[32m"submit"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-send"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m21.854 2.147-10.94 10.939"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+        [36m</form>[39m
+      [36m</section>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+[90m [2m❯[22m waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:[2m163:27[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m86:33[22m[39m
+[36m [2m❯[22m tests/unit/test_11_3_chat_actions.test.tsx:[2m123:36[22m[39m
+    [90m121|[39m       renderAs(role, access, <ChatScreen projectId="p1" agentKey="asis…
+    [90m122|[39m       [35mawait[39m [34mask[39m()[33m;[39m
+    [90m123|[39m       const waiting = await screen.findByTestId("chat-approval-waiting…
+    [90m   |[39m                                    [31m^[39m
+    [90m124|[39m       [34mexpect[39m(waiting[33m.[39mtextContent)[33m.[39m[34mtoContain[39m([32m"Analyst"[39m)[33m;[39m
+    [90m125|[39m       [34mexpect[39m(screen[33m.[39m[34mqueryByTestId[39m([32m"chat-approve"[39m))[33m.[39m[34mtoBeNull[39m()[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/10]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/test_11_3_chat_actions.test.tsx[2m > [22mtest_11_3_chat_actions[2m > [22msays so when reading a waiting run fails (no silent stop)
+[31m[1mTestingLibraryElementError[22m[39m: Unable to find an element by: [data-testid="chat-poll-error"]
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"flex min-h-0 flex-1"[39m
+      [33mdata-testid[39m=[32m"chat-screen"[39m
+    [36m>[39m
+      [36m<aside[39m
+        [33maria-label[39m=[32m"Conversations"[39m
+        [33mclass[39m=[32m"hidden w-72 shrink-0 flex-col border-r md:flex"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex min-h-0 flex-1 flex-col"[39m
+          [33mdata-testid[39m=[32m"chat-conversations"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"p-3"[39m
+          [36m>[39m
+            [36m<a[39m
+              [33mclass[39m=[32m"inline-flex w-full items-center justify-center gap-2 rounded-md border px-3 py-2 text-sm hover:bg-muted"[39m
+              [33mdata-testid[39m=[32m"chat-new"[39m
+              [33mhref[39m=[32m"/chat/asistan"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-hidden[39m=[32m"true"[39m
+                [33mclass[39m=[32m"lucide lucide-plus size-4"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"24"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"24"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M5 12h14"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M12 5v14"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [0mNew conversation[0m
+            [36m</a>[39m
+          [36m</div>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"px-3 text-sm text-muted-foreground"[39m
+          [36m>[39m
+            [0mNo conversations yet.[0m
+          [36m</p>[39m
+          [36m<ul[39m
+            [33mclass[39m=[32m"flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto px-2 pb-3"[39m
+          [36m/>[39m
+        [36m</div>[39m
+      [36m</aside>[39m
+      [36m<section[39m
+        [33maria-label[39m=[32m"Contract assistant"[39m
+        [33mclass[39m=[32m"flex min-w-0 flex-1 flex-col"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex items-center gap-2 border-b px-4 py-2"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"Show conversations"[39m
+            [33mclass[39m=[32m"group/button inline-flex shrink-0 items-center justify-center border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50 size-7 rounded-[min(var(--radius-md),12px)] in-data-[slot=button-group]:rounded-lg md:hidden"[39m
+            [33mdata-slot[39m=[32m"button"[39m
+            [33mdata-testid[39m=[32m"chat-open-list"[39m
+            [33mtabindex[39m=[32m"0"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-menu"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M4 5h16"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M4 12h16"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M4 19h16"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+          [36m<h1[39m
+            [33mclass[39m=[32m"truncate font-medium"[39m
+          [36m>[39m
+            [0mContract assistant[0m
+          [36m</h1>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33maria-live[39m=[32m"polite"[39m
+          [33mclass[39m=[32m"flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 py-4"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex justify-end"[39m
+            [33mdata-role[39m=[32m"user"[39m
+            [33mdata-testid[39m=[32m"chat-message"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex max-w-[85%] flex-col gap-2 rounded-2xl px-4 py-2 text-sm bg-primary text-primary-foreground"[39m
+            [36m>[39m
+              [36m<p[39m
+                [33mclass[39m=[32m"whitespace-pre-wrap"[39m
+              [36m>[39m
+                [0mBileti güncelle[0m
+              [36m</p>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex justify-start"[39m
+            [33mdata-role[39m=[32m"assistant"[39m
+            [33mdata-testid[39m=[32m"chat-live"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex max-w-[85%] flex-col gap-2 rounded-2xl px-4 py-2 text-sm border bg-card text-card-foreground"[39m
+            [36m>[39m
+              [36m<p[39m
+                [33mclass[39m=[32m"text-xs text-muted-foreground"[39m
+                [33mdata-phase[39m=[32m"waiting_approval"[39m
+                [33mdata-testid[39m=[32m"chat-status"[39m
+                [33mrole[39m=[32m"status"[39m
+              [36m>[39m
+                [0mWaiting for an approval[0m
+              [36m</p>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+        [36m<form[39m
+          [33mclass[39m=[32m"flex items-end gap-2 border-t p-3"[39m
+          [33mnovalidate[39m=[32m""[39m
+        [36m>[39m
+          [36m<label[39m
+            [33mclass[39m=[32m"sr-only"[39m
+            [33mfor[39m=[32m"chat-input"[39m
+          [36m>[39m
+            [0mYour message[0m
+          [36m</label>[39m
+          [36m<textarea[39m
+            [33mclass[39m=[32m"flex field-sizing-content w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 max-h-40 min-h-11 flex-1 resize-none"[39m
+            [33mdata-slot[39m=[32m"textarea"[39m
+            [33mdata-testid[39m=[32m"chat-input"[39m
+            [33mid[39m=[32m"chat-input"[39m
+            [33mplaceholder[39m=[32m"Write a question…"[39m
+          [36m/>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"Send"[39m
+            [33mclass[39m=[32m"group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 bg-primary text-primary-foreground hover:bg-primary/80 h-8 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2"[39m
+            [33mdata-disabled[39m=[32m""[39m
+            [33mdata-slot[39m=[32m"button"[39m
+            [33mdata-testid[39m=[32m"chat-send"[39m
+            [33mdisabled[39m=[32m""[39m
+            [33mtabindex[39m=[32m"0"[39m
+            [33mtype[39m=[32m"submit"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-send"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m21.854 2.147-10.94 10.939"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+        [36m</form>[39m
+      [36m</section>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"flex min-h-0 flex-1"[39m
+      [33mdata-testid[39m=[32m"chat-screen"[39m
+    [36m>[39m
+      [36m<aside[39m
+        [33maria-label[39m=[32m"Conversations"[39m
+        [33mclass[39m=[32m"hidden w-72 shrink-0 flex-col border-r md:flex"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex min-h-0 flex-1 flex-col"[39m
+          [33mdata-testid[39m=[32m"chat-conversations"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"p-3"[39m
+          [36m>[39m
+            [36m<a[39m
+              [33mclass[39m=[32m"inline-flex w-full items-center justify-center gap-2 rounded-md border px-3 py-2 text-sm hover:bg-muted"[39m
+              [33mdata-testid[39m=[32m"chat-new"[39m
+              [33mhref[39m=[32m"/chat/asistan"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-hidden[39m=[32m"true"[39m
+                [33mclass[39m=[32m"lucide lucide-plus size-4"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"24"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"24"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M5 12h14"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M12 5v14"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [0mNew conversation[0m
+            [36m</a>[39m
+          [36m</div>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"px-3 text-sm text-muted-foreground"[39m
+          [36m>[39m
+            [0mNo conversations yet.[0m
+          [36m</p>[39m
+          [36m<ul[39m
+            [33mclass[39m=[32m"flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto px-2 pb-3"[39m
+          [36m/>[39m
+        [36m</div>[39m
+      [36m</aside>[39m
+      [36m<section[39m
+        [33maria-label[39m=[32m"Contract assistant"[39m
+        [33mclass[39m=[32m"flex min-w-0 flex-1 flex-col"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex items-center gap-2 border-b px-4 py-2"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"Show conversations"[39m
+            [33mclass[39m=[32m"group/button inline-flex shrink-0 items-center justify-center border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50 size-7 rounded-[min(var(--radius-md),12px)] in-data-[slot=button-group]:rounded-lg md:hidden"[39m
+            [33mdata-slot[39m=[32m"button"[39m
+            [33mdata-testid[39m=[32m"chat-open-list"[39m
+            [33mtabindex[39m=[32m"0"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-menu"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M4 5h16"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M4 12h16"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M4 19h16"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+          [36m<h1[39m
+            [33mclass[39m=[32m"truncate font-medium"[39m
+          [36m>[39m
+            [0mContract assistant[0m
+          [36m</h1>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33maria-live[39m=[32m"polite"[39m
+          [33mclass[39m=[32m"flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 py-4"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex justify-end"[39m
+            [33mdata-role[39m=[32m"user"[39m
+            [33mdata-testid[39m=[32m"chat-message"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex max-w-[85%] flex-col gap-2 rounded-2xl px-4 py-2 text-sm bg-primary text-primary-foreground"[39m
+            [36m>[39m
+              [36m<p[39m
+                [33mclass[39m=[32m"whitespace-pre-wrap"[39m
+              [36m>[39m
+                [0mBileti güncelle[0m
+              [36m</p>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex justify-start"[39m
+            [33mdata-role[39m=[32m"assistant"[39m
+            [33mdata-testid[39m=[32m"chat-live"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex max-w-[85%] flex-col gap-2 rounded-2xl px-4 py-2 text-sm border bg-card text-card-foreground"[39m
+            [36m>[39m
+              [36m<p[39m
+                [33mclass[39m=[32m"text-xs text-muted-foreground"[39m
+                [33mdata-phase[39m=[32m"waiting_approval"[39m
+                [33mdata-testid[39m=[32m"chat-status"[39m
+                [33mrole[39m=[32m"status"[39m
+              [36m>[39m
+                [0mWaiting for an approval[0m
+              [36m</p>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+        [36m<form[39m
+          [33mclass[39m=[32m"flex items-end gap-2 border-t p-3"[39m
+          [33mnovalidate[39m=[32m""[39m
+        [36m>[39m
+          [36m<label[39m
+            [33mclass[39m=[32m"sr-only"[39m
+            [33mfor[39m=[32m"chat-input"[39m
+          [36m>[39m
+            [0mYour message[0m
+          [36m</label>[39m
+          [36m<textarea[39m
+            [33mclass[39m=[32m"flex field-sizing-content w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 max-h-40 min-h-11 flex-1 resize-none"[39m
+            [33mdata-slot[39m=[32m"textarea"[39m
+            [33mdata-testid[39m=[32m"chat-input"[39m
+            [33mid[39m=[32m"chat-input"[39m
+            [33mplaceholder[39m=[32m"Write a question…"[39m
+          [36m/>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"Send"[39m
+            [33mclass[39m=[32m"group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 bg-primary text-primary-foreground hover:bg-primary/80 h-8 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2"[39m
+            [33mdata-disabled[39m=[32m""[39m
+            [33mdata-slot[39m=[32m"button"[39m
+            [33mdata-testid[39m=[32m"chat-send"[39m
+            [33mdisabled[39m=[32m""[39m
+            [33mtabindex[39m=[32m"0"[39m
+            [33mtype[39m=[32m"submit"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-send"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m21.854 2.147-10.94 10.939"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+        [36m</form>[39m
+      [36m</section>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+[90m [2m❯[22m waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:[2m163:27[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m86:33[22m[39m
+[36m [2m❯[22m tests/unit/test_11_3_chat_actions.test.tsx:[2m140:32[22m[39m
+    [90m138|[39m     renderAs("analyst", "read", <ChatScreen projectId="p1" agentKey="a…
+    [90m139|[39m     [35mawait[39m [34mask[39m()[33m;[39m
+    [90m140|[39m     const error = await screen.findByTestId("chat-poll-error", undefin…
+    [90m   |[39m                                [31m^[39m
+    [90m141|[39m     [34mexpect[39m(error[33m.[39mtextContent)[33m.[39m[34mtoContain[39m([32m"service_unavailable"[39m)[33m;[39m
+    [90m142|[39m   })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/10]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/test_11_3_chat_actions.test.tsx[2m > [22mtest_11_3_chat_actions[2m > [22manswers the agent's question and follows the run on
+[31m[1mTestingLibraryElementError[22m[39m: Unable to find an element by: [data-testid="chat-answer-input"]
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"flex min-h-0 flex-1"[39m
+      [33mdata-testid[39m=[32m"chat-screen"[39m
+    [36m>[39m
+      [36m<aside[39m
+        [33maria-label[39m=[32m"Conversations"[39m
+        [33mclass[39m=[32m"hidden w-72 shrink-0 flex-col border-r md:flex"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex min-h-0 flex-1 flex-col"[39m
+          [33mdata-testid[39m=[32m"chat-conversations"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"p-3"[39m
+          [36m>[39m
+            [36m<a[39m
+              [33mclass[39m=[32m"inline-flex w-full items-center justify-center gap-2 rounded-md border px-3 py-2 text-sm hover:bg-muted"[39m
+              [33mdata-testid[39m=[32m"chat-new"[39m
+              [33mhref[39m=[32m"/chat/asistan"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-hidden[39m=[32m"true"[39m
+                [33mclass[39m=[32m"lucide lucide-plus size-4"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"24"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"24"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M5 12h14"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M12 5v14"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [0mNew conversation[0m
+            [36m</a>[39m
+          [36m</div>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"px-3 text-sm text-muted-foreground"[39m
+          [36m>[39m
+            [0mNo conversations yet.[0m
+          [36m</p>[39m
+          [36m<ul[39m
+            [33mclass[39m=[32m"flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto px-2 pb-3"[39m
+          [36m/>[39m
+        [36m</div>[39m
+      [36m</aside>[39m
+      [36m<section[39m
+        [33maria-label[39m=[32m"Contract assistant"[39m
+        [33mclass[39m=[32m"flex min-w-0 flex-1 flex-col"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex items-center gap-2 border-b px-4 py-2"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"Show conversations"[39m
+            [33mclass[39m=[32m"group/button inline-flex shrink-0 items-center justify-center border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50 size-7 rounded-[min(var(--radius-md),12px)] in-data-[slot=button-group]:rounded-lg md:hidden"[39m
+            [33mdata-slot[39m=[32m"button"[39m
+            [33mdata-testid[39m=[32m"chat-open-list"[39m
+            [33mtabindex[39m=[32m"0"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-menu"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M4 5h16"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M4 12h16"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M4 19h16"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+          [36m<h1[39m
+            [33mclass[39m=[32m"truncate font-medium"[39m
+          [36m>[39m
+            [0mContract assistant[0m
+          [36m</h1>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33maria-live[39m=[32m"polite"[39m
+          [33mclass[39m=[32m"flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 py-4"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex justify-end"[39m
+            [33mdata-role[39m=[32m"user"[39m
+            [33mdata-testid[39m=[32m"chat-message"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex max-w-[85%] flex-col gap-2 rounded-2xl px-4 py-2 text-sm bg-primary text-primary-foreground"[39m
+            [36m>[39m
+              [36m<p[39m
+                [33mclass[39m=[32m"whitespace-pre-wrap"[39m
+              [36m>[39m
+                [0mSözleşme süresi?[0m
+              [36m</p>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex justify-start"[39m
+            [33mdata-role[39m=[32m"assistant"[39m
+            [33mdata-testid[39m=[32m"chat-live"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex max-w-[85%] flex-col gap-2 rounded-2xl px-4 py-2 text-sm border bg-card text-card-foreground"[39m
+            [36m>[39m
+              [36m<p[39m
+                [33mclass[39m=[32m"text-xs text-muted-foreground"[39m
+                [33mdata-phase[39m=[32m"waiting_user"[39m
+                [33mdata-testid[39m=[32m"chat-status"[39m
+                [33mrole[39m=[32m"status"[39m
+              [36m>[39m
+                [0mThe assistant asks:[0m
+              [36m</p>[39m
+              [36m<p[39m
+                [33mclass[39m=[32m"font-medium"[39m
+                [33mdata-testid[39m=[32m"chat-question"[39m
+              [36m>[39m
+                [0mHangi sözleşme?[0m
+              [36m</p>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+        [36m<form[39m
+          [33mclass[39m=[32m"flex items-end gap-2 border-t p-3"[39m
+          [33mnovalidate[39m=[32m""[39m
+        [36m>[39m
+          [36m<label[39m
+            [33mclass[39m=[32m"sr-only"[39m
+            [33mfor[39m=[32m"chat-input"[39m
+          [36m>[39m
+            [0mYour message[0m
+          [36m</label>[39m
+          [36m<textarea[39m
+            [33mclass[39m=[32m"flex field-sizing-content w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 max-h-40 min-h-11 flex-1 resize-none"[39m
+            [33mdata-slot[39m=[32m"textarea"[39m
+            [33mdata-testid[39m=[32m"chat-input"[39m
+            [33mid[39m=[32m"chat-input"[39m
+            [33mplaceholder[39m=[32m"Write a question…"[39m
+          [36m/>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"Send"[39m
+            [33mclass[39m=[32m"group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 bg-primary text-primary-foreground hover:bg-primary/80 h-8 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2"[39m
+            [33mdata-disabled[39m=[32m""[39m
+            [33mdata-slot[39m=[32m"button"[39m
+            [33mdata-testid[39m=[32m"chat-send"[39m
+            [33mdisabled[39m=[32m""[39m
+            [33mtabindex[39m=[32m"0"[39m
+            [33mtype[39m=[32m"submit"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-send"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m21.854 2.147-10.94 10.939"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+        [36m</form>[39m
+      [36m</section>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+[90m [2m❯[22m Object.getElementError node_modules/@testing-library/dom/dist/config.js:[2m37:19[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m76:38[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m52:17[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m95:19[22m[39m
+[36m [2m❯[22m tests/unit/test_11_3_chat_actions.test.tsx:[2m155:29[22m[39m
+    [90m153|[39m     [35mconst[39m box [33m=[39m [35mawait[39m screen[33m.[39m[34mfindByTestId[39m([32m"chat-question"[39m)[33m;[39m
+    [90m154|[39m     [34mexpect[39m(box[33m.[39mtextContent)[33m.[39m[34mtoContain[39m([32m"Hangi sözleşme?"[39m)[33m;[39m
+    [90m155|[39m     fireEvent.change(screen.getByTestId("chat-answer-input"), { target…
+    [90m   |[39m                             [31m^[39m
+    [90m156|[39m     [35mawait[39m [34mact[39m([35masync[39m () [33m=>[39m {
+    [90m157|[39m       fireEvent[33m.[39m[34mclick[39m(screen[33m.[39m[34mgetByTestId[39m([32m"chat-answer-send"[39m))[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/10]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/test_11_3_chat_actions.test.tsx[2m > [22mtest_11_3_chat_actions[2m > [22msends the user's vote as source chat, with an optional note
+[31m[1mTestingLibraryElementError[22m[39m: Unable to find an element by: [data-testid="chat-vote-down"]
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"flex min-h-0 flex-1"[39m
+      [33mdata-testid[39m=[32m"chat-screen"[39m
+    [36m>[39m
+      [36m<aside[39m
+        [33maria-label[39m=[32m"Conversations"[39m
+        [33mclass[39m=[32m"hidden w-72 shrink-0 flex-col border-r md:flex"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex min-h-0 flex-1 flex-col"[39m
+          [33mdata-testid[39m=[32m"chat-conversations"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"p-3"[39m
+          [36m>[39m
+            [36m<a[39m
+              [33mclass[39m=[32m"inline-flex w-full items-center justify-center gap-2 rounded-md border px-3 py-2 text-sm hover:bg-muted"[39m
+              [33mdata-testid[39m=[32m"chat-new"[39m
+              [33mhref[39m=[32m"/chat/asistan"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-hidden[39m=[32m"true"[39m
+                [33mclass[39m=[32m"lucide lucide-plus size-4"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"24"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"24"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M5 12h14"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M12 5v14"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [0mNew conversation[0m
+            [36m</a>[39m
+          [36m</div>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"px-3 text-sm text-muted-foreground"[39m
+          [36m>[39m
+            [0mNo conversations yet.[0m
+          [36m</p>[39m
+          [36m<ul[39m
+            [33mclass[39m=[32m"flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto px-2 pb-3"[39m
+          [36m/>[39m
+        [36m</div>[39m
+      [36m</aside>[39m
+      [36m<section[39m
+        [33maria-label[39m=[32m"Contract assistant"[39m
+        [33mclass[39m=[32m"flex min-w-0 flex-1 flex-col"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex items-center gap-2 border-b px-4 py-2"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"Show conversations"[39m
+            [33mclass[39m=[32m"group/button inline-flex shrink-0 items-center justify-center border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50 size-7 rounded-[min(var(--radius-md),12px)] in-data-[slot=button-group]:rounded-lg md:hidden"[39m
+            [33mdata-slot[39m=[32m"button"[39m
+            [33mdata-testid[39m=[32m"chat-open-list"[39m
+            [33mtabindex[39m=[32m"0"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-menu"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M4 5h16"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M4 12h16"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M4 19h16"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+          [36m<h1[39m
+            [33mclass[39m=[32m"truncate font-medium"[39m
+          [36m>[39m
+            [0mContract assistant[0m
+          [36m</h1>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33maria-live[39m=[32m"polite"[39m
+          [33mclass[39m=[32m"flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 py-4"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex justify-end"[39m
+            [33mdata-role[39m=[32m"user"[39m
+            [33mdata-testid[39m=[32m"chat-message"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex max-w-[85%] flex-col gap-2 rounded-2xl px-4 py-2 text-sm bg-primary text-primary-foreground"[39m
+            [36m>[39m
+              [36m<p[39m
+                [33mclass[39m=[32m"whitespace-pre-wrap"[39m
+              [36m>[39m
+                [0mFesih süresi?[0m
+              [36m</p>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex justify-start"[39m
+            [33mdata-role[39m=[32m"assistant"[39m
+            [33mdata-testid[39m=[32m"chat-message"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex max-w-[85%] flex-col gap-2 rounded-2xl px-4 py-2 text-sm border bg-card text-card-foreground"[39m
+            [36m>[39m
+              [36m<p[39m
+                [33mclass[39m=[32m"whitespace-pre-wrap"[39m
+                [33mdata-testid[39m=[32m"chat-answer"[39m
+              [36m>[39m
+                [0m30 gün.[0m
+              [36m</p>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+        [36m<form[39m
+          [33mclass[39m=[32m"flex items-end gap-2 border-t p-3"[39m
+          [33mnovalidate[39m=[32m""[39m
+        [36m>[39m
+          [36m<label[39m
+            [33mclass[39m=[32m"sr-only"[39m
+            [33mfor[39m=[32m"chat-input"[39m
+          [36m>[39m
+            [0mYour message[0m
+          [36m</label>[39m
+          [36m<textarea[39m
+            [33mclass[39m=[32m"flex field-sizing-content w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 max-h-40 min-h-11 flex-1 resize-none"[39m
+            [33mdata-slot[39m=[32m"textarea"[39m
+            [33mdata-testid[39m=[32m"chat-input"[39m
+            [33mid[39m=[32m"chat-input"[39m
+            [33mplaceholder[39m=[32m"Write a question…"[39m
+          [36m/>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"Send"[39m
+            [33mclass[39m=[32m"group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 bg-primary text-primary-foreground hover:bg-primary/80 h-8 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2"[39m
+            [33mdata-disabled[39m=[32m""[39m
+            [33mdata-slot[39m=[32m"button"[39m
+            [33mdata-testid[39m=[32m"chat-send"[39m
+            [33mdisabled[39m=[32m""[39m
+            [33mtabindex[39m=[32m"0"[39m
+            [33mtype[39m=[32m"submit"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-send"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m21.854 2.147-10.94 10.939"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+        [36m</form>[39m
+      [36m</section>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"flex min-h-0 flex-1"[39m
+      [33mdata-testid[39m=[32m"chat-screen"[39m
+    [36m>[39m
+      [36m<aside[39m
+        [33maria-label[39m=[32m"Conversations"[39m
+        [33mclass[39m=[32m"hidden w-72 shrink-0 flex-col border-r md:flex"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex min-h-0 flex-1 flex-col"[39m
+          [33mdata-testid[39m=[32m"chat-conversations"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"p-3"[39m
+          [36m>[39m
+            [36m<a[39m
+              [33mclass[39m=[32m"inline-flex w-full items-center justify-center gap-2 rounded-md border px-3 py-2 text-sm hover:bg-muted"[39m
+              [33mdata-testid[39m=[32m"chat-new"[39m
+              [33mhref[39m=[32m"/chat/asistan"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-hidden[39m=[32m"true"[39m
+                [33mclass[39m=[32m"lucide lucide-plus size-4"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"24"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"24"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M5 12h14"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M12 5v14"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [0mNew conversation[0m
+            [36m</a>[39m
+          [36m</div>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"px-3 text-sm text-muted-foreground"[39m
+          [36m>[39m
+            [0mNo conversations yet.[0m
+          [36m</p>[39m
+          [36m<ul[39m
+            [33mclass[39m=[32m"flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto px-2 pb-3"[39m
+          [36m/>[39m
+        [36m</div>[39m
+      [36m</aside>[39m
+      [36m<section[39m
+        [33maria-label[39m=[32m"Contract assistant"[39m
+        [33mclass[39m=[32m"flex min-w-0 flex-1 flex-col"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex items-center gap-2 border-b px-4 py-2"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"Show conversations"[39m
+            [33mclass[39m=[32m"group/button inline-flex shrink-0 items-center justify-center border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50 size-7 rounded-[min(var(--radius-md),12px)] in-data-[slot=button-group]:rounded-lg md:hidden"[39m
+            [33mdata-slot[39m=[32m"button"[39m
+            [33mdata-testid[39m=[32m"chat-open-list"[39m
+            [33mtabindex[39m=[32m"0"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-menu"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M4 5h16"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M4 12h16"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M4 19h16"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+          [36m<h1[39m
+            [33mclass[39m=[32m"truncate font-medium"[39m
+          [36m>[39m
+            [0mContract assistant[0m
+          [36m</h1>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33maria-live[39m=[32m"polite"[39m
+          [33mclass[39m=[32m"flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 py-4"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex justify-end"[39m
+            [33mdata-role[39m=[32m"user"[39m
+            [33mdata-testid[39m=[32m"chat-message"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex max-w-[85%] flex-col gap-2 rounded-2xl px-4 py-2 text-sm bg-primary text-primary-foreground"[39m
+            [36m>[39m
+              [36m<p[39m
+                [33mclass[39m=[32m"whitespace-pre-wrap"[39m
+              [36m>[39m
+                [0mFesih süresi?[0m
+              [36m</p>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex justify-start"[39m
+            [33mdata-role[39m=[32m"assistant"[39m
+            [33mdata-testid[39m=[32m"chat-message"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex max-w-[85%] flex-col gap-2 rounded-2xl px-4 py-2 text-sm border bg-card text-card-foreground"[39m
+            [36m>[39m
+              [36m<p[39m
+                [33mclass[39m=[32m"whitespace-pre-wrap"[39m
+                [33mdata-testid[39m=[32m"chat-answer"[39m
+              [36m>[39m
+                [0m30 gün.[0m
+              [36m</p>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+        [36m<form[39m
+          [33mclass[39m=[32m"flex items-end gap-2 border-t p-3"[39m
+          [33mnovalidate[39m=[32m""[39m
+        [36m>[39m
+          [36m<label[39m
+            [33mclass[39m=[32m"sr-only"[39m
+            [33mfor[39m=[32m"chat-input"[39m
+          [36m>[39m
+            [0mYour message[0m
+          [36m</label>[39m
+          [36m<textarea[39m
+            [33mclass[39m=[32m"flex field-sizing-content w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 max-h-40 min-h-11 flex-1 resize-none"[39m
+            [33mdata-slot[39m=[32m"textarea"[39m
+            [33mdata-testid[39m=[32m"chat-input"[39m
+            [33mid[39m=[32m"chat-input"[39m
+            [33mplaceholder[39m=[32m"Write a question…"[39m
+          [36m/>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"Send"[39m
+            [33mclass[39m=[32m"group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 bg-primary text-primary-foreground hover:bg-primary/80 h-8 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2"[39m
+            [33mdata-disabled[39m=[32m""[39m
+            [33mdata-slot[39m=[32m"button"[39m
+            [33mdata-testid[39m=[32m"chat-send"[39m
+            [33mdisabled[39m=[32m""[39m
+            [33mtabindex[39m=[32m"0"[39m
+            [33mtype[39m=[32m"submit"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-send"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m21.854 2.147-10.94 10.939"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+        [36m</form>[39m
+      [36m</section>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+[90m [2m❯[22m waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:[2m163:27[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m86:33[22m[39m
+[36m [2m❯[22m tests/unit/test_11_3_chat_actions.test.tsx:[2m193:36[22m[39m
+    [90m191|[39m     renderAs("user", "edit", <ChatScreen projectId="p1" agentKey="asis…
+    [90m192|[39m     [35mawait[39m [34mact[39m([35masync[39m () [33m=>[39m {
+    [90m193|[39m       fireEvent[33m.[39m[34mclick[39m([35mawait[39m screen[33m.[39m[34mfindByTestId[39m([32m"chat-vote-down"[39m))[33m;[39m
+    [90m   |[39m                                    [31m^[39m
+    [90m194|[39m     })[33m;[39m
+    [90m195|[39m     fireEvent.change(await screen.findByTestId("chat-vote-note"), { ta…
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:24[22m[39m
+[90m [2m❯[22m process.env.NODE_ENV.exports.act node_modules/react/cjs/react.development.js:[2m789:22[22m[39m
+[90m [2m❯[22m Proxy.<anonymous> node_modules/@testing-library/react/dist/act-compat.js:[2m46:25[22m[39m
+[90m [2m❯[22m tests/unit/test_11_3_chat_actions.test.tsx:[2m192:11[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/10]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/test_11_3_chat_actions.test.tsx[2m > [22mtest_11_3_chat_actions[2m > [22mshows the stored vote and disables voting in read-only access with the reason
+[31m[1mTestingLibraryElementError[22m[39m: Unable to find an element by: [data-testid="chat-vote-up"]
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"flex min-h-0 flex-1"[39m
+      [33mdata-testid[39m=[32m"chat-screen"[39m
+    [36m>[39m
+      [36m<aside[39m
+        [33maria-label[39m=[32m"Conversations"[39m
+        [33mclass[39m=[32m"hidden w-72 shrink-0 flex-col border-r md:flex"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex min-h-0 flex-1 flex-col"[39m
+          [33mdata-testid[39m=[32m"chat-conversations"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"p-3"[39m
+          [36m>[39m
+            [36m<a[39m
+              [33mclass[39m=[32m"inline-flex w-full items-center justify-center gap-2 rounded-md border px-3 py-2 text-sm hover:bg-muted"[39m
+              [33mdata-testid[39m=[32m"chat-new"[39m
+              [33mhref[39m=[32m"/chat/asistan"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-hidden[39m=[32m"true"[39m
+                [33mclass[39m=[32m"lucide lucide-plus size-4"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"24"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"24"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M5 12h14"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M12 5v14"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [0mNew conversation[0m
+            [36m</a>[39m
+          [36m</div>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"px-3 text-sm text-muted-foreground"[39m
+          [36m>[39m
+            [0mNo conversations yet.[0m
+          [36m</p>[39m
+          [36m<ul[39m
+            [33mclass[39m=[32m"flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto px-2 pb-3"[39m
+          [36m/>[39m
+        [36m</div>[39m
+      [36m</aside>[39m
+      [36m<section[39m
+        [33maria-label[39m=[32m"Contract assistant"[39m
+        [33mclass[39m=[32m"flex min-w-0 flex-1 flex-col"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex items-center gap-2 border-b px-4 py-2"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"Show conversations"[39m
+            [33mclass[39m=[32m"group/button inline-flex shrink-0 items-center justify-center border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50 size-7 rounded-[min(var(--radius-md),12px)] in-data-[slot=button-group]:rounded-lg md:hidden"[39m
+            [33mdata-slot[39m=[32m"button"[39m
+            [33mdata-testid[39m=[32m"chat-open-list"[39m
+            [33mtabindex[39m=[32m"0"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-menu"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M4 5h16"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M4 12h16"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M4 19h16"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+          [36m<h1[39m
+            [33mclass[39m=[32m"truncate font-medium"[39m
+          [36m>[39m
+            [0mContract assistant[0m
+          [36m</h1>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33maria-live[39m=[32m"polite"[39m
+          [33mclass[39m=[32m"flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 py-4"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex justify-end"[39m
+            [33mdata-role[39m=[32m"user"[39m
+            [33mdata-testid[39m=[32m"chat-message"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex max-w-[85%] flex-col gap-2 rounded-2xl px-4 py-2 text-sm bg-primary text-primary-foreground"[39m
+            [36m>[39m
+              [36m<p[39m
+                [33mclass[39m=[32m"whitespace-pre-wrap"[39m
+              [36m>[39m
+                [0mFesih süresi?[0m
+              [36m</p>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex justify-start"[39m
+            [33mdata-role[39m=[32m"assistant"[39m
+            [33mdata-testid[39m=[32m"chat-message"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex max-w-[85%] flex-col gap-2 rounded-2xl px-4 py-2 text-sm border bg-card text-card-foreground"[39m
+            [36m>[39m
+              [36m<p[39m
+                [33mclass[39m=[32m"whitespace-pre-wrap"[39m
+                [33mdata-testid[39m=[32m"chat-answer"[39m
+              [36m>[39m
+                [0m30 gün.[0m
+              [36m</p>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+        [36m<form[39m
+          [33mclass[39m=[32m"flex items-end gap-2 border-t p-3"[39m
+          [33mnovalidate[39m=[32m""[39m
+        [36m>[39m
+          [36m<label[39m
+            [33mclass[39m=[32m"sr-only"[39m
+            [33mfor[39m=[32m"chat-input"[39m
+          [36m>[39m
+            [0mYour message[0m
+          [36m</label>[39m
+          [36m<textarea[39m
+            [33mclass[39m=[32m"flex field-sizing-content w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 max-h-40 min-h-11 flex-1 resize-none"[39m
+            [33mdata-slot[39m=[32m"textarea"[39m
+            [33mdata-testid[39m=[32m"chat-input"[39m
+            [33mid[39m=[32m"chat-input"[39m
+            [33mplaceholder[39m=[32m"Write a question…"[39m
+          [36m/>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"Send"[39m
+            [33mclass[39m=[32m"group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 bg-primary text-primary-foreground hover:bg-primary/80 h-8 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2"[39m
+            [33mdata-disabled[39m=[32m""[39m
+            [33mdata-slot[39m=[32m"button"[39m
+            [33mdata-testid[39m=[32m"chat-send"[39m
+            [33mdisabled[39m=[32m""[39m
+            [33mtabindex[39m=[32m"0"[39m
+            [33mtype[39m=[32m"submit"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-send"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m21.854 2.147-10.94 10.939"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+        [36m</form>[39m
+      [36m</section>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"flex min-h-0 flex-1"[39m
+      [33mdata-testid[39m=[32m"chat-screen"[39m
+    [36m>[39m
+      [36m<aside[39m
+        [33maria-label[39m=[32m"Conversations"[39m
+        [33mclass[39m=[32m"hidden w-72 shrink-0 flex-col border-r md:flex"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex min-h-0 flex-1 flex-col"[39m
+          [33mdata-testid[39m=[32m"chat-conversations"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"p-3"[39m
+          [36m>[39m
+            [36m<a[39m
+              [33mclass[39m=[32m"inline-flex w-full items-center justify-center gap-2 rounded-md border px-3 py-2 text-sm hover:bg-muted"[39m
+              [33mdata-testid[39m=[32m"chat-new"[39m
+              [33mhref[39m=[32m"/chat/asistan"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-hidden[39m=[32m"true"[39m
+                [33mclass[39m=[32m"lucide lucide-plus size-4"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"24"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"24"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M5 12h14"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M12 5v14"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [0mNew conversation[0m
+            [36m</a>[39m
+          [36m</div>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"px-3 text-sm text-muted-foreground"[39m
+          [36m>[39m
+            [0mNo conversations yet.[0m
+          [36m</p>[39m
+          [36m<ul[39m
+            [33mclass[39m=[32m"flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto px-2 pb-3"[39m
+          [36m/>[39m
+        [36m</div>[39m
+      [36m</aside>[39m
+      [36m<section[39m
+        [33maria-label[39m=[32m"Contract assistant"[39m
+        [33mclass[39m=[32m"flex min-w-0 flex-1 flex-col"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex items-center gap-2 border-b px-4 py-2"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"Show conversations"[39m
+            [33mclass[39m=[32m"group/button inline-flex shrink-0 items-center justify-center border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50 size-7 rounded-[min(var(--radius-md),12px)] in-data-[slot=button-group]:rounded-lg md:hidden"[39m
+            [33mdata-slot[39m=[32m"button"[39m
+            [33mdata-testid[39m=[32m"chat-open-list"[39m
+            [33mtabindex[39m=[32m"0"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-menu"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M4 5h16"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M4 12h16"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M4 19h16"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+          [36m<h1[39m
+            [33mclass[39m=[32m"truncate font-medium"[39m
+          [36m>[39m
+            [0mContract assistant[0m
+          [36m</h1>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33maria-live[39m=[32m"polite"[39m
+          [33mclass[39m=[32m"flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 py-4"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex justify-end"[39m
+            [33mdata-role[39m=[32m"user"[39m
+            [33mdata-testid[39m=[32m"chat-message"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex max-w-[85%] flex-col gap-2 rounded-2xl px-4 py-2 text-sm bg-primary text-primary-foreground"[39m
+            [36m>[39m
+              [36m<p[39m
+                [33mclass[39m=[32m"whitespace-pre-wrap"[39m
+              [36m>[39m
+                [0mFesih süresi?[0m
+              [36m</p>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex justify-start"[39m
+            [33mdata-role[39m=[32m"assistant"[39m
+            [33mdata-testid[39m=[32m"chat-message"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex max-w-[85%] flex-col gap-2 rounded-2xl px-4 py-2 text-sm border bg-card text-card-foreground"[39m
+            [36m>[39m
+              [36m<p[39m
+                [33mclass[39m=[32m"whitespace-pre-wrap"[39m
+                [33mdata-testid[39m=[32m"chat-answer"[39m
+              [36m>[39m
+                [0m30 gün.[0m
+              [36m</p>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+        [36m<form[39m
+          [33mclass[39m=[32m"flex items-end gap-2 border-t p-3"[39m
+          [33mnovalidate[39m=[32m""[39m
+        [36m>[39m
+          [36m<label[39m
+            [33mclass[39m=[32m"sr-only"[39m
+            [33mfor[39m=[32m"chat-input"[39m
+          [36m>[39m
+            [0mYour message[0m
+          [36m</label>[39m
+          [36m<textarea[39m
+            [33mclass[39m=[32m"flex field-sizing-content w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 max-h-40 min-h-11 flex-1 resize-none"[39m
+            [33mdata-slot[39m=[32m"textarea"[39m
+            [33mdata-testid[39m=[32m"chat-input"[39m
+            [33mid[39m=[32m"chat-input"[39m
+            [33mplaceholder[39m=[32m"Write a question…"[39m
+          [36m/>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"Send"[39m
+            [33mclass[39m=[32m"group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 bg-primary text-primary-foreground hover:bg-primary/80 h-8 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2"[39m
+            [33mdata-disabled[39m=[32m""[39m
+            [33mdata-slot[39m=[32m"button"[39m
+            [33mdata-testid[39m=[32m"chat-send"[39m
+            [33mdisabled[39m=[32m""[39m
+            [33mtabindex[39m=[32m"0"[39m
+            [33mtype[39m=[32m"submit"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-send"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m21.854 2.147-10.94 10.939"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+        [36m</form>[39m
+      [36m</section>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+[90m [2m❯[22m waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:[2m163:27[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m86:33[22m[39m
+[36m [2m❯[22m tests/unit/test_11_3_chat_actions.test.tsx:[2m208:30[22m[39m
+    [90m206|[39m     serve(AGENT, (url) => (url === `${P}/conversations/c1/messages` ? …
+    [90m207|[39m     renderAs("analyst", "read", <ChatScreen projectId="p1" agentKey="a…
+    [90m208|[39m     const up = (await screen.findByTestId("chat-vote-up")) as HTMLButt…
+    [90m   |[39m                              [31m^[39m
+    [90m209|[39m     [34mexpect[39m(up[33m.[39m[34mgetAttribute[39m([32m"aria-pressed"[39m))[33m.[39m[34mtoBe[39m([32m"true"[39m)[33m;[39m
+    [90m210|[39m     [34mexpect[39m(up[33m.[39mdisabled)[33m.[39m[34mtoBe[39m([35mtrue[39m)[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/10]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/test_11_3_chat_actions.test.tsx[2m > [22mtest_11_3_chat_actions[2m > [22mshows the portal welcome and example questions; an example fills the box, never sends
+[31m[1mAssertionError[22m: expected 'Ask Contract assistantAnswers from co…' to contain 'Sözleşmeler hakkında sorun.'[39m
+
+Expected: [32m"Sözleşmeler hakkında sorun."[39m
+Received: [31m"Ask Contract assistantAnswers from contracts"[39m
+
+[36m [2m❯[22m tests/unit/test_11_3_chat_actions.test.tsx:[2m218:69[22m[39m
+    [90m216|[39m     [35mconst[39m fetchMock [33m=[39m [34mserve[39m(portal)[33m;[39m
+    [90m217|[39m     renderAs("user", "edit", <ChatScreen projectId="p1" agentKey="asis…
+    [90m218|[39m     expect((await screen.findByTestId("chat-welcome")).textContent).to…
+    [90m   |[39m                                                                     [31m^[39m
+    [90m219|[39m     [35mconst[39m examples [33m=[39m screen[33m.[39m[34mgetAllByTestId[39m([32m"chat-example"[39m)[33m;[39m
+    [90m220|[39m     expect(examples.map((e) => e.textContent)).toEqual(["Fesih süresi …
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/10]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m3 failed[39m[22m[90m (3)[39m
+[2m      Tests [22m [1m[31m8 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (9)[39m
+[2m   Start at [22m 03:49:32
+[2m   Duration [22m 16.07s[2m (transform 3.19s, setup 0ms, import 3.88s, tests 10.37s, environment 3.18s)[22m
+

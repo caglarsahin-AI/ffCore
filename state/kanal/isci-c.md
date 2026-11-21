@@ -97,3 +97,27 @@ Paket: 11 · Cevap: C-11-0015 · Yigin: ffcore-11
 ### C-11-0018 · 2026-11-21 01:50 · → koordinator · PR-HAZIR
 Paket: 11 · Cevap: K-11-0012, K-GEN-0036 · SHA: 43f5ed86021b41f2d54b192afed3181677e7be0f
 **11-1 parity** hazır: dal `fix/11-1-parity`, delta `main..43f5ed8`: 1 commit (test), 3 dosya +37, ürün kodu değişmedi. Main'de kırmızı (2 failed, `11-1-parity-red.log`); dalda 03a/06a/11 27 passed (`-green.log`); `make lint && make test` 2159 passed (`-make-test.log`). Tam test-int K-GEN-0036 gereği koşulmadı (ENV-217 disk), kapıda. Bilerek değişen testler: 03a/06a muafiyetleri (gerekçeli) + yeni `test_11_4_read_mode_get_parity`. PR notu `state/pr/11.md` "PR 11-1 parity".
+
+### C-11-0019 · 2026-11-21 06:40 · → koordinator · ACK
+Paket: 11 · Cevap: K-11-0018, K-11-0019 · SHA: 2f9a25e
+11-2 başladı: dal `feat/11-2-chat` yerel main 2f9a25e'den (worktree `.worktrees/feat/11-2-chat`, origin'e dokunulmadı). Bağlayıcı: K-11-0005 S1-S4 A, KARARLAR '11-2 plan kararları'. Sıra: backend kırmızı (göç `11_0001`, `user_feedback`, `portal_config`) → kod → önyüz kırmızı (onay/ask_user/oy/portal, NOTE-1 kopuş Vitest'i) → kod → e2e → docs; test/kod/docs ayrı commit, changelog'da 11-2 üstte. FOLLOWUP-135 kapanış notu PR'da. OpenAPI ve ortak modül dokunulacağı için PR-HAZIR öncesi tam test-int slotu isteyeceğim. Yığın açarken YIGIN-AC.
+
+### C-11-0020 · 2026-11-21 06:55 · → koordinator · YIGIN-AC
+Paket: 11 · Cevap: K-11-0019 · Yigin: ffcore-11
+11-2 backend: postgres+redis, `--env-file .env.test`, `--no-build --pull never` (`0.0.0-11`; tools kaynağı `.:/work` bağlı, bağımlılık değişmedi); hedefli test-int kırmızı/yeşil (`11-2-b-*.log`). Önyüz e2e için sonra `--build` ile tam test profili. Bitince `down -v` + YIGIN-KAPA.
+
+### C-11-0021 · 2026-11-21 08:10 · → koordinator · DURUM
+Paket: 11 · Cevap: K-11-0019 · Yigin: ffcore-11
+11-2 ilerleme: backend (göç `11_0001`, `source: chat` → `user_feedback`, `portal_config`) hedefli 149 passed (`11-2-b-green-int-2.log`; kırmızı `11-2-b-red-int.log` 10 failed); önyüz lint/typecheck/check:api 0, Vitest 323/323 (`11-2-f-gate-2.log`; kırmızı `11-2-f-red-vitest.log`). ffcore-11 (C-11-0020) şimdi tam test profiliyle genişliyor: `--build --pull never` `0.0.0-11b`, `FAKE_EMBED=1`, e2e 11 spec'leri + Langfuse public API'den `user_feedback` score sorgusu (tools konteyneri; anahtarlar yazılmaz) (`11-2-e2e-run1.log`).
+
+### C-11-0022 · 2026-11-21 09:05 · → koordinator · ISTEK
+Paket: 11 · Cevap: K-11-0019 · SHA: b957c66 · Yigin: ffcore-11
+**Tam test-int slotu istiyorum** (FOLLOWUP-216: 06a OpenAPI, `agents_schemas`, `runs.py` feedback, `models/*`, göç `11_0001` değişti). Dal `feat/11-2-chat` b957c66 (test/kod/docs ayrı, 8 commit). e2e 11 spec'leri 14/14 (`11-2-e2e-run2.log`), 10bp2 panel regresyonu 29/29 (`11-2-e2e-panel.log`); Langfuse public API'de `user_feedback` score 1 (value `wrong`, not dâhil; `11-2-e2e-run1.log`). ffcore-11 açık (test profili); slot verilince aynı yığında `make test-int` koşarım, sonra `down -v` + YIGIN-KAPA + PR-HAZIR. Bu arada `make lint && make test` iki profil.
+
+### C-11-0023 · 2026-11-21 10:05 · → koordinator · YIGIN-KAPA
+Paket: 11 · Cevap: C-11-0020, C-11-0022 · Yigin: ffcore-11
+`down -v` (test, e2e, tools, qdrant): konteyner 0, volume 0 (`11-2-down.log`). Tam test-int slotu geri veriliyor.
+
+### C-11-0024 · 2026-11-21 10:05 · → koordinator · PR-HAZIR
+Paket: 11 · Cevap: K-11-0019, K-11-0021 · SHA: b957c6691da0d7c7547a43eea9c952bdb1a752f7
+**11-2** hazır: dal `feat/11-2-chat`, delta `main..b957c66` (baz 2f9a25e): 8 commit (test → kod → test → kod → test → docs), 42 dosya +1892/−119. Göç `11_0001` (`messages.user_feedback`, `agents.portal_config`; heads tek, up/down/up). Kapı: tam test-int **1188 passed / 42 skipped** (`11-2-test-int-2.log`; ilk deneme qdrant'sız koşmadı, `-test-int.log`); `make lint && make test` llmaas + airgap 2159 + 2159; önyüz lint/typecheck/check:api 0, Vitest 323/323; e2e 11 14/14, 10bp2 panel 29/29; Langfuse public API'de `user_feedback` score 1. Bilerek değişen testler: `test_11_1_chat_agents_carry_no_definition` (+`portal_config`), `test_11_1_chat_view` fikstürü (+`user_feedback`), kendi `test_11_3_portal_tab` hatam. **FOLLOWUP-135 kapanabilir** (sohbette `QuestionBox`, e2e `test_11_7_ask_user`). Sapmalar PR notunda: Langfuse score'u e2e konteynerinden değil tools'tan sorgulandı (e2e'de anahtar yok, `deploy/` touch-zone dışı); vurgu zemin değerleri gerekçeli eslint-disable + tokens.css testi. PR notu `state/pr/11.md` "PR 11-2".

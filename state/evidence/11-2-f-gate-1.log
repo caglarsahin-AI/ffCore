@@ -1,0 +1,87 @@
+HEAD=64f1bd0405c11ddcb4c27574377d2052afa1c962 + frontend code (uncommitted)
+
+/w/frontend/components/agent-wizard/portal-tab.tsx
+  82:25  error  Hard-coded colour: use a theme token class from styles/tokens.css  no-restricted-syntax
+  82:25  error  User-visible attribute text comes from messages/*.json (t(...))    no-restricted-syntax
+
+/w/frontend/lib/portal-accent.ts
+  12:64  error  Hard-coded colour: use a theme token class from styles/tokens.css  no-restricted-syntax
+  12:81  error  Hard-coded colour: use a theme token class from styles/tokens.css  no-restricted-syntax
+  13:46  error  Hard-coded colour: use a theme token class from styles/tokens.css  no-restricted-syntax
+  13:63  error  Hard-coded colour: use a theme token class from styles/tokens.css  no-restricted-syntax
+
+/w/frontend/tests/unit/test_11_3_portal_tab.test.tsx
+  54:36  warning  '_url' is defined but never used   @typescript-eslint/no-unused-vars
+  54:61  warning  '_init' is defined but never used  @typescript-eslint/no-unused-vars
+
+✖ 8 problems (6 errors, 2 warnings)
+
+lint=1
+tests/unit/test_11_1_chat_view.test.ts(11,3): error TS2322: Type '{ id: string; role: "user" | "assistant"; content: string; run_id: string | null; run_status: components["schemas"]["RunStatus"] | null; outcome_label: components["schemas"]["OutcomeLabel"] | null; ... 5 more ...; created_at: string; }' is not assignable to type '{ id: string; role: "user" | "assistant"; content: string; run_id: string | null; run_status: "failed" | "queued" | "running" | "waiting_approval" | "waiting_user" | "completed" | "cancelled" | "abandoned" | null; ... 6 more ...; created_at: string; }'.
+  Types of property 'user_feedback' are incompatible.
+    Type '{ [key: string]: unknown; } | null | undefined' is not assignable to type '{ [key: string]: unknown; } | null'.
+      Type 'undefined' is not assignable to type '{ [key: string]: unknown; } | null'.
+typecheck=2
+API contract copies and generated types are current.
+checkapi=0
+    [90m 33|[39m   })[33m;[39m
+    [90m 34|[39m })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/test_10ab_12_attr_literals.test.ts[2m > [22mtest_10ab_12_attr_literals[2m > [22mfinds no literal attribute text in the source tree (SidebarRail included)
+[31m[1mAssertionError[22m: expected [ …(2) ] to deeply equal [][39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- [][39m
+[31m+ [[39m
+[31m+   "/w/frontend/components/agent-wizard/portal-tab.tsx:82",[39m
+[31m+   "/w/frontend/components/agent-wizard/portal-tab.tsx:82",[39m
+[31m+ ][39m
+
+[36m [2m❯[22m tests/unit/test_10ab_12_attr_literals.test.ts:[2m29:18[22m[39m
+    [90m 27|[39m       r.messages.filter((m) => m.ruleId === "no-restricted-syntax").ma…
+    [90m 28|[39m     )[33m;[39m
+    [90m 29|[39m     [34mexpect[39m(hits)[33m.[39m[34mtoEqual[39m([])[33m;[39m
+    [90m   |[39m                  [31m^[39m
+    [90m 30|[39m   })[33m;[39m
+    [90m 31|[39m })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/test_11_3_portal_tab.test.tsx[2m > [22mtest_11_3_portal_tab[2m > [22msaves the portal settings with PATCH, on a published agent too
+[31m[1mAssertionError[22m: expected { portal_config: { …(3) } } to deeply equal { portal_config: { …(3) } }[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[2m  {[22m
+[2m    "portal_config": {[22m
+[2m      "accent": "#0F766E",[22m
+[2m      "examples": [[22m
+[32m-       "Fesih süresi?",[39m
+[2m        "Cezai şart var mı?",[22m
+[2m      ],[22m
+[2m      "welcome": "Sözleşmeler hakkında sorun.",[22m
+[2m    },[22m
+[2m  }[22m
+
+[36m [2m❯[22m tests/unit/test_11_3_portal_tab.test.tsx:[2m47:44[22m[39m
+    [90m 45|[39m     [34mexpect[39m([33mString[39m(url))[33m.[39m[34mtoBe[39m([32m`[39m[36m${[39m[33mP[39m[36m}[39m[32m/agents/a1`[39m)[33m;[39m
+    [90m 46|[39m     [34mexpect[39m(init[33m?.[39mmethod)[33m.[39m[34mtoBe[39m([32m"PATCH"[39m)[33m;[39m
+    [90m 47|[39m     [34mexpect[39m([33mJSON[39m[33m.[39m[34mparse[39m([33mString[39m(init[33m?.[39mbody)))[33m.[39m[34mtoEqual[39m({
+    [90m   |[39m                                            [31m^[39m
+    [90m 48|[39m       portal_config: { welcome: "Sözleşmeler hakkında sorun.", example…
+    [90m 49|[39m     })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m3 failed[39m[22m[2m | [22m[1m[32m57 passed[39m[22m[90m (60)[39m
+[2m      Tests [22m [1m[31m3 failed[39m[22m[2m | [22m[1m[32m319 passed[39m[22m[90m (322)[39m
+[2m   Start at [22m 03:57:48
+[2m   Duration [22m 49.43s[2m (transform 107.92s, setup 0ms, import 153.96s, tests 63.65s, environment 43.94s)[22m
+
+vitest=0
