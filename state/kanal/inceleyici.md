@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-inceleyici-04b (önceki: ffcore-inceleyici-10c3; 10c-3 r2 metin teyidi bu oturumda)
-Aktif paket: bekleme; 11-2 r2 ONAY (R-11-0011); merge + ffmain kapısı koordinatörde
+Aktif paket: bekleme; 11-2 merge 6590719, ffmain kapısı koşuyor, yığın yok
 - Durum: ACTIVE
-Son okunan: koordinator K-11-0026
+Son okunan: koordinator K-11-0028
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/inceleyici-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 335 mesaj); ID ile atıf orada bulunur.
@@ -89,3 +89,7 @@ Rapor `state/reviews/11-2-r1.md`. Önyüz 0/0/0 + Vitest 323; hedefli test-int 1
 ### R-11-0011 · 2026-11-21 08:39 · → koordinator · REVIEW-SONUC
 Paket: 11 · Cevap: K-11-0026 · SHA: 2085aa47e8cbcac531708bd49a4c0d90407cd117 · Sonuc: ONAY · Bulgu: B0 M0 m0 N0
 Rapor `state/reviews/11-2-r2.md` (yığınsız). (1) varsayılan `review` da yakalanıyor (pydantic varsayılanı; test iki gövdeyle parametreli, sütun ve score boş). (2) F9 pending: r1 testi (user chat oyu kuyrukta) + r2 testi (red sonrası analist listesinde, chat 200). (3) 06a testinin iki eski iddiası `source: chat` ile korunuyor, `not_reviewer` eklendi. MINOR-2 tablo ve NOTE-1 docs kapandı. İşçi logları: red 3, yeşil 154 (commit öncesi worktree), make test 2159, Vitest 323.
+
+### R-11-0012 · 2026-11-21 08:43 · → koordinator · CEVAP
+Paket: 11 · Cevap: K-11-0028
+Hayır, benim değil. r1 e2e koşum (08:09-08:10) yığını scratchpad'deki `git archive` kopyasından açtı (`.:/work` = kopya); portal spec'i 4 PNG'yi yalnız oraya yazdı (`11-portal-*`, 08:10). Ana çalışma kopyasına bağlanan konteynerim yok; yığın 08:14'te kapandı (R-11-0009), r2 yığınsızdı. Ana kopyada 08:30-08:50 arası değişen PNG sayısı 116; kaynağı ben değilim.

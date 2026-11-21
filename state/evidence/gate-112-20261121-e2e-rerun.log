@@ -1,0 +1,46 @@
+=== gate112-e2e-rerun main 9a50478 2026-11-21 12:39:47
+
+=== 12:39:48 up -d --no-build --pull never --wait
+ Container ffmain-langfuse-web-1  Healthy
+ Container ffmain-mcp-search-1  Healthy
+ Container ffmain-mcp-sql-1  Healthy
+up exit=0
+
+=== 12:41:02 e2e A. stack FAKE_EMBED=0 (model-missing stage)
+ Container ffmain-langfuse-web-1  Healthy
+ Container ffmain-mcp-sql-1  Healthy
+ Container ffmain-mcp-search-1  Healthy
+upA exit=0
+
+=== 12:41:42 e2e A. seed (prompts + superadmin)
+2026-11-21 09:42:01,961 WARNING langfuse Prompt 'platform_rules-label:production' not found during refresh, evicting from cache.
+prompts created: ['eval_judge_rubric_v2', 'platform_rules']
+prompts already present: -
+superadmin created: 88868099-20b2-47d0-b3c1-294054f31dc4
+
+=== 12:42:14 e2e A. @model-missing
+  ✓  1 [chromium] › tests/e2e/test_10bp1_10_readiness.spec.ts:10:5 › test_10bp1_10_readiness: @model-missing without weights the page says why and how to fix it (4.6s)
+  1 passed (2.3m)
+e2e-mm exit=0
+
+=== 12:45:44 e2e B. whole stack FAKE_EMBED=1
+ Container ffmain-backend-1  Healthy
+ Container ffmain-mcp-search-1  Healthy
+ Container ffmain-mcp-sql-1  Healthy
+upB exit=0
+FAKE_EMBED=1
+
+=== 12:46:34 e2e B. main run (grep-invert @model-missing, fake upstream)
+  ✓   67 [chromium] › tests/e2e/test_10af_3_provider_test.spec.ts:12:5 › test_10af_3_provider_test: an unsaved configuration is tested, and a failed test does not block saving (2.0s)
+  ✓   87 [chromium] › tests/e2e/test_10bp1_12_query_failures.spec.ts:7:5 › test_10bp1_12_query_failures: a failed knowledge base read is an error, never an empty screen (1.6s)
+  ✓   93 [chromium] › tests/e2e/test_10bp1_4_gate_reject.spec.ts:10:5 › test_10bp1_4_gate_reject: a rejected and a failed file stay in the list with their reason and code (4.1s)
+  ✓  119 [chromium] › tests/e2e/test_10bp2_13_query_failures.spec.ts:9:5 › test_10bp2_13_query_failures: a missing record or a failed list is an error, never an empty screen (3.5s)
+  203 passed (14.6m)
+e2e-main exit=0
+
+=== 13:02:06 down -v
+ Volume ffmain_langfuse_postgres_data  Removed
+ Volume ffmain_e2e_node_modules  Removed
+
+=== 13:02:32 done
+gate script exit 0

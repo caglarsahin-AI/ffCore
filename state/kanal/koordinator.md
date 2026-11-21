@@ -251,3 +251,16 @@ Paket: 11 · Cevap: R-11-0011 · SHA: 6590719 · Yigin: ffmain
 ### K-11-0029 · 2026-11-21 12:40 · → tumu · DURUM
 Paket: 11 · Cevap: K-11-0028 · Yigin: ffmain (açık kalıyor)
 gate-112-20261121: hooks 421, config ×3, build, lint, heads tek, `make test` 2159×2, samples, **test-int 1190/42 skip**, smoke, önyüz TS/check:api/Vitest 323 (60 dosya) yeşil; **e2e A ve B `npm ci` sırasında registry.npmjs.org soket kopması** ile düştü (ortam; `e2e_node_modules` volume'u `down -v` ile her kapıda siliniyor, npm ci her seferinde ağa çıkıyor — FOLLOWUP adayı). Yalnız e2e aşamaları yeniden koşuyor (`gate-112-20261121-e2e-rerun.log`, ~25 dk). YIGIN-AC sürüyor; konteyner testi yok.
+
+### K-11-0030 · 2026-11-21 13:09 · → tumu · MERGED
+Paket: 11 · Cevap: K-11-0029 · SHA: 6590719 · Yigin: ffmain (YIGIN-KAPA)
+**11 DONE.** gate-112 yeşil: test-int 1190/42, `make test` 2159×2, Vitest 323, e2e tekrarı @model-missing 1/1 + tam yığın 203/0 (ilk e2e düşüşü `npm ci` ağ kopması, FOLLOWUP-220). ffmain kapalı. KARARLAR '11-2 main kapısı YEŞİL; 11 DONE'; FOLLOWUP-135 kapandı. Dalga 8 kapanış raporu `state/dalga/dalga-8-kapanis.md` kullanıcı onayında; sıradaki dalga onaydan sonra. Push kullanıcı talimatıyla.
+
+### K-11-0031 · 2026-11-21 13:09 · → isci-c · HANDOFF-ISTEK
+Paket: 11 · Cevap: C-11-0027
+11 DONE; teşekkürler (iki PR, iki kısa düzeltme dilimi, test-int 1143 → 1190). Kanalına **HANDOFF** yaz (bitenler, açık bıraktıkların: FOLLOWUP-219 agent şartı, 220 e2e node_modules; worktree `.worktrees/feat/11-2-chat` ve `feat/11-chat` silinmeye hazır; imaj `0.0.0-11` kullanıcı temizliğine), sonra bekle: koordinatör RETIRED yazar, kullanıcı oturumu arşivler. Yeni kod/konteyner işi yok.
+
+### K-11-0032 · 2026-11-21 13:09 · → inceleyici · DURUM
+Paket: dalga-8 · Cevap: R-11-0012
+11 DONE, dalga 8 kapandı (rapor kullanıcı onayında). PNG açıklaman için teşekkürler; kaynak bulunamadı, stash'te kalıyor, kullanıcı kararı. Bekleme; sıradaki dalga onaydan sonra REVIEW-ISTEK ile gelir. Kanal başlığını 'bekleme (dalga 9 onayı)' yap.
+
