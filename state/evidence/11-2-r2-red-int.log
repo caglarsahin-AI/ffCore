@@ -1,0 +1,167 @@
+HEAD=b957c6691da0d7c7547a43eea9c952bdb1a752f7 + r2 red tests
+522 files left unchanged
+...FF..................F                                                 [100%]
+=================================== FAILURES ===================================
+________ test_11_2_r2_user_member_cannot_write_the_expert_review[body0] ________
+
+answered = (UUID('b8b98c20-4958-41b9-9405-a41a896a3eab'), <starlette.testclient.TestClient object at 0x7fe05c1b9820>, 'db7a9b8e-48c6-4bd7-8d98-da3bf8a5b3da')
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_9b00f4dde9c6) at 0x7fe02a0cc500>
+scores = <tests.integration.test_11_2_chat.FakeScores object at 0x7fe02900f410>
+make_user = <function make_user.<locals>.make at 0x7fe028fd7100>
+client_factory = <function client_factory.<locals>.make at 0x7fe02a123b00>
+body = {'vote': 'correct'}
+
+    @pytest.mark.parametrize("body", [{"vote": "correct"}, {"vote": "correct", "source": "review"}])
+    def test_11_2_r2_user_member_cannot_write_the_expert_review(
+        answered, pg, scores, make_user, client_factory, body
+    ):
+        # 11-2 r1 MINOR-1 (A): a `user` member's default (review) vote is refused, so it can neither
+        # take the run out of F9's pending list nor show as an expert score; the chat vote stays open.
+        project_id, client, run_id = answered
+        response = client.post(_url(project_id, f"/runs/{run_id}/feedback"), json=body)
+>       assert response.status_code == 403
+E       assert 200 == 403
+E        +  where 200 = <Response [200 OK]>.status_code
+
+tests/integration/test_11_2_chat.py:133: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-21 05:19:05,003 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-21 05:19:05,339 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=333
+2026-11-21 05:19:05,655 INFO ffcore.access access method=POST path=/api/v1/projects/b8b98c20-4958-41b9-9405-a41a896a3eab/agents/asistan/runs status=200 ms=313
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:71 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=333
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/b8b98c20-4958-41b9-9405-a41a896a3eab/agents/asistan/runs status=200 ms=313
+----------------------------- Captured stderr call -----------------------------
+2026-11-21 05:19:05,712 INFO ffcore.access access method=POST path=/api/v1/projects/b8b98c20-4958-41b9-9405-a41a896a3eab/runs/db7a9b8e-48c6-4bd7-8d98-da3bf8a5b3da/feedback status=200 ms=47
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/b8b98c20-4958-41b9-9405-a41a896a3eab/runs/db7a9b8e-48c6-4bd7-8d98-da3bf8a5b3da/feedback status=200 ms=47
+--------------------------- Captured stderr teardown ---------------------------
+2026-11-21 05:19:10,730 ERROR ffcore.tracing trace_delivery_failed spans=7 reason=deadline
+---------------------------- Captured log teardown -----------------------------
+ERROR    ffcore.tracing:tracing.py:116 trace_delivery_failed spans=7 reason=deadline
+________ test_11_2_r2_user_member_cannot_write_the_expert_review[body1] ________
+
+answered = (UUID('6717baef-65de-4a62-831f-c2a548004369'), <starlette.testclient.TestClient object at 0x7fe02a1694c0>, '9855dd5a-8a9a-4e2b-bef4-f5e39d03b447')
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_9b00f4dde9c6) at 0x7fe02a0ccaa0>
+scores = <tests.integration.test_11_2_chat.FakeScores object at 0x7fe05e953680>
+make_user = <function make_user.<locals>.make at 0x7fdfe7528360>
+client_factory = <function client_factory.<locals>.make at 0x7fe02902bec0>
+body = {'vote': 'correct', 'source': 'review'}
+
+    @pytest.mark.parametrize("body", [{"vote": "correct"}, {"vote": "correct", "source": "review"}])
+    def test_11_2_r2_user_member_cannot_write_the_expert_review(
+        answered, pg, scores, make_user, client_factory, body
+    ):
+        # 11-2 r1 MINOR-1 (A): a `user` member's default (review) vote is refused, so it can neither
+        # take the run out of F9's pending list nor show as an expert score; the chat vote stays open.
+        project_id, client, run_id = answered
+        response = client.post(_url(project_id, f"/runs/{run_id}/feedback"), json=body)
+>       assert response.status_code == 403
+E       assert 200 == 403
+E        +  where 200 = <Response [200 OK]>.status_code
+
+tests/integration/test_11_2_chat.py:133: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-21 05:19:13,236 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-21 05:19:13,367 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=127
+2026-11-21 05:19:13,725 INFO ffcore.access access method=POST path=/api/v1/projects/6717baef-65de-4a62-831f-c2a548004369/agents/asistan/runs status=200 ms=355
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:71 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=127
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/6717baef-65de-4a62-831f-c2a548004369/agents/asistan/runs status=200 ms=355
+----------------------------- Captured stderr call -----------------------------
+2026-11-21 05:19:13,733 ERROR opentelemetry.exporter.otlp.proto.http.trace_exporter Failed to export spans batch due to timeout, max retries or shutdown.
+2026-11-21 05:19:13,790 INFO ffcore.access access method=POST path=/api/v1/projects/6717baef-65de-4a62-831f-c2a548004369/runs/9855dd5a-8a9a-4e2b-bef4-f5e39d03b447/feedback status=200 ms=55
+------------------------------ Captured log call -------------------------------
+ERROR    opentelemetry.exporter.otlp.proto.http.trace_exporter:http.py:222 Failed to export spans batch due to timeout, max retries or shutdown.
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/6717baef-65de-4a62-831f-c2a548004369/runs/9855dd5a-8a9a-4e2b-bef4-f5e39d03b447/feedback status=200 ms=55
+--------------------------- Captured stderr teardown ---------------------------
+2026-11-21 05:19:18,803 ERROR ffcore.tracing trace_delivery_failed spans=7 reason=deadline
+---------------------------- Captured log teardown -----------------------------
+ERROR    ffcore.tracing:tracing.py:116 trace_delivery_failed spans=7 reason=deadline
+_________________ test_06a_r1_feedback_user_own_run_with_edit __________________
+
+team = (UUID('63a060f8-109b-4d10-b231-ddb3cd4fc88d'), {'owner': <starlette.testclient.TestClient object at 0x7fe040c87680>, '...ient.TestClient object at 0x7fe040b5bc20>, 'analyst': <starlette.testclient.TestClient object at 0x7fe040b5bc80>, ...})
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_9b00f4dde9c6) at 0x7fe040a8fd10>
+harness = <tests.integration.runtime_support.Harness object at 0x7fe040c2e660>
+use_queue = <function use_queue.<locals>.install at 0x7fe0409c45e0>
+
+    def test_06a_r1_feedback_user_own_run_with_edit(team, pg, harness, use_queue):
+        project_id, c = team
+        publish(pg, project_id, definition())
+        use_queue(InlineQueue(harness, _answer_ports()))
+        own = _start(c["owner"], project_id)
+        others = _start(c["other"], project_id)
+        base = f"/api/v1/projects/{project_id}/runs"
+        # 11-2 r1 MINOR-1: a `user` member's vote is their own chat vote (source chat); the expert
+        # review (source review, the default) is analysts' and above (403 not_reviewer).
+        chat = {"vote": "correct", "source": "chat"}
+        assert c["owner"].post(f"{base}/{own}/feedback", json=chat).status_code == 200
+        review = c["owner"].post(f"{base}/{own}/feedback", json={"vote": "correct"})
+>       assert review.status_code == 403 and review.json()["error"]["code"] == "not_reviewer"
+E       assert (200 == 403)
+E        +  where 200 = <Response [200 OK]>.status_code
+
+tests/integration/test_06a_run_access.py:166: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-21 05:21:36,213 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-21 05:21:36,329 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=111
+2026-11-21 05:21:36,393 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-21 05:21:36,504 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=106
+2026-11-21 05:21:36,567 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-21 05:21:36,674 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=104
+2026-11-21 05:21:36,746 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-21 05:21:36,856 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=107
+2026-11-21 05:21:36,917 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-21 05:21:37,026 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=105
+2026-11-21 05:21:37,092 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-21 05:21:37,199 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=104
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:71 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=111
+ERROR    ffcore.readiness:readiness.py:71 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=106
+ERROR    ffcore.readiness:readiness.py:71 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=104
+ERROR    ffcore.readiness:readiness.py:71 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=107
+ERROR    ffcore.readiness:readiness.py:71 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=105
+ERROR    ffcore.readiness:readiness.py:71 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=104
+----------------------------- Captured stderr call -----------------------------
+2026-11-21 05:21:37,543 INFO ffcore.access access method=POST path=/api/v1/projects/63a060f8-109b-4d10-b231-ddb3cd4fc88d/agents/asistan/runs status=200 ms=318
+2026-11-21 05:21:37,864 INFO ffcore.access access method=POST path=/api/v1/projects/63a060f8-109b-4d10-b231-ddb3cd4fc88d/agents/asistan/runs status=200 ms=318
+2026-11-21 05:21:37,915 INFO ffcore.access access method=POST path=/api/v1/projects/63a060f8-109b-4d10-b231-ddb3cd4fc88d/runs/4f732795-4232-41d3-82af-aa824bc4826c/feedback status=200 ms=47
+2026-11-21 05:21:37,966 INFO ffcore.access access method=POST path=/api/v1/projects/63a060f8-109b-4d10-b231-ddb3cd4fc88d/runs/4f732795-4232-41d3-82af-aa824bc4826c/feedback status=200 ms=48
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/63a060f8-109b-4d10-b231-ddb3cd4fc88d/agents/asistan/runs status=200 ms=318
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/63a060f8-109b-4d10-b231-ddb3cd4fc88d/agents/asistan/runs status=200 ms=318
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/63a060f8-109b-4d10-b231-ddb3cd4fc88d/runs/4f732795-4232-41d3-82af-aa824bc4826c/feedback status=200 ms=47
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/63a060f8-109b-4d10-b231-ddb3cd4fc88d/runs/4f732795-4232-41d3-82af-aa824bc4826c/feedback status=200 ms=48
+--------------------------- Captured stderr teardown ---------------------------
+2026-11-21 05:21:42,986 ERROR ffcore.tracing trace_delivery_failed spans=14 reason=deadline
+2026-11-21 05:21:44,435 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-21 05:21:44,604 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-21 05:21:44,605 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-21 05:21:44,694 ERROR opentelemetry.exporter.otlp.proto.http.trace_exporter Failed to export spans batch due to timeout, max retries or shutdown.
+2026-11-21 05:21:44,791 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-21 05:21:44,957 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-21 05:21:47,985 ERROR ffcore.tracing trace_shutdown_timeout seconds=10
+2026-11-21 05:21:53,664 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+---------------------------- Captured log teardown -----------------------------
+ERROR    ffcore.tracing:tracing.py:116 trace_delivery_failed spans=14 reason=deadline
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+ERROR    opentelemetry.exporter.otlp.proto.http.trace_exporter:http.py:222 Failed to export spans batch due to timeout, max retries or shutdown.
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+ERROR    ffcore.tracing:tracing.py:180 trace_shutdown_timeout seconds=10
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+=========================== short test summary info ============================
+FAILED tests/integration/test_11_2_chat.py::test_11_2_r2_user_member_cannot_write_the_expert_review[body0]
+FAILED tests/integration/test_11_2_chat.py::test_11_2_r2_user_member_cannot_write_the_expert_review[body1]
+FAILED tests/integration/test_06a_run_access.py::test_06a_r1_feedback_user_own_run_with_edit
+3 failed, 21 passed in 204.87s (0:03:24)

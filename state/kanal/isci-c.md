@@ -121,3 +121,15 @@ Paket: 11 · Cevap: C-11-0020, C-11-0022 · Yigin: ffcore-11
 ### C-11-0024 · 2026-11-21 10:05 · → koordinator · PR-HAZIR
 Paket: 11 · Cevap: K-11-0019, K-11-0021 · SHA: b957c6691da0d7c7547a43eea9c952bdb1a752f7
 **11-2** hazır: dal `feat/11-2-chat`, delta `main..b957c66` (baz 2f9a25e): 8 commit (test → kod → test → kod → test → docs), 42 dosya +1892/−119. Göç `11_0001` (`messages.user_feedback`, `agents.portal_config`; heads tek, up/down/up). Kapı: tam test-int **1188 passed / 42 skipped** (`11-2-test-int-2.log`; ilk deneme qdrant'sız koşmadı, `-test-int.log`); `make lint && make test` llmaas + airgap 2159 + 2159; önyüz lint/typecheck/check:api 0, Vitest 323/323; e2e 11 14/14, 10bp2 panel 29/29; Langfuse public API'de `user_feedback` score 1. Bilerek değişen testler: `test_11_1_chat_agents_carry_no_definition` (+`portal_config`), `test_11_1_chat_view` fikstürü (+`user_feedback`), kendi `test_11_3_portal_tab` hatam. **FOLLOWUP-135 kapanabilir** (sohbette `QuestionBox`, e2e `test_11_7_ask_user`). Sapmalar PR notunda: Langfuse score'u e2e konteynerinden değil tools'tan sorgulandı (e2e'de anahtar yok, `deploy/` touch-zone dışı); vurgu zemin değerleri gerekçeli eslint-disable + tokens.css testi. PR notu `state/pr/11.md` "PR 11-2".
+
+### C-11-0025 · 2026-11-21 10:40 · → koordinator · YIGIN-AC
+Paket: 11 · Cevap: K-11-0024 · Yigin: ffcore-11
+11-2 r2: postgres+redis, `--env-file .env.test`, `--no-build --pull never` (`0.0.0-11b`, tools kaynağı bağlı); hedefli test-int kırmızı/yeşil (`test_11_2_chat`, `test_06a_feedback`, `test_06a_run_access`, `test_11_chat`; `11-2-r2-*.log`) + `make test` llmaas. Bitince `down -v` + YIGIN-KAPA.
+
+### C-11-0026 · 2026-11-21 11:00 · → koordinator · YIGIN-KAPA
+Paket: 11 · Cevap: C-11-0025 · Yigin: ffcore-11
+`down -v`: konteyner 0, volume 0 (`11-2-r2-down.log`).
+
+### C-11-0027 · 2026-11-21 11:00 · → koordinator · PR-HAZIR
+Paket: 11 · Cevap: K-11-0024 · SHA: 2085aa47e8cbcac531708bd49a4c0d90407cd117
+**11-2 r2** hazır: delta `b957c66..2085aa4`: 3 commit (test c912697, kod d470bd9, docs 2085aa4),  8 files changed, 71 insertions(+), 15 deletions(-). MINOR-1 A: `user` + `review` (varsayılan dâhil) → 403 `not_reviewer`, F9 kuyruğu etkilenmez; MINOR-2 tablo düzeldi; NOTE-1 cümlesi. Kırmızı 3 failed, yeşil hedefli 154 passed; `make test` 2159; Vitest 323. Bilerek değişen test: `test_06a_r1_feedback_user_own_run_with_edit` (kullanıcı oyu `source: chat`). PR notu `state/pr/11.md` "PR 11-2 r2".

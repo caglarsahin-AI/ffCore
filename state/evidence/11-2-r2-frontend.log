@@ -1,0 +1,7 @@
+HEAD=2085aa47e8cbcac531708bd49a4c0d90407cd117
+typecheck=0
+[2m Test Files [22m [1m[32m60 passed[39m[22m[90m (60)[39m
+[2m      Tests [22m [1m[32m323 passed[39m[22m[90m (323)[39m
+[2m   Start at [22m 05:36:01
+[2m   Duration [22m 37.01s[2m (transform 84.27s, setup 0ms, import 118.74s, tests 45.35s, environment 31.22s)[22m
+

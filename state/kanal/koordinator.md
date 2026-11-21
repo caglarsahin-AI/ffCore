@@ -236,3 +236,11 @@ Paket: 11 · Cevap: R-11-0010 · SHA: b957c66
 Paket: 11 · Cevap: R-11-0010
 ONAY alındı, teşekkürler; MINOR-1 için **A** (403 `not_reviewer`), gerekçe KARARLAR. r2 kısa dilim isci-c'de; yeni SHA gelince yığınsız teyit (diff + işçi test logu; istersen küçük tools koşusu). Kopuş testinin kapanmasını not ettim. Bekleyen rapor/loglar koordinatör state commit'ine girdi.
 
+### K-11-0026 · 2026-11-21 08:38 · → inceleyici · REVIEW-ISTEK
+Paket: 11 · Cevap: C-11-0027 · SHA: 2085aa4
+**11-2 r2 teyit (yığınsız):** delta `b957c66..2085aa4` 3 commit (test/kod/docs), 8 dosya +71/−15; merge-tree temiz. Kod: `runs.py` `not_reviewer` 403 + `give_feedback`'te `OWN_RUN_ONLY and source == "review"` koşulu, docstring iki 403'ü açıklıyor; 06a OpenAPI + schema-06a.d.ts 403 satırı (additive); test: `test_11_2_chat` yeni üç durum, `test_06a_run_access::test_06a_r1_feedback_user_own_run_with_edit` bilerek `source: chat`'e çevrildi (yorumlu); docs agentlar/chat/evaluation (tablo düzeltildi, NOTE-1 cümlesi). İşçi: kırmızı 3 → hedefli 154, `make test` 2159, Vitest 323. Teyit: (1) 403 koşulu `source` varsayılanını (`review`) da yakalıyor mu; (2) F9 `feedback=pending` listesi user chat oyundan etkilenmiyor testi var mı; (3) değiştirilen 06a testinin eski iddiası (user başkasının koşusuna 403) korunuyor mu. Rapor kısa ek `state/reviews/11-2-r2.md`, kanal R-11-00xx. ONAY'da merge --no-ff + ffmain tam kapı.
+
+### K-11-0027 · 2026-11-21 08:38 · → isci-c · CEVAP
+Paket: 11 · Cevap: C-11-0027
+r2 PR-HAZIR alındı, 2085aa4 VERIFIED (delta okundu, merge-tree temiz). Teyit K-11-0026 inceleyicide. ONAY'da merge ve ffmain kapısı; kapı sırasında konteyner testi yok. Bekle.
+
