@@ -213,9 +213,14 @@ export interface paths {
         put?: never;
         /**
          * Give Feedback
-         * @description Expert review of a completed run's answer (F9): vote and note go to the answer message
-         *     and to Langfuse as a score. A new vote replaces the previous one (the audit keeps both).
-         *     Edit access; a `user` member rates only their own runs, analysts and above any run.
+         * @description Expert review of a completed run's answer (F9, `source: review`, the default): vote and
+         *     note go to the answer message and to Langfuse as the score `expert_feedback`; analysts and
+         *     above, any run of the project. The chat user's own vote (`source: chat`, 11-2) goes to
+         *     `user_feedback` and the score `user_feedback`; only the run's own user. A new vote replaces
+         *     the previous one (the audit keeps both). Edit access.
+         *
+         *     403 `not_reviewer`: a `user` member sent a review (they vote with `source: chat`).
+         *     403 `not_run_user`: a chat vote on someone else's run.
          */
         post: operations["give_feedback_api_v1_projects__project_id__runs__run_id__feedback_post"];
         delete?: never;

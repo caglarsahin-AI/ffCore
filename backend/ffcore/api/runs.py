@@ -86,6 +86,10 @@ def not_run_user(message: str) -> ApiError:
     return ApiError(403, "permission_error", "not_run_user", message)
 
 
+def not_reviewer(message: str) -> ApiError:
+    return ApiError(403, "permission_error", "not_reviewer", message)
+
+
 SettingsDep = Annotated[Settings, Depends(get_settings)]
 LastEventId = Annotated[
     str | None,
@@ -634,10 +638,17 @@ async def give_feedback(
     actor: MemberWriter,
     session: SessionDep,
 ):
-    """Expert review of a completed run's answer (F9): vote and note go to the answer message
-    and to Langfuse as a score. A new vote replaces the previous one (the audit keeps both).
-    Edit access; a `user` member rates only their own runs, analysts and above any run."""
+    """Expert review of a completed run's answer (F9, `source: review`, the default): vote and
+    note go to the answer message and to Langfuse as the score `expert_feedback`; analysts and
+    above, any run of the project. The chat user's own vote (`source: chat`, 11-2) goes to
+    `user_feedback` and the score `user_feedback`; only the run's own user. A new vote replaces
+    the previous one (the audit keeps both). Edit access.
+
+    403 `not_reviewer`: a `user` member sent a review (they vote with `source: chat`).
+    403 `not_run_user`: a chat vote on someone else's run."""
     run = await _run(session, project_id, run_id)
+    if request.state.grant.role == OWN_RUN_ONLY and body.source == "review":
+        raise not_reviewer("A user member rates their own answers with source chat.")
     if request.state.grant.role == OWN_RUN_ONLY and actor.actor_id != str(run.user_id):
         raise not_run_user("A user rates only their own runs.")
     if body.source == "chat" and actor.actor_id != str(run.user_id):
