@@ -64,7 +64,8 @@ def test_11_1_chat_agents_carry_no_definition(chatting):
     # K-11-0002 S5: no definition, prompt, model or tool list reaches the chat.
     project_id, _, client, _ = chatting
     (agent,) = client.get(_url(project_id, "/chat/agents")).json()["items"]
-    assert set(agent) == {"id", "key", "name", "description"}
+    # 11-2 (K-11-0005 S2): the portal settings are added on purpose; still no definition.
+    assert set(agent) == {"id", "key", "name", "description", "portal_config"}
 
 
 def test_11_1_chat_agents_open_to_read_access(chatting, make_user, client_factory):
