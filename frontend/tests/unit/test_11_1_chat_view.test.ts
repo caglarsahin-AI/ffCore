@@ -18,6 +18,7 @@ function message(over: Partial<ChatMessage>): ChatMessage {
     error_code: null,
     sources: null,
     feedback: null,
+    user_feedback: null,
     low_confidence: null,
     created_at: "2026-11-20T10:00:00Z",
     ...over,

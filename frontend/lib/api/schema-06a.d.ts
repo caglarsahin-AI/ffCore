@@ -48,7 +48,8 @@ export interface paths {
         head?: never;
         /**
          * Update Agent
-         * @description Name and description; the definition changes through versions.
+         * @description Name, description and chat portal settings (11-2); the definition changes through
+         *     versions. The portal settings are agent level: a published agent's are edited here too.
          */
         patch: operations["update_agent_api_v1_projects__project_id__agents__agent_id__patch"];
         trace?: never;
@@ -212,9 +213,14 @@ export interface paths {
         put?: never;
         /**
          * Give Feedback
-         * @description Expert review of a completed run's answer (F9): vote and note go to the answer message
-         *     and to Langfuse as a score. A new vote replaces the previous one (the audit keeps both).
-         *     Edit access; a `user` member rates only their own runs, analysts and above any run.
+         * @description Expert review of a completed run's answer (F9, `source: review`, the default): vote and
+         *     note go to the answer message and to Langfuse as the score `expert_feedback`; analysts and
+         *     above, any run of the project. The chat user's own vote (`source: chat`, 11-2) goes to
+         *     `user_feedback` and the score `user_feedback`; only the run's own user. A new vote replaces
+         *     the previous one (the audit keeps both). Edit access.
+         *
+         *     403 `not_reviewer`: a `user` member sent a review (they vote with `source: chat`).
+         *     403 `not_run_user`: a chat vote on someone else's run.
          */
         post: operations["give_feedback_api_v1_projects__project_id__runs__run_id__feedback_post"];
         delete?: never;
@@ -545,6 +551,7 @@ export interface components {
              * Format: date-time
              */
             updated_at: string;
+            portal_config?: components["schemas"]["PortalConfig"] | null;
         };
         /**
          * AgentStatus
@@ -557,6 +564,8 @@ export interface components {
             name?: string;
             /** Description */
             description?: string;
+            /** @description Chat portal settings; null clears them (11-2). */
+            portal_config?: components["schemas"]["PortalConfig"] | null;
         };
         /** AnswerRules */
         AnswerRules: {
@@ -638,6 +647,7 @@ export interface components {
             name: string;
             /** Description */
             description: string;
+            portal_config: components["schemas"]["PortalConfig"] | null;
         };
         /** ChatMessageList */
         ChatMessageList: {
@@ -674,6 +684,13 @@ export interface components {
             }[] | null;
             /** Feedback */
             feedback: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * User Feedback
+             * @description The chat user's own vote (source chat); feedback is the expert's review.
+             */
+            user_feedback: {
                 [key: string]: unknown;
             } | null;
             /**
@@ -819,7 +836,8 @@ export interface components {
         };
         /**
          * FeedbackRequest
-         * @description Expert review of a completed run (F9, K-06a-0005).
+         * @description Expert review of a completed run (F9, K-06a-0005), or the chat user's vote on their own
+         *     answer (11-2, K-11-0005 S1).
          */
         FeedbackRequest: {
             /**
@@ -829,6 +847,13 @@ export interface components {
             vote: "correct" | "partial" | "wrong";
             /** Note */
             note?: string | null;
+            /**
+             * Source
+             * @description review: the expert's review (messages.feedback, score expert_feedback). chat: the run's own user rating the answer (messages.user_feedback, score user_feedback); it leaves the review queue (feedback=pending) as it is.
+             * @default review
+             * @enum {string}
+             */
+            source: "review" | "chat";
         };
         /** KnowledgeFilter */
         KnowledgeFilter: {
@@ -902,6 +927,20 @@ export interface components {
          * @enum {string}
          */
         OutcomeLabel: "answered" | "declined" | "below_threshold";
+        /**
+         * PortalConfig
+         * @description What the chat shows for this agent (11-2, K-11-0005 S2): a welcome text, up to three
+         *     example questions (a click fills the message box; the user sends) and an accent colour. The
+         *     server checks the hex form only; the console derives readable light and dark tones (S3).
+         */
+        PortalConfig: {
+            /** Welcome */
+            welcome?: string | null;
+            /** Examples */
+            examples?: string[];
+            /** Accent */
+            accent?: string | null;
+        };
         /** PublishRequest */
         PublishRequest: {
             /** Version */

@@ -193,7 +193,9 @@ paths:
       tags:
       - agents
       summary: Update Agent
-      description: Name and description; the definition changes through versions.
+      description: 'Name, description and chat portal settings (11-2); the definition changes through
+
+        versions. The portal settings are agent level: a published agent''s are edited here too.'
       operationId: update_agent_api_v1_projects__project_id__agents__agent_id__patch
       parameters:
       - name: project_id
@@ -1010,11 +1012,21 @@ paths:
       tags:
       - runs
       summary: Give Feedback
-      description: 'Expert review of a completed run''s answer (F9): vote and note go to the answer message
+      description: 'Expert review of a completed run''s answer (F9, `source: review`, the default): vote
+        and
 
-        and to Langfuse as a score. A new vote replaces the previous one (the audit keeps both).
+        note go to the answer message and to Langfuse as the score `expert_feedback`; analysts and
 
-        Edit access; a `user` member rates only their own runs, analysts and above any run.'
+        above, any run of the project. The chat user''s own vote (`source: chat`, 11-2) goes to
+
+        `user_feedback` and the score `user_feedback`; only the run''s own user. A new vote replaces
+
+        the previous one (the audit keeps both). Edit access.
+
+
+        403 `not_reviewer`: a `user` member sent a review (they vote with `source: chat`).
+
+        403 `not_run_user`: a chat vote on someone else''s run.'
       operationId: give_feedback_api_v1_projects__project_id__runs__run_id__feedback_post
       parameters:
       - name: project_id
@@ -1895,6 +1907,10 @@ components:
           type: string
           format: date-time
           title: Updated At
+        portal_config:
+          anyOf:
+          - $ref: '#/components/schemas/PortalConfig'
+          - type: 'null'
       type: object
       required:
       - id
@@ -1927,6 +1943,11 @@ components:
           type: string
           maxLength: 2000
           title: Description
+        portal_config:
+          anyOf:
+          - $ref: '#/components/schemas/PortalConfig'
+          - type: 'null'
+          description: Chat portal settings; null clears them (11-2).
       additionalProperties: false
       type: object
       title: AgentUpdate
@@ -2030,12 +2051,17 @@ components:
         description:
           type: string
           title: Description
+        portal_config:
+          anyOf:
+          - $ref: '#/components/schemas/PortalConfig'
+          - type: 'null'
       type: object
       required:
       - id
       - key
       - name
       - description
+      - portal_config
       title: ChatAgentOut
       description: 'A published agent a member may chat with. Never its definition, prompt, model or tools:
 
@@ -2102,6 +2128,13 @@ components:
             type: object
           - type: 'null'
           title: Feedback
+        user_feedback:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: User Feedback
+          description: The chat user's own vote (source chat); feedback is the expert's review.
         low_confidence:
           anyOf:
           - type: boolean
@@ -2124,6 +2157,7 @@ components:
       - error_code
       - sources
       - feedback
+      - user_feedback
       - low_confidence
       - created_at
       title: ChatMessageOut
@@ -2306,12 +2340,25 @@ components:
             maxLength: 2000
           - type: 'null'
           title: Note
+        source:
+          type: string
+          enum:
+          - review
+          - chat
+          title: Source
+          description: 'review: the expert''s review (messages.feedback, score expert_feedback). chat:
+            the run''s own user rating the answer (messages.user_feedback, score user_feedback); it leaves
+            the review queue (feedback=pending) as it is.'
+          default: review
       additionalProperties: false
       type: object
       required:
       - vote
       title: FeedbackRequest
-      description: Expert review of a completed run (F9, K-06a-0005).
+      description: 'Expert review of a completed run (F9, K-06a-0005), or the chat user''s vote on their
+        own
+
+        answer (11-2, K-11-0005 S1).'
     KnowledgeFilter:
       properties:
         scope:
@@ -2421,6 +2468,35 @@ components:
       - declined
       - below_threshold
       title: OutcomeLabel
+    PortalConfig:
+      properties:
+        welcome:
+          anyOf:
+          - type: string
+            maxLength: 500
+          - type: 'null'
+          title: Welcome
+        examples:
+          items:
+            type: string
+            maxLength: 200
+          type: array
+          maxItems: 3
+          title: Examples
+        accent:
+          anyOf:
+          - type: string
+            pattern: ^#[0-9a-fA-F]{6}$
+          - type: 'null'
+          title: Accent
+      additionalProperties: false
+      type: object
+      title: PortalConfig
+      description: 'What the chat shows for this agent (11-2, K-11-0005 S2): a welcome text, up to three
+
+        example questions (a click fills the message box; the user sends) and an accent colour. The
+
+        server checks the hex form only; the console derives readable light and dark tones (S3).'
     PublishRequest:
       properties:
         version:

@@ -810,7 +810,8 @@
         "tools": "Araçlar",
         "limits": "Güvenlik ve limitler",
         "output": "Çıktı",
-        "versions": "Yayın"
+        "versions": "Yayın",
+        "portal": "Portal"
       },
       "editingVersion": "Sürüm {version}",
       "publishedReadOnly": "Bu sürüm yayında ve değiştirilemez. Yayın sekmesinden yeni taslak açın.",
@@ -908,7 +909,26 @@
       "versionDraft": "Taslak",
       "rollbackTo": "Sürüm {version} yeniden kullan",
       "versionExam": "Sınav",
-      "versionExamLink": "Kapıyı açan sınav"
+      "versionExamLink": "Kapıyı açan sınav",
+      "portal": {
+        "title": "Sohbet portalı",
+        "intro": "Sohbetin bu agent için gösterdikleri. Bu ayarlar sürümün değil agent'ındır; agent yayındayken de değiştirilebilir.",
+        "welcome": "Karşılama metni",
+        "welcomeHint": "Boş bir konuşmanın üstünde açıklamanın yerine görünür. En çok 500 karakter.",
+        "example": "Örnek soru {n}",
+        "examplesHint": "En çok üç. Tıklanınca soru mesaj kutusuna yazılır; kullanıcı gönderir.",
+        "accent": "Vurgu rengi",
+        "accentHint": "#rrggbb. Kullanıcının mesajlarında ve gönder düğmesinde kullanılır. Boş: ürün rengi.",
+        "accentInvalid": "#rrggbb biçimini kullanın, örneğin #0F766E.",
+        "preview": "Önizleme",
+        "previewLight": "Açık tema",
+        "previewDark": "Koyu tema",
+        "previewQuestion": "Bildirim süresi nedir?",
+        "adjusted": "Gösterilen ton, metni okunur kalsın diye (kontrast 4.5:1) renginizden türetildi; seçtiğiniz rengin tam kendisi değil.",
+        "save": "Portal ayarlarını kaydet",
+        "saved": "Portal ayarları kaydedildi.",
+        "accentPlaceholder": "#0F766E"
+      }
     }
   },
   "TestPanel": {
@@ -935,15 +955,6 @@
     },
     "note": "Not: {detail}",
     "fallback": "Yedek model cevap verdi: {detail}",
-    "approvalTitle": "Onay gerekiyor",
-    "approvalRole": "Onaylayabilecek: {role} ve üstü",
-    "approvalNote": "Not (ret durumunda modele gösterilir)",
-    "approve": "Onayla",
-    "reject": "Reddet",
-    "approvalNoId": "Olay onayı adlandırmadığı için karar burada verilemiyor.",
-    "openApprovals": "Onaylar'ı aç",
-    "answer": "Cevabınız",
-    "sendAnswer": "Cevapla",
     "answerTitle": "Cevap",
     "runError": "Koşu {code} ile bitti: {message}",
     "openRun": "Bu koşuyu aç"
@@ -1933,7 +1944,17 @@
     },
     "sourceUpdated": "güncelleme {date}",
     "sourceLoading": "Parça yükleniyor…",
-    "sourceError": "Parça gösterilemiyor: {message} (kod: {code})"
+    "sourceError": "Parça gösterilemiyor: {message} (kod: {code})",
+    "approvalTitle": "Onay gerekiyor",
+    "approvalRole": "Onaylayabilecek: {role} ve üstü",
+    "approve": "Onayla",
+    "reject": "Reddet",
+    "approvalNote": "Not (ret durumunda modele gösterilir)",
+    "approvalNoId": "Olay onayı adlandırmadığı için karar burada verilemiyor.",
+    "openApprovals": "Onaylar'ı aç",
+    "answer": "Cevabınız",
+    "sendAnswer": "Cevapla",
+    "approvalWaiting": "{role} ya da üstü bir rolün onayı bekleniyor. Karar verilince cevap burada sürer."
   },
   "Chat": {
     "title": "Sohbet",
@@ -1975,6 +1996,14 @@
     "badges": {
       "declined": "Kaynaklarda bulunamadı",
       "lowConfidence": "Düşük güven"
-    }
+    },
+    "examples": "Örnek sorular",
+    "voteLabel": "Bu cevabı değerlendirin",
+    "voteUp": "Yararlı",
+    "voteDown": "Yararlı değil",
+    "voteNote": "Not (isteğe bağlı)",
+    "voteSend": "Değerlendirmeyi gönder",
+    "voteThanks": "Teşekkürler, değerlendirmeniz kaydedildi.",
+    "pollFailed": "Koşu okunamadı: {message} ({code}). Yeniden deneniyor."
   }
 }

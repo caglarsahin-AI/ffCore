@@ -7,11 +7,15 @@ import { useRouter } from "next/navigation";
 import { useFormatter, useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 
+import { ApprovalPrompt } from "@/components/chat/approval-prompt";
+import { MessageFeedback } from "@/components/chat/message-feedback";
+import { QuestionBox } from "@/components/chat/question-box";
 import { SourceCards } from "@/components/chat/source-cards";
 import type { CitedSource } from "@/components/chat/source-cards";
 import { ToolCallCard } from "@/components/chat/tool-call-card";
 import { turnShownIn, useChatRun } from "@/components/chat/use-chat-run";
 import { QueryError } from "@/components/screen";
+import { useAccess } from "@/components/session-provider";
 import { useReportError } from "@/components/use-report-error";
 import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
@@ -19,7 +23,12 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { chatKeys, useChatAgents, useConversations, useDeleteConversation, useMessages } from "@/lib/api/chat-queries";
-import type { ChatAgent, ChatMessage, Conversation } from "@/lib/api/chat-queries";
+import type { ChatAgent, ChatMessage, ChatVote, Conversation } from "@/lib/api/chat-queries";
+import type { Decision } from "@/lib/api/approvals-queries";
+import { ROLES, hasRole } from "@/lib/access";
+import type { Role } from "@/lib/access";
+import { accentStyle } from "@/lib/portal-accent";
+import { ApiError } from "@/lib/api/client";
 import { errorMessageKey } from "@/lib/api/errors";
 import { answerBadge, chatPath, pendingRun, settledRun } from "@/lib/chat-view";
 import type { RunView } from "@/lib/run-view";
@@ -51,7 +60,10 @@ function AgentChat({ projectId, agent, conversationId }: { projectId: string; ag
   const t = useTranslations("Chat");
   const router = useRouter();
   const queries = useQueryClient();
+  const report = useReportError();
+  const { role, canWrite } = useAccess(projectId);
   const [listOpen, setListOpen] = useState(false);
+  const [draft, setDraft] = useState("");
   const conversations = useConversations(projectId);
   const messages = useMessages(projectId, conversationId);
   const run = useChatRun({
@@ -95,7 +107,11 @@ function AgentChat({ projectId, agent, conversationId }: { projectId: string; ag
   );
 
   return (
-    <div className="flex min-h-0 flex-1" data-testid="chat-screen">
+    <div
+      className="flex min-h-0 flex-1 [--chat-accent-fg:var(--chat-accent-light-fg,var(--primary-foreground))] [--chat-accent:var(--chat-accent-light,var(--primary))] dark:[--chat-accent-fg:var(--chat-accent-dark-fg,var(--primary-foreground))] dark:[--chat-accent:var(--chat-accent-dark,var(--primary))]"
+      style={accentStyle(agent.portal_config?.accent)}
+      data-testid="chat-screen"
+    >
       <aside className="hidden w-72 shrink-0 flex-col border-r md:flex" aria-label={t("conversations")}>
         {list}
       </aside>
@@ -113,7 +129,7 @@ function AgentChat({ projectId, agent, conversationId }: { projectId: string; ag
           <h1 className="truncate font-medium">{agent.name}</h1>
         </div>
         <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 py-4" aria-live="polite">
-          {conversationId === null && !live && <Welcome agent={agent} />}
+          {conversationId === null && !live && <Welcome agent={agent} onExample={setDraft} />}
           {conversationId !== null && messages.isPending && <p className="text-sm text-muted-foreground" role="status">{t("loading")}</p>}
           {messages.isError && <QueryError error={messages.error} />}
           {stored.map((message) => (
@@ -128,21 +144,48 @@ function AgentChat({ projectId, agent, conversationId }: { projectId: string; ag
               ended={run.ended}
               startError={run.startError?.code ?? null}
               serverStatus={run.reading ? (run.server.data?.status ?? null) : null}
+              actions={{
+                canDecide: canWrite && hasRole(role, approverOf(run.view.approval?.assignTo)),
+                deciding: run.deciding,
+                onDecide: (decision, note) => void run.decide(decision, note).catch(report),
+                onAnswer: (answer) => void run.answer(answer).catch(report),
+                busy: run.busy,
+                pollError: run.pollError,
+              }}
             />
           )}
         </div>
-        <Composer busy={run.busy} onSend={(text) => run.send(text, conversationId)} />
+        <Composer busy={run.busy} text={draft} onText={setDraft} onSend={(text) => run.send(text, conversationId)} />
       </section>
     </div>
   );
 }
 
-function Welcome({ agent }: { agent: ChatAgent }) {
+// The approver role of a pending approval: the event's assign_to, else the platform default (07).
+function approverOf(assignTo: string | null | undefined): Role {
+  return ROLES.find((r) => r === assignTo) ?? "analyst";
+}
+
+// The agent's portal settings (11-2): its welcome text instead of the description, and up to three
+// example questions; a click fills the message box, the user sends (never automatic, ARCH-10).
+function Welcome({ agent, onExample }: { agent: ChatAgent; onExample: (text: string) => void }) {
   const t = useTranslations("Chat");
+  const portal = agent.portal_config;
+  const intro = portal?.welcome || agent.description;
+  const examples = portal?.examples ?? [];
   return (
-    <div className="mx-auto flex max-w-xl flex-col gap-2 py-8 text-center" data-testid="chat-welcome">
+    <div className="mx-auto flex max-w-xl flex-col items-center gap-3 py-8 text-center" data-testid="chat-welcome">
       <p className="text-lg font-semibold">{t("welcomeTitle", { name: agent.name })}</p>
-      {agent.description && <p className="text-sm text-muted-foreground">{agent.description}</p>}
+      {intro && <p className="text-sm whitespace-pre-wrap text-muted-foreground">{intro}</p>}
+      {examples.length > 0 && (
+        <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:flex-wrap sm:justify-center" role="group" aria-label={t("examples")}>
+          {examples.map((example) => (
+            <Button key={example} type="button" variant="outline" size="sm" className="h-auto whitespace-normal" onClick={() => onExample(example)} data-testid="chat-example">
+              {example}
+            </Button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -151,7 +194,7 @@ function Bubble({ role, children, testId = "chat-message" }: { role: "user" | "a
   const user = role === "user";
   return (
     <div className={`flex ${user ? "justify-end" : "justify-start"}`} data-testid={testId} data-role={role}>
-      <div className={`flex max-w-[85%] flex-col gap-2 rounded-2xl px-4 py-2 text-sm ${user ? "bg-primary text-primary-foreground" : "border bg-card text-card-foreground"}`}>
+      <div className={`flex max-w-[85%] flex-col gap-2 rounded-2xl px-4 py-2 text-sm ${user ? "bg-[var(--chat-accent)] text-[var(--chat-accent-fg)]" : "border bg-card text-card-foreground"}`}>
         {children}
       </div>
     </div>
@@ -188,9 +231,25 @@ function StoredMessage({ projectId, message, stored, hideFailure }: { projectId:
         {message.content}
       </p>
       <SourceCards sources={(message.sources ?? []) as CitedSource[]} variant="chat" projectId={projectId} runId={message.run_id} />
+      {message.run_id && <MessageFeedback projectId={projectId} runId={message.run_id} stored={storedVote(message)} />}
     </Bubble>
   );
 }
+
+// The chat's own vote (thumbs up/down); an expert's `partial` is not one of the chat's choices.
+function storedVote(message: ChatMessage): ChatVote | null {
+  const vote = (message.user_feedback as { vote?: string } | null)?.vote;
+  return vote === "correct" || vote === "wrong" ? vote : null;
+}
+
+type TurnActions = {
+  canDecide: boolean;
+  deciding: boolean;
+  onDecide: (decision: Decision, note: string | null) => void;
+  onAnswer: (answer: string) => void;
+  busy: boolean;
+  pollError: Error | null;
+};
 
 function LiveTurn({
   projectId,
@@ -200,6 +259,7 @@ function LiveTurn({
   ended,
   startError,
   serverStatus,
+  actions,
 }: {
   projectId: string;
   input: string | null;
@@ -208,7 +268,9 @@ function LiveTurn({
   ended: string | null;
   startError: string | null;
   serverStatus: string | null;
+  actions: TurnActions;
 }) {
+  const tAccess = useTranslations("Access");
   const t = useTranslations("Chat");
   const tErrors = useTranslations("Errors");
   const status =
@@ -246,7 +308,23 @@ function LiveTurn({
               {view.answer}
             </p>
           )}
-          {view.phase === "waiting_user" && view.question && <p className="font-medium" data-testid="chat-question">{view.question}</p>}
+          {view.phase === "waiting_approval" && view.approval && (
+            <ApprovalPrompt
+              approval={view.approval}
+              projectId={projectId}
+              variant="chat"
+              canDecide={actions.canDecide}
+              approverRole={tAccess(`roles.${approverOf(view.approval.assignTo)}`)}
+              pending={actions.deciding || actions.busy}
+              onDecide={actions.onDecide}
+            />
+          )}
+          {view.phase === "waiting_user" && view.question !== null && <QuestionBox question={view.question} variant="chat" pending={actions.busy} onAnswer={actions.onAnswer} />}
+          {actions.pollError && (
+            <p className="text-sm text-destructive" role="alert" data-testid="chat-poll-error">
+              {t("pollFailed", { message: tErrors(errorMessageKey(pollCode(actions.pollError))), code: pollCode(actions.pollError) })}
+            </p>
+          )}
           <SourceCards sources={view.sources as CitedSource[]} variant="chat" projectId={projectId} runId={view.runId} />
           {view.error && (
             <p className="text-sm text-destructive" role="alert" data-testid="chat-run-error">
@@ -259,9 +337,13 @@ function LiveTurn({
   );
 }
 
-function Composer({ busy, onSend }: { busy: boolean; onSend: (text: string) => void }) {
+function pollCode(error: Error): string {
+  return error instanceof ApiError ? error.code : "network_error";
+}
+
+function Composer({ busy, text, onText, onSend }: { busy: boolean; text: string; onText: (text: string) => void; onSend: (text: string) => void }) {
   const t = useTranslations("Chat");
-  const [text, setText] = useState("");
+  const setText = onText;
   function submit(event?: React.FormEvent) {
     event?.preventDefault();
     const value = text.trim();
@@ -285,7 +367,7 @@ function Composer({ busy, onSend }: { busy: boolean; onSend: (text: string) => v
         className="max-h-40 min-h-11 flex-1 resize-none"
         data-testid="chat-input"
       />
-      <Button type="submit" disabled={busy || !text.trim()} aria-label={t("send")} data-testid="chat-send">
+      <Button type="submit" disabled={busy || !text.trim()} aria-label={t("send")} className="bg-[var(--chat-accent)] text-[var(--chat-accent-fg)] hover:bg-[var(--chat-accent)]/90" data-testid="chat-send">
         <SendIcon aria-hidden />
       </Button>
     </form>

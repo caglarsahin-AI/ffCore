@@ -78,7 +78,13 @@ async def list_chat_agents(project_id: UUID, actor: Member, session: SessionDep)
     )
     return ChatAgentList(
         items=[
-            ChatAgentOut(id=a.id, key=a.key, name=a.name, description=a.description)
+            ChatAgentOut(
+                id=a.id,
+                key=a.key,
+                name=a.name,
+                description=a.description,
+                portal_config=a.portal_config,
+            )
             for a in rows.all()
         ]
     )
@@ -177,6 +183,7 @@ async def list_messages(
                 error_code=run.error_code if run is not None else None,
                 sources=message.sources if assistant else None,
                 feedback=message.feedback if assistant else None,
+                user_feedback=message.user_feedback if assistant else None,
                 low_confidence=(
                     _low_confidence(definition, run.confidence)
                     if assistant and run is not None

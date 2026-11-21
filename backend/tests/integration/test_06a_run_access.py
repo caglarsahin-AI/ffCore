@@ -158,8 +158,13 @@ def test_06a_r1_feedback_user_own_run_with_edit(team, pg, harness, use_queue):
     own = _start(c["owner"], project_id)
     others = _start(c["other"], project_id)
     base = f"/api/v1/projects/{project_id}/runs"
-    assert c["owner"].post(f"{base}/{own}/feedback", json={"vote": "correct"}).status_code == 200
-    denied = c["owner"].post(f"{base}/{others}/feedback", json={"vote": "wrong"})
+    # 11-2 r1 MINOR-1: a `user` member's vote is their own chat vote (source chat); the expert
+    # review (source review, the default) is analysts' and above (403 not_reviewer).
+    chat = {"vote": "correct", "source": "chat"}
+    assert c["owner"].post(f"{base}/{own}/feedback", json=chat).status_code == 200
+    review = c["owner"].post(f"{base}/{own}/feedback", json={"vote": "correct"})
+    assert review.status_code == 403 and review.json()["error"]["code"] == "not_reviewer"
+    denied = c["owner"].post(f"{base}/{others}/feedback", json={"vote": "wrong", "source": "chat"})
     assert denied.status_code == 403 and denied.json()["error"]["code"] == "not_run_user"
     read_only = c["viewer"].post(f"{base}/{own}/feedback", json={"vote": "wrong"})
     assert read_only.status_code == 403

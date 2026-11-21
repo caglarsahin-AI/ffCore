@@ -58,6 +58,23 @@ Saving or publishing checks the budget against the model (C13): `context_tokens`
 Analysts with edit access build and publish agents; read-only access gets 403 on every mutation.
 Every mutation is audited.
 
+### Chat portal settings (11-2)
+
+`PATCH /agents/{id} {portal_config}` sets what the end user chat (docs/chat.md) shows for the agent:
+
+| Field | Rule |
+|---|---|
+| `welcome` | text above an empty conversation instead of the description; up to 500 characters, not blank; null: none |
+| `examples` | up to 3 example questions, each up to 200 characters and not blank; a click fills the message box, the user sends |
+| `accent` | `#rrggbb` or null (the product colour) |
+
+Other keys are refused (422). The settings belong to the agent, not to a version: they are
+changed while the agent is published and take effect at once, without a publish or an exam.
+`null` clears them. They are returned by `GET /agents/{id}` and `GET /chat/agents`. The server
+checks only the hex form of `accent`; the console derives a tone per theme from it so that the
+text on it stays readable (contrast 4.5:1 to the text, 3:1 to the page) and shows both in the
+Portal tab's preview, saying when the tone differs from the picked colour.
+
 ### Manifest (06b)
 
 - `GET /agents/{id}/manifest?version=&format=json|yaml`: the agent (`key`, `name`, `description`,
@@ -160,8 +177,15 @@ reconnect to the live stream (Redis, within `RUN_EVENT_STREAM_TTL_S`) and a repl
   `GET /runs/{id}`, `GET /runs/{id}/events`, `GET /runs/{id}/stream`. Analysts and above read
   every run of the project; a `user` member reads the runs that ran for them (`user_id`) and
   lists only those; another user's run is 404.
-- **Feedback (F9):** `POST /runs/{id}/feedback {vote: correct|partial|wrong, note?}` on a completed
-  run, with edit access: stored on the answer and sent to Langfuse as the score `expert_feedback`.
+- **Feedback (F9):** `POST /runs/{id}/feedback {vote: correct|partial|wrong, note?, source?}` on a
+  completed run, with edit access. `source: review` (the default) is the expert's review, by
+  analysts and above on any run: stored on the answer (`feedback`) and sent to Langfuse as the
+  score `expert_feedback`; `feedback=pending` lists the completed runs without one. A `user`
+  member never writes a review (403 `not_reviewer`): they rate their own answers with
+  `source: chat`. `source: chat` (11-2) is the run's own user rating their
+  answer in the chat (anyone else: 403 `not_run_user`): stored apart (`user_feedback`), score
+  `user_feedback`. A chat vote leaves the run in the review queue, and the expert's later review
+  does not overwrite it.
 
 Superadmins run agents only in projects where they are members: the run searches and calls tools
 on behalf of its user, where only membership counts (403 `run_needs_membership`).

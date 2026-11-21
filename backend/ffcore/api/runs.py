@@ -86,6 +86,10 @@ def not_run_user(message: str) -> ApiError:
     return ApiError(403, "permission_error", "not_run_user", message)
 
 
+def not_reviewer(message: str) -> ApiError:
+    return ApiError(403, "permission_error", "not_reviewer", message)
+
+
 SettingsDep = Annotated[Settings, Depends(get_settings)]
 LastEventId = Annotated[
     str | None,
@@ -597,6 +601,10 @@ async def get_run(
     return run_out(run, (await _feedback_of(session, [run.id])).get(run.id))
 
 
+# 11-2 (K-11-0005 S1): the chat user's vote is a score of its own, never an expert one (ARCH-13).
+SCORE_NAMES = {"review": "expert_feedback", "chat": "user_feedback"}
+
+
 def _send_score(run: Run, body: FeedbackRequest) -> bool:
     """A categorical Langfuse score on the run's trace (02 client). Delivery is the SDK's,
     asynchronous; its failure is the 02 log line `trace_delivery_failed`. Never fails the
@@ -608,7 +616,7 @@ def _send_score(run: Run, body: FeedbackRequest) -> bool:
         return False
     try:
         client.create_score(
-            name="expert_feedback",
+            name=SCORE_NAMES[body.source],
             value=body.vote,
             trace_id=run.langfuse_trace_id,
             data_type="CATEGORICAL",
@@ -630,12 +638,23 @@ async def give_feedback(
     actor: MemberWriter,
     session: SessionDep,
 ):
-    """Expert review of a completed run's answer (F9): vote and note go to the answer message
-    and to Langfuse as a score. A new vote replaces the previous one (the audit keeps both).
-    Edit access; a `user` member rates only their own runs, analysts and above any run."""
+    """Expert review of a completed run's answer (F9, `source: review`, the default): vote and
+    note go to the answer message and to Langfuse as the score `expert_feedback`; analysts and
+    above, any run of the project. The chat user's own vote (`source: chat`, 11-2) goes to
+    `user_feedback` and the score `user_feedback`; only the run's own user. A new vote replaces
+    the previous one (the audit keeps both). Edit access.
+
+    403 `not_reviewer`: a `user` member sent a review (they vote with `source: chat`).
+    403 `not_run_user`: a chat vote on someone else's run."""
     run = await _run(session, project_id, run_id)
+    if request.state.grant.role == OWN_RUN_ONLY and body.source == "review":
+        raise not_reviewer("A user member rates their own answers with source chat.")
     if request.state.grant.role == OWN_RUN_ONLY and actor.actor_id != str(run.user_id):
         raise not_run_user("A user rates only their own runs.")
+    if body.source == "chat" and actor.actor_id != str(run.user_id):
+        raise not_run_user(
+            "A chat vote is the run's own user's; experts review with source review."
+        )
     if run.status != RunStatus.completed:
         raise conflict("run_not_completed", f"The run is {run.status}; only answers are rated.")
     message = await session.scalar(
@@ -644,12 +663,11 @@ async def give_feedback(
     if message is None:
         raise conflict("run_not_completed", "The run has no answer to rate.")
     at = datetime.now(UTC)
-    message.feedback = {
-        "vote": body.vote,
-        "note": body.note,
-        "by": actor.actor_id,
-        "at": at.isoformat(),
-    }
+    vote = {"vote": body.vote, "note": body.note, "by": actor.actor_id, "at": at.isoformat()}
+    if body.source == "chat":
+        message.user_feedback = vote
+    else:
+        message.feedback = vote
     await session.flush()
     return FeedbackOut(
         run_id=run.id,

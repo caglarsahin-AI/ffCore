@@ -61,3 +61,16 @@ export function useSourceChunk(projectId: string, runId: string | null, chunkId:
     staleTime: Infinity,
   });
 }
+
+export type ChatVote = "correct" | "wrong";
+
+// The user's own vote on an answer (11-2, K-11-0005 S1): `source: chat` keeps it apart from the
+// expert's review (messages.user_feedback, Langfuse score user_feedback).
+export function useVote(projectId: string) {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: ({ runId, vote, note }: { runId: string; vote: ChatVote; note: string | null }) =>
+      api<S["FeedbackOut"]>("POST", `${base(projectId)}/runs/${runId}/feedback`, { vote, note, source: "chat" }),
+    onSuccess: () => void client.invalidateQueries({ queryKey: ["projects", projectId, "chat", "messages"] }),
+  });
+}
