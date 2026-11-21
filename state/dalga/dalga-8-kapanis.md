@@ -35,7 +35,7 @@ Test sayısı dalga boyunca 2117 → 2159 (birim+sözleşme, profil başına), 1
 ## 4. İnsana kalan açık konular
 
 - **Push:** `FFCORE_PUSH_OK=1` ile origin ve paycore aynası (c1d79f4, f088aa8, 15f1da9, d3f96ed, 6590719 + state; son push 1d82eba).
-- **`docs/images` stash:** ana kopyada 21 Kas 08:30-08:50 arasında 112 PNG yeniden üretilmiş (kaynak bilinmiyor; inceleyici ve isci-c değil, worktree'ler temiz); merge'ü açmak için `koordinator-docs-images-regen-20261121` etiketli stash'e alındı. Önerim: stash düşürülür (main'deki ekran görüntüleri 11-2 ile güncel).
+- **`docs/images` yeniden üretimi (çözüldü, FOLLOWUP-221):** kapının e2e B aşaması ekran görüntülerini ana kopyaya yazıyor; kullanıcı komutu: `git checkout -- docs/images` ve `git stash drop` (stash `koordinator-docs-images-regen-20261121`); kalıcı çözüm triage-2'de.
 - **Oturum arşivi:** isci-c-11 (HANDOFF sonrası RETIRED). Worktree'ler (16): feat/04b-2, 04b, 05b, 10c-2, 10c-3, 11-chat, 11-2-chat, 12, 12-2, fix/10b-sse-bekci, 11-1-parity, ajan-hooklari ×2, followup-triage-1, hke-mcp-settings, hook-egress-1; imaj etiketleri `0.0.0-11`.
 - **ENV-204:** küçük modelle (`qwen2.5:0.5b`) yerel doğrulama sürüyor (kullanıcı yığını açık); FOLLOWUP-219 nedeniyle yayımlanmış agent gerekir.
 - **ENV-217/218 kalıntısı:** `04a-knowledge-core_*` PoC volume'ları (~14 GB) kullanıcı kararı; Docker Desktop VM 11,7 GB bellek ile iki tam yığın + Ollama sınırda.
@@ -44,7 +44,7 @@ Test sayısı dalga boyunca 2117 → 2159 (birim+sözleşme, profil başına), 1
 
 ## 5. Açık kayıt sayıları ve en riskli üçü
 
-BLOCKERS.md 49,1 KB (>30 KB; DRIFT'lerin arşive taşınması önerisi sürüyor). Açık: FOLLOWUP 58, DRIFT 34, ENV 7, DECISION 3, DEBT 0. Bu dalgada kapanan: FOLLOWUP 135, 208, 210, 212, 213; ENV 217, 218. Açılan: FOLLOWUP 214, 215, 216, 219, 220; ENV 217, 218.
+BLOCKERS.md 49,1 KB (>30 KB; DRIFT'lerin arşive taşınması önerisi sürüyor). Açık: FOLLOWUP 59, DRIFT 34, ENV 7, DECISION 3, DEBT 0. Bu dalgada kapanan: FOLLOWUP 135, 208, 210, 212, 213; ENV 217, 218. Açılan: FOLLOWUP 214, 215, 216, 219, 220, 221; ENV 217, 218.
 
 En riskli üçü:
 1. **FOLLOWUP-219** (04b-2 readiness / 01 seed): `_context_needs` model `limits.context_tokens` okur, şema ve seed `context_window` yazar; Ollama bağlam denetimi yalnız yayımlanmış agent varsa çalışır. Önerim A: anahtar `context_window`.
