@@ -89,7 +89,7 @@ Bu tablo yalnız durumdur (bağlam bütçesi kararı, 16 Kasım 2026). Tam satı
 | 10c | DONE (10c-1 dalga 6; 10c-2/10c-3 dalga 6b, 19 Kasım 2026) | 03c, 05b, 09 |
 | 12 | DONE (dalga 7, 20 Kasım 2026; 12-1 + 12-2; PENDING_ENV kalemleri kullanıcı donanımı) | hepsi |
 | 14 | IN PROGRESS (dalga 9; 14-1 r2 teyitte, 14-2 sırada) | 03, 04a, 06a, 08, 11, 13a; isci-c |
-| 17 | — | 03, 11 (brief M6 sonrası yazılır) |
+| 17 | — (brief hazır 2026-11-22: plan/17-son-kullanici-acilisi.md; dalga 10 adayı) | 03a, 03b, 03c, 10a, 11, 12, 14; 15 Slack/Teams bunu bekler |
 | 16 | GOREV 2026-11-22 (dalga 9 ikinci şerit, kullanıcı A) | 03, 04a, 05a, 03b egress; isci-b |
 | 15 | — | 06a, 07, 11; Slack/Teams: 17 |
 
