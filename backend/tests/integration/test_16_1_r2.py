@@ -56,13 +56,28 @@ def test_16_1_r2_fs_registration_and_root_are_superadmin_only(src_world, pg):
     for client in ("developer", "admin"):
         moved = w[client].patch(url, json={"config": {"root": "."}})
         assert moved.status_code == 403 and code(moved) == "fs_source_superadmin_only"
-    assert w["super"].patch(url, json={"config": {"root": "paylasim", "include_globs": ["*.md"]}}).status_code == 200
+    assert (
+        w["super"]
+        .patch(url, json={"config": {"root": "paylasim", "include_globs": ["*.md"]}})
+        .status_code
+        == 200
+    )
     # Project roles keep the rest: schedule and name, sync, mappings, reading.
-    assert w["developer"].patch(url, json={"name": "Paylaşım", "schedule": {"kind": "manual"}}).status_code == 200
+    assert (
+        w["developer"]
+        .patch(url, json={"name": "Paylaşım", "schedule": {"kind": "manual"}})
+        .status_code
+        == 200
+    )
     run = sync(w, source["id"], client="developer")
     assert run["status"] == "queued"
     drain(w)
-    assert w["admin"].put(url + "/acl-mappings", json={"mappings": [{"external_group": "*", "role": "analyst"}]}).status_code == 200
+    assert (
+        w["admin"]
+        .put(url + "/acl-mappings", json={"mappings": [{"external_group": "*", "role": "analyst"}]})
+        .status_code
+        == 200
+    )
     assert w["developer"].get(url + "/items").status_code == 200
     denied = audit_rows(pg, "create_data_source", "denied") + audit_rows(
         pg, "update_data_source", "denied"
@@ -70,7 +85,9 @@ def test_16_1_r2_fs_registration_and_root_are_superadmin_only(src_world, pg):
     assert len(denied) >= 4  # every refusal is recorded (outcome denied)
 
 
-def test_16_1_r2_project_b_cannot_index_project_a_share(src_world, make_user, make_project, client_factory):
+def test_16_1_r2_project_b_cannot_index_project_a_share(
+    src_world, make_user, make_project, client_factory
+):
     """S3: the share holds project A's files; project B's developer and admin cannot register
     any root over it (".", the parent, the folder itself); only the superadmin decides which
     folder a project sees."""
@@ -83,20 +100,28 @@ def test_16_1_r2_project_b_cannot_index_project_a_share(src_world, make_user, ma
     _, b_dev = make_user(memberships={other: ("developer", "edit")})
     _, b_admin = make_user(memberships={other: ("admin", "edit")})
     b_developer, b_administrator = client_factory(b_dev), client_factory(b_admin)
-    kb = b_administrator.post(f"{API}/projects/{other}/knowledge-bases", json={"key": "b-kb", "name": "B"})
+    kb = b_administrator.post(
+        f"{API}/projects/{other}/knowledge-bases", json={"key": "b-kb", "name": "B"}
+    )
     assert kb.status_code == 201, kb.text
     for client in (b_developer, b_administrator):
         for root in (".", "paylasim", "paylasim/ik"):
             response = client.post(
                 f"{API}/projects/{other}/data-sources",
-                json={"key": f"k{abs(hash(root)) % 1000}", "name": "x", "kb_id": kb.json()["id"],
-                      "kind": "fs", "config": {"root": root}},
+                json={
+                    "key": f"k{abs(hash(root)) % 1000}",
+                    "name": "x",
+                    "kb_id": kb.json()["id"],
+                    "kind": "fs",
+                    "config": {"root": root},
+                },
             )
             assert response.status_code == 403, (root, response.text)
             assert code(response) == "fs_source_superadmin_only"
     assert b_developer.get(f"{API}/projects/{other}/data-sources").json()["data"] == []
     hits = b_administrator.post(
-        f"{API}/projects/{other}/knowledge-bases/{kb.json()['id']}/search", json={"query": "maasgizli7"}
+        f"{API}/projects/{other}/knowledge-bases/{kb.json()['id']}/search",
+        json={"query": "maasgizli7"},
     ).json()["hits"]
     assert not any("maasgizli7" in h["text"] for h in hits)
     assert found(w, "admin", "maasgizli7")  # project A (admin-only default) still has it
