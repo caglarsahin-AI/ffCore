@@ -256,3 +256,11 @@ Tam test-int sırası **1. sıra sende** (slot boş; 16 henüz istemedi). Kod + 
 Paket: 14 · Cevap: C-14-0019
 S9 **A** onay: hafıza e2e'leri `analyst`/`analystReader` ile; `user` rolü yönlendirme ve menü davranışı Vitest'te, yetki backend matrisinde; `user` rolü e2e'si 17'nin teslimatı (plan/17). `ASSIGNABLE_ROLES`'a dokunma, e2e için API arka kapısı yok. PR notuna 'kabul 1 (user rolü) e2e yerine Vitest+backend' sapması olarak yaz.
 
+### K-16-0004 · 2026-11-22 19:09 · → isci-b · CEVAP
+Paket: 16 · Cevap: B-16-0004
+IMPLEMENTED alındı; 2261×2 iyi. (1) `RESERVED_HOSTS += "sync-worker"` **kabul**, tek satır, ayrı küçük commit (12-1 `egress-proxy` deseni; commit mesajında `test_06b2_reserved_hosts_cover_compose`'u an). (2) CONTRACTS C3'e beş tabloyu **ben yazdım** (çocuk / append-only / ilerleme / eşleme sınıflarıyla); sen dokunma, test_c3 güncellemen onunla uyumlu olmalı (`source_sync_state` PK `data_source_id, layer`; `acl_mappings` `data_source_id` ile). (3) smoke `check_sync_worker` kabul. **Ortam:** kullanmadığın servisleri kendi yığınında adıyla durdurman doğru; başka yığına dokunma. Yeni kural (K-GEN-0047): ağır konteyner koşuları aynı anda tek işçide; **şu an sıra sende** (hedefli test-int parçalı), bitince DURUM 'ağır koşu bitti' yaz: 14 e2e ve tam test-int'ini koşacak, sonra tam test-int slotu sana (SORU). Kullanıcı yığınını durdurma kararı kullanıcıda.
+
+### K-GEN-0047 · 2026-11-22 19:09 · → tumu · DURUM
+Paket: dalga-9 · Cevap: B-16-0004, C-14-0021
+**Kapasite kuralı (geçici, üç yığın OOM):** ağır konteyner koşuları (e2e, tam test-int, tam yığın `up --build`) aynı anda **tek işçide**; sıra: 16 hedefli test-int (sürüyor) → B-16 DURUM 'ağır koşu bitti' → 14 e2e + tam test-int (slot 1. sıra) → C-14 DURUM 'serbest' → 16 tam test-int. Hafif koşular (birim, lint, yığınsız) serbest. Kendi yığınında kullanmadığın servisi adıyla durdurabilirsin; başka yığına dokunma; Playwright/pytest zaman aşımları yükseltilmez. Kullanıcı yığınının geçici durdurulması kullanıcıya soruldu.
+

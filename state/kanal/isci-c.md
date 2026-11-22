@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-c-14
 - Aktif paket: 14 (kullanıcıya özel kalıcı hafıza; dal feat/14-hafiza, worktree .worktrees/feat/14-hafiza)
 - Durum: ACTIVE
-- Son okunan: koordinator K-14-0002, K-GEN-0041; son yazılan C-14-0017 (PLANNED)
+- Son okunan: koordinator K-14-0002, K-GEN-0041; son yazılan C-14-0021 (DURUM)
 - Önceki lease: ffcore-isci-c-11 RETIRED (11 DONE; K-11-0033); ondan önce ffcore-isci-c-10c3 RETIRED (10c-3 MERGED 0a92084; son C-10C3-0009 RETIRED); ondan önce ffcore-isci-c-10c2 RETIRED (10c-2 MERGED b93cd96; son C-10C2-0016 RETIRED); ondan önce ffcore-isci-c-sse RETIRED (fix/10b-sse-bekci MERGED 4216718; son C-SSE-0011 RETIRED); ondan önce ffcore-isci-c-10c1 RETIRED (10c-1 MERGED; son C-10C1-0015 RETIRED); ondan önce ffcore-isci-c-10bp2 RETIRED (10b-poc-2 MERGED b43770d; son C-10bp2-0019 HANDOFF)
 
 ## Mesajlar
@@ -90,3 +90,23 @@ K-14-0017 GOREV alındı. Worktree `.worktrees/feat/14-2-hafiza-ui`, dal `feat/1
 Paket: 14 · Cevap: K-14-0017
 **14-2 PLANNED** (dal `feat/14-2-hafiza-ui`, baz `ff951fa`, [B]; ayrıntı `state/pr/14.md` "PR 14-2 · Plan": bulunanlar, tasarım, dosyalar, kabul→test, felsefe). Kaynaktan üç kısıt: (1) `memory_used` SSE'ye çıkmıyor ve çıkarma sonucu stream kapandıktan sonra yazılıyor → ikisi koşu bittikten sonra `GET /runs/{id}/events` ile; (2) `memory` geçerli agent anahtarı → `/chat/memory` o agent'ı gölgeler; (3) `.env.test`'te NER yok → e2e yığınında hafıza açılamaz. Kapsam: Hafızam sayfası (liste, düzenle, sil, tümünü sil onaylı, kapat/aç, bunu hatırla), cevapta "Bunları dikkate aldım" + Unut, canlı turdan sonra "Şunu not ettim … [Sil]" (gecikme metni açık), sihirbaz `memory` sekmesi (kendi Save'i), `/settings` Hafıza bölümü (proje varsayılanı + ilke + istatistik kartları), NOTE-1/NOTE-2 backend ekleri, docs/hafiza.md + chat/agentlar/onyuz/degisiklikler.
 Sorular (önerilen A): **S1** Hafızam yolu A `/memory` (chat düzeni) / B `/chat/memory` (agent `memory` gölgelenir) / C `/chat/_memory`. **S2** "dikkate aldım" kaynağı A koşu olayları + `?ids=` (sözleşme aynı) / B `memory_used`'ı SSE'ye ekle (C9 additive, runtime). **S3** "not ettim" A `progress.memory_extraction` yoklaması 5 sn × 2 dk / B `?source_run_id=` yoklaması. **S4** proje varsayılanı A `/settings` ready, ilk bölüm Hafıza / B ayrı `/memory-settings`. **S5** hata metinleri A `memory.errors.*` yerel eşleme + `Agents.wizard.tabs.memory` tek anahtar istisnası / B `Errors.*` + `errors.ts`. **S6** NOTE-1 A `budget.question_truncated` (graph bir satır → tam test-int slotu) / B yalnız `memory_used` / C FOLLOWUP. **S7** NOTE-2 A açarken ya da model değişince doğrula, kapatma hep çalışır / B her PUT / C olduğu gibi. **S8** e2e NER A e2e koşusunda `NER_MODEL`/`NER_REVISION` (var olan `model_cache`'ten, kapı yeşil olunca `--network none` ile varlık kanıtı; yoksa kullanıcı `make models`) / B test için sahte NER anahtarı (guardrail, zone dışı) / C e2e hafıza kapalı ekranlarla sınırlı. **S9** e2e `user` rolü A `member()`'a `user` + `chatUser`/`chatReader` fikstürü / B analyst. PLAN-ONAY ve kapı yeşil duyurusundan sonra kod.
+
+### C-14-0018 · 2026-11-22 17:43 · → koordinator · SORU
+Paket: 14 · Cevap: K-GEN-0046
+K-GEN-0046 alındı; 14-2 koda başlıyor. **Tam test-int slotu isteği (S6, K-14-0020):** `graph._memory`'ye `budget.question_truncated` satırı runtime'a dokunduğu için PR-HAZIR öncesi tam test-int gerekiyor. Şimdi sıraya yazılmak istiyorum; slotu kod ve hedefli kapılar bittiğinde (tahminen birkaç saat sonra) kullanacağım, o ana kadar tam test-int açmam. Uygunsa sırayı ve "başla" zilini bildir.
+
+### C-14-0019 · 2026-11-22 17:50 · → koordinator · KARAR-GEREK
+Paket: 14 · Cevap: K-14-0020
+**S9 uygulanamıyor (kaynakta):** `POST /projects/{id}/members` rolü `ASSIGNABLE_ROLES = ("analyst", "admin")` ile sınırlı (`models/identity.py:30`, `api/projects.py:64`); e2e konteynerinde veritabanı istemcisi yok (`frontend/package.json`'da `pg` yok, e2e servisi postgres'e bağlanmıyor, imaja paket eklemek `npm ci`/ağ ister). Yani "e2e kurulumu üyeliği doğrudan verir" için yol yok. Seçenekler:
+**A (öneri):** hafıza e2e akışları `analyst` (alpha, edit) ve `analystReader` (alpha, read) ile koşar; hafıza uçları `require_role("user")` olduğundan analyst de üye olarak kendi hafızasını kullanır, akış aynı. `user` rolünün chat'e yönlenmesi ve konsolun kapalı olması zaten 11'in e2e'sinde değil Vitest'te (`renderAs("user", …)`); 14-2 Vitest'leri de `user` rolüyle render eder. Etki: e2e'de `user` rolü yok, kabul akışları tam koşar.
+B: 17 `ASSIGNABLE_ROLES`'a `user` ekleyene kadar `user` rollü e2e adımlarını açık gerekçeli `test.skip` ile bırak (17 merge'ünde açılır). Etki: bugün yalnız analyst akışı.
+C: API değişikliği (14-2'de `user` atanabilir): 17'nin alanı, reddedilir.
+A ile ilerliyorum; farklı karar verirsen değiştiririm (fikstür satırı düzeyinde).
+
+### C-14-0020 · 2026-11-22 17:56 · → koordinator · YIGIN-AC
+Paket: 14 · Cevap: K-GEN-0046 · Yigin: ffcore-14
+14-2 için yığın `ffcore-14` açılıyor (18140/13140, `--env-file .env.test`, `--pull never`); worktree `feat/14-2-hafiza-ui`. Önce postgres + redis (backend NOTE-1/2 kırmızı/yeşil, hedefli `test_14_*`); sonra e2e için tam yığın + `e2e` profili ve NER ağırlığı kopyası (K-14-0020 S8: `ffcore_model_cache` → `ffcore-14_model_cache`, ağsız). Tam test-int ancak "başla" zilinden sonra. Bitince `down -v` + YIGIN-KAPA.
+
+### C-14-0021 · 2026-11-22 18:59 · → koordinator · DURUM
+Paket: 14 · Cevap: -
+14-2 durumu (HEAD `562c573`, kod tamam): Vitest 63 dosya, 344 test yeşil; typecheck ve eslint temiz (`14-2-dev-*.log`); backend hedefli 14 testleri 99 passed + ruff (`14-2-green-backend.log`); NER ağırlığı `ffcore_model_cache`'ten ağsız kopyalandı (snapshot `99995f7…`, 421 MB, `14-2-ner-copy.log`). e2e: ilk iki koşu web sunucusunun 300 sn sınırında düştü (`next build` tek başına 4 dk 37 sn, `14-2-e2e-build.log`). Üçüncü koşu (`14-2-e2e-3.log`, sıcak önbellek) sunucuyu açtı: `test_14_1_used_note_and_forget` **geçti**; `delete_on_the_memory_page` tarayıcı çökmesiyle ("Target crashed", test 300 sn), `screens light desktop` `getaddrinfo EAI_AGAIN backend` ile düştü (backend sağlıklı, yeniden başlama 0); seri kip yüzünden 5 test koşmadı. Ortam yükü (ffcore 17 + ffcore-14 18 + ffcore-16 20 konteyner). K-14-0023 gereği B-16 DURUM'u bekleyip yeniden deniyorum; iki deneme daha düşerse DURUM yazarım. Belgeler yazıldı (`docs/hafiza.md` ve kısa ekler), görüntüler e2e yeşil olunca.
