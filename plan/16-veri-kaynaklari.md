@@ -38,7 +38,7 @@ Jira iki yönlü ele alınır: (a) veri kaynağı olarak issue'lar bilgi tabanı
 ### Jira (veri kaynağı)
 
 - Cloud ve Server; `config.jql` (örn. `project in (OPS, HELP) AND updated >= -30d`), alan seçimi (özet, açıklama, yorumlar, çözüm, durum, etiketler).
-- Her issue bir belge: başlık + açıklama + yorumlar Markdown; metadata: proje, tür, durum, öncelik, atanan, tarih; parçalama yorum sınırlarında.
+- Her issue bir belge: başlık + açıklama + yorumlar Markdown; metadata: proje, tür, durum, öncelik, tarih (atanan/raporlayan/yorum yazarı **adı indekse girmez**: kişi düzeyi veri sınırı, K-16-0009 S1; ACL için kullanıcı kimlikleri yalnız `acl_source`'ta); parçalama yorum sınırlarında.
 - Artımlı: `updated >= since` JQL (delta, silmez); silinen/arşivlenen issue'lar yalnızca `full` koşuda güvenli silme uzlaştırmasıyla (D4) kaldırılır. Yorum ve açıklamadaki log/stack trace/JSON yığınları Kapı 2 veri dökümü tespitiyle elenir; PayCore PRSIM'de 8.594 düzyazısız ve 3.784 çok kısa parça bu kapılarla ayıklandı. (PayCore düzeltmesi D1, D4)
 - ACL: proje izin şeması → `acl_mappings`.
 - Araç tarafı için: `data/samples/openapi/jira.yaml` (issue ara, issue getir, issue oluştur [onaylı], yorum ekle [onaylı]) 05'teki MCP yayınlama ile kullanılır; bu paket yalnızca dosyayı ve bir uçtan uca testi sağlar.

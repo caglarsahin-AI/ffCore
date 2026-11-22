@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-b-16 (local_8354774b-cd7a-49fe-93ab-64f1ac4edd1c; önceki lease ffcore-isci-b-triage2 RETIRED K-TR2-0012)
 - Aktif paket: 16 (feat/16-kaynaklar)
 - Durum: ACTIVE
-- Son okunan: koordinator K-GEN-0048
+- Son okunan: koordinator K-16-0007
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/isci-b-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 309 mesaj); ID ile atıf orada bulunur.
@@ -67,3 +67,9 @@ Paket: 16 · Cevap: B-16-0007, K-16-0006 · SHA: 044c148ee278494a6140a3e7e36ab91
 **Tam test-int** (`16-1-test-int.log`, HEAD `9029a47`, OOM sonrası ikinci deneme; ilki `16-1-test-int-killed1.log`): **1310 passed, 42 skipped, 1 failed**: `test_03a_2_read_mode_get_parity` benim yeni tekil GET rotalarım yüzünden (dünyada kaynak yok → KeyError). Düzeltme yalnız test: `044c148` bu rotaları 05b/09/11 deseniyle muafiyet önekine ekler ve `test_16_1_read_mode_get_parity` ile kanıtlar; kod değişmedi. HEAD'de doğrulama `test_03a_read_side` + `test_16_1_api` 26/26, lint/format 0 (`16-1-int-parity.log`). Tam koşuyu `044c148`'de tekrarlamamı istersen slot ver.
 Diğer kapılar: kırmızı `16-1-red.log`; `make test` 2261 × iki profil; hedefli 16 37/37; ölçek 1.000 dosya delta 0,95 sn; silme yolu grubu 263/263; gen:api/check:api 0; compose config 0; smoke geçti.
 Bilerek değişen testler: `test_c3_common_columns.py` (`CHILD_TABLES` + 5), `test_57_alembic_merge.py` (`ABOVE_MERGE` + 6), `test_03a_read_side.py` (muafiyet öneki `/data-sources/{source_id}`). Zone dışı kabuller: `RESERVED_HOSTS += sync-worker` (K-16-0004), smoke `check_sync_worker`. İnceleme odakları: `sources/prune.py` + `engine._prune/prune_items` (karar ve sıra), `engine._reresolve_acl` (en özel klasör, yeniden eşleme), `sources/paths.py` + `fs.py` (C5), `knowledge/removal.py` (davranış aynı), `uq_sync_runs_one_active`, kimlik maskesi.
+
+### B-16-0013 · 2026-11-22 20:38 · → koordinator · DURUM
+Paket: 16 · Cevap: K-16-0007 · Durum: PLANNED
+**16-2 Confluence + Jira (DC ve Cloud) planı:** ayrıntı `state/pr/16.md` 'PR 16-2 plan'. Dal `feat/16-2-atlassian` 16-1 merge'ünden sonra. Yeni: `sources/{atlassian,confluence,jira,storage_format}.py`, `tests/fakes/fake_atlassian.py` (DC + Cloud uçları, `/_requests` sayacı, `/_fault`, 429), compose `fake-atlassian` (test profili) + RESERVED_HOSTS, `data/samples/openapi/jira.yaml`; additive C6 `shared_attachments`. Kurulum K-16-0003: `base_url` + kimlik + isteğe bağlı kapsam (space_keys / JQL; boş = servis hesabının gördüğü her şey). Delta göreli pencere (`now("-Nm")`, PayCore kuralı), istek sayacıyla 'yalnız değişen sayfa' kanıtı. Makro kuralları, breadcrumb D5, ACL `group:/user:/space:/project:/security:` eşlemeleri, kabul → test tablosu dosyada.
+**Sorular (A önerilen):** S1 atanan/raporlayan/yorum yazarı adı indekse girmez (B: plan metadata'sı gibi girer); S2 Jira Cloud kesin sayım için anahtar-alanlı ek listeleme (B: yaklaşık sayım → Cloud'da hiç silme yok); S3 Confluence Cloud v1 CQL arama + v2 gövde/ek (B: yalnız v1); S4 kaynak kartı bağlantısı için `SearchHit.source_url` + runtime `Source.public` additive alanı 16-2'de, tıklanabilir kart 16-3'te 14-2 sonrası (touch-zone eki: `api/knowledge_schemas.py`, `knowledge/search.py`, `runtime/prompting.py`, 04a/06a OpenAPI; tam test-int) (B: önyüz ayrı istekle türetir); S5 egress overlay'e `sync-worker` proxy'si + `test_hke_208` (B: proxy'li Cloud 16-3'e).
+PLAN-ONAY bekleniyor; dal donuk, kod yok.

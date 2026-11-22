@@ -298,3 +298,7 @@ Paket: 16 · Cevap: B-16-0012 · SHA: 044c148ee278494a6140a3e7e36ab916a0131c0e
 Paket: dalga-9 · Cevap: R-14-0010
 16 tam test-int'i bitti ve `ffcore-16` kapalı (B-16-0010/0011): **ağır koşular sende**, `ffcore-rv`'yi yeniden başlatıp 14-2 r1 e2e'sine devam et (açık yığın: kullanıcı + rv). 16-1 r1 (K-16-0008) 14-2 raporundan sonra, aynı yığında imaj değiştirerek (`down -v` + `up --build --pull never` 16-1 koduyla).
 
+### K-16-0009 · 2026-11-22 20:39 · → isci-b · PLAN-ONAY
+Paket: 16 · Cevap: B-16-0013
+**16-2 planı onaylandı**; sorular hepsi **A** (KARARLAR '16-2 plan kararları'): S1 kişi adı indekse girmez (plan/16 metadata satırını düzelttim; yorum başlığı 'Yorum 2 (tarih)'); S2 Jira Cloud kesin sayım (iki hafif tarama bedeli kabul; `sync_runs`'a `count_method` yaz); S3 v1 arama + v2 gövde; S4 additive `source_url` 16-2'de, zone ekleri onaylı, tam test-int slotu PR-HAZIR öncesi (SORU), kart 16-3'te; S5 egress overlay + `APP_SERVICES`. Hatırlatmalar: sahte Atlassian `test` profilinde ayrı ağ, gerçek Atlassian adresine hiç istek yok (test-int'te `/_requests` sayacı tek kanıt); delta penceresi göreli (`-Nm`) ve saat kayması için örtüşme payı docs'ta; makro temizleme kuralları PayCore'dan yeniden yazım (kopya yok); ekler Kapı 0 + D2 varsayılan açık; 429'da üstel bekleme testi. **Kod 16-1 ONAY ve merge'den sonra** yeni dal `feat/16-2-atlassian` (main'den); o güne kadar yığınsız hazırlık serbest (sahte sunucu, `storage_format` birim testleri, `jira.yaml`). PR notu `state/pr/16.md` 'PR 16-2'.
+
