@@ -1,6 +1,6 @@
 // Fails when the frontend contract copy or the generated types drift from the backend contract.
 //   npm run check:api   (CI and before every PR; `npm run gen:api` fixes both)
-// 03a keeps its copy in mocks/ (10a); 03c, 04a, 05a, 05b, 06a, 06b, 07 and 09 types come straight from the backend spec
+// 03a keeps its copy in mocks/ (10a); 03c, 04a, 05a, 05b, 06a, 06b, 07, 09 and 14 types come straight from the backend spec
 // (K-10bp-0002: one source, no copy to drift).
 import { execFileSync } from "node:child_process";
 import { mkdtempSync, readFileSync } from "node:fs";
@@ -19,6 +19,8 @@ const SPECS = [
   { backend: "../backend/openapi/06b.yaml", copy: null, types: "lib/api/schema-06b.d.ts" },
   // 10c-3 (FOLLOWUP-195): the MCP server screen and its monitoring.
   { backend: "../backend/openapi/05b.yaml", copy: null, types: "lib/api/schema-05b.d.ts" },
+  // 14: user memory (the chat's memory page and notes, the agent wizard's Memory tab).
+  { backend: "../backend/openapi/14.yaml", copy: null, types: "lib/api/schema-14.d.ts" },
 ];
 
 const problems = [];

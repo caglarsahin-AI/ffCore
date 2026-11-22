@@ -27,6 +27,7 @@ from langgraph.types import interrupt
 from ffcore.core import tracing
 from ffcore.guardrails.engine import TextTooLong
 from ffcore.guardrails.masking import PlaceholderAligner
+from ffcore.memory import recall as memory_recall
 from ffcore.runtime.contracts import RunEventType, RunStatus, SseEvent
 from ffcore.runtime.definition import DEFAULT_APPROVER, approval_name
 from ffcore.runtime.prompting import (
@@ -73,6 +74,28 @@ def _sources(state: RunState) -> list[Source]:
     return [Source(**s) for s in state.get("sources") or []]
 
 
+async def _memory(ctx: RunContext, question: str, budget) -> tuple[str, list[str], dict]:
+    """14: the user's memory for this question, fitted into the budget's memory share.
+    Returns the system block, the ids in it and what the `budget` event adds (`memory`: `on` or
+    why nothing was recalled). No memory port (a run without a user): nothing at all."""
+    if ctx.memory is None:
+        return "", [], {}
+    found = await ctx.memory.recall(question)
+    if found.off_reason is not None:
+        return "", [], {"memory": found.off_reason}
+    kept, dropped, used = memory_recall.fit(found.items, budget.shares["memory"])
+    budget.used["memory"] = used
+    if dropped:
+        budget.dropped["memory"] = dropped
+    ids = [str(i["id"]) for i in kept]
+    if kept or dropped:
+        await ctx.events.record(
+            RunEventType.memory_used,
+            {"items": [{"id": str(i["id"]), "kind": i["kind"]} for i in kept], "dropped": dropped},
+        )
+    return (memory_recall.block(kept) if kept else ""), ids, {"memory": "on"}
+
+
 async def prepare(state: RunState, runtime: Runtime[RunContext]) -> dict:
     ctx = runtime.context
     await ctx.boundary("prepare")
@@ -81,7 +104,12 @@ async def prepare(state: RunState, runtime: Runtime[RunContext]) -> dict:
     budget = plan_budget(d, system, ctx.tools.schemas())
     ctx.budget = budget
     history = fit_history(budget, ctx.history, d.context_policy.history_turns)
-    await ctx.events.record(RunEventType.budget, budget.event() | {"phase": "planned"})
+    memory_block, memory_ids, memory_note = await _memory(ctx, state["question"], budget)
+    if memory_block:
+        system = f"{system}\n\n{memory_block}"
+    await ctx.events.record(
+        RunEventType.budget, budget.event() | {"phase": "planned"} | memory_note
+    )
     if not ctx.stream_live:
         # V8 (K-06a-0003): the client is told up front that the answer comes in one piece.
         await ctx.events.record(
@@ -97,6 +125,8 @@ async def prepare(state: RunState, runtime: Runtime[RunContext]) -> dict:
         "pending_tool": None,
         "timing": {},
         "usage": {"prompt_tokens": 0, "completion_tokens": 0},
+        "memory_ids": memory_ids,
+        "memory_extract": memory_note.get("memory") == "on",
     }
 
 
@@ -342,8 +372,9 @@ async def model(state: RunState, runtime: Runtime[RunContext]) -> dict:
             "ms": turn.ms,
             "queue_ms": turn.queue_ms,
             "tool_calls": [c.name for c in turn.tool_calls],
-            # The final, masked messages sent to the model (02/08 content rule).
-            "request_messages": outgoing,
+            # The final, masked messages sent to the model (02/08 content rule); the memory
+            # block shows as its ids only (14 S4: its text is the user's).
+            "request_messages": memory_recall.mask(outgoing, state.get("memory_ids") or []),
         },
         iteration=iteration,
     )

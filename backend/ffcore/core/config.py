@@ -230,6 +230,11 @@ class Settings(BaseSettings):
     # (evaluation.ticks.TICK_PLAN_S, r5 MAJOR-r5-1); a CPU judge (airgap) sets its own.
     eval_judge_call_s: int = Field(default=60, gt=0, le=TICK_PLAN_S)
 
+    # --- 14: user memory ---
+    # Extraction candidates below this confidence are not written (brief 14: llmaas 0.6,
+    # airgap 0.7 for the local model; a profile value in .env.example, not an `if profile`).
+    memory_min_confidence: float = Field(default=0.6, ge=0, le=1)
+
     # --- 03c governance ---
     # Wrong API keys from one client address per minute before 429 too_many_auth_failures.
     api_key_auth_failures_per_min: int = Field(default=20, gt=0)
