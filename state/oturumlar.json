@@ -111,6 +111,14 @@
       "acildi": "2026-11-22T10:37",
       "model": "claude-opus-5-5",
       "durum": "AKTIF"
+    },
+    "local_c20ddd10-b3e3-4dc6-a9fc-1ca61c262c6c": {
+      "rol": "inceleyici",
+      "paket": "dalga-9",
+      "lease": "ffcore-inceleyici-d9",
+      "acildi": "2026-11-22T13:46",
+      "model": "claude-fable-5-2",
+      "durum": "AKTIF"
     }
   }
 }
