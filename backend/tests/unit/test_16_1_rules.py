@@ -75,7 +75,9 @@ def test_16_1_prune_tombstone_delta_uses_the_same_rules():
     # SharePoint: 30 of 100 removed at once (> 0.2 of the 70 left) is refused (R10.3, C20).
     big = full(mode="delta", tombstones=True, count_before=70, count_after=70, seen=0, to_delete=30)
     assert big.decision == "prune_refused"
-    small = full(mode="delta", tombstones=True, count_before=97, count_after=97, seen=5, to_delete=3)
+    small = full(
+        mode="delta", tombstones=True, count_before=97, count_after=97, seen=5, to_delete=3
+    )
     assert small.decision == "done"
     moving = full(mode="delta", tombstones=True, count_before=97, count_after=96, to_delete=3)
     assert moving.decision == "count_mismatch"
@@ -195,7 +197,9 @@ def test_16_1_acl_folders_most_specific_mapping_wins():
     mappings = rules(("folder:/", "analyst"), ("folder:/sozlesmeler/yonetim", "admin"))
     narrowed = acl.resolve(groups, [], mappings, {}, most_specific=True)
     assert narrowed.roles == ("admin",)
-    open_doc = acl.resolve(acl.folder_groups("genel/el-kitabi.md"), [], mappings, {}, most_specific=True)
+    open_doc = acl.resolve(
+        acl.folder_groups("genel/el-kitabi.md"), [], mappings, {}, most_specific=True
+    )
     assert open_doc.roles == ("analyst",)
     # The same rows as a union would open the management folder to analysts: never for folders.
     assert "analyst" in acl.resolve(groups, [], mappings, {}).roles

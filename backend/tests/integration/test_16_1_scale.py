@@ -22,7 +22,10 @@ def test_16_1_thousand_files_then_one_change_under_a_minute(src_world, pg):
     w = src_world
     write_tree(
         w["root"],
-        {f"klasor-{n // 100}/belge-{n:04d}.md": document_text(f"Belge {n}", f"o{n:04d}") for n in range(1000)},
+        {
+            f"klasor-{n // 100}/belge-{n:04d}.md": document_text(f"Belge {n}", f"o{n:04d}")
+            for n in range(1000)
+        },
     )
     age_tree(w["root"])
     source = create_fs_source(w)

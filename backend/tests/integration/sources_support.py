@@ -15,6 +15,7 @@ import pytest
 
 from ffcore.api.knowledge import queue_dependency
 from ffcore.api.sources import ingest_queue_dependency, sync_queue_dependency
+from ffcore.core import db
 from ffcore.knowledge import ingest, jobs
 from ffcore.sources import engine
 from tests.converters import convert_without_weights
@@ -40,7 +41,7 @@ def document_text(title: str, marker: str = "") -> str:
 
 
 @pytest.fixture
-def src_world(app, app_settings, tmp_path, make_user, make_project, client_factory):
+def src_world(app, app_settings, tmp_path, make_user, make_project, client_factory, database_url):
     from ffcore.core.config import get_settings
 
     base = tmp_path / "sources"
@@ -63,6 +64,7 @@ def src_world(app, app_settings, tmp_path, make_user, make_project, client_facto
     analyst_id, analyst = make_user(memberships={project: ("analyst", "edit")})
     w = {
         "settings": settings,
+        "database_url": database_url,
         "base": base,
         "root": base / "paylasim",
         "sync_queue": sync_queue,
@@ -129,6 +131,17 @@ def drain(w, *, http=None) -> list[dict]:
     results = []
 
     async def go():
+        # The app fixture runs without a pool (several event loops); the workers' loop is one,
+        # so it gets a pooled engine like a real worker (a new connection and name lookup per
+        # session exhausted Docker's resolver over 1,000 items), disposed before returning.
+        db.configure(w["database_url"], pooled=True)
+        try:
+            await work()
+        finally:
+            await db._engine.dispose()
+            db.configure(w["database_url"], pooled=False)
+
+    async def work():
         while w["sync_queue"].jobs or w["ingest_queue"].jobs:
             while w["sync_queue"].jobs:
                 function, run_id = w["sync_queue"].jobs.pop(0)

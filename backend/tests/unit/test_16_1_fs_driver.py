@@ -97,7 +97,7 @@ def test_16_1_fs_fetch_render_acl(settings, tree):
     d = driver(settings, base, "paylasim")
     item = next(i for i in asyncio.run(listed(d)) if i.external_id == "yonetim/kurul.md")
     raw = asyncio.run(d.fetch_raw(item))
-    assert raw.content == "# Kurul\n".encode() and raw.ext == "md"
+    assert raw.content == b"# Kurul\n" and raw.ext == "md"
     rendered = d.render(item, raw)
     assert rendered.filename == "kurul.md" and rendered.breadcrumb == ("yonetim", "kurul.md")
     groups = asyncio.run(d.acl(item, raw)).groups
@@ -194,10 +194,14 @@ def test_16_1_sync_worker_service():
     assert worker["command"] == ["arq", "ffcore.sources.worker.SyncWorkerSettings"]
     assert worker["image"] == services["worker"]["image"]  # no new image (K-16-0002 S1)
     assert "build" not in worker and "profiles" not in worker and "mem_limit" not in worker
-    assert worker["environment"]["DATABASE_URL"] == services["backend"]["environment"]["DATABASE_URL"]
+    assert (
+        worker["environment"]["DATABASE_URL"] == services["backend"]["environment"]["DATABASE_URL"]
+    )
     assert "knowledge_storage:/data/storage" in worker["volumes"]
     assert "${FS_SOURCES_HOST_DIR:-./data/sources}:/data/sources:ro" in worker["volumes"]
-    assert "${FS_SOURCES_HOST_DIR:-./data/sources}:/data/sources:ro" in services["backend"]["volumes"]
+    assert (
+        "${FS_SOURCES_HOST_DIR:-./data/sources}:/data/sources:ro" in services["backend"]["volumes"]
+    )
     for dependency in ("postgres", "redis"):
         assert worker["depends_on"][dependency]["condition"] == "service_healthy"
     # Nothing publishes the worker; it only talks to Postgres, Redis and the sources.
@@ -233,3 +237,27 @@ def test_16_1_ingest_worker_runs_source_layers():
     assert "functions = [ingest_document_job, reindex_job, source_layer_job]" in source
     makefile = (REPO / "Makefile").read_text(encoding="utf-8")
     assert "python -m ffcore.sources.cli sync --project $(PROJECT) --source $(SOURCE)" in makefile
+
+
+def test_16_1_smoke_sees_the_sync_worker(monkeypatch):
+    import importlib.util
+
+    import redis
+
+    spec = importlib.util.spec_from_file_location("smoke16", REPO / "scripts" / "smoke.py")
+    smoke = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(smoke)
+    assert smoke.check_sync_worker in smoke.CHECKS
+    stored = {}
+
+    class FakeRedis:
+        def get(self, key):
+            return stored.get(key)
+
+    monkeypatch.setattr(redis.Redis, "from_url", staticmethod(lambda url, **kw: FakeRedis()))
+    monkeypatch.setenv("REDIS_URL", "redis://redis:6379/0")
+    monkeypatch.delenv("ARQ_QUEUE_SYNC", raising=False)
+    with pytest.raises(smoke.SmokeError, match="sync-worker not running"):
+        smoke.check_sync_worker()
+    stored["sync:health-check"] = b"j_complete=1"
+    assert smoke.check_sync_worker() == "sync-worker sync:health-check present"

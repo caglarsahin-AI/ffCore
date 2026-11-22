@@ -19,8 +19,8 @@ import pytest
 from ffcore.sources import engine
 from ffcore.sources.base import SourceError
 from ffcore.sources.fs import FsDriver
-from tests.integration.conftest import audit_rows
 from tests.integration import sources_support
+from tests.integration.conftest import audit_rows
 from tests.integration.sources_support import (
     API,
     age_tree,
@@ -37,7 +37,9 @@ from tests.integration.sources_support import (
 
 src_world = sources_support.src_world
 
-TWENTY = {f"belgeler/belge-{n:02d}.md": document_text(f"Belge {n}", f"iz{n:02d}x") for n in range(20)}
+TWENTY = {
+    f"belgeler/belge-{n:02d}.md": document_text(f"Belge {n}", f"iz{n:02d}x") for n in range(20)
+}
 
 
 def full_sync(w, source_id, **extra):
@@ -107,8 +109,7 @@ def test_16_1_full_removes_three_deleted_files_from_every_layer(src_world, pg):
     before = {
         row[0]: (row[1], row[2])
         for row in pg.execute(
-            "SELECT external_id, raw_path, document_id FROM source_items"
-            " WHERE data_source_id = %s",
+            "SELECT external_id, raw_path, document_id FROM source_items WHERE data_source_id = %s",
             (source["id"],),
         ).fetchall()
     }
@@ -148,7 +149,8 @@ def test_16_1_full_removes_three_deleted_files_from_every_layer(src_world, pg):
 def test_16_1_mass_disappearance_is_refused_with_an_alert_then_forced(src_world, pg):
     w = src_world
     rule = w["admin"].post(
-        f"{API}/projects/{w['project']}/alert-rules", json={"kind": "prune_refused", "channel": "ui"}
+        f"{API}/projects/{w['project']}/alert-rules",
+        json={"kind": "prune_refused", "channel": "ui"},
     )
     assert rule.status_code in (200, 201), rule.text
     write_tree(w["root"], TWENTY)
@@ -156,7 +158,10 @@ def test_16_1_mass_disappearance_is_refused_with_an_alert_then_forced(src_world,
     full_sync(w, source["id"])
     # The share disappears (the mount lost a directory, a permission was withdrawn).
     shutil.rmtree(w["root"] / "belgeler")
-    write_tree(w["root"], {f"belgeler/belge-{n:02d}.md": TWENTY[f"belgeler/belge-{n:02d}.md"] for n in range(10)})
+    write_tree(
+        w["root"],
+        {f"belgeler/belge-{n:02d}.md": TWENTY[f"belgeler/belge-{n:02d}.md"] for n in range(10)},
+    )
     (raw,) = full_sync(w, source["id"])
     assert raw["prune_decision"] == "prune_refused" and raw["deleted"] == 0
     assert len(documents(pg, w["kb"])) == 20
@@ -260,7 +265,13 @@ def test_16_1_item_errors_are_isolated_and_listed(src_world, pg, tmp_path):
     source = create_fs_source(w)
     raw, silver = full_sync(w, source["id"])
     assert raw["status"] == "completed" and raw["added"] == 6 and raw["skipped"] == 1
-    assert {"code": "path_outside_base", "external_id": "kacis.md", "detail": "refused while listing"} in raw["errors"]
+    # A refused entry exists at the source: it is neither seen nor a deletion candidate.
+    assert raw["deleted"] == 0 and raw["prune_decision"] == "none"
+    assert {
+        "code": "path_outside_base",
+        "external_id": "kacis.md",
+        "detail": "refused while listing",
+    } in raw["errors"]
     assert silver["added"] + silver["updated"] >= 5
     assert len([d for d in documents(pg, w["kb"]) if d[3] == "indexed"]) >= 5
     items = w["admin"].get(sources_url(w, f"/{source['id']}/items?errors=true")).json()
@@ -268,10 +279,13 @@ def test_16_1_item_errors_are_isolated_and_listed(src_world, pg, tmp_path):
     assert items["data"][0]["last_error"] == "path_outside_base"
     assert not found(w, "admin", "sizinti")
     # An item error keeps the cursor where it was: the next delta looks again.
-    assert pg.execute(
-        "SELECT cursor FROM source_sync_state WHERE data_source_id = %s AND layer = 'raw'",
-        (source["id"],),
-    ).fetchone() is None
+    assert (
+        pg.execute(
+            "SELECT cursor FROM source_sync_state WHERE data_source_id = %s AND layer = 'raw'",
+            (source["id"],),
+        ).fetchone()
+        is None
+    )
 
 
 def test_16_1_unmapped_items_are_admin_only_and_folders_narrow(src_world, pg):
@@ -301,9 +315,12 @@ def test_16_1_unmapped_items_are_admin_only_and_folders_narrow(src_world, pg):
         },
     )
     assert mapping.status_code == 200
-    assert w["developer"].put(
-        sources_url(w, f"/{source['id']}/acl-mappings"), json={"mappings": []}
-    ).status_code == 403
+    assert (
+        w["developer"]
+        .put(sources_url(w, f"/{source['id']}/acl-mappings"), json={"mappings": []})
+        .status_code
+        == 403
+    )
     # A delta that lists nothing still maps the stored groups again (C15, no source request).
     sync(w, source["id"], mode="delta")
     drain(w)
@@ -337,7 +354,14 @@ def test_16_1_gold_and_silver_full_never_ask_the_source(src_world, pg, monkeypat
 
         return call
 
-    for name in ("count", "list_changes", "fetch_raw", "list_attachments", "acl", "test_connection"):
+    for name in (
+        "count",
+        "list_changes",
+        "fetch_raw",
+        "list_attachments",
+        "acl",
+        "test_connection",
+    ):
         monkeypatch.setattr(FsDriver, name, refuse(name))
     shutil.rmtree(w["root"])  # even the folder itself is gone: raw is enough
 

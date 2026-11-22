@@ -75,8 +75,10 @@ class FakeIssues:
         return RawPayload(content=json.dumps(payload, sort_keys=True).encode(), ext="json")
 
     async def list_attachments(self, item, raw):
-        for name, (content, size, when) in sorted(self.pages[item.external_id]["files"].items()):
-            yield AttachmentRef(name=name, size=size, modified_at=when, ref=f"{item.external_id}/{name}")
+        for name, (_content, size, when) in sorted(self.pages[item.external_id]["files"].items()):
+            yield AttachmentRef(
+                name=name, size=size, modified_at=when, ref=f"{item.external_id}/{name}"
+            )
 
     @asynccontextmanager
     async def fetch_attachment(self, item, attachment):
@@ -104,7 +106,10 @@ class FakeIssues:
 
 
 def files(**entries):
-    return {name: (content, len(content) if size is None else size, when) for name, (content, size, when) in entries.items()}
+    return {
+        name: (content, len(content) if size is None else size, when)
+        for name, (content, size, when) in entries.items()
+    }
 
 
 RECENT = datetime(2025, 6, 1, tzinfo=UTC)
@@ -157,17 +162,21 @@ def test_16_1_attachments_gate0_shared_and_data_dump(src_world, issues, pg):
     w = src_world
     w["settings"] = w["settings"].model_copy(update={"attachment_min_date": date(2021, 1, 1)})
     w["admin"].app.dependency_overrides[get_settings] = lambda: w["settings"]
-    source = w["admin"].post(
-        sources_url(w),
-        json={
-            "key": "ops",
-            "name": "OPS",
-            "kb_id": w["kb"],
-            "kind": "jira",
-            "deployment": "server",
-            "config": {"project": "OPS"},
-        },
-    ).json()
+    source = (
+        w["admin"]
+        .post(
+            sources_url(w),
+            json={
+                "key": "ops",
+                "name": "OPS",
+                "kb_id": w["kb"],
+                "kind": "jira",
+                "deployment": "server",
+                "config": {"project": "OPS"},
+            },
+        )
+        .json()
+    )
     sync(w, source["id"])
     raw, silver = drain(w)
     assert raw["added"] == 2 and silver["added"] == 2, (raw, silver)
@@ -177,7 +186,9 @@ def test_16_1_attachments_gate0_shared_and_data_dump(src_world, issues, pg):
     assert book[("OPS-1", "buyuk.pdf")][:2] == ("skipped", "too_large")
     assert book[("OPS-2", "eski.md")][:2] == ("skipped", "stale")
     assert book[("OPS-1", "ortak.md")][:2] == ("ok", None)
-    assert book[("OPS-2", "ortak.md")][:2] == ("ok", "shared_from") and book[("OPS-2", "ortak.md")][3]
+    assert (
+        book[("OPS-2", "ortak.md")][:2] == ("ok", "shared_from") and book[("OPS-2", "ortak.md")][3]
+    )
     assert book[("OPS-2", "ortak.md")][2] == book[("OPS-1", "ortak.md")][2]  # one file
     # Nothing Kapı 0 refused was downloaded; the shared one was downloaded once.
     assert sorted(issues.downloads) == ["OPS-1/ortak.md", "OPS-1/rehber.md", "OPS-1/uygulama.log"]
@@ -208,13 +219,18 @@ def test_16_1_attachments_gate0_shared_and_data_dump(src_world, issues, pg):
     assert Path(path).is_file() and "OPS-2" in path
     assert sources_support.found(w, "admin", "ortakek5")
     (ops2,) = [d for d in documents(pg, w["kb"]) if d[1] == "ops/OPS-2.md"]
-    names = {r[0] for r in pg.execute(
-        "SELECT filename FROM attachments WHERE document_id = %s", (ops2[0],)
-    ).fetchall()}
+    names = {
+        r[0]
+        for r in pg.execute(
+            "SELECT filename FROM attachments WHERE document_id = %s", (ops2[0],)
+        ).fetchall()
+    }
     assert "ortak.md" in names
 
 
-def test_16_1_attachment_without_size_is_bounded_while_streaming(src_world, issues, pg, monkeypatch):
+def test_16_1_attachment_without_size_is_bounded_while_streaming(
+    src_world, issues, pg, monkeypatch
+):
     w = src_world
     monkeypatch.setattr("ffcore.sources.gate0.max_bytes", lambda name: 1024)
     issues.pages = {
@@ -224,10 +240,20 @@ def test_16_1_attachment_without_size_is_bounded_while_streaming(src_world, issu
             "files": {"dokum.md": (b"x" * 4096, None, RECENT)},  # the listing gives no size
         }
     }
-    source = w["admin"].post(
-        sources_url(w),
-        json={"key": "ops", "name": "OPS", "kb_id": w["kb"], "kind": "jira", "deployment": "server"},
-    ).json()
+    source = (
+        w["admin"]
+        .post(
+            sources_url(w),
+            json={
+                "key": "ops",
+                "name": "OPS",
+                "kb_id": w["kb"],
+                "kind": "jira",
+                "deployment": "server",
+            },
+        )
+        .json()
+    )
     sync(w, source["id"])
     drain(w)
     status, reason, path, _ = ledger(pg, source["id"])[("OPS-9", "dokum.md")]

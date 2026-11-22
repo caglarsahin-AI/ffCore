@@ -62,6 +62,29 @@ def test_16_1_roles(src_world):
     assert w["admin"].get(sources_url(w, f"/{source['id']}")).status_code == 404
 
 
+def test_16_1_read_only_access_cannot_change_or_sync(src_world, make_user, client_factory):
+    w = src_world
+    source = create_fs_source(w)
+    _, email = make_user(memberships={w["project"]: ("admin", "read")})
+    reader = client_factory(email)
+    assert reader.get(sources_url(w)).status_code == 200
+    for method, suffix, payload in (
+        ("post", "", body(w, key="baska")),
+        ("patch", f"/{source['id']}", {"name": "x"}),
+        ("post", f"/{source['id']}/sync", {}),
+        ("post", f"/{source['id']}/test", None),
+        ("put", f"/{source['id']}/acl-mappings", {"mappings": []}),
+        ("delete", f"/{source['id']}", None),
+    ):
+        call = getattr(reader, method)
+        response = (
+            call(sources_url(w, suffix), json=payload)
+            if payload is not None
+            else call(sources_url(w, suffix))
+        )
+        assert response.status_code == 403, (method, suffix, response.text)
+
+
 @pytest.mark.parametrize("root", ["/", "../..", "/etc", "paylasim/../../..", "~root"])
 def test_16_1_root_outside_base_is_400(src_world, root):
     w = src_world
@@ -118,7 +141,11 @@ def test_16_1_patch_pause_and_sync_refused_while_paused(src_world):
     source = create_fs_source(w)
     patched = w["admin"].patch(
         sources_url(w, f"/{source['id']}"),
-        json={"status": "paused", "prune_max_ratio": 0.5, "schedule": {"kind": "hourly", "minute": 5}},
+        json={
+            "status": "paused",
+            "prune_max_ratio": 0.5,
+            "schedule": {"kind": "hourly", "minute": 5},
+        },
     )
     assert patched.status_code == 200, patched.text
     assert patched.json()["effective_prune_max_ratio"] == 0.5
@@ -142,7 +169,8 @@ def test_16_1_test_connection_items_and_runs(src_world):
     assert run["status"] == "queued" and run["trigger"] == "manual" and run["layer"] == "raw"
     drain(w)
     items = w["developer"].get(sources_url(w, f"/{source['id']}/items")).json()
-    assert items["total"] == 2 and [i["external_id"] for i in items["data"]] == ["a.md", "alt/b.md"]
+    assert items["total"] == 2
+    assert {i["external_id"] for i in items["data"]} == {"a.md", "alt/b.md"}
     assert all(i["document_id"] and i["state"] == "active" for i in items["data"])
     listed = w["developer"].get(sources_url(w, f"/{source['id']}/runs")).json()["data"]
     assert [r["layer"] for r in listed] == ["silver", "raw"]

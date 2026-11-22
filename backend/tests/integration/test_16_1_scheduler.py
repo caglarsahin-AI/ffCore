@@ -53,7 +53,9 @@ def test_16_1_tick_starts_due_schedules_only(src_world, pg):
     # The same slot again: the queued run holds it (one active run per source).
     again, queue = tick(w, datetime(2026, 11, 22, 2, 1, tzinfo=UTC))
     assert again["started"] == [] and queue.jobs == []
-    assert never["id"] not in {str(r[0]) for r in pg.execute("SELECT data_source_id FROM sync_runs").fetchall()}
+    assert never["id"] not in {
+        str(r[0]) for r in pg.execute("SELECT data_source_id FROM sync_runs").fetchall()
+    }
 
 
 def test_16_1_tick_fails_abandoned_runs(src_world, pg):
@@ -78,7 +80,9 @@ def test_16_1_tick_fails_abandoned_runs(src_world, pg):
 def test_16_1_cli_queues_and_audits_force_prune(src_world, pg, monkeypatch):
     w = src_world
     source = create_fs_source(w)
-    project_key = pg.execute("SELECT key FROM projects WHERE id = %s", (w["project"],)).fetchone()[0]
+    project_key = pg.execute("SELECT key FROM projects WHERE id = %s", (w["project"],)).fetchone()[
+        0
+    ]
     sync_queue, ingest_queue = RecordingQueue(), RecordingQueue()
     monkeypatch.setattr(scheduler, "get_sync_queue", lambda settings: sync_queue)
     monkeypatch.setattr(cli, "get_queue", lambda settings: ingest_queue)
