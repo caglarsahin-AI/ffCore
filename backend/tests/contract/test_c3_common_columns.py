@@ -48,6 +48,12 @@ CHILD_TABLES = {
     "mcp_server_calls": "server_id",  # 05b: one row per call of a published MCP server
     "agent_versions": "agent_id",  # 06a
     "messages": "conversation_id",  # 06a
+    # 16: a data source's items, their attachment ledger, runs, layer cursors, ACL mappings.
+    "source_items": "data_source_id",
+    "source_attachments": "source_item_id",
+    "sync_runs": "data_source_id",
+    "source_sync_state": "data_source_id",
+    "acl_mappings": "data_source_id",
 }
 C3_EXCEPTIONS |= {name: f"child via {column}" for name, column in CHILD_TABLES.items()}
 
