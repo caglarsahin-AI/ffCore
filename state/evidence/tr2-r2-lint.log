@@ -1,0 +1,5 @@
+cmd: docker run --rm --network none ffcore/tools:0.0.0-tr2 sh -c 'ruff check .claude/hooks tests/hooks && ruff format --check .claude/hooks tests/hooks'
+HEAD=95731be6688a756da020cfa5ffe588a6ffba0554 (+ uncommitted hook fix)
+All checks passed!
+9 files already formatted
+exit=0

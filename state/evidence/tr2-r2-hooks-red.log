@@ -1,0 +1,252 @@
+cmd: py -3.12 -m pytest tests/hooks/test_comments_timeout.py -q -k r2
+HEAD=135c36924d99b4ff8d9a4709c6c9cc29dfde72d3 (+ uncommitted r2 tests)
+FFFFFFF.FF.......                                                        [100%]
+================================== FAILURES ===================================
+_ test_r2_hash_in_braces_or_glued_line_is_not_a_comment[echo ${a/ #x/y}; git push origin x-PUSH] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\followup-triage-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-116/test_r2_hash_in_braces_or_glue0/ffcore')
+cmd = 'echo ${a/ #x/y}; git push origin x', rule = 'PUSH'
+
+    @pytest.mark.parametrize(
+        ("cmd", "rule"),
+        [
+            ("echo ${a/ #x/y}; git push origin x", "PUSH"),
+            ("echo ${a# #}; git push origin x", "PUSH"),
+            ("echo foo\\\n#bar; git push origin x", "PUSH"),
+            ("echo foo\\\n#bar; pytest backend/tests", "KAPI"),
+            ("echo ${a// #}; pytest backend/tests", "KAPI"),
+            ("echo ${a:-${b/ #x}}; git push origin x", "PUSH"),
+            ("echo foo\\ #x; git push origin x", "PUSH"),
+        ],
+    )
+    def test_r2_hash_in_braces_or_glued_line_is_not_a_comment(guard, main_root, cmd, rule):
+>       assert rule in rules(guard, cmd, main_root), cmd
+E       AssertionError: echo ${a/ #x/y}; git push origin x
+E       assert 'PUSH' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\followup-triage-2\\.claude\\hooks\\ffcore_guard.py'>, 'echo ${a/ #x/y}; git push origin x', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-116/test_r2_hash_in_braces_or_glue0/ffcore'))
+
+tests\hooks\test_comments_timeout.py:90: AssertionError
+_ test_r2_hash_in_braces_or_glued_line_is_not_a_comment[echo ${a# #}; git push origin x-PUSH] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\followup-triage-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-116/test_r2_hash_in_braces_or_glue1/ffcore')
+cmd = 'echo ${a# #}; git push origin x', rule = 'PUSH'
+
+    @pytest.mark.parametrize(
+        ("cmd", "rule"),
+        [
+            ("echo ${a/ #x/y}; git push origin x", "PUSH"),
+            ("echo ${a# #}; git push origin x", "PUSH"),
+            ("echo foo\\\n#bar; git push origin x", "PUSH"),
+            ("echo foo\\\n#bar; pytest backend/tests", "KAPI"),
+            ("echo ${a// #}; pytest backend/tests", "KAPI"),
+            ("echo ${a:-${b/ #x}}; git push origin x", "PUSH"),
+            ("echo foo\\ #x; git push origin x", "PUSH"),
+        ],
+    )
+    def test_r2_hash_in_braces_or_glued_line_is_not_a_comment(guard, main_root, cmd, rule):
+>       assert rule in rules(guard, cmd, main_root), cmd
+E       AssertionError: echo ${a# #}; git push origin x
+E       assert 'PUSH' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\followup-triage-2\\.claude\\hooks\\ffcore_guard.py'>, 'echo ${a# #}; git push origin x', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-116/test_r2_hash_in_braces_or_glue1/ffcore'))
+
+tests\hooks\test_comments_timeout.py:90: AssertionError
+_ test_r2_hash_in_braces_or_glued_line_is_not_a_comment[echo foo\\\n#bar; git push origin x-PUSH] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\followup-triage-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-116/test_r2_hash_in_braces_or_glue2/ffcore')
+cmd = 'echo foo\\\n#bar; git push origin x', rule = 'PUSH'
+
+    @pytest.mark.parametrize(
+        ("cmd", "rule"),
+        [
+            ("echo ${a/ #x/y}; git push origin x", "PUSH"),
+            ("echo ${a# #}; git push origin x", "PUSH"),
+            ("echo foo\\\n#bar; git push origin x", "PUSH"),
+            ("echo foo\\\n#bar; pytest backend/tests", "KAPI"),
+            ("echo ${a// #}; pytest backend/tests", "KAPI"),
+            ("echo ${a:-${b/ #x}}; git push origin x", "PUSH"),
+            ("echo foo\\ #x; git push origin x", "PUSH"),
+        ],
+    )
+    def test_r2_hash_in_braces_or_glued_line_is_not_a_comment(guard, main_root, cmd, rule):
+>       assert rule in rules(guard, cmd, main_root), cmd
+E       AssertionError: echo foo\
+E         #bar; git push origin x
+E       assert 'PUSH' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\followup-triage-2\\.claude\\hooks\\ffcore_guard.py'>, 'echo foo\\\n#bar; git push origin x', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-116/test_r2_hash_in_braces_or_glue2/ffcore'))
+
+tests\hooks\test_comments_timeout.py:90: AssertionError
+_ test_r2_hash_in_braces_or_glued_line_is_not_a_comment[echo foo\\\n#bar; pytest backend/tests-KAPI] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\followup-triage-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-116/test_r2_hash_in_braces_or_glue3/ffcore')
+cmd = 'echo foo\\\n#bar; pytest backend/tests', rule = 'KAPI'
+
+    @pytest.mark.parametrize(
+        ("cmd", "rule"),
+        [
+            ("echo ${a/ #x/y}; git push origin x", "PUSH"),
+            ("echo ${a# #}; git push origin x", "PUSH"),
+            ("echo foo\\\n#bar; git push origin x", "PUSH"),
+            ("echo foo\\\n#bar; pytest backend/tests", "KAPI"),
+            ("echo ${a// #}; pytest backend/tests", "KAPI"),
+            ("echo ${a:-${b/ #x}}; git push origin x", "PUSH"),
+            ("echo foo\\ #x; git push origin x", "PUSH"),
+        ],
+    )
+    def test_r2_hash_in_braces_or_glued_line_is_not_a_comment(guard, main_root, cmd, rule):
+>       assert rule in rules(guard, cmd, main_root), cmd
+E       AssertionError: echo foo\
+E         #bar; pytest backend/tests
+E       assert 'KAPI' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\followup-triage-2\\.claude\\hooks\\ffcore_guard.py'>, 'echo foo\\\n#bar; pytest backend/tests', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-116/test_r2_hash_in_braces_or_glue3/ffcore'))
+
+tests\hooks\test_comments_timeout.py:90: AssertionError
+_ test_r2_hash_in_braces_or_glued_line_is_not_a_comment[echo ${a// #}; pytest backend/tests-KAPI] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\followup-triage-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-116/test_r2_hash_in_braces_or_glue4/ffcore')
+cmd = 'echo ${a// #}; pytest backend/tests', rule = 'KAPI'
+
+    @pytest.mark.parametrize(
+        ("cmd", "rule"),
+        [
+            ("echo ${a/ #x/y}; git push origin x", "PUSH"),
+            ("echo ${a# #}; git push origin x", "PUSH"),
+            ("echo foo\\\n#bar; git push origin x", "PUSH"),
+            ("echo foo\\\n#bar; pytest backend/tests", "KAPI"),
+            ("echo ${a// #}; pytest backend/tests", "KAPI"),
+            ("echo ${a:-${b/ #x}}; git push origin x", "PUSH"),
+            ("echo foo\\ #x; git push origin x", "PUSH"),
+        ],
+    )
+    def test_r2_hash_in_braces_or_glued_line_is_not_a_comment(guard, main_root, cmd, rule):
+>       assert rule in rules(guard, cmd, main_root), cmd
+E       AssertionError: echo ${a// #}; pytest backend/tests
+E       assert 'KAPI' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\followup-triage-2\\.claude\\hooks\\ffcore_guard.py'>, 'echo ${a// #}; pytest backend/tests', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-116/test_r2_hash_in_braces_or_glue4/ffcore'))
+
+tests\hooks\test_comments_timeout.py:90: AssertionError
+_ test_r2_hash_in_braces_or_glued_line_is_not_a_comment[echo ${a:-${b/ #x}}; git push origin x-PUSH] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\followup-triage-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-116/test_r2_hash_in_braces_or_glue5/ffcore')
+cmd = 'echo ${a:-${b/ #x}}; git push origin x', rule = 'PUSH'
+
+    @pytest.mark.parametrize(
+        ("cmd", "rule"),
+        [
+            ("echo ${a/ #x/y}; git push origin x", "PUSH"),
+            ("echo ${a# #}; git push origin x", "PUSH"),
+            ("echo foo\\\n#bar; git push origin x", "PUSH"),
+            ("echo foo\\\n#bar; pytest backend/tests", "KAPI"),
+            ("echo ${a// #}; pytest backend/tests", "KAPI"),
+            ("echo ${a:-${b/ #x}}; git push origin x", "PUSH"),
+            ("echo foo\\ #x; git push origin x", "PUSH"),
+        ],
+    )
+    def test_r2_hash_in_braces_or_glued_line_is_not_a_comment(guard, main_root, cmd, rule):
+>       assert rule in rules(guard, cmd, main_root), cmd
+E       AssertionError: echo ${a:-${b/ #x}}; git push origin x
+E       assert 'PUSH' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\followup-triage-2\\.claude\\hooks\\ffcore_guard.py'>, 'echo ${a:-${b/ #x}}; git push origin x', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-116/test_r2_hash_in_braces_or_glue5/ffcore'))
+
+tests\hooks\test_comments_timeout.py:90: AssertionError
+_ test_r2_hash_in_braces_or_glued_line_is_not_a_comment[echo foo\\ #x; git push origin x-PUSH] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\followup-triage-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-116/test_r2_hash_in_braces_or_glue6/ffcore')
+cmd = 'echo foo\\ #x; git push origin x', rule = 'PUSH'
+
+    @pytest.mark.parametrize(
+        ("cmd", "rule"),
+        [
+            ("echo ${a/ #x/y}; git push origin x", "PUSH"),
+            ("echo ${a# #}; git push origin x", "PUSH"),
+            ("echo foo\\\n#bar; git push origin x", "PUSH"),
+            ("echo foo\\\n#bar; pytest backend/tests", "KAPI"),
+            ("echo ${a// #}; pytest backend/tests", "KAPI"),
+            ("echo ${a:-${b/ #x}}; git push origin x", "PUSH"),
+            ("echo foo\\ #x; git push origin x", "PUSH"),
+        ],
+    )
+    def test_r2_hash_in_braces_or_glued_line_is_not_a_comment(guard, main_root, cmd, rule):
+>       assert rule in rules(guard, cmd, main_root), cmd
+E       AssertionError: echo foo\ #x; git push origin x
+E       assert 'PUSH' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\followup-triage-2\\.claude\\hooks\\ffcore_guard.py'>, 'echo foo\\ #x; git push origin x', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-116/test_r2_hash_in_braces_or_glue6/ffcore'))
+
+tests\hooks\test_comments_timeout.py:90: AssertionError
+_____ test_r2_bash_comments_stay_comments[echo a >#b; git push origin x] ______
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\followup-triage-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-116/test_r2_bash_comments_stay_com1/ffcore')
+cmd = 'echo a >#b; git push origin x'
+
+    @pytest.mark.parametrize(
+        "cmd",
+        [
+            "[[ a =~ #b ]] ; git push origin x",
+            "echo a >#b; git push origin x",
+            "cat <#x; git push origin x",
+            "echo ${a} # git push origin x",
+            "echo ${a/x/y} # then git push origin x",
+            "echo foo \\\n# git push origin x",
+            "echo foo\\\\ # git push origin x",
+            "# a comment ends with \\\n# git push origin x",
+            "echo ${a/ #x/y} && \\\n#c; git push origin x",
+            "echo ${a/ #x/y} &&\\\n#c; git push origin x",
+        ],
+    )
+    def test_r2_bash_comments_stay_comments(guard, main_root, cmd):
+>       assert rules(guard, cmd, main_root) == [], cmd
+E       AssertionError: echo a >#b; git push origin x
+E       assert ['PUSH'] == []
+E         
+E         Left contains one more item: 'PUSH'
+E         Use -v to get more diff
+
+tests\hooks\test_comments_timeout.py:110: AssertionError
+_______ test_r2_bash_comments_stay_comments[cat <#x; git push origin x] _______
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\followup-triage-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-116/test_r2_bash_comments_stay_com2/ffcore')
+cmd = 'cat <#x; git push origin x'
+
+    @pytest.mark.parametrize(
+        "cmd",
+        [
+            "[[ a =~ #b ]] ; git push origin x",
+            "echo a >#b; git push origin x",
+            "cat <#x; git push origin x",
+            "echo ${a} # git push origin x",
+            "echo ${a/x/y} # then git push origin x",
+            "echo foo \\\n# git push origin x",
+            "echo foo\\\\ # git push origin x",
+            "# a comment ends with \\\n# git push origin x",
+            "echo ${a/ #x/y} && \\\n#c; git push origin x",
+            "echo ${a/ #x/y} &&\\\n#c; git push origin x",
+        ],
+    )
+    def test_r2_bash_comments_stay_comments(guard, main_root, cmd):
+>       assert rules(guard, cmd, main_root) == [], cmd
+E       AssertionError: cat <#x; git push origin x
+E       assert ['PUSH'] == []
+E         
+E         Left contains one more item: 'PUSH'
+E         Use -v to get more diff
+
+tests\hooks\test_comments_timeout.py:110: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/hooks/test_comments_timeout.py::test_r2_hash_in_braces_or_glued_line_is_not_a_comment[echo ${a/ #x/y}; git push origin x-PUSH]
+FAILED tests/hooks/test_comments_timeout.py::test_r2_hash_in_braces_or_glued_line_is_not_a_comment[echo ${a# #}; git push origin x-PUSH]
+FAILED tests/hooks/test_comments_timeout.py::test_r2_hash_in_braces_or_glued_line_is_not_a_comment[echo foo\\\n#bar; git push origin x-PUSH]
+FAILED tests/hooks/test_comments_timeout.py::test_r2_hash_in_braces_or_glued_line_is_not_a_comment[echo foo\\\n#bar; pytest backend/tests-KAPI]
+FAILED tests/hooks/test_comments_timeout.py::test_r2_hash_in_braces_or_glued_line_is_not_a_comment[echo ${a// #}; pytest backend/tests-KAPI]
+FAILED tests/hooks/test_comments_timeout.py::test_r2_hash_in_braces_or_glued_line_is_not_a_comment[echo ${a:-${b/ #x}}; git push origin x-PUSH]
+FAILED tests/hooks/test_comments_timeout.py::test_r2_hash_in_braces_or_glued_line_is_not_a_comment[echo foo\\ #x; git push origin x-PUSH]
+FAILED tests/hooks/test_comments_timeout.py::test_r2_bash_comments_stay_comments[echo a >#b; git push origin x]
+FAILED tests/hooks/test_comments_timeout.py::test_r2_bash_comments_stay_comments[cat <#x; git push origin x]
+9 failed, 8 passed, 27 deselected in 0.56s

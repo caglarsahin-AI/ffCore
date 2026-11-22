@@ -1,0 +1,134 @@
+cmd: py -3.12 -I tr2_20261122_r2_probe.py <worktree> <135c369 guard>
+HEAD=95731be6688a756da020cfa5ffe588a6ffba0554 (+ uncommitted hook fix) r1=135c369
+  A1   comment apostrophe then pytest           r1=['KAPI']  r2=['KAPI']
+      cmd="# don't\npytest backend/tests"
+  A2   comment apostrophe then push             r1=['PUSH']  r2=['PUSH']
+      cmd="# don't\ngit push origin x"
+  A3   comment apostrophe then build            r1=['PROSES-175']  r2=['PROSES-175']
+      cmd="# don't\ndocker build ."
+  A4   same line comment only                   r1=[]  r2=[]
+      cmd="git status # don't; git push"
+  B1   echo '#x' then push                      r1=['PUSH']  r2=['PUSH']
+      cmd="echo '#x'; git push origin x"
+  B2   $# then push                             r1=['PUSH']  r2=['PUSH']
+      cmd='echo $# ; git push origin x'
+  B3   ${#a} then push                          r1=['PUSH']  r2=['PUSH']
+      cmd='echo ${#a}; git push origin x'
+  B4   url fragment then push                   r1=['PUSH']  r2=['PUSH']
+      cmd='curl http://localhost:8000/docs#/x; git push origin x'
+  B5   url fragment harmless                    r1=[]  r2=[]
+      cmd='curl http://localhost:8000/docs#/x'
+  B6   heredoc data body with #                 r1=['PUSH']  r2=['PUSH']
+      cmd="cat > x.txt <<EOF\n# don't\nEOF\ngit push origin x"
+  B7   heredoc data body only                   r1=[]  r2=[]
+      cmd='cat > x.txt <<EOF\n# git push\npytest\nEOF'
+  B8   heredoc code body comment                r1=['PUSH']  r2=['PUSH']
+      cmd="sh <<EOF\n# don't\ngit push origin x\nEOF"
+  C1   timeout pytest no tee                    r1=['KAPI']  r2=['KAPI']
+      cmd='timeout 600 pytest backend/tests'
+  C2   timeout -k 5 10 push                     r1=['PUSH']  r2=['PUSH']
+      cmd='timeout -k 5 10 git push'
+  C3   timeout pytest with tee                  r1=[]  r2=[]
+      cmd='timeout 600 pytest backend/tests 2>&1 | tee state/evidence/x.log'
+  D1   ENV in comment                           r1=['ENV']  r2=['ENV']
+      cmd='git status # cat .env'
+  D2   ENV comment line                         r1=['ENV']  r2=['ENV']
+      cmd='# cat .env\ngit status'
+  D3   ENV real                                 r1=['ENV']  r2=['ENV']
+      cmd='cat .env'
+  D4   ENV behind timeout                       r1=['ENV']  r2=['ENV']
+      cmd='timeout 5 cat .env'
+* X1   ${a/ #x/y} then push                     r1=[]  r2=['PUSH']
+      cmd='echo ${a/ #x/y}; git push origin x'
+* X2   ${a# #} then push                        r1=[]  r2=['PUSH']
+      cmd='echo ${a# #}; git push origin x'
+* X3   continuation glue foo\<nl>#bar; push     r1=[]  r2=['PUSH']
+      cmd='echo foo\\\n#bar; git push origin x'
+* X4   continuation glue pytest                 r1=[]  r2=['KAPI']
+      cmd='echo foo\\\n#bar; pytest backend/tests'
+  X5   dquote multi-line inner comment          r1=['PUSH']  r2=['PUSH']
+      cmd='bash -c "\n# don\'t\ngit push origin x"'
+  X6   squote multi-line inner                  r1=['PUSH']  r2=['PUSH']
+      cmd="bash -c '\n# note\ngit push origin x'"
+  X7   $(...) with comment inside               r1=['PUSH']  r2=['PUSH']
+      cmd="echo $(date # don't\n); git push origin x"
+  X8   backtick                                 r1=['PUSH']  r2=['PUSH']
+      cmd="echo `date` # don't\ngit push origin x"
+  X9   escaped hash                             r1=['PUSH']  r2=['PUSH']
+      cmd='echo \\#x; git push origin x'
+* X10  hash after redirect                      r1=['PUSH']  r2=[]
+      cmd='echo a >#b; git push origin x'
+  X11  arithmetic $(( 1 #                       r1=[]  r2=[]
+      cmd='echo $(( 2 # 1 )); git push origin x'
+  X12  [[ =~ #                                  r1=[]  r2=[]
+      cmd='[[ a =~ #b ]] ; git push origin x'
+  X13  ANSI-C quote                             r1=[]  r2=[]
+      cmd="echo $'it\\'s' # x\ngit push origin x"
+  X14  heredoc line comment hides op?           r1=['PUSH']  r2=['PUSH']
+      cmd='sh # <<EOF\ngit push origin x'
+  X15  comment with heredoc op                  r1=['PUSH']  r2=['PUSH']
+      cmd='echo a # <<EOF\ngit push origin x\nEOF'
+  X16  tab before hash                          r1=['PUSH']  r2=['PUSH']
+      cmd="echo a\t# don't\ngit push origin x"
+  X17  hash after {                             r1=['PUSH']  r2=['PUSH']
+      cmd="{ #don't\ngit push origin x; }"
+  X18  hash after `                             r1=['PUSH']  r2=['PUSH']
+      cmd="echo `#don't`\ngit push origin x"
+  X19  hash after $(                            r1=['PUSH']  r2=['PUSH']
+      cmd="echo $(#don't\ngit push origin x)"
+  X20  comment ends with backslash              r1=['PUSH']  r2=['PUSH']
+      cmd="# don't \\\ngit push origin x"
+* X21  hash after <                             r1=['PUSH']  r2=[]
+      cmd='cat <#x; git push origin x'
+  X22  word#  # c                               r1=['PUSH']  r2=['PUSH']
+      cmd="echo a#b # don't\ngit push origin x"
+  X23  compose run inner comment                r1=['KAPI']  r2=['KAPI']
+      cmd='docker compose -p x run --rm tools sh -c "# don\'t\npytest"'
+* X24  extglob ${a// #}                         r1=[]  r2=['KAPI']
+      cmd='echo ${a// #}; pytest backend/tests'
+  T1   timeout alone                            r1=[]  r2=[]
+      cmd='timeout'
+  T2   timeout -k                               r1=[]  r2=[]
+      cmd='timeout -k'
+  T3   timeout 5                                r1=[]  r2=[]
+      cmd='timeout 5'
+  T4   timeout -k5 10 push                      r1=['PUSH']  r2=['PUSH']
+      cmd='timeout -k5 10 git push'
+  T5   timeout 5 timeout 5 push                 r1=['PUSH']  r2=['PUSH']
+      cmd='timeout 5 timeout 5 git push'
+  T6   timeout 5 sh -c push                     r1=['PUSH']  r2=['PUSH']
+      cmd="timeout 5 sh -c 'git push'"
+  T7   nice timeout pytest                      r1=['KAPI']  r2=['KAPI']
+      cmd='nice timeout 5 pytest backend/tests'
+  T8   timeout nohup pytest                     r1=['KAPI']  r2=['KAPI']
+      cmd='timeout 5 nohup pytest backend/tests'
+  T9   timeout -- 5 push                        r1=['PUSH']  r2=['PUSH']
+      cmd='timeout -- 5 git push'
+  T10  timeout --kill-after=5 10 push           r1=['PUSH']  r2=['PUSH']
+      cmd='timeout --kill-after=5 10 git push'
+  T11  timeout --kill-after 5 10 push           r1=['PUSH']  r2=['PUSH']
+      cmd='timeout --kill-after 5 10 git push'
+  T12  timeout docker build                     r1=['PROSES-175']  r2=['PROSES-175']
+      cmd='timeout 600 docker build .'
+  T13  timeout heredoc reader                   r1=['PUSH']  r2=['PUSH']
+      cmd='timeout 5 sh <<EOF\ngit push\nEOF'
+  T14  timeout -v 5 push                        r1=['PUSH']  r2=['PUSH']
+      cmd='timeout -v 5 git push'
+  T15  timeout --preserve-status 5 pytest       r1=['KAPI']  r2=['KAPI']
+      cmd='timeout --preserve-status 5 pytest backend/tests'
+  T16  /usr/bin/timeout                         r1=['PUSH']  r2=['PUSH']
+      cmd='/usr/bin/timeout 5 git push'
+  T17  timeout.exe                              r1=['PUSH']  r2=['PUSH']
+      cmd='timeout.exe 5 git push'
+  T18  xargs (known limit)                      r1=[]  r2=[]
+      cmd='echo x | xargs git push'
+  T19  timeout 5 env push                       r1=['PUSH']  r2=['PUSH']
+      cmd='timeout 5 env A=1 git push'
+  T20  timeout compose run cat .env             r1=['ENV']  r2=['ENV']
+      cmd='timeout 5 docker compose -p x run --rm tools cat .env'
+  T21  timeout -s KILL -k 3 5 make test         r1=['KAPI']  r2=['KAPI']
+      cmd='timeout -s KILL -k 3 5 make test'
+  T22  timeout 5 git status (ok)                r1=[]  r2=[]
+      cmd='timeout 5 git status'
+forms=65 changed=7
+{"forms": 65, "changed": 7}

@@ -2,10 +2,57 @@
 
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
-- Oturum kimliği: ffcore-isci-b-hke1 (local_24bba94d-3d92-4034-946d-459bec3b7f0a; önceki lease ffcore-isci-b-triage1 RETIRED, B-TRJ-0012)
-- Aktif paket: hook-egress-1 (fix/hook-egress-1)
-- Durum: RETIRED
-- Son okunan: koordinator K-HKE-0018
+- Oturum kimliği: ffcore-isci-b-triage2 (session_id e5eb3c44-44c3-42e9-a49b-c2e06d04ef64; önceki lease ffcore-isci-b-hke1 RETIRED)
+- Aktif paket: followup-triage-2 (fix/followup-triage-2)
+- Durum: ACTIVE
+- Son okunan: koordinator K-TR2-0006
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/isci-b-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 309 mesaj); ID ile atıf orada bulunur.
+
+### B-TR2-0001 · 2026-11-22 10:58 · → koordinator · ACK
+Paket: followup-triage-2 · Cevap: K-TR2-0001, K-GEN-0040
+Lease `ffcore-isci-b-triage2` alındı (başlık güncellendi; önceki ffcore-isci-b-hke1 RETIRED). Zorunlu okuma tamam (FELSEFE, FELSEFE_UYGULAMA, MULTI_AGENT_PROTOCOL, SECURITY, KARARLAR indeks, WORK_QUEUE satırı, BLOCKERS 214/215/216/219/220/221). Dal `fix/followup-triage-2` baz main 31a9944, worktree `.worktrees/fix/followup-triage-2`. Touch-zone K-TR2-0001'deki gibi; `core/config.py` gerekirse önce soru. Sıradaki: kaynak okuması ve PLANNED; PLAN-ONAY gelmeden kod yok, konteyner yok.
+
+### B-TR2-0002 · 2026-11-22 10:46 · → koordinator · DURUM
+Paket: followup-triage-2 · Cevap: K-TR2-0001 · Durum: PLANNED
+Plan, bulunan semboller, 219 test listesi ve riskler: `state/pr/followup-triage-2.md` §1-5. **Sıra:** 215 (birim) → 214 (hook) → 219 A (test-int ×2) → 221 → 220 → 216 + docs; tek PR, test/kod/docs ayrı commit. **220: A önerilen** (`frontend/Dockerfile.e2e`: aynı digest + `npm ci` katmanı, `image: ffcore/e2e:${FFCORE_VERSION}`; boş `e2e_node_modules` volume'unu Docker imajdan doldurur → `down -v` sonrası ağsız; kilit damgası uyuşmazsa açık hata, sessiz `npm ci` yok; imaj `up --build --pull never --no-start --no-deps e2e` ile, `compose build` yok). B (dış volume) reddi: yığınlar arası paylaşılan yazılabilir volume yarışı + bayat volume (11-1 `ffcore-10a-nm-pw` dersi) + `npm ci` yine her koşuda siler/indirir. **221 değişken:** `E2E_SCREENSHOT_DIR` (boş → hiç yazmaz; dolu ama dizin yok → açık hata; belge için `/work/docs/images`); yardımcı `frontend/tests/e2e/screenshots.ts::saveScreenshot`.
+**Sorular (A önerilen):**
+S1 touch-zone yol düzeltmesi: spec'ler `frontend/tests/e2e/` (GOREV `frontend/e2e/**`), 215 testi `backend/tests/unit/` (GOREV `integration`). 221 için 13 spec'te 21 `screenshot` satırı yalnız yazma yeri değişir. A: `frontend/tests/e2e/screenshots.ts` (yeni) + 13 spec'in yalnız screenshot satırları zone'a girer (öneri; isci-c 14 spec'leri de yardımcıyı kullanmalı, ona not); B: yalnız `playwright.config.ts` ile `outputDir` yönlendirme (spec'ler `../docs/images` sabit yolu yazdığı için çalışmaz).
+S2 220 sınıfı: yeni imaj tanımı (bağımlılık yok, onaylı digest üstüne). A: [B] say, koordinatör kararı (öneri: yeni bağımlılık/sürüm yok); B: [C] kullanıcı onayı.
+S3 219 belge: `docs/bilgi-tabani.md:328` eski anahtarı anlatıyor. A: o satır zone'a girer (öneri); B: FOLLOWUP.
+S4 214 belge: `handbook/ENVIRONMENT_AND_COMMANDS.md:62` "`timeout` … denetlenmez" cümlesi. A: zone'a girer (öneri, yoksa belge koddan sapar); B: FOLLOWUP.
+S5 219 eski `context_tokens` model satırı: A sayılmaz ve test bunu kanıtlar (öneri; API/seed yazamaz); B readiness `limits_unexpected` ile kırmızı.
+Risk R1 (219): `.env.test` `INFERENCE_BACKEND=ollama`; Ollama'sız yığında aktif Ollama model satırı artık `ollama_unreachable` 503 verebilir (doğru davranış; çıkarsa fikstür düzeltilir, bildiririm). PLAN-ONAY bekliyorum; kod ve konteyner yok.
+
+### B-TR2-0003 · 2026-11-22 10:57 · → koordinator · YIGIN-AC
+Paket: followup-triage-2 · Cevap: K-TR2-0002 · Yigin: ffcore-tr2
+PLAN-ONAY alındı. İlerleme: 214 test+kod commit'li (bcfa9d5, d363613; hooks host 448 passed, `tr2-214-hooks.log`), 215 test commit'li (efdc596; düşüş ortama bağlıydı: `knowledge.worker` yalnız REDIS_URL yokken düşüyordu, yürüyüş sahte URL verir, beklenen liste boş ve bilinmeyen düşüş kırar; `tr2-215-red/green.log`), 219 testleri commit'li (b882340). Şimdi `ffcore-tr2` (18220/13220, `FFCORE_VERSION=0.0.0-tr2`, `.env.test`, `--profile test --profile qdrant`, `up -d --wait --build --pull never`): yalnız readyz test-int hedefli (04a/04b-2/06a), önce kırmızı (kod öncesi), sonra yeşil; iki profil. Açık FF yığınları: ffcore, ffcore-14.
+
+### B-TR2-0004 · 2026-11-22 11:40 · → koordinator · SORU
+Paket: followup-triage-2 · Cevap: K-TR2-0002
+**Tam test-int slotu istiyorum (FOLLOWUP-216; readiness paylaşılan modül).** HEAD `aa35180fb0f4a631ce817dd491cc146190939d05` (delta `d6d2029..HEAD`, 10 commit: test/kod/docs ayrı). Yığın `ffcore-tr2` açık (18220/13220). Bugüne kadar yeşil (`state/evidence/tr2-gate-unit.log`): lint 0 (backend + hooks ruff), heads tek, `make test` llmaas 2161 / airgap 2161, önyüz lint/typecheck/check:api 0 + Vitest 323/60, hooks host 448. Hedefli: readyz test-int 17/17 ×2 profil (`tr2-219-red.log` 10 kırmızı → `tr2-219-green-{llmaas,airgap}.log`); e2e kısa koşu test_10mrk_5 4/4 üç kipte (`tr2-221-e2e-{empty,set,missing}.log`: boş → docs/images temiz, dolu → 4 dosya, yok dizin → açık hata); 220 imaj kurulumu metadata 0.0s yerel (`tr2-220-build.log`), `down -v` eşdeğeri volume silme sonrası imajdan dolum 498 paket + kilit uyuşmazlığında `e2e_deps_stale` (`tr2-220-lock.log`), `compose config` 0. Slot gelince: `QDRANT_URL=http://qdrant:6333 RUN_QDRANT_TESTS=1 pytest tests/integration` (ana kapı biçimi) tee `tr2-test-int-full.log`; R1 çıkarsa DURUM. Not (zone dışı, karar sende): `docs/takim/ajanlarla-gelistirme.md:670` hâlâ "`timeout` … yakalanmaz" diyor; A: zone'a ekle, tek satır docs commit'ime girer (öneri); B: FOLLOWUP.
+
+### B-TR2-0005 · 2026-11-22 11:59 · → koordinator · DURUM
+Paket: followup-triage-2 · Cevap: K-TR2-0003 · Durum: VERIFIED
+**Tam test-int bitti, slot serbest.** HEAD aa35180fb0f4a631ce817dd491cc146190939d05: **1193 passed, 42 skipped, 0 failed** (16:54, `state/evidence/tr2-test-int-full.log`; skip sayısı main kapısıyla aynı). R1 çıkmadı (fikstür değişikliği gerekmedi). `ffcore-tr2` PR-HAZIR'a kadar açık; test koşusu yok. Sıradaki: `ajanlarla-gelistirme.md:670` tek satır docs commit'i, PR notu, PR-HAZIR.
+
+### B-TR2-0006 · 2026-11-22 12:01 · → koordinator · PR-HAZIR
+Paket: followup-triage-2 · Cevap: K-TR2-0001, K-TR2-0002, K-TR2-0003 · SHA: 135c36924d99b4ff8d9a4709c6c9cc29dfde72d3
+**[B] fix/followup-triage-2**, delta `main..135c369` (9 commit, 30 dosya; test/kod/docs ayrı), PR notu `state/pr/followup-triage-2.md`. Dilimler: 214 (yorum kesimi + `timeout`), 215 (düşüş listesi boş + beş egress alanı, sürüklenme testi), 219 A (`context_window`, agent olmadan da denetim, eski anahtar sayılmaz), 221 (`saveScreenshot` + `E2E_SCREENSHOT_DIR`, 19 çağrı), 220 A (`ffcore/e2e` imajı, `e2e_deps_stale`), 216 + docs. **Kapılar** (`state/evidence/tr2-*.log`): lint 0, heads tek, `make test` 2161 ×2 profil, önyüz lint/typecheck/check:api 0 + Vitest 323, hooks 448, readyz test-int 17/17 ×2 (kod öncesi 10 kırmızı), **tam test-int 1193 passed / 42 skipped / 0 failed** (`tr2-test-int-full.log`, aa35180; sonraki commit yalnız tek docs cümlesi), e2e kısa koşu üç kip (`tr2-221-e2e-*.log`), 220 kilit ve volume dolumu (`tr2-220-lock.log`), imaj kurulumu `#3 load metadata … DONE 0.0s` yerel (`tr2-220-build.log` satır 12-13), `compose config` 0. **Bilerek değişen testler:** readyz fikstürleri `context_window` (04a/04b-2/06a; 04a_17b kendi modelini pasifler), `test_hke_208_settings_classes` yürüyüşü, 13 spec'in yalnız screenshot satırları; assert'ler aynı. Planda iki sapma PR notunda (215 liste boş: düşüş REDIS_URL'e bağlıydı; 221 sayı 19). `frontend/app/**`, `backend/ffcore/memory/**` diff'te yok. R1 çıkmadı. Kapı betiğine not: e2e adımında önce imaj kurulumu, `npm ci &&` önekini kaldır (`docs/onyuz.md`). Sıradaki: `ffcore-tr2` `down -v` + YIGIN-KAPA.
+
+### B-TR2-0007 · 2026-11-22 12:03 · → koordinator · YIGIN-KAPA
+Paket: followup-triage-2 · Cevap: B-TR2-0003 · Yigin: ffcore-tr2
+`down -v` (tüm profiller, e2e dahil) temiz: ffcore-tr2 konteyner 0, volume 0 (`tr2-down.log`). Açık FF yığınları: ffcore, ffcore-14. Kalan etiketler: `ffcore/{backend,frontend,tools,e2e}:0.0.0-tr2` (temizlik sende). Review'a kadar bekliyorum; DUZELT gelirse aynı dalda.
+
+### B-TR2-0008 · 2026-11-22 14:22 · → koordinator · ACK
+Paket: followup-triage-2 · Cevap: K-TR2-0006 · SHA: 135c36924d99b4ff8d9a4709c6c9cc29dfde72d3
+r2 DUZELT alındı; yığınsız (konteyner yok). Kırmızı test yazıldı (`tests/hooks/test_comments_timeout.py`, iki yönlü): X1, X2, X3, X4, X24 + iç içe `${…${…}}` + kaçışlı boşluk `foo\ #x` (bash'te kelime ortası, push koşar; rapor dışı, aynı sınıf) → 9 kırmızı (`state/evidence/tr2-r2-hooks-red.log`). Yorum kalan biçimler: `[[ =~ #b ]]`, `>#b`, `<#x` (bash yorum sayıyor; bugün dal PUSH diyor, `<` `>` sonrası da yorum başlangıcı olacak), `\`-birleşmede ters bölüden önce boşluk ya da operatör varsa `#` yine yorum (`&& \`⏎`#c`). Her biçim bash'te stdin ile doğrulandı (`tr2-r2-bash-semantics.log`; `bash -c` Windows argv'de ters bölüyü bozuyordu). Sonra kod, docs (MINOR-2 reçete koşarak, NOTE-2, NOTE-4), PR-HAZIR r2.
+
+### B-TR2-0009 · 2026-11-22 14:32 · → koordinator · PR-HAZIR
+Paket: followup-triage-2 · Cevap: K-TR2-0006 · SHA: 89df92829fa76c6eea1975fcad5136c1091e36d5
+**r2 hazır.** Delta `135c369..89df928`: 3 commit (95731be test, ae327cf fix, 89df928 docs), 7 dosya, +91/-21; yığın açılmadı (yalnız `--network none` çıplak konteyner, volume yok). PR notu `state/pr/followup-triage-2.md` "r2" bölümü.
+- **MINOR-1:** kırmızı önce 9 failed (`tr2-r2-hooks-red.log`); sonra hooks **465 passed** (`tr2-r2-hooks.log`, HEAD 89df928), ruff temiz (`tr2-r2-lint.log`). r1/r2 hook yan yana inceleyici probe biçimleri (`tr2-r2-hook-probe.log`, 65 biçim): 7 değişti, hepsi beklenen: X1-X4, X24 artık PUSH/KAPI; X10 `>#b`, X21 `<#x` PUSH→yorum (bash da yorum sayıyor, komut koşmuyor; varsayım PR notunda). Ek: kaçışlı boşluk `foo\ #x` aynı sınıftı, o da yakalanıyor. Bash doğrulaması stdin ile (`tr2-r2-bash-semantics.log`).
+- **MINOR-2:** reçete göreli `E2E_SCREENSHOT_DIR=../docs/images` + Git Bash notu; koşarak doğrulandı (`tr2-r2-221-recete.log`: compose config göreli değer korunuyor, mutlak değer çevriliyor; çıplak e2e imajında probe PNG yazdı, 1 passed; checkout docs/images değişmedi).
+- **NOTE-2, NOTE-4:** degisiklikler 219 ikinci etki cümlesi; protokol atfı 'KIRMIZI'; docs/takim 668 `timeout`, 670 yorum kuralı açık; handbook ENV:62 aynı.
+- Bilerek değişen test yok. Bekleyen commit'siz dosyalar (main checkout): `state/kanal/isci-b.md`, `state/pr/followup-triage-2.md`, `state/evidence/tr2-r2-{hooks-red,hooks,lint,bash-semantics,hook-probe,221-recete}.log`.

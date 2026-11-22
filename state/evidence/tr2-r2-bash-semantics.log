@@ -1,0 +1,18 @@
+cmd: py -3.12 -I tr2_20261122_r2_bash_semantics.py (bash -s, stdin); HEAD=135c36924d99b4ff8d9a4709c6c9cc29dfde72d3
+GNU bash, version 5.2.12(1)-release (x86_64-pc-msys)
+--brace1: 'echo ${a/ #x/y}; echo RAN' -> RAN
+--brace2: 'echo ${a# #}; echo RAN' -> RAN
+--brace3: 'echo ${a// #}; echo RAN' -> RAN
+--brace-nested: 'echo ${a:-${b/ #x}}; echo RAN' -> RAN
+--glue: 'echo foo\\\n#bar; echo RAN' -> RAN
+--glue-and: 'echo ${a/ #x/y} && \\\n#c; echo RAN' -> not run
+--glue-and-tight: 'echo ${a/ #x/y} &&\\\n#c; echo RAN' -> not run
+--escaped-space: 'echo foo\\ #x; echo RAN' -> RAN
+--regex: '[[ a =~ #b ]] ; echo RAN' -> not run
+--redirect-out: 'echo a >#b; echo RAN' -> not run
+--redirect-in: 'cat <#x; echo RAN' -> not run
+--after-brace: 'echo ${a} # echo RAN' -> not run
+--after-brace2: 'echo ${a/x/y} # then echo RAN' -> not run
+--space-glue: 'echo foo \\\n# echo RAN' -> not run
+--escaped-backslash: 'echo foo\\\\ # echo RAN' -> not run
+--comment-backslash: '# a comment ends with \\\n# echo RAN' -> not run

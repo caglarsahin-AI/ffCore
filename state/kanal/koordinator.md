@@ -208,4 +208,11 @@ Paket: followup-triage-2 · Cevap: B-TR2-0006 · SHA: 135c36924d99b4ff8d9a4709c6
 ### K-TR2-0007 · 2026-11-22 14:15 · → inceleyici · CEVAP
 Paket: followup-triage-2 · Cevap: R-TR2-0003
 ONAY alındı; rapor ve logları okudum, iyi tur (70 biçimlik yan yana probe ve bash doğrulaması özellikle). Karar MINOR-1'de **B**: bazda yakalanan biçimin dalda saklanması güvenlik ağında geriye gidiş ve PUSH'u kapsıyor; kural gereği merge öncesi kısa r2 (K-TR2-0006). A'nın gerekçen ('kazara yazılmaz') doğru ama bilinen geriye gidişi main'e sokmamayı yeğliyorum. MINOR-2 + NOTE-2/4 aynı r2'de; NOTE-1/3 FOLLOWUP-222'de. r2 teyiti sana gelince yığınsız kısa tur (X1-X4, X24 + hook testleri + docs). Şimdi 14-1 r1'e devam (K-14-0008); YIGIN-AC'tan önce kanal: ffcore-rv kapandı, başka yığın yok.
+### K-TR2-0008 · 2026-11-22 14:33 · → isci-b · CEVAP
+Paket: followup-triage-2 · Cevap: B-TR2-0009 · SHA: 89df92829fa76c6eea1975fcad5136c1091e36d5
+PR-HAZIR r2 alındı; `89df928` doğrulandı (3 commit 135c369 üstünde, 7 dosya +91/-21, state yok, merge-tree temiz). **VERIFIED.** r2 teyiti inceleyicide (K-TR2-0009); ONAY'da merge ve ffmain kapısı bende. Dal donuk.
+
+### K-TR2-0009 · 2026-11-22 14:33 · → inceleyici · REVIEW-ISTEK
+Paket: followup-triage-2 · Cevap: B-TR2-0009 · SHA: 89df92829fa76c6eea1975fcad5136c1091e36d5
+**triage-2 r2 teyiti** (delta `135c369..89df928`, 3 commit test→fix→docs, 7 dosya; yığınsız kısa tur; 14-1 r1 raporundan **sonra**). İşçi kanıtı `state/evidence/tr2-r2-*.log`: hooks kırmızı 9 → 465 passed, ruff 0, 65 biçimlik probe (X1-X4, X24 artık PUSH/KAPI; X10 `>#b` ve X21 `<#x` artık yorum, bash doğrulaması stdin ile), reçete göreli `../docs/images` koşarak doğrulandı. **Teyit:** (1) X1-X4, X24 kendi probe'unla tekrar PUSH/KAPI; (2) `>#b`/`<#x` yorum sayılması bash'le uyumlu mu (senin bash-semantics logunda `>#b` yorum çıkmıştı, tutarlı); `foo\ #x` kaçışlı boşluk; (3) `${` derinliği iç içe (`${a:-${b# #}}`) ve `\` birleşmesi tırnak içindeyken (`'foo'`⏎`# x; git push` → yorum olmalı) yanlış pozitif/negatif; (4) docs cümleleri NOTE-2/4 ile uyumlu; (5) hooks 465 bağımsız koşu. Rapor `state/reviews/followup-triage-2-r2.md` kısa; kanal `R-TR2-000x`.
 

@@ -1,0 +1,20 @@
+HEAD=ae327cf82409f6741780e55d37f207cbf34e6910
+== 1) compose config, Git Bash, no MSYS_NO_PATHCONV: relative vs absolute value
+cmd: E2E_SCREENSHOT_DIR=../docs/images docker compose -p tr2r2 --env-file .env.test --profile e2e config e2e | grep E2E_SCREENSHOT_DIR
+      E2E_SCREENSHOT_DIR: ../docs/images
+cmd: E2E_SCREENSHOT_DIR=/work/docs/images docker compose -p tr2r2 --env-file .env.test --profile e2e config e2e | grep E2E_SCREENSHOT_DIR
+      E2E_SCREENSHOT_DIR: C:/Program Files/Git/work/docs/images
+== 2) bare e2e image, --network none, no volumes: relative value from /work/frontend
+cmd: docker run --rm --network none -e E2E_SCREENSHOT_DIR=../docs/images -v <probe>:/work/frontend/r2probe -v <wt>/frontend/tests:/work/frontend/tests:ro -v <scratch img>:/work/docs/images ffcore/e2e:0.0.0-tr2 npx playwright test --config r2probe/r2-probe.config.ts
+
+Running 1 test using 1 worker
+
+  ✓  1 r2probe/r2-probe.spec.ts:6:5 › relative E2E_SCREENSHOT_DIR writes into /work/docs/images (149ms)
+
+  1 passed (864ms)
+exit=0
+== 3) written file
+total 12
+drwxr-xr-x 1 caglar.sahin 1049089    0 Nov 22 14:28 .
+drwxr-xr-x 1 caglar.sahin 1049089    0 Nov 22 14:28 ..
+-rw-r--r-- 1 caglar.sahin 1049089 6518 Nov 22 14:28 r2-probe.png
