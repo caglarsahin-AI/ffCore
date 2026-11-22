@@ -106,3 +106,4 @@
 2026-11-20T22:16:12	warn	inceleyici	Bash	KAPI	S=C:/Users/CAGLAR~1.SAH/AppData/Local/Temp/claude/9398d5fca5badfb5/ecb79a59-6471-4590-b997-842940d7a702/scratchpad; cat 
 2026-11-20T22:16:12	warn	inceleyici	Bash	PUSH	S=C:/Users/CAGLAR~1.SAH/AppData/Local/Temp/claude/9398d5fca5badfb5/ecb79a59-6471-4590-b997-842940d7a702/scratchpad; cat 
 2026-11-22T14:21:18	block	isci-b	Bash	KAPI	cd /c/ai_paycore/ffcore/.worktrees/fix/followup-triage-2 && py -3.12 -m pytest tests/hooks/test_comments_timeout.py -q -k r2 -p no:cacheprovider 2>&1 | tail -12
+2026-11-22T15:32:09	block	isci-c	Bash	KAPI	S="C:/Users/CAGLAR~1.SAH/AppData/Local/Temp/claude/9398d5fca5badfb5/c530d90b-5276-4edb-90df-35c461a9ce9a/scratchpad"; printf '%s\n' 'K-14-0011 alındı: ffmain kapısı sürerken arka plandaki `make test` (iki profil) durduruldu (TaskStop + `ffc

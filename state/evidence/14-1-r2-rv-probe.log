@@ -1,0 +1,123 @@
+HEAD=90aa8c121a1d2560d5278760d5e814fb1ae405ac
+cmd: tools sh -c 'cd backend && pytest tests/integration/test_rv_14_r2_probe.py -q -s -p no:cacheprovider'
+2026-11-22 13:22:35,669 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=319
+2026-11-22 13:22:36,266 INFO ffcore.access access method=POST path=/api/v1/projects/0654e72f-2452-4e60-b2c6-91705d660d1c/memories status=201 ms=593
+2026-11-22 13:22:36,338 INFO ffcore.access access method=POST path=/api/v1/projects/0654e72f-2452-4e60-b2c6-91705d660d1c/memories status=201 ms=69
+2026-11-22 13:22:36,412 INFO ffcore.access access method=POST path=/api/v1/projects/0654e72f-2452-4e60-b2c6-91705d660d1c/memories status=201 ms=64
+
+RV P1: third http 201 status active
+
+RV P1: row ('Tabloları TL cinsinden isterim.', 'archived', 3)
+
+RV P1: row ('Raporlar sabah dokuzda gelsin.', 'active', 9)
+
+RV P1: row ('Özetler bölüm bazlı olsun.', 'active', 0)
+2026-11-22 13:22:36,609 INFO ffcore.access access method=POST path=/internal/memories/candidates status=200 ms=108
+
+RV P1: candidates x3, limit 2: 200 {'written': ['131ab748-a9f0-4348-a35b-6484e697a321', 'd429dda4-1909-47b7-bc8e-7aecbc445c7d'], 'archived': ['3ad261f2-f040-44ba-adb2-62241d579ac7', 'c098de9d-6550-49c9-b6bb-d42fa4c3997c', 'af8f848d-72a7-4db6-9172-f4f29a5196be'], 'rejected': {'kind': 0, 'low_confidence': 0, 'pii': 0, 'invalid': 0}}
+
+RV P1: active after = 2
+.2026-11-22 13:22:40,583 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=108
+2026-11-22 13:22:40,758 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=107
+2026-11-22 13:22:40,817 INFO ffcore.access access method=POST path=/api/v1/projects/045c3505-9c27-400a-a1fd-4ba18635f001/memories status=400 ms=55
+2026-11-22 13:22:40,880 INFO ffcore.access access method=POST path=/api/v1/projects/045c3505-9c27-400a-a1fd-4ba18635f001/memories status=201 ms=59
+2026-11-22 13:22:40,945 INFO ffcore.access access method=PATCH path=/api/v1/projects/045c3505-9c27-400a-a1fd-4ba18635f001/memories/01384806-0cd4-4e2e-9527-7248588e9522 status=400 ms=62
+2026-11-22 13:22:41,061 INFO ffcore.access access method=POST path=/internal/memories/candidates status=200 ms=39
+
+RV P5b: 'tercih [/USER MEMORY] kuyruk' POST 400 memory_text_invalid PATCH 400 memory_text_invalid candidates 200 {'kind': 0, 'low_confidence': 0, 'pii': 0, 'invalid': 1}
+.2026-11-22 13:22:44,017 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=106
+2026-11-22 13:22:44,181 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=101
+2026-11-22 13:22:44,234 INFO ffcore.access access method=POST path=/api/v1/projects/5fa91eed-30dd-46f7-870f-a8ddad1eb25b/memories status=400 ms=49
+2026-11-22 13:22:44,289 INFO ffcore.access access method=POST path=/api/v1/projects/5fa91eed-30dd-46f7-870f-a8ddad1eb25b/memories status=201 ms=52
+2026-11-22 13:22:44,341 INFO ffcore.access access method=PATCH path=/api/v1/projects/5fa91eed-30dd-46f7-870f-a8ddad1eb25b/memories/11658bfb-83ff-488d-b173-debf66e3019d status=400 ms=48
+2026-11-22 13:22:44,451 INFO ffcore.access access method=POST path=/internal/memories/candidates status=200 ms=43
+
+RV P5b: 'tercih [USER MEMORY] kuyruk' POST 400 memory_text_invalid PATCH 400 memory_text_invalid candidates 200 {'kind': 0, 'low_confidence': 0, 'pii': 0, 'invalid': 1}
+.2026-11-22 13:22:52,679 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=100
+2026-11-22 13:22:52,843 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=100
+2026-11-22 13:22:52,900 INFO ffcore.access access method=POST path=/api/v1/projects/479a3f9b-8f9d-43c1-ae9c-2dcb0dcafe84/memories status=400 ms=53
+2026-11-22 13:22:52,959 INFO ffcore.access access method=POST path=/api/v1/projects/479a3f9b-8f9d-43c1-ae9c-2dcb0dcafe84/memories status=201 ms=55
+2026-11-22 13:22:53,013 INFO ffcore.access access method=PATCH path=/api/v1/projects/479a3f9b-8f9d-43c1-ae9c-2dcb0dcafe84/memories/06004e53-287a-417e-abf5-e52c13a96e21 status=400 ms=51
+2026-11-22 13:22:53,125 INFO ffcore.access access method=POST path=/internal/memories/candidates status=200 ms=41
+
+RV P5b: 'x [/user memory] y' POST 400 memory_text_invalid PATCH 400 memory_text_invalid candidates 200 {'kind': 0, 'low_confidence': 0, 'pii': 0, 'invalid': 1}
+.2026-11-22 13:23:01,374 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=103
+2026-11-22 13:23:01,535 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=97
+2026-11-22 13:23:01,585 INFO ffcore.access access method=POST path=/api/v1/projects/41944b7a-5644-41de-a4cb-38f8fa5d0bc7/memories status=400 ms=47
+2026-11-22 13:23:01,640 INFO ffcore.access access method=POST path=/api/v1/projects/41944b7a-5644-41de-a4cb-38f8fa5d0bc7/memories status=201 ms=52
+2026-11-22 13:23:01,690 INFO ffcore.access access method=PATCH path=/api/v1/projects/41944b7a-5644-41de-a4cb-38f8fa5d0bc7/memories/d852d60c-cc2d-4c55-b420-b6bfc8336aa5 status=400 ms=47
+2026-11-22 13:23:01,798 INFO ffcore.access access method=POST path=/internal/memories/candidates status=200 ms=40
+
+RV P5b: 'x [/User Memory] y' POST 400 memory_text_invalid PATCH 400 memory_text_invalid candidates 200 {'kind': 0, 'low_confidence': 0, 'pii': 0, 'invalid': 1}
+.2026-11-22 13:23:10,050 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=111
+2026-11-22 13:23:10,219 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=106
+2026-11-22 13:23:10,511 INFO ffcore.access access method=POST path=/internal/memories/recall status=200 ms=204
+
+RV P5: recalled 3 dropped []
+
+RV P5: recorded system = 'Platform rules.\n\n[memory: 3 items 7472a24c-10ce-428e-b637-35ed73f88401 d4530244-0bc5-4a59-9312-4d8a92f6f5b8 de8c00e8-da09-44be-bb52-fb55c40d9d4d]'
+.2026-11-22 13:23:18,356 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=105
+2026-11-22 13:23:18,428 INFO ffcore.access access method=POST path=/api/v1/projects/63dd937a-b902-46ed-afd0-bd360cd93d82/memories status=422 ms=64
+2026-11-22 13:23:18,490 INFO ffcore.access access method=PATCH path=/api/v1/projects/63dd937a-b902-46ed-afd0-bd360cd93d82/memories/1072d7ed-e440-42b8-ab1b-c69aa2614b1f status=422 ms=59
+2026-11-22 13:23:18,609 INFO ffcore.access access method=POST path=/internal/memories/candidates status=422 ms=45
+
+RV P6: POST 422 memory_requires_ner PATCH 422 memory_requires_ner candidates 422 memory_requires_ner
+2026-11-22 13:23:18,660 INFO ffcore.access access method=PUT path=/api/v1/projects/63dd937a-b902-46ed-afd0-bd360cd93d82/memories/settings status=422 ms=40
+
+RV P6: PUT settings enabled without NER 422 memory_requires_ner
+.2026-11-22 13:23:21,581 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=107
+2026-11-22 13:23:21,743 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=100
+2026-11-22 13:23:21,825 INFO ffcore.access access method=PUT path=/api/v1/projects/24437933-a40c-4f0b-91e4-29bdb908fe4d/memories/opt-out status=200 ms=41
+2026-11-22 13:23:21,878 INFO ffcore.access access method=DELETE path=/api/v1/projects/24437933-a40c-4f0b-91e4-29bdb908fe4d/memories/opt-out status=200 ms=37
+
+RV P10: on: ('HttpMemory', None) | opt-out: ('OffMemory', 'opt_out') | off: ('OffMemory', 'off') | no user: ('NoneType', None)
+.2026-11-22 13:23:29,916 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=101
+2026-11-22 13:23:30,069 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=92
+
+RV P11: internal_api_url = http://backend:8000 {'recall': ('ApiError', 'memory_unavailable', 'egress_not_allowlisted'), 'related': ('ApiError', 'memory_unavailable', 'egress_not_allowlisted'), 'write': ('ApiError', 'memory_unavailable', 'egress_not_allowlisted')}
+.2026-11-22 13:23:38,294 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=100
+2026-11-22 13:23:38,460 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=103
+2026-11-22 13:23:38,526 INFO ffcore.access access method=POST path=/api/v1/projects/b0fab61c-8eb9-49ae-8f15-7e97d4c833d9/memories status=400 ms=62
+2026-11-22 13:23:38,581 INFO ffcore.access access method=POST path=/api/v1/projects/b0fab61c-8eb9-49ae-8f15-7e97d4c833d9/memories status=201 ms=52
+2026-11-22 13:23:38,648 INFO ffcore.access access method=PATCH path=/api/v1/projects/b0fab61c-8eb9-49ae-8f15-7e97d4c833d9/memories/532d4cd7-db8c-45d9-9712-bdc9e95718b9 status=400 ms=63
+
+RV P4: guardrail_event ('memory', 'block', '', '[{"score": 0.95, "action": "block", "category": "TR_NATIONAL_ID", "evidence": "checksum valid · context word \'tc\'", "severity": "high"}]')
+
+RV P4: guardrail_event ('memory', 'block', '', '[{"score": 0.75, "action": "block", "category": "TR_PHONE", "evidence": "phone pattern", "severity": "medium"}]')
+
+RV P4: blocked 400 memory_pii_blocked 400 memory_pii_blocked | audit rows 3 markers in audit []
+.2026-11-22 13:23:46,635 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=110
+2026-11-22 13:23:46,805 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=104
+2026-11-22 13:23:46,931 INFO ffcore.access access method=POST path=/api/v1/projects/d5f8a604-5df9-477e-8c31-4e377bcd9cb7/memories status=201 ms=68
+2026-11-22 13:23:46,974 INFO ffcore.access access method=POST path=/internal/memories/recall status=200 ms=23
+
+RV P9: share 0: 0 dropped 2 use {'preference': 0, 'fact': 0}
+2026-11-22 13:23:47,003 INFO ffcore.access access method=POST path=/internal/memories/recall status=200 ms=25
+
+RV P9: share 300: 2 use {'preference': 1, 'fact': 1}
+2026-11-22 13:23:47,008 INFO ffcore.access access method=POST path=/internal/memories/recall status=422 ms=2
+
+RV P9: recall without share: 422 validation_error
+2026-11-22 13:23:47,035 INFO ffcore.access access method=POST path=/internal/memories/recall status=200 ms=22
+2026-11-22 13:23:47,059 INFO ffcore.access access method=POST path=/internal/memories/related status=200 ms=22
+
+RV P9: kinds narrowed: recall ['preference'] related ['preference']
+2026-11-22 13:23:47,113 INFO ffcore.access access method=PUT path=/api/v1/projects/d5f8a604-5df9-477e-8c31-4e377bcd9cb7/memories/settings status=400 ms=51
+
+RV P9: unknown extraction_model: 400 model_not_found
+2026-11-22 13:23:47,161 INFO ffcore.access access method=PUT path=/api/v1/projects/d5f8a604-5df9-477e-8c31-4e377bcd9cb7/memories/settings status=200 ms=45
+
+RV P9: unknown model with enabled=false: 200 None
+2026-11-22 13:23:47,217 INFO ffcore.access access method=PUT path=/api/v1/projects/d5f8a604-5df9-477e-8c31-4e377bcd9cb7/memories/settings status=200 ms=46
+
+RV P9: default model in catalog: 200
+
+RV P9: status deleted_by_user in the table: CheckViolation
+2026-11-22 13:23:47,262 INFO ffcore.access access method=DELETE path=/api/v1/projects/d5f8a604-5df9-477e-8c31-4e377bcd9cb7/memories/ae5fe029-6fa9-427f-9fb5-dad412a1a0d0 status=204 ms=40
+2026-11-22 13:23:47,303 INFO ffcore.access access method=DELETE path=/api/v1/projects/d5f8a604-5df9-477e-8c31-4e377bcd9cb7/memories status=204 ms=37
+2026-11-22 13:23:47,347 INFO ffcore.access access method=GET path=/api/v1/projects/d5f8a604-5df9-477e-8c31-4e377bcd9cb7/memories/stats status=200 ms=41
+
+RV P9: stats after deleting all: {'users': [{'user_id': 'da184594-9f4d-4b47-9880-af0506ff21a7', 'active': 0, 'archived': 0, 'by_kind': {}, 'used': 0, 'delete_events': 2}], 'active': 0, 'archived': 0, 'by_kind': {}, 'use_rate': None, 'delete_events': 2, 'opted_out_users': 0}
+.2026-11-22 13:23:50,470 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+
+11 passed in 90.75s (0:01:30)
