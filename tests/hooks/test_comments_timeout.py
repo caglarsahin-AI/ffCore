@@ -69,3 +69,42 @@ def test_214_timeout_nice_nohup_wrappers_are_checked(guard, main_root, cmd, rule
 )
 def test_214_harmless_forms_allowed(guard, main_root, cmd):
     assert rules(guard, cmd, main_root) == [], cmd
+
+
+# triage-2 r2 (R-TR2-0003 MINOR-1): a `#` inside `${…}` and a `#` glued to the previous word by
+# a trailing `\` are not comments in bash; the comment cut must not hide the commands after them
+# (the r1 probe forms X1-X4, X24; the base guard caught them).
+@pytest.mark.parametrize(
+    ("cmd", "rule"),
+    [
+        ("echo ${a/ #x/y}; git push origin x", "PUSH"),
+        ("echo ${a# #}; git push origin x", "PUSH"),
+        ("echo foo\\\n#bar; git push origin x", "PUSH"),
+        ("echo foo\\\n#bar; pytest backend/tests", "KAPI"),
+        ("echo ${a// #}; pytest backend/tests", "KAPI"),
+        ("echo ${a:-${b/ #x}}; git push origin x", "PUSH"),
+        ("echo foo\\ #x; git push origin x", "PUSH"),
+    ],
+)
+def test_r2_hash_in_braces_or_glued_line_is_not_a_comment(guard, main_root, cmd, rule):
+    assert rule in rules(guard, cmd, main_root), cmd
+
+
+# The other direction: where bash reads `#` as a comment, the text after it stays a comment.
+@pytest.mark.parametrize(
+    "cmd",
+    [
+        "[[ a =~ #b ]] ; git push origin x",
+        "echo a >#b; git push origin x",
+        "cat <#x; git push origin x",
+        "echo ${a} # git push origin x",
+        "echo ${a/x/y} # then git push origin x",
+        "echo foo \\\n# git push origin x",
+        "echo foo\\\\ # git push origin x",
+        "# a comment ends with \\\n# git push origin x",
+        "echo ${a/ #x/y} && \\\n#c; git push origin x",
+        "echo ${a/ #x/y} &&\\\n#c; git push origin x",
+    ],
+)
+def test_r2_bash_comments_stay_comments(guard, main_root, cmd):
+    assert rules(guard, cmd, main_root) == [], cmd
