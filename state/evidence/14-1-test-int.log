@@ -1,0 +1,1421 @@
+cd backend && QDRANT_URL=http://qdrant:6333 RUN_QDRANT_TESTS=1 pytest tests/integration
+============================= test session starts ==============================
+platform linux -- Python 3.12.10, pytest-9.2.0, pluggy-1.7.0
+rootdir: /work/backend
+configfile: pyproject.toml
+plugins: Faker-40.43.0, anyio-4.15.1, langsmith-0.14.8
+collected 1282 items
+
+tests/integration/test_01_client.py .......                              [  0%]
+tests/integration/test_01_events.py ...                                  [  0%]
+tests/integration/test_01_reconcile.py ...........                       [  1%]
+tests/integration/test_01_reconcile_shutdown.py ...                      [  1%]
+tests/integration/test_01_seed.py ...                                    [  2%]
+tests/integration/test_02_langfuse.py F.FF                               [  2%]
+tests/integration/test_02_pricing.py .                                   [  2%]
+tests/integration/test_02_r1_worker_logging.py .                         [  2%]
+tests/integration/test_03a_access.py ............                        [  3%]
+tests/integration/test_03a_auth.py ..............                        [  4%]
+tests/integration/test_03a_models.py ...........                         [  5%]
+tests/integration/test_03a_nonmember_404.py ............................ [  7%]
+........................................................................ [ 13%]
+...........................................                              [ 16%]
+tests/integration/test_03a_obo_scope.py ................                 [ 17%]
+tests/integration/test_03a_providers.py ................                 [ 19%]
+tests/integration/test_03a_read_side.py .......                          [ 19%]
+tests/integration/test_03a_schema.py .......                             [ 20%]
+tests/integration/test_03b_audit.py ............                         [ 21%]
+tests/integration/test_03b_egress_dns.py s                               [ 21%]
+tests/integration/test_03c_alerts.py ................                    [ 22%]
+tests/integration/test_03c_keys.py ..............................        [ 24%]
+tests/integration/test_03c_quota_engine.py ............                  [ 25%]
+tests/integration/test_03c_quotas_api.py .......                         [ 26%]
+tests/integration/test_03c_r1_audit_throttle.py .....                    [ 26%]
+tests/integration/test_03c_retention_content.py ...........              [ 27%]
+tests/integration/test_03c_retention_document_delete.py ..               [ 27%]
+tests/integration/test_03c_retention_job.py ...............              [ 28%]
+tests/integration/test_03c_run_quota.py .......                          [ 29%]
+tests/integration/test_04a_api.py .............                          [ 30%]
+tests/integration/test_04a_embed_api.py ....                             [ 30%]
+tests/integration/test_04a_ingest.py ............s                       [ 31%]
+tests/integration/test_04a_qdrant.py ....                                [ 32%]
+tests/integration/test_04a_readyz.py ....                                [ 32%]
+tests/integration/test_04a_review_r1_acl.py ........                     [ 32%]
+tests/integration/test_04a_review_r1_ingest.py ......                    [ 33%]
+tests/integration/test_04a_review_r1_upload.py ..                        [ 33%]
+tests/integration/test_04a_search.py ........                            [ 34%]
+tests/integration/test_04a_store.py ..........                           [ 35%]
+tests/integration/test_04a_worker.py ..                                  [ 35%]
+tests/integration/test_04b_2_normalize_tr.py ..                          [ 35%]
+tests/integration/test_04b_2_query_stats.py ...                          [ 35%]
+tests/integration/test_04b_2_readyz.py ........                          [ 36%]
+tests/integration/test_04b_2_scope_key_search.py .                       [ 36%]
+tests/integration/test_04b_2_scope_search.py ..                          [ 36%]
+tests/integration/test_04b_2_video.py ..                                 [ 36%]
+tests/integration/test_04b_api.py .......                                [ 37%]
+tests/integration/test_04b_knowledge.py ...............                  [ 38%]
+tests/integration/test_04b_migrate.py .....                              [ 38%]
+tests/integration/test_04b_r2_acl.py ....                                [ 39%]
+tests/integration/test_04b_r3_upload_acl.py ............                 [ 39%]
+tests/integration/test_05a_live_services.py FFFFF                        [ 40%]
+tests/integration/test_05a_obo_verify.py .......                         [ 40%]
+tests/integration/test_05a_search.py ........                            [ 41%]
+tests/integration/test_05a_sql.py ...............s.....                  [ 43%]
+tests/integration/test_05a_tools_api.py ................................ [ 45%]
+................                                                         [ 46%]
+tests/integration/test_05b_mcp_endpoint.py ..............                [ 47%]
+tests/integration/test_05b_mcp_servers_api.py ..................         [ 49%]
+tests/integration/test_05b_r2_origin.py .........                        [ 50%]
+tests/integration/test_05b_superset_e2e.py .                             [ 50%]
+tests/integration/test_06a_adapters.py ..                                [ 50%]
+tests/integration/test_06a_agents.py ........                            [ 50%]
+tests/integration/test_06a_feedback.py .....                             [ 51%]
+tests/integration/test_06a_graph.py ............................         [ 53%]
+tests/integration/test_06a_mcp_tools.py ............                     [ 54%]
+tests/integration/test_06a_read_side.py .                                [ 54%]
+tests/integration/test_06a_readyz.py ..                                  [ 54%]
+tests/integration/test_06a_run_access.py ..........                      [ 55%]
+tests/integration/test_06a_runs_api.py .........                         [ 56%]
+tests/integration/test_06a_scheduler.py .......                          [ 56%]
+tests/integration/test_06a_schema.py .........                           [ 57%]
+tests/integration/test_06b2_external_agent.py .........................  [ 59%]
+tests/integration/test_06b2_migration.py .                               [ 59%]
+tests/integration/test_06b_agent.py ......................               [ 61%]
+tests/integration/test_06b_direct.py ..............................      [ 63%]
+tests/integration/test_06b_identity.py ............                      [ 64%]
+tests/integration/test_06b_key_search.py ......                          [ 64%]
+tests/integration/test_06b_manifest.py .....                             [ 65%]
+tests/integration/test_07_api_read.py ............                       [ 66%]
+tests/integration/test_07_decide.py .........                            [ 66%]
+tests/integration/test_07_flow.py ..........                             [ 67%]
+tests/integration/test_07_schema.py ...........                          [ 68%]
+tests/integration/test_07_service.py ........                            [ 69%]
+tests/integration/test_07f_followups.py ....                             [ 69%]
+tests/integration/test_07f_sql_context_roles.py ..                       [ 69%]
+tests/integration/test_08_api.py .................                       [ 70%]
+tests/integration/test_08t_21_text_filter_mismatch.py ..                 [ 71%]
+tests/integration/test_08t_22_attachment_names.py ...                    [ 71%]
+tests/integration/test_08t_26_builtin_egress_key.py ..                   [ 71%]
+tests/integration/test_08t_28_internal_ner_http_auth.py .                [ 71%]
+tests/integration/test_08t_30_reindex_prsim.py ......                    [ 72%]
+tests/integration/test_08t_c17_exit.py ...                               [ 72%]
+tests/integration/test_08t_c17_facade_direct.py ....                     [ 72%]
+tests/integration/test_08t_m1_counter.py ...                             [ 72%]
+tests/integration/test_08t_m2_facade_history.py ..                       [ 73%]
+tests/integration/test_08t_m2_history.py .......                         [ 73%]
+tests/integration/test_08t_m3_paths.py .....                             [ 73%]
+tests/integration/test_08t_m7_blocked_deleted.py ..                      [ 74%]
+tests/integration/test_08t_m7_s8_endpoints.py .                          [ 74%]
+tests/integration/test_08t_r2_history_e2e.py .                           [ 74%]
+tests/integration/test_08t_r2_paths.py ............                      [ 75%]
+tests/integration/test_08t_r3_resume.py ......                           [ 75%]
+tests/integration/test_09_advance.py ...................                 [ 77%]
+tests/integration/test_09_api.py ...........                             [ 78%]
+tests/integration/test_09_exam_stack.py ssssssss                         [ 78%]
+tests/integration/test_09_from_run.py .................                  [ 79%]
+tests/integration/test_09_publish_gate.py ......................         [ 81%]
+tests/integration/test_10c2_eval_items_int.py .....                      [ 82%]
+tests/integration/test_10c3_summary_scalar_int.py ..                     [ 82%]
+tests/integration/test_116_checkpoint_sources.py ..........              [ 82%]
+tests/integration/test_11_2_chat.py .......................              [ 84%]
+tests/integration/test_11_chat.py ...................                    [ 86%]
+tests/integration/test_12_46_app_role.py ................F.....          [ 87%]
+tests/integration/test_12_egress.py sssssssssssssssss                    [ 89%]
+tests/integration/test_12_tls.py sssssssssssss                           [ 90%]
+tests/integration/test_134_egress_real_engine.py ..                      [ 90%]
+tests/integration/test_134_provider_request.py ..                        [ 90%]
+tests/integration/test_14_api.py .................                       [ 91%]
+tests/integration/test_14_runs.py ......................                 [ 93%]
+tests/integration/test_18td_tools_api.py EEE                             [ 93%]
+tests/integration/test_19_ingest_raw.py .....s................           [ 95%]
+tests/integration/test_57_alembic_merge.py .FF....                       [ 96%]
+tests/integration/test_af_2b_deleted_source_breadcrumb.py ..             [ 96%]
+tests/integration/test_af_3_updated_at_source.py ...                     [ 96%]
+tests/integration/test_trj_194_platform_registration.py ................ [ 97%]
+............                                                             [ 98%]
+tests/integration/test_trj_202_admin_manages_acl.py ............         [ 99%]
+tests/integration/test_trj_203_single_denied_row.py ....                 [100%]
+
+==================================== ERRORS ====================================
+___ ERROR at setup of test_18td_9_register_and_discover_through_the_registry ___
+
+self = <urllib.request.HTTPHandler object at 0x7f917e55e8a0>
+http_class = <class 'http.client.HTTPConnection'>
+req = <urllib.request.Request object at 0x7f917e626d80>, http_conn_args = {}
+
+    def do_open(self, http_class, req, **http_conn_args):
+        """Return an HTTPResponse object for the request, using http_class.
+    
+        http_class must implement the HTTPConnection API from http.client.
+        """
+        host = req.host
+        if not host:
+            raise URLError('no host given')
+    
+        # will parse host:port
+        h = http_class(host, timeout=req.timeout, **http_conn_args)
+        h.set_debuglevel(self._debuglevel)
+    
+        headers = dict(req.unredirected_hdrs)
+        headers.update({k: v for k, v in req.headers.items()
+                        if k not in headers})
+    
+        # TODO(jhylton): Should this be redesigned to handle
+        # persistent connections?
+    
+        # We want to make an HTTP/1.1 request, but the addinfourl
+        # class isn't prepared to deal with a persistent connection.
+        # It will try to read all remaining data from the socket,
+        # which will block while the server waits for the next request.
+        # So make sure the connection gets closed after the (only)
+        # request.
+        headers["Connection"] = "close"
+        headers = {name.title(): val for name, val in headers.items()}
+    
+        if req._tunnel_host:
+            tunnel_headers = {}
+            proxy_auth_hdr = "Proxy-Authorization"
+            if proxy_auth_hdr in headers:
+                tunnel_headers[proxy_auth_hdr] = headers[proxy_auth_hdr]
+                # Proxy-Authorization should not be sent to origin
+                # server.
+                del headers[proxy_auth_hdr]
+            h.set_tunnel(req._tunnel_host, headers=tunnel_headers)
+    
+        try:
+            try:
+>               h.request(req.get_method(), req.selector, req.data, headers,
+                          encode_chunked=req.has_header('Transfer-encoding'))
+
+/usr/local/lib/python3.12/urllib/request.py:1344: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/http/client.py:1338: in request
+    self._send_request(method, url, body, headers, encode_chunked)
+/usr/local/lib/python3.12/http/client.py:1384: in _send_request
+    self.endheaders(body, encode_chunked=encode_chunked)
+/usr/local/lib/python3.12/http/client.py:1333: in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+/usr/local/lib/python3.12/http/client.py:1093: in _send_output
+    self.send(msg)
+/usr/local/lib/python3.12/http/client.py:1037: in send
+    self.connect()
+/usr/local/lib/python3.12/http/client.py:1003: in connect
+    self.sock = self._create_connection(
+/usr/local/lib/python3.12/socket.py:841: in create_connection
+    for res in getaddrinfo(host, port, 0, SOCK_STREAM):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+host = 'ticket-desk', port = 8000, family = 0
+type = <SocketKind.SOCK_STREAM: 1>, proto = 0, flags = 0
+
+    def getaddrinfo(host, port, family=0, type=0, proto=0, flags=0):
+        """Resolve host and port into list of address info entries.
+    
+        Translate the host/port argument into a sequence of 5-tuples that contain
+        all the necessary arguments for creating a socket connected to that service.
+        host is a domain name, a string representation of an IPv4/v6 address or
+        None. port is a string service name such as 'http', a numeric port number or
+        None. By passing None as the value of host and port, you can pass NULL to
+        the underlying C API.
+    
+        The family, type and proto arguments can be optionally specified in order to
+        narrow the list of addresses returned. Passing zero as a value for each of
+        these arguments selects the full range of results.
+        """
+        # We override this function since we want to translate the numeric family
+        # and socket type values to enum constants.
+        addrlist = []
+>       for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       socket.gaierror: [Errno -2] Name or service not known
+
+/usr/local/lib/python3.12/socket.py:978: gaierror
+
+During handling of the above exception, another exception occurred:
+
+    @pytest.fixture
+    def desk():
+        request = urllib.request.Request(DESK + "/_reset", method="POST", data=b"")
+>       urllib.request.urlopen(request, timeout=5).close()
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_18td_tools_api.py:35: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/urllib/request.py:215: in urlopen
+    return opener.open(url, data, timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/urllib/request.py:515: in open
+    response = self._open(req, data)
+               ^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/urllib/request.py:532: in _open
+    result = self._call_chain(self.handle_open, protocol, protocol +
+/usr/local/lib/python3.12/urllib/request.py:492: in _call_chain
+    result = func(*args)
+             ^^^^^^^^^^^
+/usr/local/lib/python3.12/urllib/request.py:1373: in http_open
+    return self.do_open(http.client.HTTPConnection, req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <urllib.request.HTTPHandler object at 0x7f917e55e8a0>
+http_class = <class 'http.client.HTTPConnection'>
+req = <urllib.request.Request object at 0x7f917e626d80>, http_conn_args = {}
+
+    def do_open(self, http_class, req, **http_conn_args):
+        """Return an HTTPResponse object for the request, using http_class.
+    
+        http_class must implement the HTTPConnection API from http.client.
+        """
+        host = req.host
+        if not host:
+            raise URLError('no host given')
+    
+        # will parse host:port
+        h = http_class(host, timeout=req.timeout, **http_conn_args)
+        h.set_debuglevel(self._debuglevel)
+    
+        headers = dict(req.unredirected_hdrs)
+        headers.update({k: v for k, v in req.headers.items()
+                        if k not in headers})
+    
+        # TODO(jhylton): Should this be redesigned to handle
+        # persistent connections?
+    
+        # We want to make an HTTP/1.1 request, but the addinfourl
+        # class isn't prepared to deal with a persistent connection.
+        # It will try to read all remaining data from the socket,
+        # which will block while the server waits for the next request.
+        # So make sure the connection gets closed after the (only)
+        # request.
+        headers["Connection"] = "close"
+        headers = {name.title(): val for name, val in headers.items()}
+    
+        if req._tunnel_host:
+            tunnel_headers = {}
+            proxy_auth_hdr = "Proxy-Authorization"
+            if proxy_auth_hdr in headers:
+                tunnel_headers[proxy_auth_hdr] = headers[proxy_auth_hdr]
+                # Proxy-Authorization should not be sent to origin
+                # server.
+                del headers[proxy_auth_hdr]
+            h.set_tunnel(req._tunnel_host, headers=tunnel_headers)
+    
+        try:
+            try:
+                h.request(req.get_method(), req.selector, req.data, headers,
+                          encode_chunked=req.has_header('Transfer-encoding'))
+            except OSError as err: # timeout error
+>               raise URLError(err)
+E               urllib.error.URLError: <urlopen error [Errno -2] Name or service not known>
+
+/usr/local/lib/python3.12/urllib/request.py:1347: URLError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-22 09:25:36,458 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-22 09:25:36,554 ERROR ffcore.litellm_reconcile litellm_model_not_written model=pe01cedd1.chat-default code=egress_not_allowlisted
+2026-11-22 09:25:36,554 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=1
+2026-11-22 09:25:36,570 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=109
+2026-11-22 09:25:36,626 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-22 09:25:36,716 ERROR ffcore.litellm_reconcile litellm_model_not_written model=pe01cedd1.chat-default code=egress_not_allowlisted
+2026-11-22 09:25:36,716 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=1
+2026-11-22 09:25:36,731 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=102
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:71 warmup failed: ModelMissing
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:376 litellm_model_not_written model=pe01cedd1.chat-default code=egress_not_allowlisted
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:377 litellm_reconciled created=0 updated=0 deleted=0 problems=1
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=109
+ERROR    ffcore.readiness:readiness.py:71 warmup failed: ModelMissing
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:376 litellm_model_not_written model=pe01cedd1.chat-default code=egress_not_allowlisted
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:377 litellm_reconciled created=0 updated=0 deleted=0 problems=1
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=102
+____ ERROR at setup of test_18td_10_reads_opened_send_reply_keeps_approval _____
+
+self = <urllib.request.HTTPHandler object at 0x7f917e55e8a0>
+http_class = <class 'http.client.HTTPConnection'>
+req = <urllib.request.Request object at 0x7f919ffd4f80>, http_conn_args = {}
+
+    def do_open(self, http_class, req, **http_conn_args):
+        """Return an HTTPResponse object for the request, using http_class.
+    
+        http_class must implement the HTTPConnection API from http.client.
+        """
+        host = req.host
+        if not host:
+            raise URLError('no host given')
+    
+        # will parse host:port
+        h = http_class(host, timeout=req.timeout, **http_conn_args)
+        h.set_debuglevel(self._debuglevel)
+    
+        headers = dict(req.unredirected_hdrs)
+        headers.update({k: v for k, v in req.headers.items()
+                        if k not in headers})
+    
+        # TODO(jhylton): Should this be redesigned to handle
+        # persistent connections?
+    
+        # We want to make an HTTP/1.1 request, but the addinfourl
+        # class isn't prepared to deal with a persistent connection.
+        # It will try to read all remaining data from the socket,
+        # which will block while the server waits for the next request.
+        # So make sure the connection gets closed after the (only)
+        # request.
+        headers["Connection"] = "close"
+        headers = {name.title(): val for name, val in headers.items()}
+    
+        if req._tunnel_host:
+            tunnel_headers = {}
+            proxy_auth_hdr = "Proxy-Authorization"
+            if proxy_auth_hdr in headers:
+                tunnel_headers[proxy_auth_hdr] = headers[proxy_auth_hdr]
+                # Proxy-Authorization should not be sent to origin
+                # server.
+                del headers[proxy_auth_hdr]
+            h.set_tunnel(req._tunnel_host, headers=tunnel_headers)
+    
+        try:
+            try:
+>               h.request(req.get_method(), req.selector, req.data, headers,
+                          encode_chunked=req.has_header('Transfer-encoding'))
+
+/usr/local/lib/python3.12/urllib/request.py:1344: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/http/client.py:1338: in request
+    self._send_request(method, url, body, headers, encode_chunked)
+/usr/local/lib/python3.12/http/client.py:1384: in _send_request
+    self.endheaders(body, encode_chunked=encode_chunked)
+/usr/local/lib/python3.12/http/client.py:1333: in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+/usr/local/lib/python3.12/http/client.py:1093: in _send_output
+    self.send(msg)
+/usr/local/lib/python3.12/http/client.py:1037: in send
+    self.connect()
+/usr/local/lib/python3.12/http/client.py:1003: in connect
+    self.sock = self._create_connection(
+/usr/local/lib/python3.12/socket.py:841: in create_connection
+    for res in getaddrinfo(host, port, 0, SOCK_STREAM):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+host = 'ticket-desk', port = 8000, family = 0
+type = <SocketKind.SOCK_STREAM: 1>, proto = 0, flags = 0
+
+    def getaddrinfo(host, port, family=0, type=0, proto=0, flags=0):
+        """Resolve host and port into list of address info entries.
+    
+        Translate the host/port argument into a sequence of 5-tuples that contain
+        all the necessary arguments for creating a socket connected to that service.
+        host is a domain name, a string representation of an IPv4/v6 address or
+        None. port is a string service name such as 'http', a numeric port number or
+        None. By passing None as the value of host and port, you can pass NULL to
+        the underlying C API.
+    
+        The family, type and proto arguments can be optionally specified in order to
+        narrow the list of addresses returned. Passing zero as a value for each of
+        these arguments selects the full range of results.
+        """
+        # We override this function since we want to translate the numeric family
+        # and socket type values to enum constants.
+        addrlist = []
+>       for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       socket.gaierror: [Errno -2] Name or service not known
+
+/usr/local/lib/python3.12/socket.py:978: gaierror
+
+During handling of the above exception, another exception occurred:
+
+    @pytest.fixture
+    def desk():
+        request = urllib.request.Request(DESK + "/_reset", method="POST", data=b"")
+>       urllib.request.urlopen(request, timeout=5).close()
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_18td_tools_api.py:35: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/urllib/request.py:215: in urlopen
+    return opener.open(url, data, timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/urllib/request.py:515: in open
+    response = self._open(req, data)
+               ^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/urllib/request.py:532: in _open
+    result = self._call_chain(self.handle_open, protocol, protocol +
+/usr/local/lib/python3.12/urllib/request.py:492: in _call_chain
+    result = func(*args)
+             ^^^^^^^^^^^
+/usr/local/lib/python3.12/urllib/request.py:1373: in http_open
+    return self.do_open(http.client.HTTPConnection, req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <urllib.request.HTTPHandler object at 0x7f917e55e8a0>
+http_class = <class 'http.client.HTTPConnection'>
+req = <urllib.request.Request object at 0x7f919ffd4f80>, http_conn_args = {}
+
+    def do_open(self, http_class, req, **http_conn_args):
+        """Return an HTTPResponse object for the request, using http_class.
+    
+        http_class must implement the HTTPConnection API from http.client.
+        """
+        host = req.host
+        if not host:
+            raise URLError('no host given')
+    
+        # will parse host:port
+        h = http_class(host, timeout=req.timeout, **http_conn_args)
+        h.set_debuglevel(self._debuglevel)
+    
+        headers = dict(req.unredirected_hdrs)
+        headers.update({k: v for k, v in req.headers.items()
+                        if k not in headers})
+    
+        # TODO(jhylton): Should this be redesigned to handle
+        # persistent connections?
+    
+        # We want to make an HTTP/1.1 request, but the addinfourl
+        # class isn't prepared to deal with a persistent connection.
+        # It will try to read all remaining data from the socket,
+        # which will block while the server waits for the next request.
+        # So make sure the connection gets closed after the (only)
+        # request.
+        headers["Connection"] = "close"
+        headers = {name.title(): val for name, val in headers.items()}
+    
+        if req._tunnel_host:
+            tunnel_headers = {}
+            proxy_auth_hdr = "Proxy-Authorization"
+            if proxy_auth_hdr in headers:
+                tunnel_headers[proxy_auth_hdr] = headers[proxy_auth_hdr]
+                # Proxy-Authorization should not be sent to origin
+                # server.
+                del headers[proxy_auth_hdr]
+            h.set_tunnel(req._tunnel_host, headers=tunnel_headers)
+    
+        try:
+            try:
+                h.request(req.get_method(), req.selector, req.data, headers,
+                          encode_chunked=req.has_header('Transfer-encoding'))
+            except OSError as err: # timeout error
+>               raise URLError(err)
+E               urllib.error.URLError: <urlopen error [Errno -2] Name or service not known>
+
+/usr/local/lib/python3.12/urllib/request.py:1347: URLError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-22 09:25:40,988 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-22 09:25:41,097 ERROR ffcore.litellm_reconcile litellm_model_not_written model=pe01cedd1.chat-default code=egress_not_allowlisted
+2026-11-22 09:25:41,098 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=1
+2026-11-22 09:25:41,100 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=109
+2026-11-22 09:25:41,159 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-22 09:25:41,249 ERROR ffcore.litellm_reconcile litellm_model_not_written model=pe01cedd1.chat-default code=egress_not_allowlisted
+2026-11-22 09:25:41,250 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=1
+2026-11-22 09:25:41,264 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=101
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:71 warmup failed: ModelMissing
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:376 litellm_model_not_written model=pe01cedd1.chat-default code=egress_not_allowlisted
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:377 litellm_reconciled created=0 updated=0 deleted=0 problems=1
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=109
+ERROR    ffcore.readiness:readiness.py:71 warmup failed: ModelMissing
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:376 litellm_model_not_written model=pe01cedd1.chat-default code=egress_not_allowlisted
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:377 litellm_reconciled created=0 updated=0 deleted=0 problems=1
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=101
+___ ERROR at setup of test_18td_11_invoke_reaches_the_desk_without_identity ____
+
+self = <urllib.request.HTTPHandler object at 0x7f917e55e8a0>
+http_class = <class 'http.client.HTTPConnection'>
+req = <urllib.request.Request object at 0x7f919057b0b0>, http_conn_args = {}
+
+    def do_open(self, http_class, req, **http_conn_args):
+        """Return an HTTPResponse object for the request, using http_class.
+    
+        http_class must implement the HTTPConnection API from http.client.
+        """
+        host = req.host
+        if not host:
+            raise URLError('no host given')
+    
+        # will parse host:port
+        h = http_class(host, timeout=req.timeout, **http_conn_args)
+        h.set_debuglevel(self._debuglevel)
+    
+        headers = dict(req.unredirected_hdrs)
+        headers.update({k: v for k, v in req.headers.items()
+                        if k not in headers})
+    
+        # TODO(jhylton): Should this be redesigned to handle
+        # persistent connections?
+    
+        # We want to make an HTTP/1.1 request, but the addinfourl
+        # class isn't prepared to deal with a persistent connection.
+        # It will try to read all remaining data from the socket,
+        # which will block while the server waits for the next request.
+        # So make sure the connection gets closed after the (only)
+        # request.
+        headers["Connection"] = "close"
+        headers = {name.title(): val for name, val in headers.items()}
+    
+        if req._tunnel_host:
+            tunnel_headers = {}
+            proxy_auth_hdr = "Proxy-Authorization"
+            if proxy_auth_hdr in headers:
+                tunnel_headers[proxy_auth_hdr] = headers[proxy_auth_hdr]
+                # Proxy-Authorization should not be sent to origin
+                # server.
+                del headers[proxy_auth_hdr]
+            h.set_tunnel(req._tunnel_host, headers=tunnel_headers)
+    
+        try:
+            try:
+>               h.request(req.get_method(), req.selector, req.data, headers,
+                          encode_chunked=req.has_header('Transfer-encoding'))
+
+/usr/local/lib/python3.12/urllib/request.py:1344: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/http/client.py:1338: in request
+    self._send_request(method, url, body, headers, encode_chunked)
+/usr/local/lib/python3.12/http/client.py:1384: in _send_request
+    self.endheaders(body, encode_chunked=encode_chunked)
+/usr/local/lib/python3.12/http/client.py:1333: in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+/usr/local/lib/python3.12/http/client.py:1093: in _send_output
+    self.send(msg)
+/usr/local/lib/python3.12/http/client.py:1037: in send
+    self.connect()
+/usr/local/lib/python3.12/http/client.py:1003: in connect
+    self.sock = self._create_connection(
+/usr/local/lib/python3.12/socket.py:841: in create_connection
+    for res in getaddrinfo(host, port, 0, SOCK_STREAM):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+host = 'ticket-desk', port = 8000, family = 0
+type = <SocketKind.SOCK_STREAM: 1>, proto = 0, flags = 0
+
+    def getaddrinfo(host, port, family=0, type=0, proto=0, flags=0):
+        """Resolve host and port into list of address info entries.
+    
+        Translate the host/port argument into a sequence of 5-tuples that contain
+        all the necessary arguments for creating a socket connected to that service.
+        host is a domain name, a string representation of an IPv4/v6 address or
+        None. port is a string service name such as 'http', a numeric port number or
+        None. By passing None as the value of host and port, you can pass NULL to
+        the underlying C API.
+    
+        The family, type and proto arguments can be optionally specified in order to
+        narrow the list of addresses returned. Passing zero as a value for each of
+        these arguments selects the full range of results.
+        """
+        # We override this function since we want to translate the numeric family
+        # and socket type values to enum constants.
+        addrlist = []
+>       for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       socket.gaierror: [Errno -3] Temporary failure in name resolution
+
+/usr/local/lib/python3.12/socket.py:978: gaierror
+
+During handling of the above exception, another exception occurred:
+
+    @pytest.fixture
+    def desk():
+        request = urllib.request.Request(DESK + "/_reset", method="POST", data=b"")
+>       urllib.request.urlopen(request, timeout=5).close()
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_18td_tools_api.py:35: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/urllib/request.py:215: in urlopen
+    return opener.open(url, data, timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/urllib/request.py:515: in open
+    response = self._open(req, data)
+               ^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/urllib/request.py:532: in _open
+    result = self._call_chain(self.handle_open, protocol, protocol +
+/usr/local/lib/python3.12/urllib/request.py:492: in _call_chain
+    result = func(*args)
+             ^^^^^^^^^^^
+/usr/local/lib/python3.12/urllib/request.py:1373: in http_open
+    return self.do_open(http.client.HTTPConnection, req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <urllib.request.HTTPHandler object at 0x7f917e55e8a0>
+http_class = <class 'http.client.HTTPConnection'>
+req = <urllib.request.Request object at 0x7f919057b0b0>, http_conn_args = {}
+
+    def do_open(self, http_class, req, **http_conn_args):
+        """Return an HTTPResponse object for the request, using http_class.
+    
+        http_class must implement the HTTPConnection API from http.client.
+        """
+        host = req.host
+        if not host:
+            raise URLError('no host given')
+    
+        # will parse host:port
+        h = http_class(host, timeout=req.timeout, **http_conn_args)
+        h.set_debuglevel(self._debuglevel)
+    
+        headers = dict(req.unredirected_hdrs)
+        headers.update({k: v for k, v in req.headers.items()
+                        if k not in headers})
+    
+        # TODO(jhylton): Should this be redesigned to handle
+        # persistent connections?
+    
+        # We want to make an HTTP/1.1 request, but the addinfourl
+        # class isn't prepared to deal with a persistent connection.
+        # It will try to read all remaining data from the socket,
+        # which will block while the server waits for the next request.
+        # So make sure the connection gets closed after the (only)
+        # request.
+        headers["Connection"] = "close"
+        headers = {name.title(): val for name, val in headers.items()}
+    
+        if req._tunnel_host:
+            tunnel_headers = {}
+            proxy_auth_hdr = "Proxy-Authorization"
+            if proxy_auth_hdr in headers:
+                tunnel_headers[proxy_auth_hdr] = headers[proxy_auth_hdr]
+                # Proxy-Authorization should not be sent to origin
+                # server.
+                del headers[proxy_auth_hdr]
+            h.set_tunnel(req._tunnel_host, headers=tunnel_headers)
+    
+        try:
+            try:
+                h.request(req.get_method(), req.selector, req.data, headers,
+                          encode_chunked=req.has_header('Transfer-encoding'))
+            except OSError as err: # timeout error
+>               raise URLError(err)
+E               urllib.error.URLError: <urlopen error [Errno -3] Temporary failure in name resolution>
+
+/usr/local/lib/python3.12/urllib/request.py:1347: URLError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-22 09:25:44,188 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-22 09:25:44,284 ERROR ffcore.litellm_reconcile litellm_model_not_written model=pe01cedd1.chat-default code=egress_not_allowlisted
+2026-11-22 09:25:44,284 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=1
+2026-11-22 09:25:44,298 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=108
+2026-11-22 09:25:44,357 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-22 09:25:44,457 ERROR ffcore.litellm_reconcile litellm_model_not_written model=pe01cedd1.chat-default code=egress_not_allowlisted
+2026-11-22 09:25:44,457 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=1
+2026-11-22 09:25:44,471 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=107
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:71 warmup failed: ModelMissing
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:376 litellm_model_not_written model=pe01cedd1.chat-default code=egress_not_allowlisted
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:377 litellm_reconciled created=0 updated=0 deleted=0 problems=1
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=108
+ERROR    ffcore.readiness:readiness.py:71 warmup failed: ModelMissing
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:376 litellm_model_not_written model=pe01cedd1.chat-default code=egress_not_allowlisted
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:377 litellm_reconciled created=0 updated=0 deleted=0 problems=1
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=107
+=================================== FAILURES ===================================
+___________________ test_02_1_litellm_call_traced_with_cost ____________________
+
+    @contextlib.contextmanager
+    def map_httpcore_exceptions() -> Generator[None]:
+        global HTTPCORE_EXC_MAP
+        if len(HTTPCORE_EXC_MAP) == 0:
+            HTTPCORE_EXC_MAP = _load_httpcore_exceptions()
+        try:
+>           yield
+
+/opt/venv/lib/python3.12/site-packages/httpx2/_transports/default.py:98: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/venv/lib/python3.12/site-packages/httpx2/_transports/default.py:245: in handle_request
+    resp = self._pool.handle_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpcore2/_sync/connection_pool.py:242: in handle_request
+    raise exc from None
+/opt/venv/lib/python3.12/site-packages/httpcore2/_sync/connection_pool.py:224: in handle_request
+    response = connection.handle_request(pool_request.request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpcore2/_sync/connection.py:94: in handle_request
+    raise exc
+/opt/venv/lib/python3.12/site-packages/httpcore2/_sync/connection.py:74: in handle_request
+    stream = self._connect(request)
+             ^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpcore2/_sync/connection.py:117: in _connect
+    stream = self._network_backend.connect_tcp(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpcore2/_backends/sync.py:203: in connect_tcp
+    with map_exceptions(exc_map):
+         ^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/contextlib.py:158: in __exit__
+    self.gen.throw(value)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+map = {<class 'TimeoutError'>: <class 'httpcore2.ConnectTimeout'>, <class 'OSError'>: <class 'httpcore2.ConnectError'>}
+
+    @contextlib.contextmanager
+    def map_exceptions(map: ExceptionMapping) -> Generator[None]:
+        try:
+            yield
+        except Exception as exc:  # noqa: PIE786
+            for from_exc, to_exc in map.items():
+                if isinstance(exc, from_exc):
+>                   raise to_exc(exc) from exc
+E                   httpcore2.ConnectError: [Errno -2] Name or service not known
+
+/opt/venv/lib/python3.12/site-packages/httpcore2/_exceptions.py:17: ConnectError
+
+The above exception was the direct cause of the following exception:
+
+database_url = 'postgresql+psycopg://ffcore:dummy-not-secret-postgres@postgres:5432/ffcore_test_aec0679947fa'
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_aec0679947fa) at 0x7f932c165250>
+catalog = <tests.integration.litellm_support.catalog.<locals>.Catalog object at 0x7f932c164770>
+lf_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+
+    def test_02_1_litellm_call_traced_with_cost(database_url, pg, catalog, lf_settings):
+        """Kabul 1 and 2: within 30 s, tokens and cost = models.pricing, nested under our span."""
+        project_id = _priced_model(catalog)
+        run_reconcile(database_url, lf_settings)
+        tracing.init_tracing(lf_settings)
+        run_id = f"run-{uuid.uuid4().hex[:8]}"
+    
+        trace_id, span_id = _traced_calls(database_url, lf_settings, project_id, run_id)
+        tracing.shutdown_tracing()  # flush our span
+        started = time.monotonic()
+    
+        trace, generations = None, []
+        while time.monotonic() - started < 30:
+>           response = httpx2.get(f"{LANGFUSE}/api/public/traces/{trace_id}", headers=_auth())
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_02_langfuse.py:98: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/venv/lib/python3.12/site-packages/httpx2/_api.py:194: in get
+    return request(
+/opt/venv/lib/python3.12/site-packages/httpx2/_api.py:108: in request
+    return client.request(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:796: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:979: in send
+    response = self._send_handling_auth(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1007: in _send_handling_auth
+    response = self._send_handling_redirects(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1042: in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1075: in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_transports/default.py:244: in handle_request
+    with map_httpcore_exceptions():
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/contextlib.py:158: in __exit__
+    self.gen.throw(value)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    @contextlib.contextmanager
+    def map_httpcore_exceptions() -> Generator[None]:
+        global HTTPCORE_EXC_MAP
+        if len(HTTPCORE_EXC_MAP) == 0:
+            HTTPCORE_EXC_MAP = _load_httpcore_exceptions()
+        try:
+            yield
+        except Exception as exc:
+            mapped_exc = None
+    
+            for from_exc, to_exc in HTTPCORE_EXC_MAP.items():
+                if not isinstance(exc, from_exc):
+                    continue
+                # We want to map to the most specific exception we can find.
+                # Eg if `exc` is an `httpcore2.ReadTimeout`, we want to map to
+                # `httpx2.ReadTimeout`, not just `httpx2.TimeoutException`.
+                if mapped_exc is None or issubclass(to_exc, mapped_exc):
+                    mapped_exc = to_exc
+    
+            if mapped_exc is None:  # pragma: no cover
+                raise
+    
+            message = str(exc)
+>           raise mapped_exc(message) from exc
+E           httpx2.ConnectError: [Errno -2] Name or service not known
+
+/opt/venv/lib/python3.12/site-packages/httpx2/_transports/default.py:115: ConnectError
+----------------------------- Captured stderr call -----------------------------
+2026-11-22 09:03:35,460 INFO ffcore.litellm_reconcile litellm_reconciled created=1 updated=0 deleted=0 problems=0
+2026-11-22 09:03:40,643 ERROR ffcore.tracing trace_delivery_failed spans=1 reason=deadline
+2026-11-22 09:03:42,126 ERROR opentelemetry.exporter.otlp.proto.http.trace_exporter Failed to export spans batch due to timeout, max retries or shutdown.
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:377 litellm_reconciled created=1 updated=0 deleted=0 problems=0
+ERROR    ffcore.tracing:tracing.py:116 trace_delivery_failed spans=1 reason=deadline
+ERROR    opentelemetry.exporter.otlp.proto.http.trace_exporter:http.py:222 Failed to export spans batch due to timeout, max retries or shutdown.
+_______________________ test_02_4_init_keys_authenticate _______________________
+
+    @contextlib.contextmanager
+    def map_httpcore_exceptions() -> Generator[None]:
+        global HTTPCORE_EXC_MAP
+        if len(HTTPCORE_EXC_MAP) == 0:
+            HTTPCORE_EXC_MAP = _load_httpcore_exceptions()
+        try:
+>           yield
+
+/opt/venv/lib/python3.12/site-packages/httpx2/_transports/default.py:98: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/venv/lib/python3.12/site-packages/httpx2/_transports/default.py:245: in handle_request
+    resp = self._pool.handle_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpcore2/_sync/connection_pool.py:242: in handle_request
+    raise exc from None
+/opt/venv/lib/python3.12/site-packages/httpcore2/_sync/connection_pool.py:224: in handle_request
+    response = connection.handle_request(pool_request.request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpcore2/_sync/connection.py:94: in handle_request
+    raise exc
+/opt/venv/lib/python3.12/site-packages/httpcore2/_sync/connection.py:74: in handle_request
+    stream = self._connect(request)
+             ^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpcore2/_sync/connection.py:117: in _connect
+    stream = self._network_backend.connect_tcp(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpcore2/_backends/sync.py:203: in connect_tcp
+    with map_exceptions(exc_map):
+         ^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/contextlib.py:158: in __exit__
+    self.gen.throw(value)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+map = {<class 'TimeoutError'>: <class 'httpcore2.ConnectTimeout'>, <class 'OSError'>: <class 'httpcore2.ConnectError'>}
+
+    @contextlib.contextmanager
+    def map_exceptions(map: ExceptionMapping) -> Generator[None]:
+        try:
+            yield
+        except Exception as exc:  # noqa: PIE786
+            for from_exc, to_exc in map.items():
+                if isinstance(exc, from_exc):
+>                   raise to_exc(exc) from exc
+E                   httpcore2.ConnectError: [Errno -3] Temporary failure in name resolution
+
+/opt/venv/lib/python3.12/site-packages/httpcore2/_exceptions.py:17: ConnectError
+
+The above exception was the direct cause of the following exception:
+
+    def test_02_4_init_keys_authenticate():
+>       response = httpx2.get(f"{LANGFUSE}/api/public/projects", headers=_auth())
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_02_langfuse.py:143: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/venv/lib/python3.12/site-packages/httpx2/_api.py:194: in get
+    return request(
+/opt/venv/lib/python3.12/site-packages/httpx2/_api.py:108: in request
+    return client.request(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:796: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:979: in send
+    response = self._send_handling_auth(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1007: in _send_handling_auth
+    response = self._send_handling_redirects(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1042: in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1075: in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_transports/default.py:244: in handle_request
+    with map_httpcore_exceptions():
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/contextlib.py:158: in __exit__
+    self.gen.throw(value)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    @contextlib.contextmanager
+    def map_httpcore_exceptions() -> Generator[None]:
+        global HTTPCORE_EXC_MAP
+        if len(HTTPCORE_EXC_MAP) == 0:
+            HTTPCORE_EXC_MAP = _load_httpcore_exceptions()
+        try:
+            yield
+        except Exception as exc:
+            mapped_exc = None
+    
+            for from_exc, to_exc in HTTPCORE_EXC_MAP.items():
+                if not isinstance(exc, from_exc):
+                    continue
+                # We want to map to the most specific exception we can find.
+                # Eg if `exc` is an `httpcore2.ReadTimeout`, we want to map to
+                # `httpx2.ReadTimeout`, not just `httpx2.TimeoutException`.
+                if mapped_exc is None or issubclass(to_exc, mapped_exc):
+                    mapped_exc = to_exc
+    
+            if mapped_exc is None:  # pragma: no cover
+                raise
+    
+            message = str(exc)
+>           raise mapped_exc(message) from exc
+E           httpx2.ConnectError: [Errno -3] Temporary failure in name resolution
+
+/opt/venv/lib/python3.12/site-packages/httpx2/_transports/default.py:115: ConnectError
+----------------------------- Captured stderr call -----------------------------
+2026-11-22 09:03:52,861 ERROR opentelemetry.exporter.otlp.proto.http.trace_exporter Failed to export spans batch due to timeout, max retries or shutdown.
+------------------------------ Captured log call -------------------------------
+ERROR    opentelemetry.exporter.otlp.proto.http.trace_exporter:http.py:222 Failed to export spans batch due to timeout, max retries or shutdown.
+___________________________ test_02_6_seed_and_fetch ___________________________
+
+    @contextlib.contextmanager
+    def map_httpcore_exceptions() -> typing.Iterator[None]:
+        global HTTPCORE_EXC_MAP
+        if len(HTTPCORE_EXC_MAP) == 0:
+            HTTPCORE_EXC_MAP = _load_httpcore_exceptions()
+        try:
+>           yield
+
+/opt/venv/lib/python3.12/site-packages/httpx/_transports/default.py:101: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/venv/lib/python3.12/site-packages/httpx/_transports/default.py:250: in handle_request
+    resp = self._pool.handle_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpcore/_sync/connection_pool.py:256: in handle_request
+    raise exc from None
+/opt/venv/lib/python3.12/site-packages/httpcore/_sync/connection_pool.py:236: in handle_request
+    response = connection.handle_request(
+/opt/venv/lib/python3.12/site-packages/httpcore/_sync/connection.py:101: in handle_request
+    raise exc
+/opt/venv/lib/python3.12/site-packages/httpcore/_sync/connection.py:78: in handle_request
+    stream = self._connect(request)
+             ^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpcore/_sync/connection.py:124: in _connect
+    stream = self._network_backend.connect_tcp(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpcore/_backends/sync.py:207: in connect_tcp
+    with map_exceptions(exc_map):
+         ^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/contextlib.py:158: in __exit__
+    self.gen.throw(value)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+map = {<class 'TimeoutError'>: <class 'httpcore.ConnectTimeout'>, <class 'OSError'>: <class 'httpcore.ConnectError'>}
+
+    @contextlib.contextmanager
+    def map_exceptions(map: ExceptionMapping) -> typing.Iterator[None]:
+        try:
+            yield
+        except Exception as exc:  # noqa: PIE786
+            for from_exc, to_exc in map.items():
+                if isinstance(exc, from_exc):
+>                   raise to_exc(exc) from exc
+E                   httpcore.ConnectError: [Errno -2] Name or service not known
+
+/opt/venv/lib/python3.12/site-packages/httpcore/_exceptions.py:14: ConnectError
+
+The above exception was the direct cause of the following exception:
+
+lf_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_02_6_seed_and_fetch0')
+
+    def test_02_6_seed_and_fetch(lf_settings, tmp_path):
+        name = f"test-02-{uuid.uuid4().hex[:8]}"
+        (tmp_path / f"{name}.md").write_text("Hello {{who}}", encoding="utf-8")
+        (tmp_path / "README.md").write_text("not a prompt", encoding="utf-8")
+        client = tracing.init_tracing(lf_settings)
+    
+>       first = seed_prompts(client, tmp_path)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_02_langfuse.py:156: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+ffcore/core/prompts.py:88: in seed_prompts
+    client.create_prompt(
+/opt/venv/lib/python3.12/site-packages/langfuse/_client/client.py:4181: in create_prompt
+    server_prompt = self.api.prompts.create(request=request)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/langfuse/api/prompts/client.py:213: in create
+    _response = self._raw_client.create(
+/opt/venv/lib/python3.12/site-packages/langfuse/api/prompts/raw_client.py:312: in create
+    _response = self._client_wrapper.httpx_client.request(
+/opt/venv/lib/python3.12/site-packages/langfuse/api/core/http_client.py:308: in request
+    response = self.httpx_client.request(
+/opt/venv/lib/python3.12/site-packages/httpx/_client.py:825: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx/_client.py:914: in send
+    response = self._send_handling_auth(
+/opt/venv/lib/python3.12/site-packages/httpx/_client.py:942: in _send_handling_auth
+    response = self._send_handling_redirects(
+/opt/venv/lib/python3.12/site-packages/httpx/_client.py:979: in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx/_client.py:1014: in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx/_transports/default.py:249: in handle_request
+    with map_httpcore_exceptions():
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/contextlib.py:158: in __exit__
+    self.gen.throw(value)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    @contextlib.contextmanager
+    def map_httpcore_exceptions() -> typing.Iterator[None]:
+        global HTTPCORE_EXC_MAP
+        if len(HTTPCORE_EXC_MAP) == 0:
+            HTTPCORE_EXC_MAP = _load_httpcore_exceptions()
+        try:
+            yield
+        except Exception as exc:
+            mapped_exc = None
+    
+            for from_exc, to_exc in HTTPCORE_EXC_MAP.items():
+                if not isinstance(exc, from_exc):
+                    continue
+                # We want to map to the most specific exception we can find.
+                # Eg if `exc` is an `httpcore.ReadTimeout`, we want to map to
+                # `httpx.ReadTimeout`, not just `httpx.TimeoutException`.
+                if mapped_exc is None or issubclass(to_exc, mapped_exc):
+                    mapped_exc = to_exc
+    
+            if mapped_exc is None:  # pragma: no cover
+                raise
+    
+            message = str(exc)
+>           raise mapped_exc(message) from exc
+E           httpx.ConnectError: [Errno -2] Name or service not known
+
+/opt/venv/lib/python3.12/site-packages/httpx/_transports/default.py:118: ConnectError
+----------------------------- Captured stderr call -----------------------------
+2026-11-22 09:04:23,248 ERROR langfuse Error while fetching prompt 'test-02-b2f63009-label:production': [Errno -3] Temporary failure in name resolution
+------------------------------ Captured log call -------------------------------
+ERROR    langfuse:client.py:4066 Error while fetching prompt 'test-02-b2f63009-label:production': [Errno -3] Temporary failure in name resolution
+_________________ test_05a_live_discovery[mcp-search-actions0] _________________
+
+settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+key = 'mcp-search', actions = {'search_documents'}
+
+    @pytest.mark.parametrize(
+        ("key", "actions"),
+        [("mcp-search", {"search_documents"}), ("mcp-sql", {"get_schema", "run_sql"})],
+    )
+    def test_05a_live_discovery(settings, key, actions):
+>       found = asyncio.run(mcp_client.discover(target(key), settings, caller=CALLER))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_05a_live_services.py:38: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/asyncio/runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+target = ToolTarget(key='mcp-search', endpoint_url='http://mcp-search:8000/mcp', auth_type='forward_user', auth={})
+settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+caller = Caller(user_id='live-test-user', project_id='00000000-0000-0000-0000-000000000000')
+timeout_s = None
+
+    async def discover(
+        target: ToolTarget, settings: Settings, *, caller: Caller, timeout_s: float | None = None
+    ) -> list[DiscoveredAction]:
+        """MCP tools/list, every page."""
+        limit = timeout_s or settings.mcp_call_timeout_s
+        actions: list[DiscoveredAction] = []
+        statuses: list[int] = []
+        try:
+            with anyio.fail_after(limit):
+                async with _session(target, settings, caller, None, limit, statuses) as session:
+                    cursor = None
+                    while True:
+                        params = types.PaginatedRequestParams(cursor=cursor) if cursor else None
+                        page = await session.list_tools(params=params)
+                        actions += [
+                            DiscoveredAction(t.name, t.description, dict(t.input_schema))
+                            for t in page.tools
+                        ]
+                        cursor = page.next_cursor
+                        if not cursor:
+                            break
+        except TimeoutError:
+            raise ToolCallError("tool_timeout") from None
+        except ToolCallError:
+            raise
+        except Exception as exc:  # noqa: BLE001 - mapped to a closed code
+>           raise ToolCallError(_code(exc, statuses)) from None
+E           ffcore.services.mcp_client.ToolCallError: egress_dns_failed
+
+ffcore/services/mcp_client.py:295: ToolCallError
+__________________ test_05a_live_discovery[mcp-sql-actions1] ___________________
+
+settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+key = 'mcp-sql', actions = {'get_schema', 'run_sql'}
+
+    @pytest.mark.parametrize(
+        ("key", "actions"),
+        [("mcp-search", {"search_documents"}), ("mcp-sql", {"get_schema", "run_sql"})],
+    )
+    def test_05a_live_discovery(settings, key, actions):
+>       found = asyncio.run(mcp_client.discover(target(key), settings, caller=CALLER))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_05a_live_services.py:38: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/asyncio/runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+target = ToolTarget(key='mcp-sql', endpoint_url='http://mcp-sql:8000/mcp', auth_type='forward_user', auth={})
+settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+caller = Caller(user_id='live-test-user', project_id='00000000-0000-0000-0000-000000000000')
+timeout_s = None
+
+    async def discover(
+        target: ToolTarget, settings: Settings, *, caller: Caller, timeout_s: float | None = None
+    ) -> list[DiscoveredAction]:
+        """MCP tools/list, every page."""
+        limit = timeout_s or settings.mcp_call_timeout_s
+        actions: list[DiscoveredAction] = []
+        statuses: list[int] = []
+        try:
+            with anyio.fail_after(limit):
+                async with _session(target, settings, caller, None, limit, statuses) as session:
+                    cursor = None
+                    while True:
+                        params = types.PaginatedRequestParams(cursor=cursor) if cursor else None
+                        page = await session.list_tools(params=params)
+                        actions += [
+                            DiscoveredAction(t.name, t.description, dict(t.input_schema))
+                            for t in page.tools
+                        ]
+                        cursor = page.next_cursor
+                        if not cursor:
+                            break
+        except TimeoutError:
+            raise ToolCallError("tool_timeout") from None
+        except ToolCallError:
+            raise
+        except Exception as exc:  # noqa: BLE001 - mapped to a closed code
+>           raise ToolCallError(_code(exc, statuses)) from None
+E           ffcore.services.mcp_client.ToolCallError: egress_dns_failed
+
+ffcore/services/mcp_client.py:295: ToolCallError
+_________________ test_05a_live_token_for_another_tool_refused _________________
+
+settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+
+    def test_05a_live_token_for_another_tool_refused(settings):
+        # A token cut for mcp-search is refused by the mcp-sql container (aud list, S3).
+        wrong = ToolTarget(
+            key="mcp-search", endpoint_url=SERVICES["mcp-sql"], auth_type="forward_user", auth={}
+        )
+        with pytest.raises(mcp_client.ToolCallError) as err:
+            asyncio.run(mcp_client.discover(wrong, settings, caller=CALLER))
+>       assert err.value.code == "tool_auth_failed"
+E       AssertionError: assert 'egress_dns_failed' == 'tool_auth_failed'
+E         
+E         - tool_auth_failed
+E         + egress_dns_failed
+
+tests/integration/test_05a_live_services.py:49: AssertionError
+____________________ test_05a_live_run_sql_on_demo_database ____________________
+
+settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+
+    def test_05a_live_run_sql_on_demo_database(settings):
+        cli._seed_sql_demo(settings, SCHEMA_DIR)  # the documented operator step; idempotent
+        sql = "SELECT code FROM departments ORDER BY id LIMIT 2"
+>       result = asyncio.run(
+            mcp_client.call(
+                target("mcp-sql"), "run_sql", {"sql": sql, "reason": "live"}, settings, caller=CALLER
+            )
+        )
+
+tests/integration/test_05a_live_services.py:55: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/asyncio/runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+target = ToolTarget(key='mcp-sql', endpoint_url='http://mcp-sql:8000/mcp', auth_type='forward_user', auth={})
+action = 'run_sql'
+arguments = {'sql': 'SELECT code FROM departments ORDER BY id LIMIT 2', 'reason': 'live'}
+settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+caller = Caller(user_id='live-test-user', project_id='00000000-0000-0000-0000-000000000000')
+timeout_s = None, run_id = None, guard = None
+
+    async def call(
+        target: ToolTarget,
+        action: str,
+        arguments: dict[str, Any],
+        settings: Settings,
+        *,
+        caller: Caller,
+        timeout_s: float | None = None,
+        run_id: str | None = None,
+        guard: Guard | None = None,
+    ) -> CallResult:
+        limit = timeout_s or settings.mcp_call_timeout_s
+        started = time.monotonic()
+        status, truncated = "ok", False
+        statuses: list[int] = []
+        try:
+            if guard is not None:
+                arguments = await guard.pre(action, arguments)
+            try:
+                with anyio.fail_after(limit):
+                    async with _session(target, settings, caller, run_id, limit, statuses) as session:
+                        result = await session.call_tool(action, arguments)
+            except TimeoutError:
+                raise ToolCallError("tool_timeout") from None
+            except ToolCallError:
+                raise
+            except Exception as exc:  # noqa: BLE001 - mapped to a closed code (MCPError too)
+>               raise ToolCallError(_code(exc, statuses)) from None
+E               ffcore.services.mcp_client.ToolCallError: egress_dns_failed
+
+ffcore/services/mcp_client.py:343: ToolCallError
+----------------------------- Captured stderr call -----------------------------
+2026-11-22 09:09:51,787 INFO ffcore.tools tool_call tool=mcp-sql action=run_sql status=egress_dns_failed latency_ms=3733 truncated=False
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.tools:mcp_client.py:358 tool_call tool=mcp-sql action=run_sql status=egress_dns_failed latency_ms=3733 truncated=False
+________________ test_05a_live_forged_token_refused_by_mcp_sql _________________
+
+settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+
+    def test_05a_live_forged_token_refused_by_mcp_sql(settings):
+        # Review r1 MAJOR-1 in the real container: right audience, wrong signing key. The
+        # container asks the real backend (POST /api/v1/internal/obo/verify) and refuses.
+        from pydantic import SecretStr
+    
+        forger = settings.model_copy(
+            update={"obo_jwt_secret": SecretStr("dummy-not-secret-forged-obo-key-0123456789abcdef")}
+        )
+        with pytest.raises(mcp_client.ToolCallError) as err:
+            asyncio.run(
+                mcp_client.call(
+                    target("mcp-sql"),
+                    "run_sql",
+                    {"sql": "SELECT code FROM departments", "reason": "forged"},
+                    forger,
+                    caller=CALLER,
+                )
+            )
+>       assert err.value.code == "tool_auth_failed"
+E       AssertionError: assert 'egress_dns_failed' == 'tool_auth_failed'
+E         
+E         - tool_auth_failed
+E         + egress_dns_failed
+
+tests/integration/test_05a_live_services.py:82: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-22 09:09:54,583 INFO ffcore.tools tool_call tool=mcp-sql action=run_sql status=egress_dns_failed latency_ms=2758 truncated=False
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.tools:mcp_client.py:358 tool_call tool=mcp-sql action=run_sql status=egress_dns_failed latency_ms=2758 truncated=False
+_______________ test_12_46_running_backend_connects_as_the_role ________________
+
+    def test_12_46_running_backend_connects_as_the_role():
+        """The stack's own database: the backend's pool is connected as the role, not the owner."""
+        admin = make_url(os.environ["DATABASE_URL"]).set(drivername="postgresql")
+        with psycopg.connect(admin.render_as_string(hide_password=False), autocommit=True) as conn:
+            users = {
+                row[0]
+                for row in conn.execute(
+                    "SELECT DISTINCT usename FROM pg_stat_activity"
+                    " WHERE datname = current_database() AND client_addr IS NOT NULL"
+                )
+            }
+>       assert APP_USER in users
+E       AssertionError: assert 'ffcore_app' in {'ffcore'}
+
+tests/integration/test_12_46_app_role.py:133: AssertionError
+________________ test_57_2_empty_database_upgrade_head_and_back ________________
+
+scratch_db = <tests.integration.conftest.ScratchDatabase object at 0x7f91906697f0>
+
+    def test_57_2_empty_database_upgrade_head_and_back(scratch_db):
+        db = scratch_db  # the fixture already ran `upgrade head` on an empty database
+        assert db.versions() == {_head()}
+        schema = db.tables()
+        assert {"projects", "audit_events", "runs", "approvals", "api_keys"} | RETENTION <= schema
+    
+        db.run("downgrade", "57_0001")  # undo step 2 of the merge and the chain above it
+        assert db.versions() == PRE_MERGE_ROWS | {"57_0001"}
+>       assert db.tables() == schema - ABOVE_MERGE  # the merge revisions carry no schema
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert {'agent_versi...pi_keys', ...} == {'agent_versi...pi_keys', ...}
+E         
+E         Extra items in the right set:
+E         'memory_settings'
+E         'memories'
+E         'memory_opt_outs'
+E         Use -v to get more diff
+
+tests/integration/test_57_alembic_merge.py:54: AssertionError
+______________ test_57_3_pre_merge_database_upgrades_to_one_head _______________
+
+scratch_db = <tests.integration.conftest.ScratchDatabase object at 0x7f9170d2b9e0>
+
+    def test_57_3_pre_merge_database_upgrades_to_one_head(scratch_db):
+        # A database installed from main before the merge (four rows), as on a running installation,
+        # with data in it: the merge revisions carry no schema, so nothing is lost.
+        db = scratch_db
+        db.run("downgrade", "0001")
+        assert db.versions() == {"0001"}
+        for rev in sorted(PRE_MERGE_ROWS):
+            db.run("upgrade", rev)
+        assert db.versions() == PRE_MERGE_ROWS
+        schema = db.tables()
+        project = uuid.uuid4()
+        db.conn.execute(
+            "INSERT INTO projects (id, key, name, created_by) VALUES (%s, %s, %s, 'test')",
+            (project, f"p57-{project.hex[:8]}", "Merge test"),
+        )
+    
+        db.run("upgrade", "head")
+        assert db.versions() == {_head()}
+>       assert db.tables() == schema | ABOVE_MERGE
+E       AssertionError: assert {'agent_versi...pi_keys', ...} == {'agent_versi...pi_keys', ...}
+E         
+E         Extra items in the left set:
+E         'memory_settings'
+E         'memories'
+E         'memory_opt_outs'
+E         Use -v to get more diff
+
+tests/integration/test_57_alembic_merge.py:83: AssertionError
+=============================== warnings summary ===============================
+tests/integration/test_04a_worker.py::test_04a_upload_job_runs_in_worker
+tests/integration/test_04a_worker.py::test_04a_job_for_missing_row_retries_then_fails_loud
+  /opt/venv/lib/python3.12/site-packages/arq/worker.py:877: DeprecationWarning: Call to deprecated close. (Use aclose() instead) -- Deprecated since version 5.0.1.
+    await self.pool.close(close_connection_pool=True)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/integration/test_02_langfuse.py::test_02_1_litellm_call_traced_with_cost
+FAILED tests/integration/test_02_langfuse.py::test_02_4_init_keys_authenticate
+FAILED tests/integration/test_02_langfuse.py::test_02_6_seed_and_fetch - http...
+FAILED tests/integration/test_05a_live_services.py::test_05a_live_discovery[mcp-search-actions0]
+FAILED tests/integration/test_05a_live_services.py::test_05a_live_discovery[mcp-sql-actions1]
+FAILED tests/integration/test_05a_live_services.py::test_05a_live_token_for_another_tool_refused
+FAILED tests/integration/test_05a_live_services.py::test_05a_live_run_sql_on_demo_database
+FAILED tests/integration/test_05a_live_services.py::test_05a_live_forged_token_refused_by_mcp_sql
+FAILED tests/integration/test_12_46_app_role.py::test_12_46_running_backend_connects_as_the_role
+FAILED tests/integration/test_57_alembic_merge.py::test_57_2_empty_database_upgrade_head_and_back
+FAILED tests/integration/test_57_alembic_merge.py::test_57_3_pre_merge_database_upgrades_to_one_head
+ERROR tests/integration/test_18td_tools_api.py::test_18td_9_register_and_discover_through_the_registry
+ERROR tests/integration/test_18td_tools_api.py::test_18td_10_reads_opened_send_reply_keeps_approval
+ERROR tests/integration/test_18td_tools_api.py::test_18td_11_invoke_reaches_the_desk_without_identity
+= 11 failed, 1226 passed, 42 skipped, 2 warnings, 3 errors in 1535.60s (0:25:35) =
+make: *** [Makefile:31: test-int] Error 1

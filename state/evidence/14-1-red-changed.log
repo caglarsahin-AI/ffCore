@@ -1,0 +1,15 @@
+            assert results[name].counts == {"target": "none"}
+        # 14 registers the `memory` class's executor (test_14_runs covers what it removes).
+>       assert "memories" in results["memory"].counts
+E       AssertionError: assert 'memories' in {'target': 'none'}
+E        +  where {'target': 'none'} = ClassResult(data_class='memory', project_id=None, cutoff=None, counts={'target': 'none'}, status='ok', error_code=None).counts
+
+tests/integration/test_03c_retention_job.py:194: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/test_03a_write_flag.py::test_03a_3_exemptions_are_real_routes
+FAILED tests/contract/test_c3_common_columns.py::test_c3_exceptions_are_real_tables
+FAILED tests/contract/test_14_openapi.py::test_14_openapi_draft_matches_app
+FAILED tests/contract/test_14_openapi.py::test_14_openapi_paths - KeyError: '14'
+FAILED tests/contract/test_14_openapi.py::test_14_statistics_schemas_have_no_text
+FAILED tests/integration/test_03c_retention_job.py::test_03c_14_external_and_no_target_reported
+6 failed, 7 passed in 13.89s

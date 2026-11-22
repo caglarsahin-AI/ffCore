@@ -1,0 +1,40 @@
+ImportError while importing test module '/work/backend/tests/unit/test_14_pii.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/local/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/unit/test_14_pii.py:9: in <module>
+    from ffcore.memory import pii
+E   ModuleNotFoundError: No module named 'ffcore.memory'
+______________ ERROR collecting tests/integration/test_14_api.py _______________
+ImportError while importing test module '/work/backend/tests/integration/test_14_api.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/local/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/integration/test_14_api.py:12: in <module>
+    from tests.integration.memory_support import enable, set_ner  # noqa: F401 - fixture
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/integration/memory_support.py:18: in <module>
+    from ffcore.api import memories as api
+E   ImportError: cannot import name 'memories' from 'ffcore.api' (/work/backend/ffcore/api/__init__.py)
+______________ ERROR collecting tests/integration/test_14_runs.py ______________
+ImportError while importing test module '/work/backend/tests/integration/test_14_runs.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/local/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/integration/test_14_runs.py:21: in <module>
+    from ffcore.memory import jobs as memory_jobs
+E   ModuleNotFoundError: No module named 'ffcore.memory'
+=========================== short test summary info ============================
+ERROR tests/unit/test_14_extract.py
+ERROR tests/unit/test_14_recall.py
+ERROR tests/unit/test_14_pii.py
+ERROR tests/integration/test_14_api.py
+ERROR tests/integration/test_14_runs.py
+!!!!!!!!!!!!!!!!!!! Interrupted: 5 errors during collection !!!!!!!!!!!!!!!!!!!!
+5 errors in 17.56s
