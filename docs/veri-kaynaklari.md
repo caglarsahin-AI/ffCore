@@ -65,9 +65,11 @@ A full run deletes the items the source no longer lists only when **all** of the
    look like a mass deletion);
 3. the share to delete, over what the source holds now, is not above the limit
    (`PRUNE_MAX_RATIO`, default 0.2; a source can set its own). Above it the run is
-   `prune_refused`: nothing is deleted and a `prune_refused` alert fires (03c alert rules). A
-   project admin can repeat the full run with `force_prune` (audited) when the disappearance is
-   real.
+   `prune_refused`: nothing is deleted, the run row and the log say so, and a `prune_refused`
+   alert fires **when the project has an alert rule for it** (03c: alerts are rule driven; create
+   one with `POST /api/v1/projects/{id}/alert-rules {"kind": "prune_refused", "channel": "ui"}`
+   or e-mail/webhook). A project admin can repeat the full run with `force_prune` (audited) when
+   the disappearance is real.
 
 Deletion order: the vector store first (if it fails nothing else is touched, `prune_failed`),
 then the document rows, the runs that showed them (`source_deleted`) and their retained text,
@@ -113,6 +115,19 @@ Mappings are changed by project admins (`PUT …/data-sources/{id}/acl-mappings`
 
 ## Network folder
 
+**Who registers it.** One share (`FS_SOURCES_BASE`) serves the whole installation, so a network-
+folder source is registered, and its root or filters changed, **only by a superadmin**
+(`403 fs_source_superadmin_only` for project roles). The superadmin knows the share and decides
+which folder each project may index; otherwise any project's developer or admin could register
+`.` and index every department's files. Project roles then sync it, map its permissions, watch
+its runs and read it. Confluence, Jira and SharePoint sources bring the project's own service
+account and are registered by the project admin (16-2, 16-3).
+
+**Writing to the share decides content.** Whoever may write into the mounted share decides what
+gets indexed: a symlink out of the base is refused, but a hard link to a file elsewhere on the
+same file system cannot be told apart from a regular file. Mount only shares whose writers you
+would let choose indexed content, and keep the base on its own file system.
+
 Mount the share on the host and point `FS_SOURCES_HOST_DIR` at it; it is mounted read-only at
 `/data/sources` (`FS_SOURCES_BASE`) in the backend and the sync worker. A source's `root` is a
 path **relative** to that directory; an absolute path, `..` or a symlink out is refused at
@@ -121,15 +136,20 @@ skipped and listed with `path_outside_base`; a symlink inside the base is `symli
 So `.env`, the application and the storage tree cannot be indexed. `include_globs` /
 `exclude_globs` select files by their relative path (shell patterns, `*` crosses `/`).
 
-A delta lists files whose modification time is newer than the cursor and compares their bytes;
-moved or deleted files are found by a full run. A folder named like a personnel-data source
+A delta lists files whose modification time is newer than the cursor and compares their bytes.
+A file that keeps an old modification time (moved, renamed, copied with its original date, e.g.
+`cp -p`, `robocopy /COPY:DAT`) is not seen by a delta; scheduled runs are deltas, so run a
+**full** sync after such a change (it also finds deleted files). A folder named like a personnel-data source
 (`prsim…`) is refused (`prsim_requires_ner`) until names are masked (08).
 
 ## API
 
 `/api/v1/projects/{project_id}/data-sources` (OpenAPI `backend/openapi/16.yaml`). Developers and
-above list, register, test and sync; deleting a source, mapping permissions and `force_prune`
-are the project admin's.
+above list, test and sync; a network-folder source is registered (and its root/filters
+changed) by a superadmin, the other kinds by the project admin; deleting a source, mapping
+permissions and `force_prune` are the project admin's. A knowledge base fed by an active source
+cannot be deleted (`409 knowledge_base_has_sources`: pause or delete the source first); a run
+of a source whose knowledge base is gone fails `kb_deleted` and writes nothing.
 
 | Method and path | Purpose |
 |---|---|
@@ -146,12 +166,14 @@ stored value; they never reach logs or audit rows. A source still feeding docume
 deleted (`409 data_source_has_items`): remove its documents with a full run first (narrow the
 filter or empty the folder), so the safe delete rule applies.
 
-Error codes: `path_outside_base` (400), `source_kind_unavailable`, `deployment_invalid`,
+Error codes: `path_outside_base` (400), `fs_source_superadmin_only` (403),
+`source_kind_unavailable`, `deployment_invalid`,
 `config_invalid`, `secret_required`, `secret_unexpected`, `secret_invalid`, `schedule_invalid`,
 `fs_root_missing`, `prsim_requires_ner`, `force_prune_requires_full`, `acl_mapping_target`,
 `acl_mapping_duplicate`, `acl_mapping_user_not_member` (422), `data_source_key_taken`,
-`data_source_paused`, `data_source_has_items`, `sync_running`, `sync_run_finished` (409),
-`queue_unavailable` (503).
+`data_source_paused`, `data_source_has_items`, `sync_running`, `sync_run_finished`,
+`knowledge_base_has_sources` (409), `queue_unavailable` (503). Run errors (in the run row):
+`kb_deleted`, `count_failed`, `listing_failed`, `prune_failed`, `raw_failed`, `run_abandoned`.
 
 ## Settings
 
@@ -162,6 +184,7 @@ Error codes: `path_outside_base` (400), `source_kind_unavailable`, `deployment_i
 | `PRUNE_MAX_RATIO` | `0.2` | largest share one full run may delete without `force_prune` |
 | `ATTACHMENT_MIN_DATE` | empty | Kapı 0 date rule for attachments (`YYYY-MM-DD`) |
 | `ARQ_QUEUE_SYNC` | `sync` | the sync worker's queue (test runs use another) |
+| `SYNC_WORKER_MEM_LIMIT` | `2g` | sync-worker container memory (a file is read whole, up to 500 MB) |
 
 ## Services
 

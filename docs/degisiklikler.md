@@ -10,8 +10,11 @@ if anything.
   (docs/veri-kaynaklari.md). 16-1 ships the core (three layers raw/silver/gold, the safe delete
   rule, Kapı 0 for attachments before download, permission mapping) and the **network folder**
   source; Confluence/Jira come in 16-2, SharePoint and the console screen in 16-3.
-- **New service:** `sync-worker` (backend image, queue `sync`, C10) runs the raw layer and a
-  minute tick for schedules. The ingest `worker` gains `source_layer_job` (silver, gold). Both
+- **Who registers what (r2):** a network-folder source (and its root/filters) is registered by a
+  **superadmin** only (`403 fs_source_superadmin_only`): one share serves every project. A
+  knowledge base fed by an active source cannot be deleted (`409 knowledge_base_has_sources`).
+- **New service:** `sync-worker` (backend image, queue `sync`, C10, `SYNC_WORKER_MEM_LIMIT`
+  default 2g) runs the raw layer and a minute tick for schedules. The ingest `worker` gains `source_layer_job` (silver, gold). Both
   start with the stack; no port is published.
 - **Settings and volumes:** `FS_SOURCES_HOST_DIR` (host directory, mounted read-only at
   `/data/sources` in backend and sync-worker), `FS_SOURCES_BASE`, `PRUNE_MAX_RATIO` (0.2),

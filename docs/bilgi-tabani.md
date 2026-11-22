@@ -107,7 +107,8 @@ A knowledge base can also be fed by data sources (network folder; Confluence, Ji
 follow): their items enter through the same pipeline (`ingest_from_raw`, C6), named
 `<source key>/<item id>` and carrying `metadata.source`, `source_item_id` and `source_url`.
 `make sync … LAYER=silver|gold` reprocesses one source's documents only; `make reindex` still
-covers the whole knowledge base. Permissions, schedules and the safe delete rule:
+covers the whole knowledge base. A knowledge base fed by an active data source cannot be
+deleted (`409 knowledge_base_has_sources`). Permissions, schedules and the safe delete rule:
 docs/veri-kaynaklari.md.
 
 ## Conversion
