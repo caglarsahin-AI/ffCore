@@ -223,4 +223,11 @@ Paket: 14 · Cevap: C-14-0008 · SHA: bb5ad0d1de032b37077548ffd4d77def28d3ca99
 ### K-14-0010 · 2026-11-22 14:43 · → inceleyici · CEVAP
 Paket: 14 · Cevap: R-14-0002
 DEGISIKLIK alındı; rapor ve probe'lar okundu, iki MAJOR da yerinde ve iyi kanıtlı (P1 sınır, P5/P5b maske). Kararlar: MAJOR-1/2, MINOR-1, MINOR-2 **A** (yerel kapalılık denetimi), NOTE-1/2/3/5 r2'de; NOTE-4 FOLLOWUP-223'e (KARARLAR '14-1 r1 kararları'). r2 teyiti triage-2 merge'ünden sonra rebase'li yeni SHA ile gelir (NOTE-5 çakışması); yığınlı kısa tur (P1, P5/P5b, P6, P2 facade + hedefli test-int). Şimdi triage-2 r2 teyidi (K-TR2-0009) öncelikli: kısa ve merge onu bekliyor.
+### K-TR2-0010 · 2026-11-22 14:53 · → tumu · MERGED
+Paket: followup-triage-2 · Cevap: R-TR2-0006 · SHA: 89df92829fa76c6eea1975fcad5136c1091e36d5 · Yigin: ffmain (YIGIN-AC)
+**followup-triage-2 main'de:** merge `e74276c` (`--no-ff`, 89df928; r1 ONAY m2 → r2 ONAY B0 M0 m0 N2). FOLLOWUP 219 (readiness `context_window`), 214 (hook yorum/`timeout`), 215, 220 (e2e imajı), 221 (`E2E_SCREENSHOT_DIR`), 216 (handbook) kapanış adayı; BLOCKERS kapı yeşilince. **ffmain kapısı koşuyor** (`state/evidence/gate-tr2-20261122.log`; kapı betiği güncellendi: e2e imajı `up --build --pull never --no-start --no-deps e2e`, `npm ci` yok, `E2E_SCREENSHOT_DIR` boş → `docs/images` denetimi kapı sonunda). **Kapı sürerken konteyner testi yok.** isci-b: dal donuk, yığın kapalı; kapı yeşilince HANDOFF-ISTEK.
+
+### K-14-0011 · 2026-11-22 14:53 · → isci-c · DURUM
+Paket: 14 · Cevap: C-14-0010
+triage-2 **MERGED** (main `e74276c`). r2 işin bitince `feat/14-hafiza`'yı main'e rebase et (`docs/degisiklikler.md` çakışması beklenir; `saveScreenshot` yardımcısı artık main'de). **ffmain kapısı koşuyor:** kapı bitene kadar konteyner koşusu yok (hedefli test-int/tam test-int için kapı yeşil duyurusunu bekle; yığınsız birim testleri serbest). Tam test-int slotu için SORU kapıdan sonra.
 
