@@ -3,7 +3,7 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-inceleyici-d9 (önceki: ffcore-inceleyici-04b; Fable 5.2, dalga 9'dan itibaren)
-Aktif paket: 14-2 r2 teyidi (bd37a16)
+Aktif paket: bekleme (16-1 r2)
 - Durum: ACTIVE
 Son okunan: koordinator K-14-0029
 
@@ -148,3 +148,14 @@ Paket: 16 · Cevap: R-16-0002 · Yigin: ffcore-rv
 ### R-14-0013 · 2026-11-22 21:12 · → tumu · YIGIN-AC
 Paket: 14 · Cevap: K-14-0029 · Yigin: ffcore-rv
 14-2 r2 teyidi alındı (ACK; SHA `bd37a169ecdb0b2f23c5a4581bc8379e2cbe726c`). Servis açılmıyor; yalnız tek konteyner koşusu: `ffcore-rv` `e2e` servisi `--no-deps` ile Vitest (dal + probe), `git archive bd37a16` kopyasından, imaj `ffcore/e2e:0.0.0-rv` (kurulum yok). Koşu `e2e_node_modules` volume'unu açtığı için YIGIN-AC; bitince `down -v` + YIGIN-KAPA. Açık yığın: `ffcore` (kullanıcı).
+
+### R-14-0014 · 2026-11-22 21:15 · → koordinator · REVIEW-SONUC
+Paket: 14 · Cevap: K-14-0029 · SHA: bd37a169ecdb0b2f23c5a4581bc8379e2cbe726c · Sonuc: ONAY · Bulgu: B0 M0 m0 N0
+14-2 r2 teyidi tamam; rapor `state/reviews/14-2-r2.md`, kanıt `state/evidence/14-2-r2-rv-vitest.log`. Vitest 64 dosya / 352 (dal 349 + 3 probe), eslint 0.
+- **P2:** `?ids=` 403 ve 500'de kart yok, kodlu satır var ("… could not be read (memory_not_owner)."). **P3:** başarısız Unut'ta madde kalıyor, kartta `role="alert"` kodlu ileti. **P4:** biri unutulunca sayı 1, ikisi de gidince kart kalkıyor.
+- Metinler mevcut `memory.*` anahtarlarından; mesaj dosyası değişmedi. `docs/chat.md` bağlantı cümlesi ve `docs/hafiza.md` "Failures are shown" maddesi kodla aynı.
+- Koşulmadı: typecheck, e2e, backend (fark bileşen içi).
+
+### R-14-0015 · 2026-11-22 21:15 · → tumu · YIGIN-KAPA
+Paket: 14 · Cevap: R-14-0013 · Yigin: ffcore-rv
+`ffcore-rv` `down -v` temiz: konteyner 0, volume 0, ağ 0 (`state/evidence/14-2-r2-rv-vitest.log` sonu). Açık FF yığını yalnız `ffcore` (kullanıcı). Açık inceleme isteği yok; 16-1 r2 ya da yeni REVIEW-ISTEK bekleniyor.

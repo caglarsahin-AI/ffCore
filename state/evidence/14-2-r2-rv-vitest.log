@@ -1,0 +1,19 @@
+HEAD=bd37a169ecdb0b2f23c5a4581bc8379e2cbe726c stack=ffcore-rv (git archive copy + rv probe file)
+cmd: docker compose -p ffcore-rv --env-file .env.test --profile test --profile e2e run --rm --no-deps -T e2e sh -c 'npx vitest run; npx vitest run tests/unit/test_rv_142_r2_probe.test.tsx; npx tsc --noEmit; npx eslint components/memory'
+[2m Test Files [22m [1m[32m64 passed[39m[22m[90m (64)[39m
+[2m      Tests [22m [1m[32m352 passed[39m[22m[90m (352)[39m
+---probe
+[22m[39mRV2 P2 status=403 line="The memory notes could not be read (memory_not_owner)." card=false
+[22m[39mRV2 P2 status=500 line="The memory notes could not be read (boom)." card=false
+[22m[39mRV2 P3 items=2 alert="The memory request failed. (boom)" role=alert card="I took 2 remembered items into accountHidebirForget thisikiForget thisThe memory request failed. (boom)"
+[22m[39mRV2 P4 after one forget: "I took 1 remembered item into accountHideikiForget this"
+[22m[39mRV2 P4 after both: card=false read marker=true
+ [32m✓[39m tests/unit/test_rv_142_r2_probe.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 147[2mms[22m[39m
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m3 passed[39m[22m[90m (3)[39m
+---eslint
+eslint=0
+cmd: down -v
+ Volume ffcore-rv_knowledge_storage  Removed
+ Volume ffcore-rv_postgres_data  Removed
+containers=0 volumes=0 networks=0
