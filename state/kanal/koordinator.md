@@ -231,3 +231,15 @@ Paket: followup-triage-2 · Cevap: R-TR2-0006 · SHA: 89df92829fa76c6eea1975fcad
 Paket: 14 · Cevap: C-14-0010
 triage-2 **MERGED** (main `e74276c`). r2 işin bitince `feat/14-hafiza`'yı main'e rebase et (`docs/degisiklikler.md` çakışması beklenir; `saveScreenshot` yardımcısı artık main'de). **ffmain kapısı koşuyor:** kapı bitene kadar konteyner koşusu yok (hedefli test-int/tam test-int için kapı yeşil duyurusunu bekle; yığınsız birim testleri serbest). Tam test-int slotu için SORU kapıdan sonra.
 
+### K-GEN-0044 · 2026-11-22 15:45 · → tumu · DURUM
+Paket: dalga-9 · Cevap: K-TR2-0010 · Yigin: ffmain (YIGIN-KAPA)
+**ffmain kapısı YEŞİL** (gate-tr2-20261122): hooks 465, `make test` 2161×2, test-int 1193/42, smoke, Vitest 323, e2e imajından `npm ci`siz @model-missing 1/1 + tam yığın 203/0, kapı sonunda `docs/images` değişmedi (FOLLOWUP-221 doğrulandı), `down -v` temiz. **followup-triage-2 DONE**; FOLLOWUP 214/215/216/219/220/221 kapandı (KARARLAR 'triage-2 main kapısı YEŞİL'). Konteyner koşuları serbest; açık yığın yok (kullanıcı yığını hariç).
+
+### K-TR2-0011 · 2026-11-22 15:45 · → isci-b · HANDOFF-ISTEK
+Paket: followup-triage-2 · Cevap: B-TR2-0009
+triage-2 DONE; teşekkürler (altı dilim, iki tur, hook probe'u bazla yan yana, 465 test). Kanalına **HANDOFF** yaz (bitenler; açık bıraktıkların: FOLLOWUP-222'ye devredilen NOTE-1/3 ve `run --build`; worktree `.worktrees/fix/followup-triage-2` silinmeye hazır, imaj `0.0.0-tr2` kullanıcı temizliğine), sonra bekle: RETIRED yazarım, kullanıcı arşivler. Yeni kod/konteyner işi yok.
+
+### K-14-0012 · 2026-11-22 15:45 · → isci-c · CEVAP
+Paket: 14 · Cevap: C-14-0012
+Kapı yeşil, konteyner koşuları serbest. **Tam test-int slotu sende** (kuyrukta tek sen): `ffcore-14` YIGIN-AC → `make lint`, `make test` ×2 profil, hedefli 14 + 06a + facade, **tam test-int tam yığında** (ana kapı biçimi, fake-llm; tee `14-1-r2-test-int.log`), `down -v` + YIGIN-KAPA → PR-HAZIR r2 (`SHA:` rebase'li 90aa8c1 ya da sonrası; delta `bb5ad0d..` + rebase notu; `HEAD=` satırlı loglar). Rebase'te `docs/degisiklikler.md` çözümünü PR notuna yaz. İnceleyici r2 teyitine PR-HAZIR'dan sonra geçer.
+

@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-c-14
 - Aktif paket: 14 (kullanıcıya özel kalıcı hafıza; dal feat/14-hafiza, worktree .worktrees/feat/14-hafiza)
 - Durum: ACTIVE
-- Son okunan: koordinator K-14-0002, K-GEN-0041; son yazılan C-14-0010 (ACK)
+- Son okunan: koordinator K-14-0002, K-GEN-0041; son yazılan C-14-0012 (YIGIN-KAPA)
 - Önceki lease: ffcore-isci-c-11 RETIRED (11 DONE; K-11-0033); ondan önce ffcore-isci-c-10c3 RETIRED (10c-3 MERGED 0a92084; son C-10C3-0009 RETIRED); ondan önce ffcore-isci-c-10c2 RETIRED (10c-2 MERGED b93cd96; son C-10C2-0016 RETIRED); ondan önce ffcore-isci-c-sse RETIRED (fix/10b-sse-bekci MERGED 4216718; son C-SSE-0011 RETIRED); ondan önce ffcore-isci-c-10c1 RETIRED (10c-1 MERGED; son C-10C1-0015 RETIRED); ondan önce ffcore-isci-c-10bp2 RETIRED (10b-poc-2 MERGED b43770d; son C-10bp2-0019 HANDOFF)
 
 ## Mesajlar
@@ -59,3 +59,11 @@ K-14-0007 alındı: dal `feat/14-hafiza` donuk (HEAD `bb5ad0d`), REVIEW-ISTEK be
 ### C-14-0010 · 2026-11-22 14:45 · → koordinator · ACK
 Paket: 14 · Cevap: K-14-0009 · SHA: bb5ad0d1de032b37077548ffd4d77def28d3ca99
 K-14-0009 DUZELT alındı; rapor `state/reviews/14-1-r1.md` ve KARARLAR '14-1 r1 kararları' okundu. r2 kapsamı: MAJOR-1 (bu yazımın kimlikleri tahliye dışı, P1 testi), MAJOR-2 (işaretçili metin 400 `memory_text_invalid` POST/PATCH + aday `invalid`; maske konumla), MINOR-1 (`NerConfigError` → 422 `memory_requires_ner` POST/PATCH/candidates), MINOR-2 A (kapalılık/opt-out worker'da DB'den, HTTP recall yalnız açıkken, `question` sınırı koşu girdisi sabitinden, facade uzun mesaj testi), NOTE-1/2/3/5. NOTE-4 FOLLOWUP-223. Sıra: her madde önce kırmızı test, test/kod/docs ayrı commit; yığın gerekince YIGIN-AC; triage-2 MERGED duyurusunda main'e rebase, sonra tam test-int SORU, sonra PR-HAZIR r2.
+
+### C-14-0011 · 2026-11-22 14:55 · → koordinator · YIGIN-AC
+Paket: 14 · Cevap: K-14-0009 · Yigin: ffcore-14
+r2 (K-14-0009) için yığın `ffcore-14` yeniden açılıyor (18140/13140), `--env-file .env.test`, `--pull never`; kayıtlı etiketler `ffcore/tools:0.0.0-14`, `ffcore/backend:0.0.0-14`. Önce yalnız postgres + redis (kırmızı/yeşil unit, contract, hedefli `test_14_*`); hedefli 06a + facade regresyonu için gerekirse fake-llm/litellm. Tam test-int yok (rebase sonrası SORU ile). Bitince `down -v` + YIGIN-KAPA. Açık başka yığın: yalnız `ffcore` (main).
+
+### C-14-0012 · 2026-11-22 15:32 · → koordinator · YIGIN-KAPA
+Paket: 14 · Cevap: K-14-0011 · Yigin: ffcore-14
+K-14-0011 alındı: ffmain kapısı sürerken arka plandaki iki profilli birim kapısı durduruldu (TaskStop, `ffcore-14-tools-run-*` adıyla silindi); yığın `ffcore-14` `down -v` ile kapatıldı (konteyner 0, `ffcore-14_*` volume 0). Kapı yeşil duyurusuna kadar konteyner koşusu yok. r2 kodu tamam: commit'ler `0b1363d` (kırmızı test), `58ca6e6` (test), `47b6278` (fix), `9bebd38` (docs). Yeşil kanıt: hedefli 14 (unit, contract, int, facade) 121 passed ve ruff (`14-1-r2-green-14.log`); 06a, 06b, 08t facade, 134 ve 57 regresyonu 70 passed (`14-1-r2-int-06a-facade.log`); LiteLLM gerektiren 08t-c17 4 passed (`14-1-r2-int-08t-c17.log`); gen:api ve check:api 0. Kalan: main `e74276c`'ye rebase (konteynersiz, şimdi); kapı yeşil olunca iki profil birim kapısı ve hedefli tekrar; ardından tam test-int için SORU.
