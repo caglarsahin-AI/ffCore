@@ -48,7 +48,8 @@ def test_16_1_roles(src_world):
     w = src_world
     assert w["analyst"].get(sources_url(w)).status_code == 403
     assert w["analyst"].post(sources_url(w), json=body(w)).status_code == 403
-    created = w["developer"].post(sources_url(w), json=body(w))
+    # 16-1 r1 MAJOR-1: a network folder is registered by the superadmin (test_16_1_r2_*).
+    created = w["super"].post(sources_url(w), json=body(w))
     assert created.status_code == 201, created.text
     source = created.json()
     assert source["created_by"] and source["status"] == "active" and source["items"] == 0
@@ -88,7 +89,7 @@ def test_16_1_read_only_access_cannot_change_or_sync(src_world, make_user, clien
 @pytest.mark.parametrize("root", ["/", "../..", "/etc", "paylasim/../../..", "~root"])
 def test_16_1_root_outside_base_is_400(src_world, root):
     w = src_world
-    response = w["admin"].post(sources_url(w), json=body(w, config={"root": root}))
+    response = w["super"].post(sources_url(w), json=body(w, config={"root": root}))
     assert response.status_code == 400 and error_code(response) == "path_outside_base"
 
 
@@ -97,7 +98,7 @@ def test_16_1_root_through_a_symlink_is_400(src_world, tmp_path):
     outside = tmp_path / "outside"
     outside.mkdir()
     (w["base"] / "kacis").symlink_to(outside, target_is_directory=True)
-    response = w["admin"].post(sources_url(w), json=body(w, config={"root": "kacis"}))
+    response = w["super"].post(sources_url(w), json=body(w, config={"root": "kacis"}))
     assert response.status_code == 400 and error_code(response) == "path_outside_base"
 
 
@@ -115,22 +116,22 @@ def test_16_1_root_through_a_symlink_is_400(src_world, tmp_path):
 def test_16_1_validation_codes(src_world, extra, code):
     w = src_world
     (w["base"] / "prsim").mkdir()
-    response = w["admin"].post(sources_url(w), json=body(w, **extra))
+    response = w["super"].post(sources_url(w), json=body(w, **extra))
     assert response.status_code == 422, response.text
     assert error_code(response) == code
 
 
 def test_16_1_schedule_and_key_rules(src_world):
     w = src_world
-    bad = w["admin"].post(sources_url(w), json=body(w, schedule={"kind": "daily"}))
+    bad = w["super"].post(sources_url(w), json=body(w, schedule={"kind": "daily"}))
     assert bad.status_code == 422
-    cron = w["admin"].post(sources_url(w), json=body(w, schedule={"kind": "cron", "at": "0 2"}))
+    cron = w["super"].post(sources_url(w), json=body(w, schedule={"kind": "cron", "at": "0 2"}))
     assert cron.status_code == 422
-    ok = w["admin"].post(sources_url(w), json=body(w, schedule={"kind": "daily", "at": "02:30"}))
+    ok = w["super"].post(sources_url(w), json=body(w, schedule={"kind": "daily", "at": "02:30"}))
     assert ok.status_code == 201 and ok.json()["schedule"]["at"] == "02:30"
-    taken = w["admin"].post(sources_url(w), json=body(w))
+    taken = w["super"].post(sources_url(w), json=body(w))
     assert taken.status_code == 409 and error_code(taken) == "data_source_key_taken"
-    other_kb = w["admin"].post(
+    other_kb = w["super"].post(
         sources_url(w), json=body(w, key="baska", kb_id="00000000-0000-0000-0000-000000000000")
     )
     assert other_kb.status_code == 404

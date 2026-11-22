@@ -62,6 +62,8 @@ def src_world(app, app_settings, tmp_path, make_user, make_project, client_facto
     admin_id, admin = make_user(memberships={project: ("admin", "edit")})
     developer_id, developer = make_user(memberships={project: ("developer", "edit")})
     analyst_id, analyst = make_user(memberships={project: ("analyst", "edit")})
+    # 16-1 r1 MAJOR-1: a network-folder source is registered by the installation's superadmin.
+    _, superadmin = make_user(superadmin="edit")
     w = {
         "settings": settings,
         "database_url": database_url,
@@ -73,6 +75,7 @@ def src_world(app, app_settings, tmp_path, make_user, make_project, client_facto
         "admin": client_factory(admin),
         "developer": client_factory(developer),
         "analyst": client_factory(analyst),
+        "super": client_factory(superadmin),
         "admin_id": str(admin_id),
         "analyst_id": str(analyst_id),
         "analyst_email": analyst,
@@ -108,7 +111,7 @@ def age_tree(root: Path, seconds: int = 3600) -> None:
             os.utime(path, (old, old))
 
 
-def create_fs_source(w, key="paylasim", root="paylasim", client="admin", **extra):
+def create_fs_source(w, key="paylasim", root="paylasim", client="super", **extra):
     body = {"key": key, "name": key, "kb_id": w["kb"], "kind": "fs", "config": {"root": root}}
     body.update(extra)
     response = w[client].post(sources_url(w), json=body)

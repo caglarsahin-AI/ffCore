@@ -193,7 +193,9 @@ def test_16_1_sync_worker_service():
     worker = services["sync-worker"]
     assert worker["command"] == ["arq", "ffcore.sources.worker.SyncWorkerSettings"]
     assert worker["image"] == services["worker"]["image"]  # no new image (K-16-0002 S1)
-    assert "build" not in worker and "profiles" not in worker and "mem_limit" not in worker
+    assert "build" not in worker and "profiles" not in worker
+    # 16-1 r1 MINOR-2: the whole file is read into memory (Kapı 0 limit 500 MB), two jobs at once.
+    assert worker["mem_limit"] == "${SYNC_WORKER_MEM_LIMIT:-2g}"
     assert (
         worker["environment"]["DATABASE_URL"] == services["backend"]["environment"]["DATABASE_URL"]
     )
@@ -225,6 +227,7 @@ def test_16_1_settings_and_env_example(settings):
         "PRUNE_MAX_RATIO",
         "ATTACHMENT_MIN_DATE",
         "ARQ_QUEUE_SYNC",
+        "SYNC_WORKER_MEM_LIMIT",
     ):
         assert f"\n{name}=" in example, name
     app_env = _compose()["services"]["backend"]["environment"]
