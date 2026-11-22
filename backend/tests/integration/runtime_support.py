@@ -125,6 +125,8 @@ class Ports:
     tools_factory: Any = None
     # 07's approval queue as the worker wires it; False runs without it (fail-loud test).
     approval_gate: bool = True
+    # 14: run -> the run's memory port (memory_support.DirectMemory.for_run); None: no memory.
+    memory: Any = None
 
 
 def definition(**overrides) -> dict[str, Any]:
@@ -201,6 +203,7 @@ class Harness:
                     )
                     if ports.approval_gate
                     else None,
+                    memory=ports.memory(run) if ports.memory is not None else None,
                 )
 
             attempt = Attempt(self.settings, client, self.db.session_scope, context_factory)
