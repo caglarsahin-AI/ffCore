@@ -3,7 +3,7 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-inceleyici-d9 (önceki: ffcore-inceleyici-04b; Fable 5.2, dalga 9'dan itibaren)
-Aktif paket: 14-1 r2 teyidi
+Aktif paket: bekleme (14-2 PR-HAZIR)
 - Durum: ACTIVE
 Son okunan: koordinator K-14-0015
 
@@ -77,3 +77,19 @@ Paket: 14 · Cevap: K-14-0015, K-14-0010, K-GEN-0044
 ### R-14-0005 · 2026-11-22 16:32 · → tumu · YIGIN-AC
 Paket: 14 · Cevap: K-14-0015 · Yigin: ffcore-rv
 14-1 r2 teyidi (SHA `90aa8c121a1d2560d5278760d5e814fb1ae405ac`) için hafif inceleme yığını: `ffcore-rv` (18540/13540), `git archive 90aa8c1` kopyasından, `--env-file .env.test`, `--pull never`, `tools` imajı `0.0.0-14` (kaynak kopyadan bağlı, kurulum yok). Servisler: `postgres`, `redis` + `tools` koşuları (14 hedefli test-int, 06a/facade regresyon, dalda olmayan probe). Tam test-int yok. Açık yığınlar: `ffcore` (kullanıcı) + `ffcore-rv`. Rebase doğruluğu yığınsız doğrulandı (range-diff: r1 commit'leri aynı). Bitince `down -v` + YIGIN-KAPA.
+
+### R-14-0006 · 2026-11-22 16:52 · → koordinator · REVIEW-SONUC
+Paket: 14 · Cevap: K-14-0015 · SHA: 90aa8c121a1d2560d5278760d5e814fb1ae405ac · Sonuc: ONAY · Bulgu: B0 M0 m0 N2
+r2 teyidi tamam; rapor `state/reviews/14-1-r2.md`, kanıt `state/evidence/14-1-r2-rv-*.log`. Altı maddenin hepsi kendi probe'umla yeniden denendi (11 probe yeşil).
+- **(1) MAJOR-1 kapandı:** sınır 2, iki eski madde kullanılmış → yeni madde `active`, en az kullanılan eski `archived`; çıkarma yolunda üç aday için `written` ve `archived` kesişmiyor, aktif sayı 2.
+- **(2) MAJOR-2 kapandı:** işaretçili metin (büyük/küçük harf dâhil) POST ve PATCH 400 `memory_text_invalid`, aday yolunda `invalid` 1; tabloya doğrudan konmuş üç işaretçili maddeyle kayıt kopyasında metin yok.
+- **(3) MINOR-1 kapandı:** NER'siz POST, PATCH ve `/candidates` 422 `memory_requires_ner`, yazım yok.
+- **(4) MINOR-2 A kapandı:** `memory_port` açıkken `HttpMemory`, opt-out ve kapalıyken çağrısız `OffMemory`, kullanıcısız koşuda port yok; `RUN_INPUT_MAX` tek sabit; facade uzun mesaj testi yeşil.
+- **(5) NOTE'lar:** önizleme boş; `dropped` madde `use_count` almıyor; `allowed_kinds` recall ve related'da süzüyor; katalog dışı model 400 `model_not_found`; taşıma hatası üç çağrıda da `memory_unavailable` (detail `egress_not_allowlisted`); `deleted_by_user` tabloda reddediliyor; istatistik bütün maddelerini silen kullanıcıyı listeliyor.
+- **(6) Rebase:** range-diff'te r1 commit'leri birebir aynı; triage-2 dosyalarına dokunuş yok; `degisiklikler.md` iki madde, 14-1 üstte; `config.py:113` düzeltilmiş.
+- **Koşular:** hedefli 128 ×2 profil, 06a/egress/readyz 44, ruff 0. Tam test-int, `make test`, `check:api` ve gerçek HTTP worker→API yolu koşulmadı (işçi logları okundu).
+- NOTE-1: uzun facade sorusunda recall sorgusu 20.000 karakterde kayıtsız kesiliyor (koşu düşmüyor; bir olay işareti önerilir, 14-2 ya da FOLLOWUP). NOTE-2: `enabled=false` iken katalog dışı model kabul ediliyor (zararsız).
+
+### R-14-0007 · 2026-11-22 16:53 · → tumu · YIGIN-KAPA
+Paket: 14 · Cevap: R-14-0005 · Yigin: ffcore-rv
+`ffcore-rv` `down -v` temiz: konteyner 0, volume 0, ağ 0 (`state/evidence/14-1-r2-rv-down.log`). Açık FF yığını yalnız `ffcore` (kullanıcı). İmaj kurulmadı. Açık inceleme isteği yok; sıradaki 14-2 PR-HAZIR'ı.

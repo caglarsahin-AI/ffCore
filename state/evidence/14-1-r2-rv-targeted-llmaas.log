@@ -1,3 +1,5 @@
 HEAD=90aa8c121a1d2560d5278760d5e814fb1ae405ac DEPLOY_PROFILE=llmaas
 cmd: tools sh -c 'cd backend && pytest tests/unit/test_14_extract.py tests/unit/test_14_pii.py tests/unit/test_14_recall.py tests/unit/test_03a_write_flag.py tests/contract/test_14_openapi.py tests/contract/test_c3_common_columns.py tests/integration/test_14_api.py tests/integration/test_14_runs.py tests/integration/test_14_facade.py tests/integration/test_03c_retention_job.py tests/integration/test_57_alembic_merge.py -q -p no:cacheprovider'
-.....................................................................
+........................................................................ [ 56%]
+........................................................                 [100%]
+128 passed in 337.77s (0:05:37)

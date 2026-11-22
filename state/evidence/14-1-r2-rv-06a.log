@@ -1,0 +1,6 @@
+HEAD=90aa8c121a1d2560d5278760d5e814fb1ae405ac
+cmd: pytest tests/integration/test_06a_graph.py tests/integration/test_06a_runs_api.py tests/integration/test_134_egress_real_engine.py tests/integration/test_04a_readyz.py -q
+............................................                             [100%]
+44 passed in 113.97s (0:01:53)
+All checks passed!
+24 files already formatted
