@@ -1,0 +1,1417 @@
+openapi: 3.1.0
+info:
+  title: FFCore API
+  description: 'User memory: the member''s own items, opt-out, administrator settings and statistics (no
+    text), and the worker''s internal recall and extraction writes (package 14).'
+  version: '0.14'
+paths:
+  /api/v1/projects/{project_id}/memories:
+    get:
+      tags:
+      - memories
+      summary: List Memories
+      description: 'The caller''s own items, newest first. `ids` answers the chat''s "taken into account"
+        note
+
+        (run events carry ids only); `source_run_id` its "noted" notice.'
+      operationId: list_memories_api_v1_projects__project_id__memories_get
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: ids
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: array
+            items:
+              type: string
+              format: uuid
+          - type: 'null'
+          title: Ids
+      - name: source_run_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Source Run Id
+      - name: status
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - enum:
+            - active
+            - archived
+            type: string
+          - type: 'null'
+          title: Status
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MemoryList'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+    post:
+      tags:
+      - memories
+      summary: Remember
+      description: '"Remember this": no extraction model, `kind=preference`, `confidence=1`; PII checked.'
+      operationId: remember_api_v1_projects__project_id__memories_post
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RememberRequest'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MemoryOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+    delete:
+      tags:
+      - memories
+      summary: Delete All Memories
+      description: Every item of the caller in this project, active and archived.
+      operationId: delete_all_memories_api_v1_projects__project_id__memories_delete
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      responses:
+        '204':
+          description: Successful Response
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/memories/{memory_id}:
+    patch:
+      tags:
+      - memories
+      summary: Update Memory
+      description: 'The owner''s correction: the new text is PII-checked and embedded again.'
+      operationId: update_memory_api_v1_projects__project_id__memories__memory_id__patch
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: memory_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Memory Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MemoryUpdate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MemoryOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+    delete:
+      tags:
+      - memories
+      summary: Delete Memory
+      description: 'Immediate and permanent (brief 14; S6): the row is deleted, not marked.'
+      operationId: delete_memory_api_v1_projects__project_id__memories__memory_id__delete
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: memory_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Memory Id
+      responses:
+        '204':
+          description: Successful Response
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/memories/opt-out:
+    get:
+      tags:
+      - memories
+      summary: Get Opt Out
+      operationId: get_opt_out_api_v1_projects__project_id__memories_opt_out_get
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OptOutOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+    put:
+      tags:
+      - memories
+      summary: Opt Out
+      description: 'Memory off for the caller: nothing is written or recalled until they turn it on again.
+
+        Existing items stay (the caller may delete them).'
+      operationId: opt_out_api_v1_projects__project_id__memories_opt_out_put
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OptOutOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+    delete:
+      tags:
+      - memories
+      summary: Opt In
+      operationId: opt_in_api_v1_projects__project_id__memories_opt_out_delete
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OptOutOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/memories/stats:
+    get:
+      tags:
+      - memories
+      summary: Memory Stats
+      description: Counts per member and kind, use and delete numbers; never a text (brief 14).
+      operationId: memory_stats_api_v1_projects__project_id__memories_stats_get
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MemoryStats'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/memories/settings:
+    get:
+      tags:
+      - memories
+      summary: Get Memory Settings
+      description: The effective settings of the project (no `agent_id`) or of one agent.
+      operationId: get_memory_settings_api_v1_projects__project_id__memories_settings_get
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: agent_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Agent Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MemorySettingsOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+    put:
+      tags:
+      - memories
+      summary: Put Memory Settings
+      description: The project's row (no `agent_id`) or the agent's own. Turning memory on needs NER (S3).
+      operationId: put_memory_settings_api_v1_projects__project_id__memories_settings_put
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: agent_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Agent Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MemorySettingsIn'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MemorySettingsOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /internal/memories/recall:
+    post:
+      tags:
+      - memories-internal
+      summary: Internal Recall
+      description: '`prepare`''s recall: off reason or the items (profile always, then `recall_top_k`).'
+      operationId: internal_recall_internal_memories_recall_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecallRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecallResponse'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /internal/memories/related:
+    post:
+      tags:
+      - memories-internal
+      summary: Internal Related
+      description: 'The extraction''s context: the items closest to the turn (not marked used).'
+      operationId: internal_related_internal_memories_related_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RelatedRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecallResponse'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /internal/memories/candidates:
+    post:
+      tags:
+      - memories-internal
+      summary: Internal Candidates
+      description: 'The extraction job''s candidates, written by the store''s rules. Memory turned off
+        or the
+
+        user opted out while the job waited: 409, nothing is written.'
+      operationId: internal_candidates_internal_memories_candidates_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CandidatesRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CandidatesResponse'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+components:
+  schemas:
+    CandidateIn:
+      properties:
+        kind:
+          type: string
+          enum:
+          - profile
+          - preference
+          - fact
+          - decision
+          title: Kind
+        text:
+          type: string
+          maxLength: 500
+          minLength: 1
+          title: Text
+        confidence:
+          type: number
+          maximum: 1.0
+          minimum: 0.0
+          title: Confidence
+        supersedes_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Supersedes Id
+      additionalProperties: false
+      type: object
+      required:
+      - kind
+      - text
+      - confidence
+      title: CandidateIn
+    CandidatesRequest:
+      properties:
+        project_id:
+          type: string
+          format: uuid
+          title: Project Id
+        user_id:
+          type: string
+          format: uuid
+          title: User Id
+        run_id:
+          type: string
+          format: uuid
+          title: Run Id
+        items:
+          items:
+            $ref: '#/components/schemas/CandidateIn'
+          type: array
+          maxItems: 3
+          title: Items
+      additionalProperties: false
+      type: object
+      required:
+      - project_id
+      - user_id
+      - run_id
+      - items
+      title: CandidatesRequest
+    CandidatesResponse:
+      properties:
+        written:
+          items:
+            type: string
+            format: uuid
+          type: array
+          title: Written
+        archived:
+          items:
+            type: string
+            format: uuid
+          type: array
+          title: Archived
+        rejected:
+          additionalProperties:
+            type: integer
+          type: object
+          title: Rejected
+      type: object
+      required:
+      - written
+      - archived
+      - rejected
+      title: CandidatesResponse
+    ErrorBody:
+      properties:
+        error:
+          $ref: '#/components/schemas/ErrorDetail'
+      type: object
+      required:
+      - error
+      title: ErrorBody
+      description: OpenAI-shaped error body used by every 4xx response.
+    ErrorDetail:
+      properties:
+        message:
+          type: string
+          title: Message
+          description: English, actionable, never contains secrets.
+        type:
+          type: string
+          title: Type
+          description: authentication_error, permission_error, not_found_error, ...
+        code:
+          type: string
+          title: Code
+          description: Stable machine-readable code, e.g. read_only_access.
+      type: object
+      required:
+      - message
+      - type
+      - code
+      title: ErrorDetail
+    MemoryList:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/MemoryOut'
+          type: array
+          title: Items
+      type: object
+      required:
+      - items
+      title: MemoryList
+    MemoryOut:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        kind:
+          type: string
+          enum:
+          - profile
+          - preference
+          - fact
+          - decision
+          title: Kind
+        text:
+          type: string
+          title: Text
+        agent_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Agent Id
+        status:
+          type: string
+          enum:
+          - active
+          - archived
+          title: Status
+        confidence:
+          type: number
+          title: Confidence
+        source_run_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Source Run Id
+        supersedes_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Supersedes Id
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+        last_used_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Last Used At
+        use_count:
+          type: integer
+          title: Use Count
+      type: object
+      required:
+      - id
+      - kind
+      - text
+      - agent_id
+      - status
+      - confidence
+      - source_run_id
+      - supersedes_id
+      - created_at
+      - updated_at
+      - last_used_at
+      - use_count
+      title: MemoryOut
+    MemorySettingsIn:
+      properties:
+        enabled:
+          type: boolean
+          title: Enabled
+        allowed_kinds:
+          items:
+            type: string
+            enum:
+            - profile
+            - preference
+            - fact
+            - decision
+          type: array
+          minItems: 1
+          title: Allowed Kinds
+        max_items_per_user:
+          type: integer
+          maximum: 10000.0
+          exclusiveMinimum: 0.0
+          title: Max Items Per User
+          default: 200
+        recall_top_k:
+          type: integer
+          maximum: 50.0
+          minimum: 0.0
+          title: Recall Top K
+          default: 5
+        ttl_days:
+          anyOf:
+          - type: integer
+            maximum: 1095.0
+            exclusiveMinimum: 0.0
+          - type: 'null'
+          title: Ttl Days
+        extraction_model:
+          type: string
+          maxLength: 200
+          minLength: 1
+          title: Extraction Model
+          default: memory-extract
+      additionalProperties: false
+      type: object
+      required:
+      - enabled
+      title: MemorySettingsIn
+    MemorySettingsOut:
+      properties:
+        enabled:
+          type: boolean
+          title: Enabled
+        allowed_kinds:
+          items:
+            type: string
+            enum:
+            - profile
+            - preference
+            - fact
+            - decision
+          type: array
+          minItems: 1
+          title: Allowed Kinds
+        max_items_per_user:
+          type: integer
+          maximum: 10000.0
+          exclusiveMinimum: 0.0
+          title: Max Items Per User
+          default: 200
+        recall_top_k:
+          type: integer
+          maximum: 50.0
+          minimum: 0.0
+          title: Recall Top K
+          default: 5
+        ttl_days:
+          anyOf:
+          - type: integer
+            maximum: 1095.0
+            exclusiveMinimum: 0.0
+          - type: 'null'
+          title: Ttl Days
+        extraction_model:
+          type: string
+          maxLength: 200
+          minLength: 1
+          title: Extraction Model
+          default: memory-extract
+        agent_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Agent Id
+        source:
+          type: string
+          enum:
+          - agent
+          - project
+          - default
+          title: Source
+        ner_ready:
+          type: boolean
+          title: Ner Ready
+      additionalProperties: false
+      type: object
+      required:
+      - enabled
+      - agent_id
+      - source
+      - ner_ready
+      title: MemorySettingsOut
+    MemoryStats:
+      properties:
+        users:
+          items:
+            $ref: '#/components/schemas/UserStats'
+          type: array
+          title: Users
+        active:
+          type: integer
+          title: Active
+        archived:
+          type: integer
+          title: Archived
+        by_kind:
+          additionalProperties:
+            type: integer
+          type: object
+          title: By Kind
+        use_rate:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Use Rate
+        delete_events:
+          type: integer
+          title: Delete Events
+        opted_out_users:
+          type: integer
+          title: Opted Out Users
+      type: object
+      required:
+      - users
+      - active
+      - archived
+      - by_kind
+      - use_rate
+      - delete_events
+      - opted_out_users
+      title: MemoryStats
+    MemoryUpdate:
+      properties:
+        text:
+          type: string
+          maxLength: 500
+          minLength: 1
+          title: Text
+      additionalProperties: false
+      type: object
+      required:
+      - text
+      title: MemoryUpdate
+    OptOutOut:
+      properties:
+        opted_out:
+          type: boolean
+          title: Opted Out
+      type: object
+      required:
+      - opted_out
+      title: OptOutOut
+    RecallRequest:
+      properties:
+        project_id:
+          type: string
+          format: uuid
+          title: Project Id
+        user_id:
+          type: string
+          format: uuid
+          title: User Id
+        run_id:
+          type: string
+          format: uuid
+          title: Run Id
+        question:
+          type: string
+          maxLength: 20000
+          title: Question
+        share:
+          type: integer
+          minimum: 0.0
+          title: Share
+      additionalProperties: false
+      type: object
+      required:
+      - project_id
+      - user_id
+      - run_id
+      - question
+      - share
+      title: RecallRequest
+    RecallResponse:
+      properties:
+        off_reason:
+          anyOf:
+          - type: string
+            enum:
+            - 'off'
+            - opt_out
+            - no_user
+          - type: 'null'
+          title: Off Reason
+        items:
+          items:
+            $ref: '#/components/schemas/RecalledItem'
+          type: array
+          title: Items
+        extraction_model:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Extraction Model
+        dropped:
+          items:
+            type: string
+            format: uuid
+          type: array
+          title: Dropped
+      type: object
+      required:
+      - off_reason
+      - items
+      title: RecallResponse
+    RecalledItem:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        kind:
+          type: string
+          enum:
+          - profile
+          - preference
+          - fact
+          - decision
+          title: Kind
+        text:
+          type: string
+          title: Text
+      type: object
+      required:
+      - id
+      - kind
+      - text
+      title: RecalledItem
+    RelatedRequest:
+      properties:
+        project_id:
+          type: string
+          format: uuid
+          title: Project Id
+        user_id:
+          type: string
+          format: uuid
+          title: User Id
+        run_id:
+          type: string
+          format: uuid
+          title: Run Id
+        text:
+          type: string
+          maxLength: 40000
+          title: Text
+      additionalProperties: false
+      type: object
+      required:
+      - project_id
+      - user_id
+      - run_id
+      - text
+      title: RelatedRequest
+    RememberRequest:
+      properties:
+        text:
+          type: string
+          maxLength: 500
+          minLength: 1
+          title: Text
+      additionalProperties: false
+      type: object
+      required:
+      - text
+      title: RememberRequest
+    UserStats:
+      properties:
+        user_id:
+          type: string
+          format: uuid
+          title: User Id
+        active:
+          type: integer
+          title: Active
+        archived:
+          type: integer
+          title: Archived
+        by_kind:
+          additionalProperties:
+            type: integer
+          type: object
+          title: By Kind
+        used:
+          type: integer
+          title: Used
+        delete_events:
+          type: integer
+          title: Delete Events
+      type: object
+      required:
+      - user_id
+      - active
+      - archived
+      - by_kind
+      - used
+      - delete_events
+      title: UserStats
+      description: 'One member''s counts: no text, no item ids (brief 14: administrators see numbers).'

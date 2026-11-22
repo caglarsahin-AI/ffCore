@@ -29,6 +29,12 @@ C3_EXCEPTIONS = {
     "retention_runs": "append-only (03c; named in CONTRACTS C3)",
     "alerts": "append-only (03c; named in CONTRACTS C3)",
     "notification_settings": "settings row per project or global (03c)",
+    # 14 (K-14-0003 S5, S6): a user's item is deleted at once on request, never soft-deleted, and
+    # is written by the platform for its owner (`user_id`, `source_run_id`), so neither
+    # `deleted_at` nor `created_by` applies; settings and opt-outs are rows edited in place.
+    "memories": "user-owned items, hard delete on the owner's request (14)",
+    "memory_settings": "settings row per project or agent (14)",
+    "memory_opt_outs": "link: project member who turned memory off (14)",
 }
 
 # Child tables take the project through their parent (CONTRACTS C3): the column named here is a

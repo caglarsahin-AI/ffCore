@@ -11,7 +11,7 @@ import sys
 import yaml
 from fastapi.openapi.utils import get_openapi
 
-from ffcore.api import api_router, facade, internal
+from ffcore.api import api_router, facade, internal, memories
 from ffcore.core.readiness import router as readiness_router
 
 PACKAGES = {
@@ -73,6 +73,13 @@ PACKAGES = {
         "description": "Exams over Langfuse datasets: suites, exam runs, progress (package 09).",
         "tags": {"evaluation"},
     },
+    "14": {
+        "version": "0.14",
+        "description": "User memory: the member's own items, opt-out, administrator settings and "
+        "statistics (no text), and the worker's internal recall and extraction writes "
+        "(package 14).",
+        "tags": {"memories", "memories-internal"},
+    },
 }
 
 
@@ -84,6 +91,7 @@ def _routes_with_tags(tags: set[str]) -> list:
         + list(readiness_router.routes)
         + list(facade.router.routes)  # 06b: /v1, outside /api/v1
         + list(internal.facade_router.routes)
+        + list(memories.internal_router.routes)  # 14: /internal/memories
     )
     selected = []
     for route in routes:

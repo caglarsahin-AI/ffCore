@@ -110,7 +110,8 @@ class Settings(BaseSettings):
     llm_call_timeout_s: int = Field(default=60, gt=0)
 
     # --- 04a knowledge base ---
-    # /readyz C13 check: the context Ollama is started with versus the models' context_tokens.
+    # /readyz C13 check: the context Ollama is started with versus the models'
+    # `limits.context_window` (triage-2).
     inference_backend: Literal["ollama", "vllm"] | None = None
     ollama_context_length: int | None = Field(default=None, gt=0)
     # Ingest queue (arq); contains the Redis password, so it is a secret.
@@ -229,6 +230,11 @@ class Settings(BaseSettings):
     # not the hard limit (LLM_CALL_TIMEOUT_S stays that). At most the usable window of a tick
     # (evaluation.ticks.TICK_PLAN_S, r5 MAJOR-r5-1); a CPU judge (airgap) sets its own.
     eval_judge_call_s: int = Field(default=60, gt=0, le=TICK_PLAN_S)
+
+    # --- 14: user memory ---
+    # Extraction candidates below this confidence are not written (brief 14: llmaas 0.6,
+    # airgap 0.7 for the local model; a profile value in .env.example, not an `if profile`).
+    memory_min_confidence: float = Field(default=0.6, ge=0, le=1)
 
     # --- 03c governance ---
     # Wrong API keys from one client address per minute before 429 too_many_auth_failures.

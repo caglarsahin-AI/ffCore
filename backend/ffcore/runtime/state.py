@@ -31,6 +31,10 @@ class RunState(TypedDict, total=False):
     # Milliseconds spent per kind, for the "where did the time go" fields (B1).
     timing: dict[str, int]
     usage: dict[str, int]
+    # 14: ids of the memory items in the system message (the recorded copy masks their text)
+    # and whether the run may teach memory once it is completed (memory on, not opted out).
+    memory_ids: list[str]
+    memory_extract: bool
 
 
 @dataclass
@@ -125,6 +129,13 @@ class ApprovalGate(Protocol):
     ) -> ApprovalTicket: ...
 
 
+class MemoryPort(Protocol):
+    """14: recall for `prepare` (memory.recall.HttpMemory, or OffMemory when memory does
+    nothing for the run); `share` is the budget's memory share in tokens."""
+
+    async def recall(self, question: str, share: int) -> Any: ...
+
+
 class StopRun(Exception):
     """Ends a run at a step boundary with a final status and code (never a silent stop)."""
 
@@ -160,3 +171,5 @@ class RunContext:
     # 07's approval queue; a tool call that needs approval without it fails the run
     # (`approval_gate_missing`), it never runs unapproved or waits unrecorded.
     approvals: ApprovalGate | None = None
+    # 14: the user's memory; None for a run without one (tests, a key's run without a user).
+    memory: MemoryPort | None = None

@@ -10,6 +10,7 @@ from ffcore.models.identity import Project, ProjectMember, User  # 03a
 from ffcore.models.keys import ApiKey  # 03c
 from ffcore.models.knowledge import Attachment, Chunk, Document, KbQuery, KnowledgeBase  # 04a
 from ffcore.models.mcp_servers import McpServer, McpServerCall  # 05b
+from ffcore.models.memory import Memory, MemoryOptOut, MemorySetting  # 14
 from ffcore.models.quota import Quota, UsageDaily  # 03c
 from ffcore.models.retention import RetentionPolicy, RetentionRun  # 03c
 from ffcore.models.runs import Conversation, Message, Run, RunEvent  # 06a
@@ -37,6 +38,9 @@ __all__ = [
     "KnowledgeBase",
     "McpServer",
     "McpServerCall",
+    "Memory",
+    "MemoryOptOut",
+    "MemorySetting",
     "Message",
     "Model",
     "NotificationSettings",

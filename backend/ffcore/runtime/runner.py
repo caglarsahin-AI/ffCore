@@ -24,6 +24,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ffcore.core import tracing
 from ffcore.core.config import Settings
+from ffcore.memory import jobs as memory_jobs
 from ffcore.models.agents import AgentVersion
 from ffcore.models.runs import Message, Run, RunEvent
 from ffcore.runtime import checkpoints
@@ -324,6 +325,10 @@ async def _complete(
     )
     # The run is over: its checkpoint (and the chunk text in it) goes (FOLLOWUP-116).
     await checkpoints.purge(session, settings, run.id)
+    if final.get("memory_extract"):
+        # 14 (K-14-0003 S1): only now, after `done` and the commit, so the answer never waits
+        # for memory and the job reads the finished turn.
+        await memory_jobs.enqueue_after_done(settings, run.id)
 
 
 async def _stop(

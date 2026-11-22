@@ -188,8 +188,10 @@ def test_03c_14_audit_drop_detach_record_then_drop(pg, run_job):
 def test_03c_14_external_and_no_target_reported(run_job):
     results = {r.data_class: r for r in run_job(dry_run=True)}
     assert results["traces"].counts == {"target": "external:langfuse"}
-    for name in ("metrics", "results", "memory"):
+    for name in ("metrics", "results"):
         assert results[name].counts == {"target": "none"}
+    # 14 registers the `memory` class's executor (test_14_runs covers what it removes).
+    assert "memories" in results["memory"].counts
 
 
 def test_03c_14_idempotent_second_pass(pg, make_project, run_job):

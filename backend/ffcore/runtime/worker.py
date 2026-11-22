@@ -19,6 +19,7 @@ from ffcore.core import db, tracing
 from ffcore.core.config import get_settings
 from ffcore.core.logging import configure_logging
 from ffcore.core.prompts import PromptStore
+from ffcore.memory.jobs import extract_memories
 from ffcore.runtime import adapters
 from ffcore.runtime.contracts import JobClass
 from ffcore.runtime.runner import Attempt, AttemptAborted, execute, fail_after_retries
@@ -197,7 +198,11 @@ def _settings_class(name: str, queue: str, job_class: JobClass) -> type:
         name,
         (),
         {
-            "functions": [run_agent],
+            # 14: the memory extraction job runs on the background queue (memory.jobs).
+            "functions": [
+                run_agent,
+                *([extract_memories] if job_class is JobClass.background else []),
+            ],
             "cron_jobs": cron_jobs_for(job_class),
             "on_startup": _startup_for(job_class),
             "on_shutdown": shutdown,

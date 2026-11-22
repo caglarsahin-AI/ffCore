@@ -35,6 +35,20 @@ WRITE_EXEMPT |= {"chat_completions", "internal_key_search"}
 # 11-1: deleting one's own conversation is own data, open in read-only mode (brief 11: read-only
 # users chat and delete their own conversations); the handler finds the caller's rows only.
 WRITE_EXEMPT |= {"delete_conversation"}
+# 14 (K-14-0003): a member's own memory is their data and stays under their control in
+# read-only mode too (remember, edit, delete, delete all, opt out and back in; the handlers
+# touch the caller's rows only), and the worker's internal memory routes (service account).
+WRITE_EXEMPT |= {
+    "remember",
+    "update_memory",
+    "delete_memory",
+    "delete_all_memories",
+    "opt_out",
+    "opt_in",
+    "internal_recall",
+    "internal_related",
+    "internal_candidates",
+}
 
 
 def api_routes(routes):

@@ -117,6 +117,8 @@ x-app-env: &app-env
   EVAL_MAX_ITEM_RUNS: ${EVAL_MAX_ITEM_RUNS:-500}
   EVAL_JUDGE_CALLS_PER_TICK: ${EVAL_JUDGE_CALLS_PER_TICK:-20}
   EVAL_JUDGE_CALL_S: ${EVAL_JUDGE_CALL_S:-60}
+  # 14 user memory: profile value (.env.example; llmaas 0.6, airgap 0.7).
+  MEMORY_MIN_CONFIDENCE: ${MEMORY_MIN_CONFIDENCE:-0.6}
   # 03c API keys: failed attempts per client address per minute; last_used_at write buffer.
   API_KEY_AUTH_FAILURES_PER_MIN: ${API_KEY_AUTH_FAILURES_PER_MIN:-20}
   API_KEY_LAST_USED_FLUSH_S: ${API_KEY_LAST_USED_FLUSH_S:-60}

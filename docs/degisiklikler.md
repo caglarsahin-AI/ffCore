@@ -4,6 +4,46 @@ Behaviour and configuration changes that a deployment or an API client notices, 
 (handbook/RELEASE_AND_ROLLBACK.md, CHANGE_CONTROL.md). Each entry names the package and what to do,
 if anything.
 
+## 2026-11-22 · 14-1 · User memory (backend)
+
+- **What:** a member's assistant remembers lasting facts about them (role, preferences, recurring
+  context, explicit decisions) inside the organisation. After a completed run a background job
+  (`llm-background` queue, model slot interactive-low) asks the `memory-extract` model for 0-3
+  items; each passes the memory PII check (the project's PII categories plus person names,
+  action `block`), the confidence threshold and dedupe (similarity > 0.9 supersedes and archives
+  the old item). At the next run `prepare` adds the user's items to the system message (profile
+  always, then `recall_top_k`, within `context_policy.memory_max_tokens`) and records
+  `memory_used` (ids and kinds only). Memory is **off** by default; turning it on needs the
+  installation's NER model. Screens and the user guide come with 14-2.
+- **Limits and recall:** a member at `max_items_per_user` keeps learning: the new item stays
+  active and the least used older one is archived. Only the items that fit the memory share are
+  marked used (the others are named in `budget.dropped.memory`), and recall reads only the kinds
+  the settings allow now. Whether memory works for a run (setting, opt-out) is read by the agent
+  worker itself: a run with memory off makes no memory call.
+- **API (additive, `backend/openapi/14.yaml`):** `…/memories` (own items: list, "remember this",
+  edit, delete, delete all), `…/memories/opt-out`, `…/memories/stats` and `…/memories/settings`
+  (admin), and the worker's `/internal/memories/{recall,related,candidates}` (service account).
+  New error codes: `memory_pii_blocked` (400), `memory_text_invalid` (400, the text holds the
+  memory block's markers `[USER MEMORY]` / `[/USER MEMORY]`), `memory_not_owner` (403),
+  `memory_disabled`, `memory_opted_out` (409), `memory_requires_ner` (422: turning memory on, and
+  every write while the NER model is missing), `memory_unavailable` (502, a memory call of the
+  worker failed, transport errors included). `PUT …/memories/settings` with `enabled: true`
+  refuses an `extraction_model` that is not an active chat model of the project
+  (`model_not_found`, 400). An item's `status` is `active` or `archived`.
+- **Run events:** `llm_call.request_messages` shows the memory block as
+  `[memory: n items <ids>]` (the text is the user's, analysts read run events; the whole block is
+  replaced, whatever an item contains); `budget` gains
+  `memory` (`on`, `off`, `opt_out`, `no_user`) when the run has a user; the extraction outcome is a
+  `progress` event `{"memory_extraction": {...}}` with ids and counts. A refused memory text
+  is recorded in `guardrail_events` (policy `memory`) with its categories and no text preview.
+- **Migration:** `14_0001` creates `memories` (`embedding vector(EMBED_DIM)`), `memory_settings`
+  and `memory_opt_outs` (no change to existing tables; `alembic downgrade 11_0001` removes them).
+  Retention class `memory` now deletes items unused for `keep_days` (365) and expired ones.
+- **Configuration:** `MEMORY_MIN_CONFIDENCE` (llmaas 0.6, airgap 0.7; `.env.example`). Langfuse
+  prompt `memory_extract` (seed `backend/prompts/memory_extract.md`, `make seed-prompts`).
+- **Action:** `make seed-prompts` once (adds `memory_extract`); the `migrate` service applies
+  `14_0001` at `make up`. New `frontend/lib/api/schema-14.d.ts` for API clients.
+
 ## 2026-11-22 · followup-triage-2 · Readiness model window, e2e image and screenshots, hook comments
 
 - **What:** `/readyz` `ollama_context` and `ollama_runtime_context` read each active Ollama
