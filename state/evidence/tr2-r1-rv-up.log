@@ -1,0 +1,33 @@
+HEAD=135c36924d99b4ff8d9a4709c6c9cc29dfde72d3 stack=ffcore-rv
+ Network ffcore-rv_default  Creating
+ Network ffcore-rv_default  Created
+ Volume "ffcore-rv_model_cache"  Creating
+ Volume "ffcore-rv_model_cache"  Created
+ Volume "ffcore-rv_knowledge_storage"  Creating
+ Volume "ffcore-rv_knowledge_storage"  Created
+ Volume "ffcore-rv_langfuse_clickhouse_data"  Creating
+ Volume "ffcore-rv_langfuse_clickhouse_data"  Created
+ Volume "ffcore-rv_langfuse_clickhouse_logs"  Creating
+ Volume "ffcore-rv_langfuse_clickhouse_logs"  Created
+ Volume "ffcore-rv_langfuse_postgres_data"  Creating
+ Volume "ffcore-rv_langfuse_postgres_data"  Created
+ Volume "ffcore-rv_langfuse_minio_data"  Creating
+ Volume "ffcore-rv_langfuse_minio_data"  Created
+ Volume "ffcore-rv_postgres_data"  Creating
+ Volume "ffcore-rv_postgres_data"  Created
+ Volume "ffcore-rv_redis_data"  Creating
+ Volume "ffcore-rv_redis_data"  Created
+ Container ffcore-rv-postgres-1  Creating
+ Container ffcore-rv-redis-1  Creating
+ Container ffcore-rv-redis-1  Created
+ Container ffcore-rv-postgres-1  Created
+ Container ffcore-rv-redis-1  Starting
+ Container ffcore-rv-postgres-1  Starting
+ Container ffcore-rv-redis-1  Started
+ Container ffcore-rv-postgres-1  Started
+ Container ffcore-rv-postgres-1  Waiting
+ Container ffcore-rv-redis-1  Waiting
+ Container ffcore-rv-redis-1  Healthy
+ Container ffcore-rv-postgres-1  Healthy
+ffcore-rv-postgres-1 Up 11 seconds (healthy)
+ffcore-rv-redis-1 Up 11 seconds (healthy)

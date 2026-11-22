@@ -1,0 +1,68 @@
+HEAD=135c36924d99b4ff8d9a4709c6c9cc29dfde72d3
+## 3 lock file of the checkout changes (one byte appended)
+e2e_deps_stale: frontend/package-lock.json differs from the e2e image (or the e2e_node_modules volume predates it). Rebuild: docker compose --profile e2e up --build --pull never --no-start --no-deps e2e, then down -v (docs/onyuz.md).
+run_exit(default command)=1
+e2e_deps_stale: frontend/package-lock.json differs from the e2e image (or the e2e_node_modules volume predates it). Rebuild: docker compose --profile e2e up --build --pull never --no-start --no-deps e2e, then down -v (docs/onyuz.md).
+run_exit(with args)=1
+lock-restored
+## 4 screenshots: E2E_SCREENSHOT_DIR empty (default)
+
+Running 2 tests using 1 worker
+
+RV dir=null
+  ✓  1 [chromium] › tests/rvprobe/rv_screenshots.spec.ts:5:5 › rv page and locator screenshots (197ms)
+RV escape=none
+  ✓  2 [chromium] › tests/rvprobe/rv_screenshots.spec.ts:13:5 › rv name with a path is refused when a directory is set (52ms)
+
+  2 passed (1.3s)
+pw_exit=0
+png files written under /work or /tmp:
+0
+E2E_SCREENSHOT_DIR=[]
+## 5 screenshots: E2E_SCREENSHOT_DIR=/tmp/shots (exists)
+
+Running 2 tests using 1 worker
+
+  ✘  1 [chromium] › tests/rvprobe/rv_screenshots.spec.ts:5:5 › rv page and locator screenshots (103ms)
+RV escape=Error: E2E_SCREENSHOT_DIR=C:/Users/CAGLAR~1.SAH/AppData/Local/Temp/shots is not a directory (relative paths start at /work/frontend)
+  ✓  2 [chromium] › tests/rvprobe/rv_screenshots.spec.ts:13:5 › rv name with a path is refused when a directory is set (63ms)
+
+
+  1) [chromium] › tests/rvprobe/rv_screenshots.spec.ts:5:5 › rv page and locator screenshots ───────
+
+    Error: E2E_SCREENSHOT_DIR=C:/Users/CAGLAR~1.SAH/AppData/Local/Temp/shots is not a directory (relative paths start at /work/frontend)
+
+       at ../e2e/screenshots.ts:20
+
+      18 |   }
+      19 |   if (!isDir) {
+    > 20 |     throw new Error(`E2E_SCREENSHOT_DIR=${dir} is not a directory (relative paths start at /work/frontend)`);
+         |           ^
+      21 |   }
+      22 |   return dir;
+      23 | }
+        at screenshotDir (/work/frontend/tests/e2e/screenshots.ts:20:11)
+        at /work/frontend/tests/rvprobe/rv_screenshots.spec.ts:7:53
+
+    Error Context: test-results/rv_screenshots-rv-page-and-locator-screenshots-chromium/error-context.md
+
+  1 failed
+    [chromium] › tests/rvprobe/rv_screenshots.spec.ts:5:5 › rv page and locator screenshots ────────
+  1 passed (1.6s)
+pw_exit=1
+total 0
+## 6 screenshots: E2E_SCREENSHOT_DIR=/tmp/missing (does not exist)
+pw_exit=1
+RV escape=Error: E2E_SCREENSHOT_DIR=C:/Users/CAGLAR~1.SAH/AppData/Local/Temp/missing is not a directory (relative paths start at /work/frontend)
+    Error: E2E_SCREENSHOT_DIR=C:/Users/CAGLAR~1.SAH/AppData/Local/Temp/missing is not a directory (relative paths start at /work/frontend)
+    > 20 |     throw new Error(`E2E_SCREENSHOT_DIR=${dir} is not a directory (relative paths start at /work/frontend)`);
+  1 failed
+  1 passed (1.6s)
+ls: cannot access '/tmp/missing': No such file or directory
+## 7 screenshots: E2E_SCREENSHOT_DIR is a file
+pw_exit=1
+RV escape=Error: E2E_SCREENSHOT_DIR=C:/Program Files/Git/etc/hostname is not a directory (relative paths start at /work/frontend)
+    Error: E2E_SCREENSHOT_DIR=C:/Program Files/Git/etc/hostname is not a directory (relative paths start at /work/frontend)
+    > 20 |     throw new Error(`E2E_SCREENSHOT_DIR=${dir} is not a directory (relative paths start at /work/frontend)`);
+  1 failed
+  1 passed (1.8s)

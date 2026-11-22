@@ -1,0 +1,20 @@
+bash 5.2.12(1)-release
+--X1
+xy y
+RAN
+--X2
+x #x y
+RAN
+--X3
+foo#bar
+RAN
+--X24
+xx y
+RAN
+--X12
+bash: -c: line 1: unexpected argument `newline' to conditional binary operator
+--X11
+bash: line 1: bad substitution: no closing `)' in $(( 2 # 1 ))
+--X10
+bash: -c: line 1: syntax error near unexpected token `newline'
+bash: -c: line 1: `echo a >#b; echo RAN'

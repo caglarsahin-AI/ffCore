@@ -1,0 +1,45 @@
+HEAD=135c36924d99b4ff8d9a4709c6c9cc29dfde72d3
+ffcore/e2e:0.0.0-rv
+#0 building with "default" instance using docker driver
+
+#1 [e2e internal] load build definition from Dockerfile.e2e
+#1 transferring dockerfile: 1.29kB done
+#1 DONE 0.0s
+
+#2 [e2e internal] load .dockerignore
+#2 transferring context: 115B done
+#2 DONE 0.0s
+
+#3 [e2e internal] load metadata for mcr.microsoft.com/playwright@sha256:47b510dd9230bf0b9bfc9b20102241e577ea7a99334ab4c3ca19f19770e9b8ea
+#3 DONE 0.0s
+
+#4 [e2e 1/4] FROM mcr.microsoft.com/playwright@sha256:47b510dd9230bf0b9bfc9b20102241e577ea7a99334ab4c3ca19f19770e9b8ea
+#4 DONE 0.0s
+
+#5 [e2e internal] load build context
+#5 transferring context: 451.09kB 0.0s done
+#5 DONE 0.0s
+
+#6 [e2e 2/4] WORKDIR /work/frontend
+#6 CACHED
+
+#7 [e2e 3/4] COPY package.json package-lock.json ./
+#7 CACHED
+
+#8 [e2e 4/4] RUN npm ci --no-audit --no-fund && cp package-lock.json node_modules/.ffcore-e2e-lock
+#8 CACHED
+
+#9 [e2e] exporting to image
+#9 exporting layers done
+#9 writing image sha256:5a5c2e46c68574c6764c1bbda3965c2cd58ec88bf23e5aaedc426abce85e4793 done
+#9 naming to docker.io/ffcore/e2e:0.0.0-rv
+#9 naming to docker.io/ffcore/e2e:0.0.0-rv done
+#9 DONE 0.0s
+ Volume "ffcore-rv_e2e_node_modules"  Creating
+ Volume "ffcore-rv_e2e_node_modules"  Created
+ Container ffcore-rv-e2e-1  Creating
+ Container ffcore-rv-e2e-1  Created
+
+real	0m24.642s
+user	0m0.031s
+sys	0m0.061s

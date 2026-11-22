@@ -1,0 +1,44 @@
+HEAD=135c36924d99b4ff8d9a4709c6c9cc29dfde72d3 DEPLOY_PROFILE=llmaas
+2026-11-22 10:55:45,950 INFO ffcore.access access method=GET path=/readyz status=503 ms=659
+2026-11-22 10:55:46,019 INFO ffcore.access access method=GET path=/readyz status=200 ms=64
+.2026-11-22 10:55:49,855 ERROR ffcore.readiness warmup failed: RuntimeError
+2026-11-22 10:55:50,019 INFO ffcore.access access method=GET path=/readyz status=503 ms=94
+.2026-11-22 10:55:52,839 INFO ffcore.access access method=GET path=/readyz status=200 ms=91
+2026-11-22 10:55:52,908 INFO ffcore.access access method=GET path=/readyz status=503 ms=58
+2026-11-22 10:55:52,973 INFO ffcore.access access method=GET path=/readyz status=503 ms=62
+2026-11-22 10:55:53,039 INFO ffcore.access access method=GET path=/readyz status=200 ms=64
+.2026-11-22 10:55:56,967 INFO ffcore.access access method=GET path=/readyz status=200 ms=90
+.2026-11-22 10:55:59,823 INFO ffcore.access access method=GET path=/readyz status=503 ms=89
+.2026-11-22 10:56:03,669 INFO ffcore.access access method=GET path=/readyz status=200 ms=96
+.2026-11-22 10:56:06,490 INFO ffcore.access access method=GET path=/readyz status=503 ms=84
+.2026-11-22 10:56:14,613 INFO ffcore.access access method=GET path=/readyz status=503 ms=94
+.2026-11-22 10:56:22,501 INFO ffcore.access access method=GET path=/readyz status=503 ms=97
+.2026-11-22 10:56:25,315 INFO ffcore.access access method=GET path=/readyz status=200 ms=90
+.2026-11-22 10:56:29,198 INFO ffcore.access access method=GET path=/readyz status=200 ms=105
+.2026-11-22 10:56:32,052 INFO ffcore.access access method=GET path=/readyz status=200 ms=112
+.2026-11-22 10:56:40,179 INFO ffcore.access access method=GET path=/readyz status=503 ms=95
+.2026-11-22 10:56:48,014 INFO ffcore.access access method=GET path=/readyz status=503 ms=90
+.2026-11-22 10:56:50,906 INFO ffcore.access access method=GET path=/readyz status=503 ms=102
+2026-11-22 10:56:50,976 INFO ffcore.access access method=GET path=/readyz status=200 ms=68
+.2026-11-22 10:56:59,034 INFO ffcore.access access method=GET path=/readyz status=503 ms=88
+2026-11-22 10:56:59,099 INFO ffcore.access access method=GET path=/readyz status=200 ms=61
+.2026-11-22 10:57:06,871 INFO ffcore.access access method=GET path=/readyz status=200 ms=87
+2026-11-22 10:57:06,932 INFO ffcore.access access method=GET path=/readyz status=200 ms=58
+.2026-11-22 10:57:09,733 INFO ffcore.access access method=GET path=/readyz status=503 ms=108
+
+RV P1: http=503 status=not_ready
+RV P1: ollama_context = {"code": null, "detail": "OLLAMA_CONTEXT_LENGTH=32768, largest needed context=16000", "name": "ollama_context", "status": "ok"}
+RV P1: ollama_runtime_context = {"code": "ollama_unreachable", "detail": "EgressDenied", "name": "ollama_runtime_context", "status": "failed"}
+.2026-11-22 10:57:17,838 INFO ffcore.access access method=GET path=/readyz status=200 ms=90
+
+RV P2: http=200 status=ready
+RV P2: ollama_context = {"code": null, "detail": "no active Ollama model with limits.context_window and no published agent on Ollama", "name": "ollama_context", "status": "skipped"}
+RV P2: ollama_runtime_context = {"code": null, "detail": "no active Ollama model with limits.context_window and no published agent on Ollama", "name": "ollama_runtime_context", "status": "skipped"}
+RV P2: skipped-with-NO_NEED = True
+.2026-11-22 10:57:25,729 INFO ffcore.access access method=GET path=/readyz status=503 ms=124
+
+RV P3: http=503 status=not_ready
+RV P3: ollama_context = {"code": "context_configuration_invalid", "detail": "OLLAMA_CONTEXT_LENGTH=32768, largest needed context=65536", "name": "ollama_context", "status": "failed"}
+RV P3: ollama_runtime_context = {"code": "ollama_unreachable", "detail": "EgressDenied", "name": "ollama_runtime_context", "status": "failed"}
+.
+20 passed in 115.35s (0:01:55)
