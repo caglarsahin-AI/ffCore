@@ -28,15 +28,23 @@ function json(body: unknown, status = 200) {
 const client = () => new QueryClient({ defaultOptions: { queries: { retry: false } } });
 type Call = [string, RequestInit | undefined];
 
-function serve(events: () => unknown[], memories: Record<string, ReturnType<typeof item>>) {
+const failure = (code: string, status: number) => json({ error: { code, type: "api_error", message: code } }, status);
+
+function serve(
+  events: () => unknown[],
+  memories: Record<string, ReturnType<typeof item>>,
+  fail: { byIds?: Response; remove?: Response } = {},
+) {
   const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
     const url = String(input);
     if (url === `${P}/runs/r1/events`) return json({ items: events() });
     if (url.startsWith(`${P}/memories?`) && (init?.method ?? "GET") === "GET") {
+      if (fail.byIds) return fail.byIds.clone();
       const ids = new URL(url, "http://x").searchParams.getAll("ids");
       return json({ items: ids.map((id) => memories[id]).filter(Boolean) });
     }
     if (init?.method === "DELETE" && url.startsWith(`${P}/memories/`)) {
+      if (fail.remove) return fail.remove.clone();
       delete memories[url.split("/").pop()!];
       return new Response(null, { status: 204 });
     }
@@ -130,5 +138,67 @@ describe("test_14_memory_notes", () => {
     await new Promise((r) => setTimeout(r, 100));
     expect(reads).toBe(1);
     expect(screen.queryByTestId("memory-noted-later")).toBeNull();
+  });
+
+  // 14-2 r1 MINOR-1 (K-14-0026): the card's error paths are on screen, and its count is the
+  // number of items still there (review probes P2, P3, P4).
+  it.each([
+    ["memory_not_owner", 403],
+    ["internal_error", 500],
+  ])("says, with the code, that the used items could not be read (P2: %s)", async (code, status) => {
+    serve(() => [BUDGET_ON, USED, DONE], {}, { byIds: failure(code, status) });
+    renderAs("user", "edit", <MemoryNotes projectId="p1" runId="r1" watch={false} />, client());
+    const line = await screen.findByTestId("memory-used-error");
+    expect(line.textContent).toContain(`(${code})`);
+    expect(screen.queryByTestId("memory-used")).toBeNull();
+  });
+
+  it("says, with the code, that a forget failed and keeps the item (P3)", async () => {
+    const memories = { m1: item("m1", "Tabloları TL cinsinden isterim.") };
+    serve(() => [BUDGET_ON, USED, DONE], memories, { remove: failure("internal_error", 500) });
+    renderAs("user", "edit", <MemoryNotes projectId="p1" runId="r1" watch={false} />, client());
+    const note = await screen.findByTestId("memory-used");
+    fireEvent.click(within(note).getByTestId("memory-used-toggle"));
+    await within(note).findByTestId("memory-used-item");
+    await act(async () => {
+      fireEvent.click(within(note).getByTestId("memory-forget"));
+    });
+    const alert = await within(note).findByRole("alert");
+    expect(alert.textContent).toContain("(internal_error)");
+    expect(within(note).getByTestId("memory-used-item")).toBeTruthy();
+  });
+
+  it("counts only the items still there after one is forgotten (P4)", async () => {
+    const memories = { m1: item("m1", "Tabloları TL cinsinden isterim."), m2: item("m2", "Raporları sabah ister.") };
+    const two = event(3, "memory_used", { items: [{ id: "m1", kind: "preference" }, { id: "m2", kind: "preference" }], dropped: [] });
+    serve(() => [BUDGET_ON, two, DONE], memories);
+    renderAs("user", "edit", <MemoryNotes projectId="p1" runId="r1" watch={false} />, client());
+    const note = await screen.findByTestId("memory-used");
+    await waitFor(() => expect(note.textContent).toContain("2 remembered items"));
+    fireEvent.click(within(note).getByTestId("memory-used-toggle"));
+    await waitFor(() => expect(within(note).getAllByTestId("memory-used-item")).toHaveLength(2));
+    await act(async () => {
+      fireEvent.click(within(note).getAllByTestId("memory-forget")[0]);
+    });
+    await waitFor(() => expect(within(note).getAllByTestId("memory-used-item")).toHaveLength(1));
+    expect(note.textContent).toContain("1 remembered item ");
+  });
+
+  it("says, with the code, that the noted items could not be read or deleted", async () => {
+    const noted = event(10, "progress", { memory_extraction: { candidates: 1, written: ["m2"], archived: [], rejected: {} } });
+    serve(() => [BUDGET_ON, DONE, noted], {}, { byIds: failure("internal_error", 500) });
+    renderAs("user", "edit", <MemoryNotes projectId="p1" runId="r1" watch pollMs={20} limitMs={5000} />, client());
+    expect((await screen.findByTestId("memory-noted-error")).textContent).toContain("(internal_error)");
+    cleanup();
+
+    const memories = { m2: item("m2", "Raporları sabah ister.") };
+    serve(() => [BUDGET_ON, DONE, noted], memories, { remove: failure("internal_error", 500) });
+    renderAs("user", "edit", <MemoryNotes projectId="p1" runId="r1" watch pollMs={20} limitMs={5000} />, client());
+    const line = await screen.findByTestId("memory-noted");
+    await act(async () => {
+      fireEvent.click(within(line).getByTestId("memory-noted-delete"));
+    });
+    expect((await within(line).findByTestId("memory-error")).textContent).toContain("(internal_error)");
+    expect(within(line).getByTestId("memory-noted-item")).toBeTruthy();
   });
 });
