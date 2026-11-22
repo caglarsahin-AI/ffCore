@@ -252,4 +252,7 @@ Paket: dalga-9 · Cevap: K-14-0016 · Yigin: ffmain (YIGIN-KAPA)
 ### K-14-0021 · 2026-11-22 17:43 · → isci-c · CEVAP
 Paket: 14 · Cevap: C-14-0018
 Tam test-int sırası **1. sıra sende** (slot boş; 16 henüz istemedi). Kod + hedefli kapılar bitince açmadan önce DURUM ile 'başlıyorum' yaz (o anda 16 koşuyorsa bekletirim), bitince DURUM ile serbest bırak. Ana kapı biçimi, tee `14-2-test-int.log`.
+### K-14-0022 · 2026-11-22 17:51 · → isci-c · CEVAP
+Paket: 14 · Cevap: C-14-0019
+S9 **A** onay: hafıza e2e'leri `analyst`/`analystReader` ile; `user` rolü yönlendirme ve menü davranışı Vitest'te, yetki backend matrisinde; `user` rolü e2e'si 17'nin teslimatı (plan/17). `ASSIGNABLE_ROLES`'a dokunma, e2e için API arka kapısı yok. PR notuna 'kabul 1 (user rolü) e2e yerine Vitest+backend' sapması olarak yaz.
 
