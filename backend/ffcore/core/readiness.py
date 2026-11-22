@@ -7,12 +7,14 @@ Checks:
   models          which models serve; FAKE_EMBED=1 is stated, never hidden
   embed_dim       chunks.embedding column size equals EMBED_DIM (P5)
   ollama_context  with INFERENCE_BACKEND=ollama: OLLAMA_CONTEXT_LENGTH is set and not below
-                  any active Ollama model's limits.context_tokens (C13); skipped, with the
-                  reason, when there is no Ollama model.
+                  the largest needed context (C13): every active Ollama model's
+                  limits.context_window (the key ModelLimits, the seed and the console write;
+                  FOLLOWUP-219) and every published agent's limits.context_tokens on an Ollama
+                  model (06a). Skipped, with the reason, when neither exists.
   ollama_runtime_context
                   (04b-2, FOLLOWUP-31) what Ollama really runs with: `/api/ps`
                   `models[].context_length` of each loaded model against the same largest
-                  context_tokens; smaller → context_configuration_invalid, the field missing →
+                  needed context; smaller → context_configuration_invalid, the field missing →
                   ollama_ps_unexpected (never a silent pass), no model loaded → skipped with the
                   model names. Written to Ollama's API documentation; not yet verified against the
                   pinned ollama 0.12.6 image (ENV-204).
@@ -21,8 +23,8 @@ Checks:
                   without REDIS_URL, failed when Redis does not answer (runs cannot start)
   ingest_queue    (04b-2, FOLLOWUP-86) jobs waiting in the ingest queue (arq, Redis); information
                   only, no threshold; skipped without REDIS_URL, failed when Redis does not answer
-06a extends ollama_context with published agents' limits.context_tokens on Ollama models: an
-install or seed change that would cut a published agent's budget is said here (C13).
+A model's own window is checked without any agent (FOLLOWUP-219); 06a's published agents add
+their budgets, so an install or seed change that would cut one is said here (C13).
 """
 
 import asyncio
@@ -108,7 +110,7 @@ async def _ollama_context_check(settings: Settings) -> ReadinessCheck:
             name="ollama_context",
             status="skipped",
             code=None,
-            detail="no active Ollama model with limits.context_tokens",
+            detail=NO_NEED,
         )
     configured = settings.ollama_context_length
     ok = configured is not None and configured >= max(needed)
@@ -116,13 +118,17 @@ async def _ollama_context_check(settings: Settings) -> ReadinessCheck:
         "ollama_context",
         ok,
         "context_configuration_invalid",
-        f"OLLAMA_CONTEXT_LENGTH={configured}, largest context_tokens={max(needed)}",
+        f"OLLAMA_CONTEXT_LENGTH={configured}, largest needed context={max(needed)}",
     )
 
 
+NO_NEED = "no active Ollama model with limits.context_window and no published agent on Ollama"
+
+
 async def _context_needs(settings: Settings):
-    """Active Ollama LLM models (provider id, encrypted config, model_id) and the context tokens
-    they must hold: models' limits.context_tokens and published agents' (06a)."""
+    """Active Ollama LLM models (provider id, encrypted config, model_id) and the context sizes
+    Ollama must hold: each model's limits.context_window (FOLLOWUP-219: ModelLimits has no
+    context_tokens, so an old key in a row is not counted) and published agents' budgets (06a)."""
     from ffcore.core import db
     from ffcore.models.catalog import Model, Provider
 
@@ -139,7 +145,7 @@ async def _context_needs(settings: Settings):
                 )
             )
         ).all()
-    needed = [int(r.limits["context_tokens"]) for r in rows if r.limits.get("context_tokens")]
+    needed = [int(r.limits["context_window"]) for r in rows if r.limits.get("context_window")]
     needed += await _published_agent_context(db, Model, Provider)
     return rows, needed
 
@@ -186,7 +192,7 @@ async def _ollama_runtime_check(settings: Settings) -> ReadinessCheck:
             name=name,
             status="skipped",
             code=None,
-            detail="no active Ollama model with limits.context_tokens",
+            detail=NO_NEED,
         )
     largest = max(needed)
     loaded, not_loaded = [], []
@@ -223,7 +229,7 @@ async def _ollama_runtime_check(settings: Settings) -> ReadinessCheck:
             detail=f"not loaded: {', '.join(not_loaded)}; checked once a request loads them",
         )
     small = [(m, c) for m, c in loaded if c < largest]
-    detail = ", ".join(f"{m}={c}" for m, c in loaded) + f"; largest context_tokens={largest}"
+    detail = ", ".join(f"{m}={c}" for m, c in loaded) + f"; largest needed context={largest}"
     if not_loaded:
         detail += f"; not loaded: {', '.join(not_loaded)}"
     return check(name, not small, "context_configuration_invalid", detail)
