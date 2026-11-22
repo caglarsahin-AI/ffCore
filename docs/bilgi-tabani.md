@@ -325,10 +325,12 @@ docker compose run --rm tools make models
 `GET /readyz` is 503 `warming` until both models are loaded (`model_missing` when a weight is
 not in the cache), then checks the `chunks.embedding`
 size against `EMBED_DIM`, the vector store, and (with `INFERENCE_BACKEND=ollama`) that
-`OLLAMA_CONTEXT_LENGTH` is set and not below any active Ollama model's `limits.context_tokens`
-(`context_configuration_invalid`). `ollama_runtime_context` (04b-2, FOLLOWUP-31) then asks
-Ollama's `/api/ps` what each loaded model really runs with (`context_length`): below the
-largest `context_tokens` is `context_configuration_invalid`, a missing field
+`OLLAMA_CONTEXT_LENGTH` is set and not below the largest needed context
+(`context_configuration_invalid`): every active Ollama model's `limits.context_window` (the
+console and seed field; checked without any agent, FOLLOWUP-219) and every published agent's
+`limits.context_tokens` on an Ollama model. `ollama_runtime_context` (04b-2, FOLLOWUP-31) then
+asks Ollama's `/api/ps` what each loaded model really runs with (`context_length`): below the
+same largest needed context is `context_configuration_invalid`, a missing field
 `ollama_ps_unexpected`, no answer `ollama_unreachable`; while no model is loaded the check
 is skipped and names them. **Not yet verified against the pinned ollama 0.12.6 image**
 (ENV-204): written to Ollama's API documentation and tested with a stand-in answer.

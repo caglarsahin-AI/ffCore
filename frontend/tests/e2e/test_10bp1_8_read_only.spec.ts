@@ -4,6 +4,7 @@ import type { Page } from "@playwright/test";
 import en from "../../messages/en.json";
 import { fixture } from "./fixtures";
 import { PDF, createKb, openKb, uploadViaApi, waitFinal } from "./knowledge";
+import { saveScreenshot } from "./screenshots";
 import { selectProject, signIn } from "./support";
 
 // Every change control of the two knowledge base screens.
@@ -41,7 +42,7 @@ test("test_10bp1_8_read_only: admin+read sees the same knowledge bases and docum
   await openKb(page, kb);
   await expect(page.getByTestId("upload-button")).toBeVisible();
   const editRows = await tableText(page);
-  await page.screenshot({ path: "../docs/images/10bp1-kb-detail-edit.png", fullPage: true });
+  await saveScreenshot(page, "10bp1-kb-detail-edit.png");
 
   const other = await browser.newContext({ baseURL });
   const readPage = await other.newPage();
@@ -57,7 +58,7 @@ test("test_10bp1_8_read_only: admin+read sees the same knowledge bases and docum
   await expect(
     readPage.getByTestId("document-SZL-2024-011_cihaz-bakim.pdf").getByRole("button", { name: en.Documents.delete }),
   ).toBeDisabled();
-  await readPage.screenshot({ path: "../docs/images/10bp1-kb-detail-read.png", fullPage: true });
+  await saveScreenshot(readPage, "10bp1-kb-detail-read.png");
 
   // Searching is reading: it stays available in read mode.
   await readPage.getByRole("tab", { name: en.KnowledgeBases.tabs.search }).click();

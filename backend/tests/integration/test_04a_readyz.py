@@ -61,7 +61,9 @@ def test_04a_17a_warmup_failure_is_reported(client_factory, ready_app, monkeypat
     assert _checks(response)["warmup"]["code"] == "warmup_failed"
 
 
-def _ollama_model(pg, project_id, context_tokens):
+def _ollama_model(pg, project_id, context_window, key="context_window"):
+    """An active Ollama LLM model; `limits.context_window` is its window (FOLLOWUP-219). `key`
+    writes another limits key straight into the row (the API cannot: ModelLimits is strict)."""
     provider = uuid.uuid4()
     pg.execute(
         "INSERT INTO providers (id, key, label, driver, domains, config_encrypted,"
@@ -74,7 +76,7 @@ def _ollama_model(pg, project_id, context_tokens):
         " capabilities, input_types, pricing, limits, upstream_api, request_policy, created_by)"
         " VALUES (%s, %s, 'chat-default', 'Chat', %s, 'llm', 'qwen3.5:35b', '{}', '{text}',"
         " '{}', %s, 'chat', '{}', 'test')",
-        (uuid.uuid4(), project_id, provider, json.dumps({"context_tokens": context_tokens})),
+        (uuid.uuid4(), project_id, provider, json.dumps({key: context_window})),
     )
 
 
@@ -87,7 +89,8 @@ def test_04a_17b_context_configuration_invalid(client_factory, ready_app, pg, ma
     none_yet = client.get("/readyz")
     assert _checks(none_yet)["ollama_context"]["status"] == "skipped"
 
-    _ollama_model(pg, make_project(), 16000)
+    project_id = make_project()
+    _ollama_model(pg, project_id, 16000)
     ready_app["settings"] = base.model_copy(update={"ollama_context_length": 8192})
     small = client.get("/readyz")
     assert small.status_code == 503
@@ -98,7 +101,30 @@ def test_04a_17b_context_configuration_invalid(client_factory, ready_app, pg, ma
     assert _checks(missing)["ollama_context"]["code"] == "context_configuration_invalid"
 
     ready_app["settings"] = base.model_copy(update={"ollama_context_length": 32768})
-    assert client.get("/readyz").status_code == 200
+    ok = client.get("/readyz")
+    assert ok.status_code == 200
+    assert "largest needed context=16000" in _checks(ok)["ollama_context"]["detail"]
+    pg.execute("UPDATE models SET is_active = false WHERE project_id = %s", (project_id,))
+
+
+def test_04a_17b_legacy_context_tokens_key_is_not_counted(
+    client_factory, ready_app, pg, make_project
+):
+    """FOLLOWUP-219 A (S5): a model's window is `limits.context_window` only. The old
+    `context_tokens` key (not writable through the API) is not a second path: it is not counted."""
+    asyncio.run(readiness.warmup(ready_app["settings"]))
+    project_id = make_project()
+    _ollama_model(pg, project_id, 900000, key="context_tokens")
+    ready_app["settings"] = ready_app["settings"].model_copy(
+        update={"inference_backend": "ollama", "ollama_context_length": 32768}
+    )
+    try:
+        response = client_factory().get("/readyz")
+        check = _checks(response)["ollama_context"]
+        assert check["status"] in ("ok", "skipped"), check
+        assert "900000" not in (check["detail"] or "")
+    finally:
+        pg.execute("UPDATE models SET is_active = false WHERE project_id = %s", (project_id,))
 
 
 def test_04a_17_embed_dim_column_mismatch(client_factory, ready_app):

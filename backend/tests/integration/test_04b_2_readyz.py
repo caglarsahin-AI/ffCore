@@ -1,6 +1,7 @@
 """04b-2 slice 6. S7 / FOLLOWUP-31 (K-04B-0021 S-c A, K-04B-0022): after the configuration check,
 /readyz asks Ollama's `/api/ps` what context each loaded model really runs with
-(`models[].context_length`). Smaller than the largest context_tokens → 503
+(`models[].context_length`). Smaller than the largest needed context (model
+`limits.context_window`, published agents' `context_tokens`; FOLLOWUP-219) → 503
 `context_configuration_invalid`; the field missing → `ollama_ps_unexpected` (no silent pass); no
 model loaded → skipped with a detail. The answer here is a stand-in: the field was not verified
 against the pinned ollama 0.12.6 image (ENV-204).
@@ -60,6 +61,19 @@ def test_04b_2_s7_smaller_runtime_context_is_503(
     assert small.status_code == 503
     check = _checks(small)["ollama_runtime_context"]
     assert check["code"] == "context_configuration_invalid" and "8192" in check["detail"]
+
+
+def test_04b_2_219_model_window_is_checked_without_an_agent(
+    client_factory, ready_app, monkeypatch, ollama_project
+):
+    """FOLLOWUP-219 A: no published agent; the model's own window (16000) is what Ollama must
+    hold, so a runtime context of 8192 is 503 and not skipped."""
+    _ollama(ready_app, monkeypatch, [{"name": MODEL, "context_length": 8192}])
+    small = client_factory().get("/readyz")
+    assert small.status_code == 503
+    check = _checks(small)["ollama_runtime_context"]
+    assert check["code"] == "context_configuration_invalid"
+    assert "largest needed context=16000" in check["detail"]
 
 
 def test_04b_2_s7_missing_field_is_an_error(client_factory, ready_app, monkeypatch, ollama_project):
@@ -125,7 +139,7 @@ def untagged_project(pg, make_project):
         " capabilities, input_types, pricing, limits, upstream_api, request_policy, created_by)"
         " VALUES (%s, %s, 'chat-untagged', 'Chat', %s, 'llm', 'llama3', '{}', '{text}',"
         " '{}', %s, 'chat', '{}', 'test')",
-        (uuid.uuid4(), project_id, provider, json.dumps({"context_tokens": 16000})),
+        (uuid.uuid4(), project_id, provider, json.dumps({"context_window": 16000})),
     )
     yield project_id
     pg.execute("UPDATE models SET is_active = false WHERE project_id = %s", (project_id,))

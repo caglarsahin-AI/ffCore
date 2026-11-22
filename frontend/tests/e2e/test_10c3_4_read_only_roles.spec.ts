@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test";
 
 import { fixture } from "./fixtures";
 import { SAMPLE_OPERATIONS, createSampleServer } from "./mcp";
+import { saveScreenshot } from "./screenshots";
 import { THEMES, selectProject, signIn, useTheme } from "./support";
 
 // 10c-3 kabul 4 (plan/10 salt-okunur mod, R10.5): the read user (superadmin, access read) sees the
@@ -53,7 +54,7 @@ for (const theme of THEMES) {
       await page.goto(`/mcp-servers/${server.id}`);
       await expect(page.getByTestId("mcp-operations")).toBeVisible();
       await expect(page.getByTestId("read-only-badge")).toHaveCount(mode === "read" ? 1 : 0);
-      await page.screenshot({ path: `../docs/images/10c3-mcp-server-${mode}-${theme}.png`, fullPage: true });
+      await saveScreenshot(page, `10c3-mcp-server-${mode}-${theme}.png`);
     }
   });
 }

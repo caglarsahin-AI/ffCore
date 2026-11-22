@@ -4,6 +4,7 @@ import type { Page } from "@playwright/test";
 
 import { publishedAgent } from "./chat";
 import { fixture } from "./fixtures";
+import { saveScreenshot } from "./screenshots";
 import { THEMES, selectProject, signIn, useTheme } from "./support";
 
 // 11: every chat screen in both themes, on a desktop and a phone width (brief 11 "mobil uyumlu"),
@@ -31,20 +32,20 @@ for (const theme of THEMES) {
       await page.goto("/chat");
       await expect(page.getByTestId("chat-no-project")).toBeVisible();
       await axe(page);
-      await page.screenshot({ path: `../docs/images/11-no-project-${theme}-${viewport.name}.png`, fullPage: true });
+      await saveScreenshot(page, `11-no-project-${theme}-${viewport.name}.png`);
 
       await selectProject(context, baseURL!, alpha.id);
       await page.goto("/chat");
       await expect(page.getByTestId("chat-agent").first()).toBeVisible();
       await axe(page);
-      await page.screenshot({ path: `../docs/images/11-agents-${theme}-${viewport.name}.png`, fullPage: true });
+      await saveScreenshot(page, `11-agents-${theme}-${viewport.name}.png`);
 
       await page.goto(`/chat/${agent.key}`);
       await page.getByTestId("chat-input").fill("Sözleşme süresi nedir?");
       await page.getByTestId("chat-send").click();
       await expect(page.getByTestId("chat-answer")).toHaveCount(1, { timeout: 120_000 });
       await axe(page);
-      await page.screenshot({ path: `../docs/images/11-chat-${theme}-${viewport.name}.png`, fullPage: true });
+      await saveScreenshot(page, `11-chat-${theme}-${viewport.name}.png`);
 
       if (viewport.name === "mobile") {
         // The conversation list is a sheet on a phone; the page never scrolls sideways.

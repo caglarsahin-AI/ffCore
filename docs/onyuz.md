@@ -413,13 +413,14 @@ Turkish samples are asked in Turkish. `--workers=1` keeps the waits stable on a 
 
 ```bash
 export ALLOWED_INTERNAL_HOSTS=litellm,langfuse-web,mcp-search,mcp-sql,ticket-desk,fake-llm FFCORE_VERSION=0.0.0-10bp2 BACKEND_PORT=18010 FRONTEND_PORT=13010
-docker compose -p 10bp2 --env-file .env.test --profile test up -d --wait --build
+docker compose -p 10bp2 --env-file .env.test --profile test up -d --wait --build --pull never
+docker compose -p 10bp2 --env-file .env.test --profile test --profile e2e up --build --pull never --no-start --no-deps e2e
 docker compose -p 10bp2 --env-file .env.test --profile tools run --rm --no-deps tools make seed-prompts
 printf 'dummy-not-secret-e2e-pw' | docker compose -p 10bp2 --env-file .env.test run --rm --no-deps -T backend python -m ffcore.cli create-superadmin --email e2e-admin@example.org --full-name "E2E Admin" --password-stdin
-docker compose -p 10bp2 --env-file .env.test --profile test --profile e2e run --rm e2e sh -c "npm ci --no-audit --no-fund && npx playwright test --grep @model-missing --workers=1"
+docker compose -p 10bp2 --env-file .env.test --profile test --profile e2e run --rm e2e npx playwright test --grep @model-missing --workers=1
 export FAKE_EMBED=1   # keep it set: `run e2e` recreates the backend from the shell's values
 docker compose -p 10bp2 --env-file .env.test --profile test up -d --wait backend worker
-docker compose -p 10bp2 --env-file .env.test --profile test --profile e2e run --rm e2e sh -c "npm ci --no-audit --no-fund && npx playwright test --grep-invert @model-missing --workers=1"
+docker compose -p 10bp2 --env-file .env.test --profile test --profile e2e run --rm e2e npx playwright test --grep-invert @model-missing --workers=1
 docker compose -p 10bp2 --env-file .env.test --profile test --profile e2e down -v
 ```
 
@@ -429,14 +430,34 @@ console on `localhost:3000` (the origin in `.env.test` `CONSOLE_ORIGINS`) and dr
 It also gets `LITELLM_URL` and `LITELLM_MASTER_KEY` (the `.env.test` test value) to read
 LiteLLM's `/model/info`; the key goes only in a header. CI runs the same commands. Playwright image: `mcr.microsoft.com/playwright:v1.64.1-noble`
 (`sha256:47b510dd9230bf0b9bfc9b20102241e577ea7a99334ab4c3ca19f19770e9b8ea`), matching
-`@playwright/test` 1.64.1, pinned in `deploy/docker-compose.yml`. Screenshots are written to
-`docs/images/<package>-<screen>-<theme>.png` (10a, 10bp1, 10mrk, 10bp2, 10c1).
+`@playwright/test` 1.64.1, pinned in `deploy/docker-compose.yml` (build argument
+`PLAYWRIGHT_IMAGE` of the `e2e` service).
+
+**Dependencies (FOLLOWUP-220).** The `e2e` service runs `ffcore/e2e:<FFCORE_VERSION>`, built from
+`frontend/Dockerfile.e2e`: the pinned Playwright image plus `npm ci` of
+`frontend/package-lock.json`. Build it once per stack and lock file with the second line of the
+sequence (`up --build --pull never --no-start --no-deps e2e`; never `docker compose build`, which
+reaches the registries for base image metadata). That build is the only step that downloads
+packages; the runs do not. The stack's `e2e_node_modules` volume is filled from the image when it
+is empty, also after `down -v`. When `package-lock.json` changes, the container stops with
+`e2e_deps_stale` instead of installing anything: rebuild the image as above and `down -v` (or
+remove the volume `<project>_e2e_node_modules`) so the volume is filled again.
+
+**Screenshots (FOLLOWUP-221).** The screenshot tests write only when `E2E_SCREENSHOT_DIR` is set
+(`frontend/tests/e2e/screenshots.ts`); empty, the default, writes nothing, so a run on the
+repository checkout (the `e2e` service mounts it at `/work`) never rewrites `docs/images`. To
+refresh the docs images on purpose: `export E2E_SCREENSHOT_DIR=../docs/images` before the
+`run` (an existing directory inside the container, relative to `/work/frontend`; a missing one
+fails the test). Prefer the relative value: Git Bash rewrites an absolute `/work/…` value into a
+Windows path (`C:/Program Files/Git/work/…`) unless `MSYS_NO_PATHCONV=1` is set. The images
+are `docs/images/<package>-<screen>-<theme>.png` (10a, 10bp1, 10mrk, 10bp2, 10c1, 10c2, 10c3,
+11). The main gate script needs no change: it does not set the variable, so the gate's e2e
+stage leaves the checkout's `docs/images` as it is.
 
 The exam tests (10c-1) need nothing more than the agent tests: Langfuse and the background
 worker's advancer are default services, fake-llm answers "hello", and each test adds its exam
-items from a completed run (from-run), so no `seed-eval` is needed. Without network access
-(`npm ci` cannot reach a registry), fill the stack's `e2e_node_modules` volume from an existing
-glibc `node_modules` volume and run `npx playwright test` instead of `npm ci && …`.
+items from a completed run (from-run), so no `seed-eval` is needed. Without network access the
+runs need nothing: the packages are in the `e2e` image (only its build needs the registry).
 
 ### MCP servers (10c-3): the fake upstream
 
@@ -452,7 +473,8 @@ fake (`test_10c3_1`, `test_10c3_3`) fail loudly.
 ```bash
 export ALLOWED_INTERNAL_HOSTS=litellm,langfuse-web,mcp-search,mcp-sql,ticket-desk,fake-llm,ffcore-10c3-e2e-upstream EGRESS_ALLOWLIST=superset.example.com FAKE_EMBED=1
 docker compose -p ffcore-10c3 --env-file .env.test --profile test up -d --wait --pull never
-docker compose -p ffcore-10c3 --env-file .env.test --profile test --profile e2e run --rm --name ffcore-10c3-e2e-upstream -e E2E_UPSTREAM_HOST=ffcore-10c3-e2e-upstream e2e sh -c "npx playwright test --grep-invert @model-missing --workers=1"
+docker compose -p ffcore-10c3 --env-file .env.test --profile test --profile e2e up --build --pull never --no-start --no-deps e2e
+docker compose -p ffcore-10c3 --env-file .env.test --profile test --profile e2e run --rm --name ffcore-10c3-e2e-upstream -e E2E_UPSTREAM_HOST=ffcore-10c3-e2e-upstream e2e npx playwright test --grep-invert @model-missing --workers=1
 ```
 
 ## Screenshots

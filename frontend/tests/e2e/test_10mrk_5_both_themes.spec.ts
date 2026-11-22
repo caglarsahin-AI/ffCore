@@ -2,6 +2,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
 import { expectLoaded } from "./brand";
+import { saveScreenshot } from "./screenshots";
 import { SCREENS, THEMES, openScreen, useTheme } from "./support";
 
 // The brand areas in both themes: sign-in (badge) and a console screen (sidebar logo).
@@ -15,7 +16,7 @@ for (const screen of BRAND_SCREENS) {
       await expectLoaded(page.getByTestId(screen.signedIn ? "sidebar-logo" : "login-brand-logo"));
       const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze();
       expect(results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target).join(" | ")}`)).toEqual([]);
-      await page.screenshot({ path: `../docs/images/10mrk-${screen.name}-${theme}.png`, fullPage: true });
+      await saveScreenshot(page, `10mrk-${screen.name}-${theme}.png`);
     });
   }
 }

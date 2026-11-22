@@ -4,6 +4,28 @@ Behaviour and configuration changes that a deployment or an API client notices, 
 (handbook/RELEASE_AND_ROLLBACK.md, CHANGE_CONTROL.md). Each entry names the package and what to do,
 if anything.
 
+## 2026-11-22 · followup-triage-2 · Readiness model window, e2e image and screenshots, hook comments
+
+- **What:** `/readyz` `ollama_context` and `ollama_runtime_context` read each active Ollama
+  model's `limits.context_window` (the field the console and the seed write) and check it even
+  when no agent is published; before, they read a `context_tokens` key models never carry and
+  were skipped without an agent (FOLLOWUP-219). Published agents' `limits.context_tokens` still
+  count. The detail text says `largest needed context=N`.
+- **Changed (tests and tooling, no API change):** the e2e service runs an image with the
+  frontend's `node_modules` built in (`frontend/Dockerfile.e2e`, `ffcore/e2e:<FFCORE_VERSION>`);
+  runs no longer call `npm ci` and do not reach the npm registry; a changed lock file stops the
+  run with `e2e_deps_stale` (FOLLOWUP-220). Screenshots are written only when
+  `E2E_SCREENSHOT_DIR` is set (FOLLOWUP-221). The agent hook reads `#` comments as comments and
+  checks commands behind `timeout` (FOLLOWUP-214).
+- **Action:** an install with `INFERENCE_BACKEND=ollama` whose `OLLAMA_CONTEXT_LENGTH` is below
+  an active Ollama model's `context_window` now gets 503 `context_configuration_invalid` from
+  `/readyz` (it was hidden before): raise `OLLAMA_CONTEXT_LENGTH` or lower the model's window in
+  the console. An active Ollama model with no published agent while Ollama does not answer now
+  gets 503 `ollama_unreachable` from `ollama_runtime_context` (it was `skipped`, 200 before):
+  start Ollama or deactivate the model. e2e: build the image once per stack
+  (`docker compose --profile e2e up --build --pull never --no-start --no-deps e2e`, docs/onyuz.md)
+  and drop `npm ci &&` from `run e2e` commands.
+
 ## 2026-11-21 · 11-2 · Chat approval, question, rating and portal settings
 
 - **What:** the chat (docs/chat.md) approves or rejects an action inline for a member with `edit`

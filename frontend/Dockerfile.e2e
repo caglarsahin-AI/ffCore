@@ -1,0 +1,14 @@
+# e2e image (FOLLOWUP-220): the pinned Playwright image plus this lock file's node_modules, so a
+# gate run never goes to the npm registry. Built only through compose, never on its own:
+#   docker compose --profile e2e up --build --pull never --no-start --no-deps e2e
+# The base image (digest pinned) is the build argument PLAYWRIGHT_IMAGE in deploy/docker-compose.yml.
+# The stack's empty e2e_node_modules volume is filled from /work/frontend/node_modules of this
+# image when it is first mounted (also after `down -v`); the checkout's lock file must match the
+# one installed here, otherwise the container stops with an error (no silent `npm ci`).
+ARG PLAYWRIGHT_IMAGE
+FROM ${PLAYWRIGHT_IMAGE}
+WORKDIR /work/frontend
+COPY package.json package-lock.json ./
+RUN npm ci --no-audit --no-fund && cp package-lock.json node_modules/.ffcore-e2e-lock
+ENTRYPOINT ["sh", "-c", "if ! cmp -s package-lock.json node_modules/.ffcore-e2e-lock; then echo 'e2e_deps_stale: frontend/package-lock.json differs from the e2e image (or the e2e_node_modules volume predates it). Rebuild: docker compose --profile e2e up --build --pull never --no-start --no-deps e2e, then down -v (docs/onyuz.md).' >&2; exit 1; fi; exec \"$@\"", "e2e"]
+CMD ["npm", "run", "test:e2e"]

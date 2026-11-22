@@ -560,19 +560,29 @@ services:
     # Console acceptance tests against this stack (10a-binding, K-10ab-0004). Builds and serves the
     # console itself on localhost:3000 (= CONSOLE_ORIGINS) and drives Chromium; host needs no Node.
     # Call: docker compose --profile e2e run --rm e2e   (docs/onyuz.md has the full sequence)
-    # Image = @playwright/test version in frontend/package.json; digest pinned, 12 mirrors it.
-    image: ${REGISTRY_PREFIX}mcr.microsoft.com/playwright@sha256:47b510dd9230bf0b9bfc9b20102241e577ea7a99334ab4c3ca19f19770e9b8ea
+    # FOLLOWUP-220: node_modules are a layer of this image (frontend/Dockerfile.e2e), built once
+    # per lock file with `up --build --pull never --no-start --no-deps e2e`; no run reaches npm.
+    # Base = @playwright/test version in frontend/package.json; digest pinned, 12 mirrors it.
+    image: ${REGISTRY_PREFIX}ffcore/e2e:${FFCORE_VERSION:?FFCORE_VERSION tanımlı değil}
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.e2e
+      args:
+        PLAYWRIGHT_IMAGE: ${REGISTRY_PREFIX}mcr.microsoft.com/playwright@sha256:47b510dd9230bf0b9bfc9b20102241e577ea7a99334ab4c3ca19f19770e9b8ea
     profiles: ["e2e"]
     ipc: host
     working_dir: /work/frontend
-    command: ["sh", "-c", "npm ci --no-audit --no-fund && npm run test:e2e"]
+    command: ["npm", "run", "test:e2e"]
     volumes:
       - .:/work
-      # glibc node_modules, kept apart from the alpine (musl) ones of the frontend image.
+      # glibc node_modules, kept apart from the alpine (musl) ones of the frontend image. Empty
+      # (first run, or after `down -v`) it is filled from the image; the image checks the lock.
       - e2e_node_modules:/work/frontend/node_modules
     environment:
       FFCORE_BACKEND_URL: http://backend:8000
       NEXT_TELEMETRY_DISABLED: "1"
+      # FOLLOWUP-221: screenshots are written only when set (docs images: /work/docs/images).
+      E2E_SCREENSHOT_DIR: ${E2E_SCREENSHOT_DIR:-}
       # 10a-forms (K-10af-0002 D2): tests read LiteLLM's /model/info to prove a model added in the
       # console reaches the gateway. Test value from .env.test, sent only as a header.
       LITELLM_URL: http://litellm:4000
