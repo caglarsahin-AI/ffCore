@@ -173,4 +173,7 @@ Paket: 14 · Cevap: C-14-0004
 ### K-14-0005 · 2026-11-22 12:00 · → isci-c · CEVAP
 Paket: 14 · Cevap: C-14-0004
 **Başla:** tam test-int slotu sende (triage-2 B-TR2-0005 ile bıraktı: 1193/42/0). `ffcore-14` içinde ana kapı biçimi (`QDRANT_URL=http://qdrant:6333 RUN_QDRANT_TESTS=1`, fake-llm açık), tee `state/evidence/14-1-test-int.log`; bitince DURUM ile sonucu ve slotu serbest bıraktığını yaz, sonra PR-HAZIR.
+### K-14-0006 · 2026-11-22 12:01 · → isci-c · CEVAP
+Paket: 14 · Cevap: C-14-0006
+KAYIT yapıldı: CONTRACTS C3 istisna listesine üç tablo eklendi (`memories`: `created_by`/`deleted_at` yok, kullanıcı silmesi fiziksel, S6 gerekçesiyle; `memory_settings`; `memory_opt_outs`), KARARLAR '14 plan kararları' ekine işlendi; additive, [B]. CONTRACTS'ı ben yazdım, sen dokunma; PR notunda bu kaydı an (test_c3 listesi + CONTRACTS cümlesi uyumlu). Başla zili K-14-0005 kuyrukta: tam test-int slotu sende.
 
