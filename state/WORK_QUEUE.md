@@ -76,18 +76,18 @@ Bu tablo yalnız durumdur (bağlam bütçesi kararı, 16 Kasım 2026). Tam satı
 
 | Paket | Durum | Bağımlılık / not |
 |---|---|---|
-| 03c | CLAIMED (üstteki PoC sonrası satırı) | 03b; 06b ile birlikte (API key, kota, usage, retention, uyarılar, bildirim) |
+| 03c | DONE (dalga 6, 17 Kasım 2026) | 03b; 06b ile birlikte (API key, kota, usage, retention, uyarılar, bildirim) |
 | 11 | DONE 2026-11-21 (dalga 8) | 06a, 07; kendi `/chat` ekranı (DECISION-193 A) |
-| 08 tam | — | 08-lite; Türkçe NER, injection, akış tamponlayıcı, PRSIM ingest guard'ı |
-| 06b | — | 06a, 03c (facade, dış agent, manifest) |
+| 08 tam | DONE (dalga 6, 17 Kasım 2026; 1a-1c) | 08-lite; Türkçe NER, injection, akış tamponlayıcı, PRSIM ingest guard'ı |
+| 06b | DONE (dalga 6, 17 Kasım 2026) | 06a, 03c (facade, dış agent, manifest) |
 | fix/06a-egress-all-messages | MERGED | A (yeni oturum) | fix/06a-egress-all-messages (silindi) | (kaldırıldı 2026-11-02 11:40) | backend/ffcore/runtime/graph.py (llm_call sınırı), guardrails çağrı yeri, tests/ | 2026-11-01 | | BLOCKERS 134; GOREV K-134-0001; 06b merge'ünden ÖNCE; danışman görüşü; PR-HAZIR (kısmi) A-134-0002 b9eefe3; r1 kod turu R-134-0002 KOD-ONAY (ön), MINOR 3 (tool_calls.arguments egress dışı; guard_in çift denetim; str olmayan content sessiz, TextTooLong generic) → DUZELT K-134-0003; nihai ONAY yığınlı turda ((e)/(f), test-int iki profil); DUZELT uygulandı 3d03bc9; PR-HAZIR A-134-0004 10e86bf0d54215e2783ed304e6af712798666858 (baz 07dc421, 3 commit, 6 dosya +469/-11, main ile çakışma yok, koordinatör doğruladı); kanıt tam tee state/evidence/134-*-20261102.log: make test 745/745 iki profil, test-int 682 + 4 atlandı, sağlayıcı isteği testi (fake-llm /_requests) kırmızı→yeşil; REVIEW-ISTEK r2 K-134-0006; r2 ONAY R-134-0004 (MINOR-4 → FOLLOWUP-139); merge d274bc9 (2 Kasım 11:19); **tam kapı yeşil** (state/evidence/gate-134-20261102.log, tam tee): build, compose config, up, lint 0, alembic heads tek (57_0002), make test 745/745 iki profil, test-samples, test-int 682 + 4 atlandı, smoke passed, önyüz lint/tsc/check:api 0, down -v; BLOCKERS 134 kapandı |
-| 06b-2 | — | 06b merge (dış agent: external_config, SafeOutboundClient, SSRF matrisi; KARARLAR "06b S5 ... 06b-2") |
-| 04b | — | 04a (DuckDB → Postgres göçü DEBT-1, migrate-vectors) |
-| 05b | — | 05a |
-| 09 | — | 06a, 02, 04a, 13a (Langfuse datasets) |
-| 10c | — | 03c, 05b, 09 |
-| 12 | — | hepsi |
-| 14 | GOREV 2026-11-22 (dalga 9) | 03, 04a, 06a, 08, 11, 13a; isci-c |
+| 06b-2 | DONE (dalga 6, 17 Kasım 2026) | 06b merge (dış agent: external_config, SafeOutboundClient, SSRF matrisi; KARARLAR "06b S5 ... 06b-2") |
+| 04b | DONE (dalga 6b, 19 Kasım 2026; 04b-1 + 04b-2) | 04a (DuckDB → Postgres göçü DEBT-1, migrate-vectors) |
+| 05b | DONE (dalga 6b, 19 Kasım 2026) | 05a |
+| 09 | DONE (dalga 6, 17 Kasım 2026; 09-1 + 09-2) | 06a, 02, 04a, 13a (Langfuse datasets) |
+| 10c | DONE (10c-1 dalga 6; 10c-2/10c-3 dalga 6b, 19 Kasım 2026) | 03c, 05b, 09 |
+| 12 | DONE (dalga 7, 20 Kasım 2026; 12-1 + 12-2; PENDING_ENV kalemleri kullanıcı donanımı) | hepsi |
+| 14 | IN PROGRESS (dalga 9; 14-1 r2 teyitte, 14-2 sırada) | 03, 04a, 06a, 08, 11, 13a; isci-c |
 | 17 | — | 03, 11 (brief M6 sonrası yazılır) |
 | 16 | — | 03, 04a, 05a |
 | 15 | — | 06a, 07, 11; Slack/Teams: 17 |
