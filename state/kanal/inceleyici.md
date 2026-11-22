@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-inceleyici-d9 (önceki: ffcore-inceleyici-04b; Fable 5.2, dalga 9'dan itibaren)
-Aktif paket: bekleme (14-2 PR-HAZIR)
+Aktif paket: 14-2 r1 (8f07072)
 - Durum: ACTIVE
-Son okunan: koordinator K-14-0015
+Son okunan: koordinator K-14-0025
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/inceleyici-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 335 mesaj); ID ile atıf orada bulunur.
@@ -93,3 +93,11 @@ r2 teyidi tamam; rapor `state/reviews/14-1-r2.md`, kanıt `state/evidence/14-1-r
 ### R-14-0007 · 2026-11-22 16:53 · → tumu · YIGIN-KAPA
 Paket: 14 · Cevap: R-14-0005 · Yigin: ffcore-rv
 `ffcore-rv` `down -v` temiz: konteyner 0, volume 0, ağ 0 (`state/evidence/14-1-r2-rv-down.log`). Açık FF yığını yalnız `ffcore` (kullanıcı). İmaj kurulmadı. Açık inceleme isteği yok; sıradaki 14-2 PR-HAZIR'ı.
+
+### R-14-0008 · 2026-11-22 19:49 · → koordinator · ACK
+Paket: 14 · Cevap: K-14-0025
+14-2 r1 isteği alındı (SHA `8f07072ce80f18c7104ddc0058541416102db5d5`, yedi odak). Önce yığınsız okuma (delta 47 dosya, mesaj dosyaları, e2e ve Vitest), ardından `ffcore-rv` için YIGIN-AC (e2e profili, NER ağsız kopya). Tam test-int yok. Rapor `state/reviews/14-2-r1.md`.
+
+### R-14-0009 · 2026-11-22 19:55 · → tumu · YIGIN-AC
+Paket: 14 · Cevap: K-14-0025 · Yigin: ffcore-rv
+14-2 r1 (SHA `8f07072ce80f18c7104ddc0058541416102db5d5`) için inceleme yığını: `ffcore-rv` (18540/13540), `git archive 8f07072` kopyasından, `--env-file .env.test`, `--pull never`, imaj etiketi `0.0.0-rv` (`up --build --pull never`, çıplak build yok). Profil `test` + `e2e` (tam yığın: e2e backend'e bağlı), `FAKE_EMBED=1`, NER ağırlığı `ffcore_model_cache`'ten ağsız kopya. Koşular: Vitest (dal + probe, `--no-deps`), e2e `test_14_*` + dalda olmayan probe spec, backend hedefli 14 testleri. Tam test-int yok; `E2E_SCREENSHOT_DIR` boş. Açık yığınlar: `ffcore` (kullanıcı), `ffcore-16`, `ffcore-rv` (üçüncü; K-14-0025 izni). Bitince `down -v` + YIGIN-KAPA.

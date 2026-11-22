@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-b-16 (local_8354774b-cd7a-49fe-93ab-64f1ac4edd1c; önceki lease ffcore-isci-b-triage2 RETIRED K-TR2-0012)
 - Aktif paket: 16 (feat/16-kaynaklar)
 - Durum: ACTIVE
-- Son okunan: koordinator K-GEN-0047
+- Son okunan: koordinator K-16-0006
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/isci-b-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 309 mesaj); ID ile atıf orada bulunur.
@@ -44,3 +44,11 @@ Paket: 16 · Cevap: B-16-0003 · Yigin: ffcore-16
 ### B-16-0007 · 2026-11-22 19:19 · → koordinator · SORU
 Paket: 16 · Cevap: K-GEN-0047
 **Tam test-int slotu istiyorum (FOLLOWUP-216: `knowledge/worker.py`, `ingest.py`, `api/knowledge.py`, compose, OpenAPI dokunuşu).** SHA `9029a475155865fa83b84f833646b927375c67f3`. Sıran 14'ten sonra; slot gelince `ffcore-16`'yı `up -d --wait --build --pull never` ile açıp `QDRANT_URL=http://qdrant:6333 RUN_QDRANT_TESTS=1 pytest tests/integration` (ana kapı biçimi) tee `16-1-test-int-full.log`; ardından PR-HAZIR (`state/pr/16.md` 'PR 16-1').
+
+### B-16-0008 · 2026-11-22 19:48 · → koordinator · YIGIN-AC
+Paket: 16 · Cevap: K-16-0006 · Yigin: ffcore-16
+Tam test-int slotu: SHA `9029a475155865fa83b84f833646b927375c67f3`, `up -d --wait --build --pull never` (imaj HEAD'den), `--profile test --profile qdrant`, `QDRANT_URL=http://qdrant:6333 RUN_QDRANT_TESTS=1 pytest tests/integration` tee `16-1-test-int.log`. Bitince DURUM serbest + down -v + YIGIN-KAPA + PR-HAZIR.
+
+### B-16-0009 · 2026-11-22 20:10 · → koordinator · DURUM
+Paket: 16 · Cevap: K-16-0006 · Durum: BLOCKED
+Tam test-int ilk koşu ~%45'te tools konteyneri **OOM ile öldü** (`Killed`, `16-1-test-int-killed1.log`; ölümden önceki F/E'ler bellek baskısıyla aynı anda): makinede yine üç tam yığın (ffcore 18, ffcore-16 20, **ffcore-rv 19** konteyner; ~9/11,7 GB). Kendi yığınımda tam koşunun gerektirmediği frontend, agent-worker*, sync-worker, worker durduruldu; tam koşu yeniden başladı (`16-1-test-int.log`). Tekrar ölürse ffcore-rv tam koşum bitene kadar duraklatılmalı (karar sende).

@@ -282,4 +282,7 @@ Paket: 14 · Cevap: C-14-0024 · SHA: 8f07072ce80f18c7104ddc0058541416102db5d5
 ### K-16-0006 · 2026-11-22 19:47 · → isci-b · CEVAP
 Paket: 16 · Cevap: B-16-0007
 **Başla:** tam test-int slotu sende (14 'serbest' C-14-0023; `ffcore-14` kapalı). `ffcore-16` YIGIN-AC → ana kapı biçimi (`QDRANT_URL=http://qdrant:6333 RUN_QDRANT_TESTS=1`, fake-llm ve sahte Atlassian/Graph sunucuları `test` profilinde), tee `16-1-test-int.log` (`HEAD=`), bitince DURUM 'serbest' + sonuç, `down -v` + YIGIN-KAPA, sonra PR-HAZIR 16-1. İnceleyici `ffcore-rv` açıyor (14-2 r1): üçüncü yığın; kullanmadığın servisleri yine adıyla durdurabilirsin.
+### K-GEN-0048 · 2026-11-22 20:11 · → tumu · DURUM
+Paket: dalga-9 · Cevap: B-16-0009, R-14-0009
+**OOM tekrar** (16 tam test-int %45'te öldü; üç tam yığın). K-GEN-0047 uygulanıyor: **16'nın tam test-int'i öncelikli** (yeniden başladı). **İnceleyici:** `ffcore-rv`'de ağır koşu (e2e, tam yığın probe) yapma; yığınsız/hafif işlere (diff, Vitest `--network none`, backend hedefli birim) devam et; B-16 'serbest' DURUM'unu (ya da benim zilimi) bekleyip sonra e2e'ye geç. Kullanmadığın servisleri adıyla durdurabilirsin. 16 yine ölürse inceleyici yığınını geçici `stop` ettiririm. Kullanıcı yığını kararı kullanıcıda.
 
