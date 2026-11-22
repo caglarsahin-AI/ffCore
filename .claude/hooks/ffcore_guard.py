@@ -30,6 +30,7 @@ import shlex
 import sys
 from collections.abc import Mapping
 from pathlib import Path
+from typing import NamedTuple
 
 KNOWN_ROLES = frozenset(
     {"koordinator", "inceleyici", "isci-a", "isci-b", "isci-c", "isci-d", "test", "sekreter"}
@@ -991,34 +992,60 @@ def heredoc_reader(line: str, m: re.Match) -> str:
     return "code" if reader in INTERPRETERS else "data"
 
 
-COMMENT_AFTER = " \t;&|()"
+COMMENT_AFTER = " \t;&|()<>"
 
 
-def unquoted_heredocs(line: str, quote: str | None) -> tuple[list[re.Match], str | None, int]:
-    """Heredoc operators of `line` that stand outside quotes, the quote still open at the end
-    of the line and where an unquoted `#` comment starts (len(line) without one). `quote` is the
-    quote open from earlier lines (a multi-line `sh -c '…'`): a `<<EOF` inside it belongs to the
-    inner shell, which is checked on its own (r2). A comment is a `#` at a word start outside
-    quotes (not `$#`, `${#x}`, `a#b`); its text is not shell, so an apostrophe in it
-    (`# don't`) opens no quote (FOLLOWUP-214)."""
+class LineState(NamedTuple):
+    """What one line leaves open for the next: the quote, the `${` depth and, after a trailing
+    unquoted `\\`, the character before that backslash (the next line is glued to it)."""
+
+    quote: str | None = None
+    braces: int = 0
+    glued_to: str | None = None
+
+
+def unquoted_heredocs(line: str, state: LineState) -> tuple[list[re.Match], LineState, int]:
+    """Heredoc operators of `line` that stand outside quotes, the state open at the end of the
+    line and where an unquoted `#` comment starts (len(line) without one). An open quote from
+    earlier lines (a multi-line `sh -c '…'`): a `<<EOF` inside it belongs to the inner shell,
+    which is checked on its own (r2). A comment is a `#` at a word start outside quotes, as bash
+    reads it (FOLLOWUP-214, triage-2 r2): after a blank or an operator character, not after an
+    escaped one (`foo\\ #x`), not inside `${…}` (`${a/ #x/y}`) and not where a trailing `\\`
+    glued the line to the end of a word (`foo\\`⏎`#bar`). Its text is not shell, so an
+    apostrophe in it (`# don't`) opens no quote."""
+    quote, braces, glued_to = state
     open_at: list[str | None] = []
     escaped = False
+    word_start = glued_to is None or glued_to in COMMENT_AFTER
     cut = len(line)
     for i, ch in enumerate(line):
         open_at.append(quote)
+        at_word_start = word_start
+        word_start = False
         if escaped:
             escaped = False
         elif ch == "\\" and quote != "'":
             escaped = True
-        elif quote is None and ch == "#" and (i == 0 or line[i - 1] in COMMENT_AFTER):
+        elif quote is None and braces == 0 and ch == "#" and at_word_start:
             cut = i
             break
         elif quote is None and ch in ("'", '"'):
             quote = ch
         elif ch == quote:
             quote = None
+        elif quote is None and ch == "{" and i > 0 and line[i - 1] == "$":
+            braces += 1
+        elif quote is None and ch == "}" and braces:
+            braces -= 1
+        elif quote is None and ch in COMMENT_AFTER:
+            word_start = True
+    glued_to = None
+    if escaped and cut == len(line):
+        # The trailing `\` joins the next line to what stood before it: a blank or an operator
+        # (the next line starts a word) or a word (it goes on).
+        glued_to = " " if at_word_start else "w"
     matches = [m for m in HEREDOC_RE.finditer(line[:cut]) if open_at[m.start()] is None]
-    return matches, quote, cut
+    return matches, LineState(quote, braces, glued_to), cut
 
 
 def strip_heredocs(command: str) -> tuple[str, list[str]]:
@@ -1031,12 +1058,12 @@ def strip_heredocs(command: str) -> tuple[str, list[str]]:
     out: list[str] = []
     code: list[str] = []
     i = 0
-    quote: str | None = None
+    state = LineState()
     while i < len(lines):
         line = lines[i]
         out.append(line)
         i += 1
-        matches, quote, _ = unquoted_heredocs(line, quote)
+        matches, state, _ = unquoted_heredocs(line, state)
         for m in matches:
             kind = heredoc_reader(line, m)
             body: list[str] = []
@@ -1069,9 +1096,9 @@ def heredoc_commands(command: str) -> tuple[str, list[tuple[bool, str]]]:
     out: list[str] = []
     bodies: list[tuple[bool, str]] = []
     i = 0
-    quote: str | None = None
+    state = LineState()
     while i < len(lines):
-        matches, quote, cut = unquoted_heredocs(lines[i], quote)
+        matches, state, cut = unquoted_heredocs(lines[i], state)
         line = lines[i][:cut]  # a comment is not shell text (FOLLOWUP-214)
         out.append(line)
         i += 1
