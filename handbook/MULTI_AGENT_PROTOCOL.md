@@ -32,7 +32,7 @@ Aynı dosya ya da glob iki aktif claim'de olamaz. Çakışmada:
 | 07 | `backend/app/api/approvals*`, runtime interrupt entegrasyonu |
 | 08 | `backend/app/guardrails/` |
 | 09 | `backend/app/evaluation/` |
-| 10a / 10b-poc / 10c / 11 | `frontend/app/(console)/{auth,projects,providers,models}` / `{knowledge,tools,agents,runs,approvals,status}` / `{dashboards,mcp,keys,quotas,alerts,retention,usage}` / `frontend/app/(chat)/`. `(console)/channels` 15'in, `(console)/sources` 16'nın, `(console)/memory` 14'ün |
+| 10a / 10b-poc / 10c / 11 | `frontend/app/(console)/{auth,projects,providers,models}` / `{knowledge,tools,agents,runs,approvals,status}` / `{dashboards,mcp,keys,quotas,alerts,retention,usage}` / `frontend/app/(chat)/`. `(console)/channels` 15'in, `(console)/sources` 16'nın; 14: `(chat)/memory` (Hafızam; `/chat/<agent>` ile çakışmasın diye `/memory`) + `(console)/settings` Hafıza bölümü ve agent sihirbazı Hafıza sekmesi (22 Kasım 2026, K-14-0020) |
 | 12 | `deploy/offline/`, `docs/kurulum*`, `docs/donanim.md` |
 | 13a / 13b | `data/samples/` (sentetik veri, test setleri) / `tests/e2e/`, `Makefile` seed/e2e/eval hedefleri, `docs/demo.md` |
 | 14 | `backend/app/memory/`, chat ekranı hafıza paneli |
