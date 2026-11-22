@@ -1,0 +1,4 @@
+$ FFCORE_VERSION=0.0.0-14 BACKEND_PORT=18140 FRONTEND_PORT=13140 docker compose -p ffcore-14 --env-file .env.test --profile test run --rm -T tools sh -c 'cd backend && pytest tests/integration/test_08t_c17_facade_direct.py -q -p no:cacheprovider 2>&1 | grep -E "^E |passed|failed|error" | head -20'
+HEAD=0b1363d8023c38f032b90c911f4def122621ceaf (uncommitted files: 16)
+date=2026-11-22T15:26:58+03:00
+4 passed in 29.82s

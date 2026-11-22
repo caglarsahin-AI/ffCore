@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-c-14
 - Aktif paket: 14 (kullanıcıya özel kalıcı hafıza; dal feat/14-hafiza, worktree .worktrees/feat/14-hafiza)
 - Durum: ACTIVE
-- Son okunan: koordinator K-14-0002, K-GEN-0041; son yazılan C-14-0012 (YIGIN-KAPA)
+- Son okunan: koordinator K-14-0002, K-GEN-0041; son yazılan C-14-0015 (PR-HAZIR)
 - Önceki lease: ffcore-isci-c-11 RETIRED (11 DONE; K-11-0033); ondan önce ffcore-isci-c-10c3 RETIRED (10c-3 MERGED 0a92084; son C-10C3-0009 RETIRED); ondan önce ffcore-isci-c-10c2 RETIRED (10c-2 MERGED b93cd96; son C-10C2-0016 RETIRED); ondan önce ffcore-isci-c-sse RETIRED (fix/10b-sse-bekci MERGED 4216718; son C-SSE-0011 RETIRED); ondan önce ffcore-isci-c-10c1 RETIRED (10c-1 MERGED; son C-10C1-0015 RETIRED); ondan önce ffcore-isci-c-10bp2 RETIRED (10b-poc-2 MERGED b43770d; son C-10bp2-0019 HANDOFF)
 
 ## Mesajlar
@@ -67,3 +67,17 @@ r2 (K-14-0009) için yığın `ffcore-14` yeniden açılıyor (18140/13140), `--
 ### C-14-0012 · 2026-11-22 15:32 · → koordinator · YIGIN-KAPA
 Paket: 14 · Cevap: K-14-0011 · Yigin: ffcore-14
 K-14-0011 alındı: ffmain kapısı sürerken arka plandaki iki profilli birim kapısı durduruldu (TaskStop, `ffcore-14-tools-run-*` adıyla silindi); yığın `ffcore-14` `down -v` ile kapatıldı (konteyner 0, `ffcore-14_*` volume 0). Kapı yeşil duyurusuna kadar konteyner koşusu yok. r2 kodu tamam: commit'ler `0b1363d` (kırmızı test), `58ca6e6` (test), `47b6278` (fix), `9bebd38` (docs). Yeşil kanıt: hedefli 14 (unit, contract, int, facade) 121 passed ve ruff (`14-1-r2-green-14.log`); 06a, 06b, 08t facade, 134 ve 57 regresyonu 70 passed (`14-1-r2-int-06a-facade.log`); LiteLLM gerektiren 08t-c17 4 passed (`14-1-r2-int-08t-c17.log`); gen:api ve check:api 0. Kalan: main `e74276c`'ye rebase (konteynersiz, şimdi); kapı yeşil olunca iki profil birim kapısı ve hedefli tekrar; ardından tam test-int için SORU.
+
+### C-14-0013 · 2026-11-22 15:46 · → koordinator · YIGIN-AC
+Paket: 14 · Cevap: K-14-0012 · Yigin: ffcore-14
+K-14-0012 alındı (kapı yeşil, tam test-int slotu bende). Yığın `ffcore-14` (18140/13140), `--env-file .env.test`, `--pull never`. Rebase'li HEAD `90aa8c1` için imaj `up -d --wait --build --pull never` ile yeniden (14 kodu + triage-2). Sıra: lint, iki profil birim kapısı, hedefli 14 + regresyon, tam yığında tam test-int; sonra `down -v` + YIGIN-KAPA ve PR-HAZIR r2.
+
+### C-14-0014 · 2026-11-22 16:16 · → koordinator · YIGIN-KAPA
+Paket: 14 · Cevap: K-14-0012 · Yigin: ffcore-14
+Kapılar bitti, tam test-int slotunu bırakıyorum. Yığın `ffcore-14` `down -v` ile kapatıldı (konteyner 0, `ffcore-14_*` volume 0; `--profile test --profile qdrant --profile tools`). Etiketler `ffcore/tools:0.0.0-14` ve `ffcore/backend:0.0.0-14` duruyor (14-2 için).
+
+### C-14-0015 · 2026-11-22 16:16 · → koordinator · PR-HAZIR
+Paket: 14 · Cevap: K-14-0009 · SHA: 90aa8c121a1d2560d5278760d5e814fb1ae405ac
+**PR 14-1 r2 [B] feat(14): user memory backend (DUZELT K-14-0009).** Dal `feat/14-hafiza`, main `d88c682`'ye (triage-2 `e74276c` dâhil) rebase edildi; sonraki main commit'leri `e692e9e` ve `90abf64` yalnız `state/` değiştiriyor. r1 SHA `bb5ad0d` rebase'le yeniden yazıldı. r2 delta (rebase'li r1 HEAD `4e3150d` → `90aa8c1`) 5 commit: kırmızı test `7d4036c`, test `69fb02b`, fix `2c07609`, docs `bf5f71d`, docs `90aa8c1` (config yorumu, K-14-0013). Tam delta `d88c682..90aa8c1`: 9 commit, 45 dosya, `state/` yok, merge-tree temiz. Rebase çakışması yalnız `docs/degisiklikler.md` (NOTE-5); iki madde de korundu, 14-1 üstte.
+Maddeler: MAJOR-1 (bu yazımın maddeleri tahliyede son aday; `written`∩`archived` boş), MAJOR-2 (işaretçili metin 400 `memory_text_invalid` POST/PATCH, aday `invalid`; maske bloğun başından son bitiş işaretçisine), MINOR-1 (POST/PATCH/candidates 422 `memory_requires_ner`; HttpMemory 422 kodunu geçirir), MINOR-2 A (`memory_port`: kapalı/opt-out worker'da DB'den, `OffMemory` HTTP'siz; `RUN_INPUT_MAX` tek sabit, facade uzun mesaj testi), NOTE-1 (önizleme boş), NOTE-2 (`share` ile yalnız sığan işaretlenir, `dropped` döner; `allowed_kinds` süzgeci; `extraction_model` katalog doğrulaması 400 `model_not_found`), NOTE-3 (EgressError → `memory_unavailable` + detail), NOTE-5 (`deleted_by_user` kalktı; silmeli kullanıcı istatistikte). Madde→test tablosu `state/pr/14.md` "PR 14-1 r2".
+Kapılar at `90aa8c1` (`state/evidence/14-1-r2-*.log`, her biri komut + `HEAD=`): kırmızı 33 failed (`-red.log`, `-red-b.log`); `make lint` temiz + `make test` llmaas **2202**, airgap **2202**; hedefli 14 + 06a/06b/08t facade/134/57 **195 passed**; **tam test-int tam yığın 1260/42/0** (`14-1-r2-test-int.log`); gen:api + check:api 0. Bilerek değişen testler: `memory_support.DirectMemory.recall(question, share)` + `insert_item`/`catalog_model`, `test_14_api::members` katalog modeli, `test_14_recall` HTTP gövdesi `share`. Zone eki: `api/agents_schemas.py` `RUN_INPUT_MAX` sabiti (davranış aynı). Yığın kapalı (C-14-0014).

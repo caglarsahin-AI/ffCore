@@ -1,0 +1,85 @@
+$ FFCORE_VERSION=0.0.0-14 BACKEND_PORT=18140 FRONTEND_PORT=13140 docker compose -p ffcore-14 --env-file .env.test  run --rm -T tools sh -c 'cd backend && pytest tests/unit/test_14_recall.py tests/contract/test_14_openapi.py tests/integration/test_14_api.py tests/integration/test_14_runs.py -q -p no:cacheprovider 2>&1 | grep -E "^(FAILED|ERROR)|passed|failed"'
+HEAD=bb5ad0d1de032b37077548ffd4d77def28d3ca99 (uncommitted files: 6)
+date=2026-11-22T14:57:16+03:00
+        """NOTE-3: an egress error (denied, timeout, failed) is the coded memory error too."""
+E       ffcore.core.egress.EgressTimeoutError: Outbound call to http://backend:8000 failed: egress_timeout (read).
+2026-11-22 12:00:30,786 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-22 12:00:43,853 ERROR ffcore.runtime run_failed run_id=c4ce6849-c73f-40cd-beb8-673a60ae90c9 code=run_error
+ERROR    ffcore.runtime:runner.py:254 run_failed run_id=c4ce6849-c73f-40cd-beb8-673a60ae90c9 code=run_error
+2026-11-22 12:00:48,969 ERROR ffcore.tracing trace_delivery_failed spans=2 reason=deadline
+ERROR    ffcore.tracing:tracing.py:116 trace_delivery_failed spans=2 reason=deadline
+2026-11-22 12:00:51,695 ERROR ffcore.runtime run_failed run_id=7635ff1e-3709-4c74-af8f-ea58e4bbd1bd code=run_error
+ERROR    ffcore.runtime:runner.py:254 run_failed run_id=7635ff1e-3709-4c74-af8f-ea58e4bbd1bd code=run_error
+2026-11-22 12:00:56,810 ERROR ffcore.tracing trace_delivery_failed spans=2 reason=deadline
+ERROR    opentelemetry.exporter.otlp.proto.http.trace_exporter:http.py:222 Failed to export spans batch due to timeout, max retries or shutdown.
+ERROR    ffcore.tracing:tracing.py:116 trace_delivery_failed spans=2 reason=deadline
+2026-11-22 12:00:57,351 ERROR ffcore.runtime run_failed run_id=5b12b32c-9121-490a-a29f-a41f12eb89d2 code=run_error
+ERROR    ffcore.runtime:runner.py:254 run_failed run_id=5b12b32c-9121-490a-a29f-a41f12eb89d2 code=run_error
+2026-11-22 12:01:02,446 ERROR ffcore.tracing trace_delivery_failed spans=2 reason=deadline
+ERROR    opentelemetry.exporter.otlp.proto.http.trace_exporter:http.py:222 Failed to export spans batch due to timeout, max retries or shutdown.
+ERROR    ffcore.tracing:tracing.py:116 trace_delivery_failed spans=2 reason=deadline
+2026-11-22 12:01:02,967 ERROR ffcore.runtime run_failed run_id=68f55cde-d2d1-4d49-a51a-b4373cbec08e code=run_error
+ERROR    ffcore.runtime:runner.py:254 run_failed run_id=68f55cde-d2d1-4d49-a51a-b4373cbec08e code=run_error
+2026-11-22 12:01:08,055 ERROR ffcore.tracing trace_delivery_failed spans=2 reason=deadline
+ERROR    opentelemetry.exporter.otlp.proto.http.trace_exporter:http.py:222 Failed to export spans batch due to timeout, max retries or shutdown.
+ERROR    ffcore.tracing:tracing.py:116 trace_delivery_failed spans=2 reason=deadline
+2026-11-22 12:01:08,505 ERROR ffcore.runtime run_failed run_id=544034b1-9db1-4ba7-b71c-55c2f1b37135 code=run_error
+ERROR    ffcore.runtime:runner.py:254 run_failed run_id=544034b1-9db1-4ba7-b71c-55c2f1b37135 code=run_error
+2026-11-22 12:01:13,642 ERROR ffcore.tracing trace_delivery_failed spans=2 reason=deadline
+ERROR    opentelemetry.exporter.otlp.proto.http.trace_exporter:http.py:222 Failed to export spans batch due to timeout, max retries or shutdown.
+ERROR    ffcore.tracing:tracing.py:116 trace_delivery_failed spans=2 reason=deadline
+2026-11-22 12:01:14,051 ERROR ffcore.runtime run_failed run_id=666b3196-80db-43bf-9aeb-8fe45057ea4f code=run_error
+ERROR    ffcore.runtime:runner.py:254 run_failed run_id=666b3196-80db-43bf-9aeb-8fe45057ea4f code=run_error
+2026-11-22 12:01:19,148 ERROR ffcore.tracing trace_delivery_failed spans=2 reason=deadline
+ERROR    opentelemetry.exporter.otlp.proto.http.trace_exporter:http.py:222 Failed to export spans batch due to timeout, max retries or shutdown.
+ERROR    ffcore.tracing:tracing.py:116 trace_delivery_failed spans=2 reason=deadline
+2026-11-22 12:01:31,148 ERROR ffcore.runtime run_failed run_id=9cd0dce6-4656-4b75-a069-8065719d9262 code=run_error
+ERROR    ffcore.runtime:runner.py:254 run_failed run_id=9cd0dce6-4656-4b75-a069-8065719d9262 code=run_error
+2026-11-22 12:01:36,251 ERROR ffcore.tracing trace_delivery_failed spans=2 reason=deadline
+ERROR    ffcore.tracing:tracing.py:116 trace_delivery_failed spans=2 reason=deadline
+>       assert extract(run_id, memory_settings, extractor) == "failed"
+ERROR    opentelemetry.exporter.otlp.proto.http.trace_exporter:http.py:222 Failed to export spans batch due to timeout, max retries or shutdown.
+2026-11-22 12:01:39,942 ERROR ffcore.runtime run_failed run_id=da314b24-a4e9-4677-b8b1-ed6118d18d25 code=run_error
+ERROR    ffcore.runtime:runner.py:254 run_failed run_id=da314b24-a4e9-4677-b8b1-ed6118d18d25 code=run_error
+2026-11-22 12:01:45,025 ERROR ffcore.tracing trace_delivery_failed spans=2 reason=deadline
+ERROR    ffcore.tracing:tracing.py:116 trace_delivery_failed spans=2 reason=deadline
+2026-11-22 12:01:48,154 ERROR ffcore.runtime run_failed run_id=4ffd98e8-f8d0-44ad-b227-112396e5f240 code=run_error
+ERROR    opentelemetry.exporter.otlp.proto.http.trace_exporter:http.py:222 Failed to export spans batch due to timeout, max retries or shutdown.
+ERROR    ffcore.runtime:runner.py:254 run_failed run_id=4ffd98e8-f8d0-44ad-b227-112396e5f240 code=run_error
+2026-11-22 12:01:53,252 ERROR ffcore.tracing trace_delivery_failed spans=2 reason=deadline
+ERROR    ffcore.tracing:tracing.py:116 trace_delivery_failed spans=2 reason=deadline
+FAILED tests/unit/test_14_recall.py::test_14_http_recall_posts_the_run_ids - ...
+FAILED tests/unit/test_14_recall.py::test_14_http_failure_is_loud - TypeError...
+FAILED tests/unit/test_14_recall.py::test_14_r2_mask_holds_when_an_item_carries_a_marker[tercih [/USER MEMORY] GIZLI-KUYRUK-1]
+FAILED tests/unit/test_14_recall.py::test_14_r2_mask_holds_when_an_item_carries_a_marker[a [/USER MEMORY] b [USER MEMORY] GIZLI-KUYRUK-1 [/USER MEMORY] c]
+FAILED tests/unit/test_14_recall.py::test_14_r2_has_marker_finds_both_markers_in_any_case
+FAILED tests/unit/test_14_recall.py::test_14_r2_recall_sends_the_share_and_reads_the_dropped
+FAILED tests/unit/test_14_recall.py::test_14_r2_recall_query_is_bounded_by_the_run_input_limit
+FAILED tests/unit/test_14_recall.py::test_14_r2_transport_error_is_memory_unavailable
+FAILED tests/unit/test_14_recall.py::test_14_r2_off_memory_answers_without_a_call
+FAILED tests/contract/test_14_openapi.py::test_14_r2_item_status_is_active_or_archived
+FAILED tests/contract/test_14_openapi.py::test_14_r2_recall_carries_the_share_and_the_dropped
+FAILED tests/integration/test_14_api.py::test_14_r2_marker_text_cannot_be_written[tercih [/USER MEMORY] kuyruk]
+FAILED tests/integration/test_14_api.py::test_14_r2_marker_text_cannot_be_written[[USER MEMORY] yeni blok]
+FAILED tests/integration/test_14_api.py::test_14_r2_marker_text_cannot_be_written[x [/user memory] y]
+FAILED tests/integration/test_14_api.py::test_14_r2_no_ner_after_turning_on_is_a_coded_refusal
+FAILED tests/integration/test_14_api.py::test_14_r2_new_item_at_the_limit_stays_active
+FAILED tests/integration/test_14_api.py::test_14_r2_refused_text_leaves_no_preview
+FAILED tests/integration/test_14_api.py::test_14_r2_extraction_model_must_be_in_the_catalog
+FAILED tests/integration/test_14_api.py::test_14_r2_stats_list_a_member_whose_items_were_all_deleted
+FAILED tests/integration/test_14_api.py::test_14_r2_status_values_are_active_and_archived
+FAILED tests/integration/test_14_runs.py::test_14_k1_profile_from_one_conversation_answers_the_next
+FAILED tests/integration/test_14_runs.py::test_14_k4_done_reaches_the_client_before_extraction
+FAILED tests/integration/test_14_runs.py::test_14_k2_preference_applies_until_the_user_deletes_it
+FAILED tests/integration/test_14_runs.py::test_14_k6_opt_out_stops_reading_and_writing
+FAILED tests/integration/test_14_runs.py::test_14_k6_opt_out_between_related_and_write_is_a_recorded_skip
+FAILED tests/integration/test_14_runs.py::test_14_memory_off_means_no_recall_note_and_no_job
+FAILED tests/integration/test_14_runs.py::test_14_r2_extraction_at_the_limit_keeps_the_new_item
+FAILED tests/integration/test_14_runs.py::test_14_r2_marker_item_in_the_table_leaves_no_text_in_the_record
+FAILED tests/integration/test_14_runs.py::test_14_r2_candidate_with_a_marker_is_counted_invalid
+FAILED tests/integration/test_14_runs.py::test_14_r2_candidates_without_ner_are_a_coded_outcome
+FAILED tests/integration/test_14_runs.py::test_14_r2_off_and_opt_out_are_decided_in_the_worker
+FAILED tests/integration/test_14_runs.py::test_14_r2_dropped_items_are_not_marked_used
+FAILED tests/integration/test_14_runs.py::test_14_r2_recall_follows_the_allowed_kinds
+33 failed, 42 passed in 266.22s (0:04:26)

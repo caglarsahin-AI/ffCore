@@ -1,0 +1,7 @@
+$ MSYS_NO_PATHCONV=1 docker run --rm --network none -v C:/ai_paycore/ffcore/.worktrees/feat/14-hafiza:/w -v ffcore-10a-nm:/w/frontend/node_modules:ro -w /w/frontend node:20.19.5-alpine sh -c 'npm run gen:api; npm run check:api'
+HEAD=0b1363d8023c38f032b90c911f4def122621ceaf (uncommitted files: 16)
+> ffcore-frontend@0.1.0 check:api
+> node scripts/check-api.mjs
+
+API contract copies and generated types are current.
+rc=0

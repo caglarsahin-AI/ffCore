@@ -1,0 +1,19 @@
+$ FFCORE_VERSION=0.0.0-14 BACKEND_PORT=18140 FRONTEND_PORT=13140 docker compose -p ffcore-14 --env-file .env.test  run --rm -T tools sh -c 'cd backend && pytest tests/unit/test_14_recall.py tests/contract/test_14_openapi.py tests/integration/test_14_api.py tests/integration/test_14_runs.py tests/integration/test_14_facade.py -q -p no:cacheprovider -k "r2" 2>&1 | tail -60'
+HEAD=bb5ad0d1de032b37077548ffd4d77def28d3ca99 (uncommitted files: 6)
+date=2026-11-22T14:56:35+03:00
+
+==================================== ERRORS ====================================
+_____________ ERROR collecting tests/integration/test_14_facade.py _____________
+ImportError while importing test module '/work/backend/tests/integration/test_14_facade.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/local/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/integration/test_14_facade.py:7: in <module>
+    from ffcore.api.agents_schemas import RUN_INPUT_MAX
+E   ImportError: cannot import name 'RUN_INPUT_MAX' from 'ffcore.api.agents_schemas' (/work/backend/ffcore/api/agents_schemas.py)
+=========================== short test summary info ============================
+ERROR tests/integration/test_14_facade.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+49 deselected, 1 error in 8.53s

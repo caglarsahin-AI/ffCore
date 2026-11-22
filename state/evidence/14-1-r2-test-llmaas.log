@@ -1,0 +1,13 @@
+$ FFCORE_VERSION=0.0.0-14 BACKEND_PORT=18140 FRONTEND_PORT=13140 docker compose -p ffcore-14 --env-file .env.test  run --rm -T tools sh -c 'make lint && DEPLOY_PROFILE=llmaas make test 2>&1 | tail -6'
+HEAD=90aa8c121a1d2560d5278760d5e814fb1ae405ac (uncommitted files: 0)
+date=2026-11-22T15:49:11+03:00
+ruff check backend scripts data/samples/scripts services tests/deploy
+All checks passed!
+ruff format --check backend scripts data/samples/scripts services tests/deploy
+580 files already formatted
+tests/contract/test_c2_on_behalf_of.py ..                                [ 99%]
+tests/contract/test_c3_common_columns.py .....                           [ 99%]
+tests/contract/test_c5_vectorstore.py ...                                [ 99%]
+tests/contract/test_c9_runs.py .......                                   [100%]
+
+======================= 2202 passed in 181.49s (0:03:01) =======================

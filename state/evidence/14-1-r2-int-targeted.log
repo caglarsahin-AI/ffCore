@@ -1,0 +1,7 @@
+$ FFCORE_VERSION=0.0.0-14 BACKEND_PORT=18140 FRONTEND_PORT=13140 docker compose -p ffcore-14 --env-file .env.test --profile test --profile qdrant run --rm -T tools sh -c 'cd backend && pytest tests/unit/test_14_extract.py tests/unit/test_14_recall.py tests/unit/test_14_pii.py tests/contract/test_14_openapi.py tests/unit/test_03a_write_flag.py tests/contract/test_c3_common_columns.py tests/integration/test_14_api.py tests/integration/test_14_runs.py tests/integration/test_14_facade.py tests/integration/test_03c_retention_job.py tests/integration/test_06a_graph.py tests/integration/test_06a_runs_api.py tests/integration/test_134_egress_real_engine.py tests/integration/test_06b_agent.py tests/integration/test_08t_m2_facade_history.py tests/integration/test_08t_c17_facade_direct.py tests/integration/test_57_alembic_merge.py -q -p no:cacheprovider 2>&1 | tail -15'
+HEAD=90aa8c121a1d2560d5278760d5e814fb1ae405ac (uncommitted files: 0)
+date=2026-11-22T15:56:08+03:00
+........................................................................ [ 36%]
+........................................................................ [ 73%]
+...................................................                      [100%]
+195 passed in 137.67s (0:02:17)
