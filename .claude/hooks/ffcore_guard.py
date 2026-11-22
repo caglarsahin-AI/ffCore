@@ -12,7 +12,7 @@ Exit 0 lets it run. FFCORE_GUARD_MODE=warn|block (default block).
 
 Bash rules also apply inside `sh -c` / `bash -c` text, `$(…)` and backticks,
 `( … )` / `{ …; }` groups, compound commands, behind wrappers (`env`, `command`,
-`time`, `nice`, `nohup`, `exec`) and to the command a `docker compose run|exec`
+`time`, `nice`, `nohup`, `timeout`, `exec`) and to the command a `docker compose run|exec`
 starts in its service. This is a safety net, not a sandbox: commands built at
 runtime (variables, script files, Makefile recipes) and Bash writes to state
 files are not inspected. Log lines are masked (credentials in URLs,
@@ -630,6 +630,11 @@ def unwrap(toks: list[str]) -> list[str]:
             rest = rest[1:]
             if head == "time" and rest[:1] == ["-p"]:
                 rest = rest[1:]
+        elif head == "timeout":  # timeout [-s SIG|-k N|--opt…] DURATION cmd (FOLLOWUP-214)
+            i = 1
+            while i < len(rest) and rest[i].startswith("-"):
+                i += 2 if rest[i] in TIMEOUT_VALUE_OPTS else 1
+            rest = rest[i + 1 :]
         elif rest[0] in ("for", "select", "case", "in", "done", "fi", "esac"):
             return assigns
         elif head == "env":
@@ -959,12 +964,6 @@ def reader_command(toks: list[str]) -> list[str]:
         if not toks:
             return toks
         head = basename(toks[0])
-        if head == "timeout":
-            i = 1
-            while i < len(toks) and toks[i].startswith("-"):
-                i += 2 if toks[i] in TIMEOUT_VALUE_OPTS else 1
-            toks = strip_assignments(unwrap(toks[i + 1 :]))  # i is the duration
-            continue
         service = compose_service_command(toks)
         if service is not None:
             toks = strip_assignments(unwrap(service[1]))
@@ -992,24 +991,34 @@ def heredoc_reader(line: str, m: re.Match) -> str:
     return "code" if reader in INTERPRETERS else "data"
 
 
-def unquoted_heredocs(line: str, quote: str | None) -> tuple[list[re.Match], str | None]:
-    """Heredoc operators of `line` that stand outside quotes, and the quote still open at the
-    end of the line. `quote` is the quote open from earlier lines (a multi-line `sh -c '…'`):
-    a `<<EOF` inside it belongs to the inner shell, which is checked on its own (r2)."""
+COMMENT_AFTER = " \t;&|()"
+
+
+def unquoted_heredocs(line: str, quote: str | None) -> tuple[list[re.Match], str | None, int]:
+    """Heredoc operators of `line` that stand outside quotes, the quote still open at the end
+    of the line and where an unquoted `#` comment starts (len(line) without one). `quote` is the
+    quote open from earlier lines (a multi-line `sh -c '…'`): a `<<EOF` inside it belongs to the
+    inner shell, which is checked on its own (r2). A comment is a `#` at a word start outside
+    quotes (not `$#`, `${#x}`, `a#b`); its text is not shell, so an apostrophe in it
+    (`# don't`) opens no quote (FOLLOWUP-214)."""
     open_at: list[str | None] = []
     escaped = False
-    for ch in line:
+    cut = len(line)
+    for i, ch in enumerate(line):
         open_at.append(quote)
         if escaped:
             escaped = False
         elif ch == "\\" and quote != "'":
             escaped = True
+        elif quote is None and ch == "#" and (i == 0 or line[i - 1] in COMMENT_AFTER):
+            cut = i
+            break
         elif quote is None and ch in ("'", '"'):
             quote = ch
         elif ch == quote:
             quote = None
-    matches = [m for m in HEREDOC_RE.finditer(line) if open_at[m.start()] is None]
-    return matches, quote
+    matches = [m for m in HEREDOC_RE.finditer(line[:cut]) if open_at[m.start()] is None]
+    return matches, quote, cut
 
 
 def strip_heredocs(command: str) -> tuple[str, list[str]]:
@@ -1027,7 +1036,7 @@ def strip_heredocs(command: str) -> tuple[str, list[str]]:
         line = lines[i]
         out.append(line)
         i += 1
-        matches, quote = unquoted_heredocs(line, quote)
+        matches, quote, _ = unquoted_heredocs(line, quote)
         for m in matches:
             kind = heredoc_reader(line, m)
             body: list[str] = []
@@ -1062,10 +1071,10 @@ def heredoc_commands(command: str) -> tuple[str, list[tuple[bool, str]]]:
     i = 0
     quote: str | None = None
     while i < len(lines):
-        line = lines[i]
+        matches, quote, cut = unquoted_heredocs(lines[i], quote)
+        line = lines[i][:cut]  # a comment is not shell text (FOLLOWUP-214)
         out.append(line)
         i += 1
-        matches, quote = unquoted_heredocs(line, quote)
         for m in matches:
             body: list[str] = []
             while i < len(lines) and lines[i].strip() != m.group(2):
