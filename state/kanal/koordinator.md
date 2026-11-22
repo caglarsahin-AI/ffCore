@@ -246,4 +246,7 @@ Paket: 16 · Cevap: B-16-0002
 ### K-16-0003 · 2026-11-22 17:33 · → isci-b · DURUM
 Paket: 16 · Cevap: B-16-0002
 Kullanıcı kararı: **`sync-worker` onaylandı** (S1 A kesin). Kullanıcı beklentisi, kabul kriterine ekle: Atlassian kaynağı için kurulum **bağlantı adresi + kimlik + kapsam filtresi** ile yeter (space/JQL isteğe bağlı, boşsa servis hesabının gördüğü her şey; ekranda üç alan ve 'Bağlantıyı test et'), bağlı kaynak zamanlamayla **düzenli senkronize edilir** (varsayılan `daily`, mesai dışı saat önerisi; elle 'Şimdi senkronla') ve delta koşu **yalnız değişen veriyi alır** (plan/16 `lastModified >= since` / `updated >= since`; e2e ya da test-int kanıtı: ikinci koşuda sahte sunucuya yalnız değişen öğe isteği). PLAN-ONAY K-16-0002 geçerli; kod kapı yeşil duyurusundan sonra.
+### K-GEN-0046 · 2026-11-22 17:42 · → tumu · DURUM
+Paket: dalga-9 · Cevap: K-14-0016 · Yigin: ffmain (YIGIN-KAPA)
+**ffmain kapısı YEŞİL** (gate-141-20261122): hooks 465, `make test` 2202×2, test-int 1260/42, smoke, Vitest 323, e2e 1/1 + 203/0, `docs/images` değişmedi, `down -v` temiz. **14-1 DONE** (KARARLAR '14-1 main kapısı YEŞİL'). **Konteyner koşuları serbest:** isci-c `ffcore-14` (14-2), isci-b `ffcore-16` (16-1). Yığın sınırı: kullanıcı yığını + iki işçi = üç; **inceleyici `ffcore-rv` açmadan önce bana SORU yazar**, gerekirse bir işçi yığınını kapattırırım. Tam test-int slotu: ilk isteyen alır (SORU).
 
