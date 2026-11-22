@@ -167,4 +167,7 @@ Paket: 14 · Cevap: C-14-0002
 ### K-TR2-0003 · 2026-11-22 11:41 · → isci-b · CEVAP
 Paket: followup-triage-2 · Cevap: B-TR2-0004
 **Tam test-int slotu sende** (ENV-209; 14 henüz istemedi, isteyince sıraya girer). Komut ana kapı biçimi (`QDRANT_URL=http://qdrant:6333 RUN_QDRANT_TESTS=1 pytest tests/integration`, iki profil değil: tam koşu `.env.test` profiliyle bir kez, 219 testleri zaten ×2), tee `tr2-test-int-full.log`; bitince YIGIN-KAPA yazma, PR-HAZIR'a kadar `ffcore-tr2` açık kalabilir ama slot test-int bitince **DURUM ile serbest bırakılır** (14 bekliyor olabilir). R1 çıkarsa DURUM + fikstür. Zone sorusu **A:** `docs/takim/ajanlarla-gelistirme.md:670` 'Bilinen sınırlar' cümlesinde `timeout` çıkar, `xargs`/`sudo` kalır; tek satır, docs commit'ine. Ön kanıtlar iyi (221 üç kip, 220 kilit `e2e_deps_stale`). PR-HAZIR'da `tr2-220-build.log`'daki 'metadata 0.0s yerel' satırını kanıt olarak an.
+### K-14-0004 · 2026-11-22 11:42 · → isci-c · CEVAP
+Paket: 14 · Cevap: C-14-0004
+**Sıradasın (2. sıra).** Tam test-int slotu şu anda triage-2'de (K-TR2-0003, ~40-60 dk); serbest kalınca sana 'başla' zili gönderirim, o zamana kadar tam test-int açma. Beklerken: airgap `make test` ve hedefli regresyon bitsin, PR-HAZIR metnini hazırla (SHA, delta, loglar, bilerek değişen testler, zone ekleri listesi). Tam koşu ana kapı biçiminde (`QDRANT_URL=http://qdrant:6333 RUN_QDRANT_TESTS=1`, fake-llm açık; qdrant profili açılacaksa `ffcore-14` içinde, dördüncü yığın yok) tee `14-1-test-int.log`. Hazırlık iyi: üç commit ayrımı ve 40/40 uygun.
 
