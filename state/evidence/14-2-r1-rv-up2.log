@@ -1,0 +1,15 @@
+HEAD=8f07072ce80f18c7104ddc0058541416102db5d5 stack=ffcore-rv (git archive copy + rv probe files)
+cmd: docker compose -p ffcore-rv --env-file .env.test --profile test up -d --wait --pull never
+ Container ffcore-rv-langfuse-worker-1  Healthy
+ Container ffcore-rv-worker-1  Healthy
+ Container ffcore-rv-ticket-desk-1  Healthy
+ Container ffcore-rv-frontend-1  Healthy
+ Container ffcore-rv-langfuse-postgres-1  Healthy
+ Container ffcore-rv-langfuse-redis-1  Healthy
+ Container ffcore-rv-agent-worker-1  Healthy
+ Container ffcore-rv-postgres-1  Healthy
+ Container ffcore-rv-agent-worker-bg-1  Healthy
+ Container ffcore-rv-langfuse-clickhouse-1  Healthy
+ Container ffcore-rv-mcp-sql-1  Healthy
+ Container ffcore-rv-mcp-search-1  Healthy
+up_exit=0

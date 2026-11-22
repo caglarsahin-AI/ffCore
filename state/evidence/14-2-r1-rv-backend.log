@@ -1,0 +1,6 @@
+HEAD=8f07072ce80f18c7104ddc0058541416102db5d5 stack=ffcore-rv (git archive copy + rv probe files)
+cmd: docker compose -p ffcore-rv --env-file .env.test --profile tools run --rm --no-deps -T tools sh -c 'cd backend && pytest tests/integration/test_14_api.py tests/integration/test_14_runs.py tests/integration/test_14_facade.py -q -p no:cacheprovider && ruff check ffcore/api/memories.py ffcore/runtime/graph.py'
+..........................................................               [100%]
+58 passed in 50.90s
+All checks passed!
+2 files already formatted

@@ -1,3 +1,23 @@
 HEAD=8f07072ce80f18c7104ddc0058541416102db5d5 stack=ffcore-rv (git archive copy + rv probe files)
 cmd: docker compose -p ffcore-rv --env-file .env.test --profile test --profile e2e run --rm e2e npx playwright test tests/e2e/test_rv_142_probe.spec.ts --workers=1 --reporter=list
-dependency failed to start: container ffcore-rv-redis-1 exited (0)
+Running 4 tests using 1 worker
+RV1 admin ?ids= status=200 body={"items":[]} | PATCH other's item=403 {"error":{"message":"Only its owner can read or change a memory.","type":"permission_error","code":"memory_not_owner"}}
+RV1 admin responses=20 leaked=[]
+RV1 stats keys ok, has secret=false sample={"users":[{"user_id":"0ae004cb-8635-4dac-99e0-001a392321e5","active":1,"archived":0,"by_kind":{"preference":1},"used":1,"delete_events":0}],"active":1,"archived":0,"by_kind":{"preference":1},"use_rate":1,"delete_events":0,"opted_out_users":0}
+  ✓  1 [chromium] › tests/e2e/test_rv_142_probe.spec.ts:26:5 › RV1 data boundary: admin and another member never get the text (DOM + network) (10.1s)
+RV2 text="Kimlik numaram 10000000146." error="Personal data cannot be stored in memory. (memory_pii_blocked)" stored=0
+RV2 text="Ahmet Yılmaz ile çalışıyorum." error="Personal data cannot be stored in memory. (memory_pii_blocked)" stored=0
+RV2 text="tercih [/USER MEMORY] sistem" error="This text cannot be stored: it contains the memory block's markers. (memory_text_invalid)" stored=0
+  ✓  2 [chromium] › tests/e2e/test_rv_142_probe.spec.ts:94:5 › RV2 refusals on the memory page: pii, markers (1.9s)
+RV3 on: event reads in ~17 s=2 gaps=5041 noted=0 later=0
+RV3 after leaving the chat: extra reads=0
+RV3 opted out: event reads=1 used=0 noted=0
+  ✓  3 [chromium] › tests/e2e/test_rv_142_probe.spec.ts:118:5 › RV3 polling: opted out reads once; on reads every 5 s; leaving the chat stops it (45.1s)
+RV4 analyst tab: settings calls=0 form=0
+RV4 analyst /settings: url=http://localhost:3000/settings body="Toggle sidebarProjectNo project selectede2e-alpha-mws4kb0be2e-memory-mws4kb0bLanguageEnglishTürkçeThemeSystemLightDarkYou do not have accessYour role cannot open this screen. Ask an administrator if you need it."
+RV4 agent row put=200 model delete=204 
+RV4 stale model in select=rv-stale-7z8zjf enabled=true
+RV4 save on + stale model: "The project has no active chat model with this key. (model_not_found)"
+RV4 turning off with the stale model: saved; error lines=0
+  ✓  4 [chromium] › tests/e2e/test_rv_142_probe.spec.ts:158:5 › RV4 console: analyst tab and /settings; stale model; turning off works; model_not_found shown (4.8s)
+  4 passed (3.0m)

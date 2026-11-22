@@ -1,0 +1,12 @@
+HEAD=8f07072ce80f18c7104ddc0058541416102db5d5 stack=ffcore-rv (git archive copy + rv probe files)
+cmd: docker compose -p ffcore-rv --env-file .env.test --profile test --profile e2e run --rm e2e npx playwright test tests/e2e/test_14_ --workers=1 --reporter=line
+Running 8 tests using 1 worker
+[1/8] [chromium] › tests/e2e/test_14_1_memory.spec.ts:18:5 › test_14_1_used_note_and_forget: the next run has no memory block
+[2/8] [chromium] › tests/e2e/test_14_1_memory.spec.ts:42:5 › test_14_1_delete_on_the_memory_page: the next run has no memory block
+[3/8] [chromium] › tests/e2e/test_14_1_memory.spec.ts:61:5 › test_14_1_opt_out: no memory is used while the member has it off
+[4/8] [chromium] › tests/e2e/test_14_1_memory.spec.ts:81:5 › test_14_1_admin_sees_numbers_not_text
+[5/8] [chromium] › tests/e2e/test_14_2_screens_themes.spec.ts:31:9 › test_14_2_screens_themes: light desktop
+[6/8] [chromium] › tests/e2e/test_14_2_screens_themes.spec.ts:31:9 › test_14_2_screens_themes: light mobile
+[7/8] [chromium] › tests/e2e/test_14_2_screens_themes.spec.ts:31:9 › test_14_2_screens_themes: dark desktop
+[8/8] [chromium] › tests/e2e/test_14_2_screens_themes.spec.ts:31:9 › test_14_2_screens_themes: dark mobile
+  8 passed (2.9m)

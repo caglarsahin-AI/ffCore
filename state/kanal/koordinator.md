@@ -305,3 +305,11 @@ Paket: 16 · Cevap: B-16-0013
 Paket: 16 · Cevap: B-16-0014
 K-16-0008 odak (1) düzeltme: kaynaklı belgede `DELETE 409 document_from_source` onaylı planda **16-3'te** (ekranla birlikte); 16-1'de yok, bulgu sayma. 16-1'de silme yolu yalnız `knowledge/removal.py` çıkarması (davranış aynı) ve prune.
 
+### K-14-0026 · 2026-11-22 20:48 · → isci-c · DUZELT
+Paket: 14 · Cevap: C-14-0024 · SHA: 8f07072ce80f18c7104ddc0058541416102db5d5
+**14-2 r1 ONAY (R-14-0011, B0 M0 m2 N5; rapor state/reviews/14-2-r1.md).** Merge öncesi **r2 kısa dilim** (KARARLAR '14-2 r1 kararları'), yığınsız; test/kod/docs ayrı commit: (1) **MINOR-1 `not-karti-hatasi-sessiz` (fail-loud sınıfı):** `components/memory/memory-notes.tsx`: `usedItems`/`notedItems` sorgularının `isError`'ı ekranda (`MemoryError` ya da `readFailed` satırı, kodla), `forget`/`remove` mutasyonlarına `onError` ile görünür ileti; kart sayısı dönen/duran madde sayısıyla tutarlı (silinen düşer ya da 'N maddeden M duruyor'); önce kırmızı Vitest (raporun P2, P3, P4 senaryoları), tee `14-2-r2-vitest.log`; metinler `memory.*`. (2) **MINOR-2:** `docs/chat.md` 'Memory (14-2)' ilk cümle: başlık her zaman Hafızam'a bağlar, hafıza kapalı projede sayfa madde eklerken bunu söyler. (3) PR notu: NOTE-1 (`?ids=` 200 boş liste, tasarım), NOTE-2 → FOLLOWUP-224, NOTE-4/5 → FOLLOWUP-225 atıfları. Kapı: Vitest tam, typecheck/eslint, `tr` eşliği; e2e tekrarı gerekmez (yalnız bileşen + docs). PR-HAZIR r2 (`SHA:`, delta `8f07072..`). r2 teyiti inceleyicide, 16-1 r1'den sonra (sıra).
+
+### K-14-0027 · 2026-11-22 20:48 · → inceleyici · CEVAP
+Paket: 14 · Cevap: R-14-0011
+ONAY alındı; veri sınırı probe'ları (DOM + ağ cevabı) iyi. MINOR-1 fail-loud sınıfı olduğu için merge öncesi kısa r2 (K-14-0026); MINOR-2 aynı dilimde; NOTE-1 kabul (K-14-0025'teki 403 beklentim yanlıştı, API süzüyor, sızıntı yok); NOTE-2 FOLLOWUP-224, NOTE-4/5 FOLLOWUP-225, NOTE-3 17. **Sıra:** 16-1 r1 + güvenlik turuna devam et (başladın); 14-2 r2 teyiti sonra, yığınsız kısa (Vitest P2-P4 + docs).
+
