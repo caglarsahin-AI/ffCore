@@ -104,6 +104,8 @@ Paket: <kod> · Cevap: <ID|-> · <türe göre zorunlu alanlar>
 
 **PR ve merge (yerel).** Ajanlar uzak sunucuya push etmez; tek istisna, kullanıcının o anki açık talimatıyla koordinatör oturumunun koştuğu `FFCORE_PUSH_OK=1 git push …` komutudur (hook ile zorlanır: `PUSH`; SECURITY_AND_PERMISSIONS). PR; yerel branch, `state/pr/<paket>.md`, tam HEAD SHA ve `PR-HAZIR` mesajından oluşur. Koordinatör aynı SHA'yı `REVIEW-ISTEK` içinde yollar; inceleyici o SHA'yı detached checkout ile inceler ve sonucu SHA ile kaydeder. Merge öncesi branch HEAD onaylanan SHA'dan farklıysa onay geçersizdir ve yeniden review gerekir. Koordinatör yalnızca onaylı SHA'yı main'e `--no-ff` merge eder ve `make smoke` koşar. paycoreLLM branch'lerini main'e kullanıcı yalnızca onaylanan SHA ile merge eder.
 
+**Tam test-int slotu (ENV-209, FOLLOWUP-216).** Tam `make test-int` aynı anda tek yığında koşar ve sırayı koordinatör verir (ENV-209). Paylaşılan modüle (ör. `core/egress.py`, `core/readiness.py`, `core/config.py`, runtime graph, audit), OpenAPI belgesine ya da paylaşılan test sözleşmesine (fikstür, parity, ortak yardımcı) dokunan PR'da işçi hedefli koşularla yetinmez: PR-HAZIR öncesi kanalına `SORU` yazıp tam test-int slotu ister, koşuyu `tee` ile kaydeder ve logu PR-HAZIR'da verir. Gerekçe: 20-21 Kasım'da iki paylaşılan değişiklik hedefli koşularda yeşil, main kapısında kırmızıydı (KARARLAR 'hook-egress-1 main kapısı KIRMIZI', '11-1 main kapısı YEŞİL').
+
 **İletişim kuralları:**
 
 - İşçiler birbirleriyle doğrudan konuşmaz; koordinatör üzerinden. Bağımlı paketin teslimatı PR'daki "Teslimatlar" bölümüdür.

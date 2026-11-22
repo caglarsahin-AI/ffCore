@@ -30,6 +30,7 @@
 | `make test` | `DEPLOY_PROFILE=llmaas FAKE_LLM=1` | 0 | |
 | `make test` | `DEPLOY_PROFILE=airgap FAKE_LLM=1` | 0 | |
 | `make test-int` | | | |
+| tam test-int slotu (ENV-209, FOLLOWUP-216) | paylaşılan modül / OpenAPI / test sözleşmesi dokunuşu: evet → slot + log yolu; hayır → gerekçe | | |
 | `alembic upgrade head && alembic downgrade -1 && alembic upgrade head` | | | |
 | `make smoke` | | | |
 
