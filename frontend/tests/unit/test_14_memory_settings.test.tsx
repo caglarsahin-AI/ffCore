@@ -95,13 +95,20 @@ describe("test_14_memory_settings", () => {
 
   it("the agent tab saves the agent's own row", async () => {
     const mock = serve({ ...SETTINGS, enabled: true, source: "project" });
-    renderAs("analyst", "edit", <MemoryTab projectId="p1" agentId="a1" />, client());
+    renderAs("admin", "edit", <MemoryTab projectId="p1" agentId="a1" />, client());
     expect((await screen.findByTestId("memory-source")).textContent).toContain("project");
     await act(async () => {
       fireEvent.click(screen.getByTestId("memory-save"));
     });
     await waitFor(() => expect(puts(mock)).toHaveLength(1));
     expect(String(puts(mock)[0][0])).toBe(`${P}/memories/settings?agent_id=a1`);
+  });
+
+  it("the agent tab tells an analyst the settings are an administrator's, without reading them", () => {
+    const mock = serve();
+    renderAs("analyst", "edit", <MemoryTab projectId="p1" agentId="a1" />, client());
+    expect(screen.getByTestId("memory-admin-only")).toBeTruthy();
+    expect(mock).not.toHaveBeenCalled();
   });
 
   it("cannot turn memory on without the NER model and says why", async () => {
