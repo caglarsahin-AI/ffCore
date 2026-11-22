@@ -3,6 +3,7 @@ import type { Page } from "@playwright/test";
 
 import { completedExam } from "./eval";
 import { fixture } from "./fixtures";
+import { saveScreenshot } from "./screenshots";
 import { selectProject, signIn } from "./support";
 
 // GOREV kabul 5 (brief 10): a read-only user sees every exam screen with the same data and no
@@ -67,7 +68,7 @@ for (const screen of SCREENS) {
         // No enabled cancel control on an ended exam and none in read mode at all.
         await expect(page.locator("button:not([disabled])[data-testid^='eval-cancel']")).toHaveCount(0);
       }
-      if (shot) await page.screenshot({ path: `../docs/images/10c1-${screen.name}-${mode}.png`, fullPage: true });
+      if (shot) await saveScreenshot(page, `10c1-${screen.name}-${mode}.png`);
     }
   });
 }

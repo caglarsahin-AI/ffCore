@@ -4,6 +4,7 @@ import type { Page } from "@playwright/test";
 
 import { completedExam, createSuite, helloAgent } from "./eval";
 import { fixture } from "./fixtures";
+import { saveScreenshot } from "./screenshots";
 import { THEMES, selectProject, signIn, useTheme } from "./support";
 
 // GOREV kabul 6: the exam screens in both themes with real data (screenshots for the PR and
@@ -55,7 +56,7 @@ for (const screen of SCREENS) {
       await selectProject(context, baseURL!, fixture().alpha.id);
       await screen.open(page, data);
       await page.waitForLoadState("networkidle");
-      await page.screenshot({ path: `../docs/images/10c1-${screen.name}-${theme}.png`, fullPage: true });
+      await saveScreenshot(page, `10c1-${screen.name}-${theme}.png`);
       const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze();
       expect(results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target).join(" | ")}`)).toEqual([]);
     });

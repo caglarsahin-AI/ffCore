@@ -5,6 +5,7 @@ import type { Page } from "@playwright/test";
 import { approvalAgent, chatModel, createAgent, enableAction, registerTicketDesk, runViaApi } from "./agents";
 import type { Agent, Tool } from "./agents";
 import { fixture } from "./fixtures";
+import { saveScreenshot } from "./screenshots";
 import { THEMES, selectProject, signIn, useTheme } from "./support";
 
 // The 10b-poc-2 screens in both themes with real data: screenshots for the PR and docs/onyuz.md,
@@ -60,7 +61,7 @@ for (const screen of SCREENS) {
       await selectProject(context, baseURL!, fixture().alpha.id);
       await screen.open(page, data);
       await page.waitForLoadState("networkidle");
-      await page.screenshot({ path: `../docs/images/10bp2-${screen.name}-${theme}.png`, fullPage: true });
+      await saveScreenshot(page, `10bp2-${screen.name}-${theme}.png`);
       const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze();
       expect(results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target).join(" | ")}`)).toEqual([]);
     });

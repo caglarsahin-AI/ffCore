@@ -4,6 +4,7 @@ import { expect, test } from "@playwright/test";
 import en from "../../messages/en.json";
 import { FAKE_PROVIDER_URL, createProvider } from "./api";
 import { fixture } from "./fixtures";
+import { saveScreenshot } from "./screenshots";
 import { THEMES, selectProject, signIn, useTheme } from "./support";
 
 // Both forms open and filled, in both themes: screenshot for docs/onyuz.md and WCAG 2 A/AA check.
@@ -24,7 +25,7 @@ for (const theme of THEMES) {
     await form.getByTestId("provider-save").click(); // shows the required-field errors as well
     // Back to the top first: the fixed sidebar is captured where the page is scrolled to.
     await page.evaluate(() => window.scrollTo(0, 0));
-    await page.screenshot({ path: `../docs/images/10a-provider-form-${theme}.png`, fullPage: true });
+    await saveScreenshot(page, `10a-provider-form-${theme}.png`);
     const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze();
     expect(results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target).join(" | ")}`)).toEqual([]);
   });
@@ -45,7 +46,7 @@ for (const theme of THEMES) {
     await form.getByTestId("catalog-fill").click();
     await expect(form.getByTestId("catalog-note")).toBeVisible();
     await page.evaluate(() => window.scrollTo(0, 0));
-    await page.screenshot({ path: `../docs/images/10a-model-form-${theme}.png`, fullPage: true });
+    await saveScreenshot(page, `10a-model-form-${theme}.png`);
     const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze();
     expect(results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target).join(" | ")}`)).toEqual([]);
   });

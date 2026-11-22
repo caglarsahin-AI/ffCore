@@ -3,6 +3,7 @@ import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
 
 import { fixture } from "./fixtures";
+import { saveScreenshot } from "./screenshots";
 import { THEMES, selectProject, signIn, useTheme } from "./support";
 
 // 10c-2 kabul 6 and 7 (D7). The read user (superadmin, access read) opens every 10a-10c list screen
@@ -57,7 +58,7 @@ for (const screen of GOVERNANCE) {
         await open(page, screen.path);
         await expect(page.getByTestId(screen.ready)).toBeVisible();
         await expect(page.getByTestId("read-only-badge")).toHaveCount(mode === "read" ? 1 : 0);
-        await page.screenshot({ path: `../docs/images/10c2-${screen.name}-${mode}-${theme}.png`, fullPage: true });
+        await saveScreenshot(page, `10c2-${screen.name}-${mode}-${theme}.png`);
         if (mode === "edit") {
           const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze();
           expect(results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target).join(" | ")}`)).toEqual([]);

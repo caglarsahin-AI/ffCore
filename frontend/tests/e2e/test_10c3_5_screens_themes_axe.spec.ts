@@ -4,6 +4,7 @@ import type { Page } from "@playwright/test";
 
 import { fixture } from "./fixtures";
 import { createSampleServer } from "./mcp";
+import { saveScreenshot } from "./screenshots";
 import { THEMES, selectProject, signIn, useTheme } from "./support";
 
 // 10c-3 kabul 6: the MCP servers list, the publish form, the operations tab and the monitoring tab
@@ -26,7 +27,7 @@ for (const theme of THEMES) {
     await page.getByTestId("primary-action").click();
     await expect(page.getByTestId("mcp-server-form")).toBeVisible();
     await axe(page, "list+form");
-    await page.screenshot({ path: `../docs/images/10c3-mcp-servers-${theme}.png`, fullPage: true });
+    await saveScreenshot(page, `10c3-mcp-servers-${theme}.png`);
 
     await page.goto(`/mcp-servers/${server.id}`);
     await expect(page.getByTestId("mcp-operations")).toBeVisible();
@@ -35,6 +36,6 @@ for (const theme of THEMES) {
     await page.getByRole("tab", { name: "Monitoring" }).click();
     await expect(page.getByTestId("mcp-calls-requests")).toBeVisible();
     await axe(page, "monitoring");
-    await page.screenshot({ path: `../docs/images/10c3-mcp-monitoring-${theme}.png`, fullPage: true });
+    await saveScreenshot(page, `10c3-mcp-monitoring-${theme}.png`);
   });
 }

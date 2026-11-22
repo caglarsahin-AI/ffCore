@@ -4,6 +4,7 @@ import type { Page } from "@playwright/test";
 
 import { publishedAgent } from "./chat";
 import { fixture } from "./fixtures";
+import { saveScreenshot } from "./screenshots";
 import { THEMES, selectProject, signIn, useTheme } from "./support";
 
 // 11-2 (K-11-0005 S2, S3): the console's Portal tab on a published agent, and what the chat shows:
@@ -37,7 +38,7 @@ for (const theme of THEMES) {
     await page.getByTestId("portal-save").click();
     await expect(page.getByTestId("portal-saved")).toBeVisible();
     await axe(page);
-    await page.getByTestId("portal-tab").screenshot({ path: `../docs/images/11-portal-tab-${theme}.png` });
+    await saveScreenshot(page.getByTestId("portal-tab"), `11-portal-tab-${theme}.png`);
 
     await page.goto(`/chat/${agent.key}`);
     const welcome = page.getByTestId("chat-welcome");
@@ -47,7 +48,7 @@ for (const theme of THEMES) {
     await expect(page.getByTestId("chat-input")).toHaveValue(PORTAL.examples[0]);
     await expect(page.getByTestId("chat-live")).toHaveCount(0);
     await axe(page);
-    await page.screenshot({ path: `../docs/images/11-portal-chat-${theme}.png`, fullPage: true });
+    await saveScreenshot(page, `11-portal-chat-${theme}.png`);
 
     await page.getByTestId("chat-send").click();
     await expect(page.getByTestId("chat-answer")).toHaveCount(1, { timeout: 120_000 });
