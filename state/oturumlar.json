@@ -93,6 +93,22 @@
       "model": "claude-opus-5-5",
       "durum": "RETIRED",
       "kapandi": "2026-11-20T23:42"
+    },
+    "local_f17a745c-2748-4b21-bbfc-c76665ed58eb": {
+      "rol": "isci-c",
+      "paket": "14",
+      "lease": "ffcore-isci-c-14",
+      "acildi": "2026-11-22T10:37",
+      "model": "claude-opus-5-5",
+      "durum": "AKTIF"
+    },
+    "local_18b881ce-9f70-451b-8bb5-93c4e2444861": {
+      "rol": "isci-b",
+      "paket": "followup-triage-2",
+      "lease": "ffcore-isci-b-triage2",
+      "acildi": "2026-11-22T10:37",
+      "model": "claude-opus-5-5",
+      "durum": "AKTIF"
     }
   }
 }
