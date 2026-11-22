@@ -1,0 +1,9 @@
+HEAD=9029a475155865fa83b84f833646b927375c67f3 2026-11-22 19:48:25 up --build
+ Container ffcore-16-agent-worker-1  Healthy
+ Container ffcore-16-litellm-1  Healthy
+ Container ffcore-16-langfuse-redis-1  Healthy
+ Container ffcore-16-backend-1  Healthy
+ Container ffcore-16-langfuse-minio-1  Healthy
+ Container ffcore-16-migrate-1  Exited
+ Container ffcore-16-mcp-sql-1  Healthy
+ Container ffcore-16-mcp-search-1  Healthy

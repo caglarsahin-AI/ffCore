@@ -1,0 +1,113 @@
+HEAD=8f07072ce80f18c7104ddc0058541416102db5d5 stack=ffcore-rv (git archive copy)
+cmd: docker compose -p ffcore-rv --env-file .env.test --profile test up -d --wait --build --pull never
+ Container ffcore-rv-backend-1  Waiting
+ Container ffcore-rv-backend-1  Waiting
+ Container ffcore-rv-postgres-1  Waiting
+ Container ffcore-rv-postgres-1  Healthy
+ Container ffcore-rv-backend-1  Healthy
+ Container ffcore-rv-agent-worker-bg-1  Starting
+ Container ffcore-rv-backend-1  Healthy
+ Container ffcore-rv-frontend-1  Starting
+ Container ffcore-rv-backend-1  Healthy
+ Container ffcore-rv-mcp-search-1  Starting
+ Container ffcore-rv-backend-1  Healthy
+ Container ffcore-rv-agent-worker-1  Starting
+ Container ffcore-rv-backend-1  Healthy
+ Container ffcore-rv-worker-1  Starting
+ Container ffcore-rv-backend-1  Healthy
+ Container ffcore-rv-mcp-sql-1  Starting
+ Container ffcore-rv-mcp-search-1  Started
+ Container ffcore-rv-worker-1  Started
+ Container ffcore-rv-agent-worker-bg-1  Started
+ Container ffcore-rv-agent-worker-1  Started
+ Container ffcore-rv-mcp-sql-1  Started
+ Container ffcore-rv-frontend-1  Started
+ Container ffcore-rv-mcp-sql-1  Waiting
+ Container ffcore-rv-frontend-1  Waiting
+ Container ffcore-rv-langfuse-minio-1  Waiting
+ Container ffcore-rv-agent-worker-1  Waiting
+ Container ffcore-rv-fake-llm-1  Waiting
+ Container ffcore-rv-backend-1  Waiting
+ Container ffcore-rv-mcp-search-1  Waiting
+ Container ffcore-rv-agent-worker-bg-1  Waiting
+ Container ffcore-rv-redis-1  Waiting
+ Container ffcore-rv-langfuse-worker-1  Waiting
+ Container ffcore-rv-migrate-1  Waiting
+ Container ffcore-rv-ticket-desk-1  Waiting
+ Container ffcore-rv-postgres-1  Waiting
+ Container ffcore-rv-langfuse-postgres-1  Waiting
+ Container ffcore-rv-langfuse-web-1  Waiting
+ Container ffcore-rv-litellm-1  Waiting
+ Container ffcore-rv-worker-1  Waiting
+ Container ffcore-rv-langfuse-clickhouse-1  Waiting
+ Container ffcore-rv-langfuse-redis-1  Waiting
+ Container ffcore-rv-fake-llm-1  Healthy
+ Container ffcore-rv-ticket-desk-1  Healthy
+ Container ffcore-rv-agent-worker-bg-1  Healthy
+ Container ffcore-rv-langfuse-redis-1  Healthy
+ Container ffcore-rv-backend-1  Healthy
+ Container ffcore-rv-frontend-1  Healthy
+ Container ffcore-rv-langfuse-clickhouse-1  Healthy
+ Container ffcore-rv-redis-1  Healthy
+ Container ffcore-rv-migrate-1  Exited
+ Container ffcore-rv-agent-worker-1  Healthy
+ Container ffcore-rv-worker-1  Healthy
+ Container ffcore-rv-langfuse-worker-1  Healthy
+ Container ffcore-rv-langfuse-postgres-1  Healthy
+ Container ffcore-rv-langfuse-minio-1  Healthy
+ Container ffcore-rv-postgres-1  Healthy
+ Container ffcore-rv-langfuse-web-1  Healthy
+ Container ffcore-rv-litellm-1  Healthy
+ Container ffcore-rv-mcp-sql-1  Healthy
+ Container ffcore-rv-mcp-search-1  Healthy
+up_exit=0
+cmd: docker compose -p ffcore-rv --env-file .env.test --profile test --profile e2e up --build --pull never --no-start --no-deps e2e
+
+
+
+
+
+
+ Volume "ffcore-rv_e2e_node_modules"  Creating
+ Volume "ffcore-rv_e2e_node_modules"  Created
+ Container ffcore-rv-e2e-1  Creating
+ Container ffcore-rv-e2e-1  Created
+cmd: docker compose -p ffcore-rv --env-file .env.test --profile tools up --build --pull never --no-start --no-deps tools
+
+
+
+
+
+
+
+
+ Container ffcore-rv-tools-1  Creating
+ Container ffcore-rv-tools-1  Created
+cmd: NER copy from ffcore_model_cache (no network)
+models--akdeniz27--bert-base-turkish-cased-ner
+cmd: seed-prompts
+2026-11-22 17:07:40,665 WARNING langfuse Prompt 'eval_judge_rubric_v2-label:production' not found during refresh, evicting from cache.
+2026-11-22 17:07:41,574 WARNING langfuse Prompt 'memory_extract-label:production' not found during refresh, evicting from cache.
+2026-11-22 17:07:43,253 WARNING langfuse Prompt 'platform_rules-label:production' not found during refresh, evicting from cache.
+prompts created: ['eval_judge_rubric_v2', 'memory_extract', 'platform_rules']
+prompts already present: -
+cmd: create-superadmin (test value)
+superadmin created: b3808364-2012-4aee-b01d-34952df10212
+ffcore-rv-agent-worker-1 Up 10 minutes
+ffcore-rv-agent-worker-bg-1 Up 23 seconds
+ffcore-rv-backend-1 Up 10 minutes (healthy)
+ffcore-rv-fake-llm-1 Up 11 minutes
+ffcore-rv-frontend-1 Up 10 minutes
+ffcore-rv-langfuse-clickhouse-1 Up 11 minutes (healthy)
+ffcore-rv-langfuse-minio-1 Up 11 minutes (healthy)
+ffcore-rv-langfuse-postgres-1 Up 11 minutes (healthy)
+ffcore-rv-langfuse-redis-1 Up 11 minutes (healthy)
+ffcore-rv-langfuse-web-1 Up 10 minutes (healthy)
+ffcore-rv-langfuse-worker-1 Up 10 minutes
+ffcore-rv-litellm-1 Up 11 minutes (healthy)
+ffcore-rv-mcp-search-1 Up 10 minutes (healthy)
+ffcore-rv-mcp-sql-1 Up 10 minutes (healthy)
+ffcore-rv-postgres-1 Up 11 minutes (healthy)
+ffcore-rv-redis-1 Up 11 minutes (healthy)
+ffcore-rv-ticket-desk-1 Up 11 minutes (healthy)
+ffcore-rv-worker-1 Up 10 minutes

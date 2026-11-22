@@ -1,0 +1,8 @@
+HEAD=8f07072ce80f18c7104ddc0058541416102db5d5 stack=ffcore-rv (git archive copy + rv probe files)
+cmd: docker compose -p ffcore-rv --env-file .env.test --profile test --profile e2e run --rm e2e npx playwright test tests/e2e/test_14_ --workers=1 --reporter=line
+npm error path /work/frontend
+npm error command failed
+npm error signal SIGTERM
+npm error command sh -c 'playwright' test tests/e2e/test_14_ --workers=1 --reporter=line
+npm error A complete log of this run can be found in: /root/.npm/_logs/2026-11-22T17_11_12_796Z-debug-0.log
+NOT: kosu K-GEN-0048 uzerine yarida kesildi (OOM onceligi 16); sonuc sayilmaz.

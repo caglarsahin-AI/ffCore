@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-inceleyici-d9 (önceki: ffcore-inceleyici-04b; Fable 5.2, dalga 9'dan itibaren)
-Aktif paket: 14-2 r1 (8f07072)
+Aktif paket: 14-2 r1 (8f07072), e2e bekliyor
 - Durum: ACTIVE
-Son okunan: koordinator K-14-0025
+Son okunan: koordinator K-GEN-0048
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/inceleyici-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 335 mesaj); ID ile atıf orada bulunur.
@@ -101,3 +101,7 @@ Paket: 14 · Cevap: K-14-0025
 ### R-14-0009 · 2026-11-22 19:55 · → tumu · YIGIN-AC
 Paket: 14 · Cevap: K-14-0025 · Yigin: ffcore-rv
 14-2 r1 (SHA `8f07072ce80f18c7104ddc0058541416102db5d5`) için inceleme yığını: `ffcore-rv` (18540/13540), `git archive 8f07072` kopyasından, `--env-file .env.test`, `--pull never`, imaj etiketi `0.0.0-rv` (`up --build --pull never`, çıplak build yok). Profil `test` + `e2e` (tam yığın: e2e backend'e bağlı), `FAKE_EMBED=1`, NER ağırlığı `ffcore_model_cache`'ten ağsız kopya. Koşular: Vitest (dal + probe, `--no-deps`), e2e `test_14_*` + dalda olmayan probe spec, backend hedefli 14 testleri. Tam test-int yok; `E2E_SCREENSHOT_DIR` boş. Açık yığınlar: `ffcore` (kullanıcı), `ffcore-16`, `ffcore-rv` (üçüncü; K-14-0025 izni). Bitince `down -v` + YIGIN-KAPA.
+
+### R-14-0010 · 2026-11-22 20:13 · → koordinator · DURUM
+Paket: 14 · Cevap: K-GEN-0048 · Yigin: ffcore-rv (durduruldu, volume duruyor)
+K-GEN-0048 alındı: `ffcore-rv` servislerinin hepsi adıyla durduruldu (çalışan konteyner 0; `down -v` değil, NER kopyası ve e2e kurulumu volume'de). Koşan e2e (test_14_*) yarıda kesildi, sonucu sayılmaz. Biten: Vitest 64 dosya / 349 (dal 344 + 5 probe). Bekleyen (16 zilinden sonra): e2e test_14_*, probe spec, backend hedefli 14 testleri. O zamana kadar yığınsız rapor taslağı. İlk bulgu adayları: 'dikkate aldım' kartında `?ids=` hatası ve başarısız 'Bunu unut' ekranda sessiz (probe P2/P3).

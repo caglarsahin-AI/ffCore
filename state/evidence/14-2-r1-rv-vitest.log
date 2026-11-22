@@ -1,0 +1,14 @@
+HEAD=8f07072ce80f18c7104ddc0058541416102db5d5 stack=ffcore-rv (git archive copy + rv probe files)
+cmd: docker compose -p ffcore-rv --env-file .env.test --profile test --profile e2e run --rm --no-deps -T e2e sh -c 'npx vitest run; npx vitest run tests/unit/test_rv_142_probe.test.tsx'
+[2m Test Files [22m [1m[32m64 passed[39m[22m[90m (64)[39m
+[2m      Tests [22m [1m[32m349 passed[39m[22m[90m (349)[39m
+---probe
+[22m[39mRV P1 reads before unmount=3 after=3
+[22m[39mRV P2 status=403 card=true text="I took 2 remembered items into accountHide" items=0 errorLine=false alert=0
+[22m[39mRV P2 status=500 card=true text="I took 2 remembered items into accountHide" items=0 errorLine=false alert=0
+[22m[39mRV P3 items=2 alerts=0 errorTestId=0 text="I took 2 remembered items into accountHidebirForget thisikiForget this"
+[22m[39mRV P4 two ids, one item left: text="I took 2 remembered items into accountHidebirForget this"
+[22m[39mRV P5 html=""
+ [32m✓[39m tests/unit/test_rv_142_probe.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[33m 948[2mms[22m[39m
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m5 passed[39m[22m[90m (5)[39m

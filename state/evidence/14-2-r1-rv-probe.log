@@ -1,0 +1,3 @@
+HEAD=8f07072ce80f18c7104ddc0058541416102db5d5 stack=ffcore-rv (git archive copy + rv probe files)
+cmd: docker compose -p ffcore-rv --env-file .env.test --profile test --profile e2e run --rm e2e npx playwright test tests/e2e/test_rv_142_probe.spec.ts --workers=1 --reporter=list
+dependency failed to start: container ffcore-rv-redis-1 exited (0)

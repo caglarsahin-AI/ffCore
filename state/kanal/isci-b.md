@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-b-16 (local_8354774b-cd7a-49fe-93ab-64f1ac4edd1c; önceki lease ffcore-isci-b-triage2 RETIRED K-TR2-0012)
 - Aktif paket: 16 (feat/16-kaynaklar)
 - Durum: ACTIVE
-- Son okunan: koordinator K-16-0006
+- Son okunan: koordinator K-GEN-0048
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/isci-b-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 309 mesaj); ID ile atıf orada bulunur.
@@ -52,3 +52,18 @@ Tam test-int slotu: SHA `9029a475155865fa83b84f833646b927375c67f3`, `up -d --wai
 ### B-16-0009 · 2026-11-22 20:10 · → koordinator · DURUM
 Paket: 16 · Cevap: K-16-0006 · Durum: BLOCKED
 Tam test-int ilk koşu ~%45'te tools konteyneri **OOM ile öldü** (`Killed`, `16-1-test-int-killed1.log`; ölümden önceki F/E'ler bellek baskısıyla aynı anda): makinede yine üç tam yığın (ffcore 18, ffcore-16 20, **ffcore-rv 19** konteyner; ~9/11,7 GB). Kendi yığınımda tam koşunun gerektirmediği frontend, agent-worker*, sync-worker, worker durduruldu; tam koşu yeniden başladı (`16-1-test-int.log`). Tekrar ölürse ffcore-rv tam koşum bitene kadar duraklatılmalı (karar sende).
+
+### B-16-0010 · 2026-11-22 20:33 · → koordinator · DURUM
+Paket: 16 · Cevap: K-GEN-0048 · Durum: VERIFIED
+**Serbest**: tam test-int bitti, ffcore-16 kapandı; inceleyici ağır koşularına başlayabilir.
+
+### B-16-0011 · 2026-11-22 20:33 · → koordinator · YIGIN-KAPA
+Paket: 16 · Cevap: B-16-0008 · Yigin: ffcore-16
+`down -v` tamam: konteyner 0, volume 0 (`16-1-down-full.log`).
+
+### B-16-0012 · 2026-11-22 20:33 · → koordinator · PR-HAZIR
+Paket: 16 · Cevap: B-16-0007, K-16-0006 · SHA: 044c148ee278494a6140a3e7e36ab916a0131c0e
+**PR 16-1 [B] veri kaynakları çekirdeği + ağ klasörü.** Dal `feat/16-kaynaklar`, delta `7f82b2e..044c148` (5 commit: test kırmızı `8800fe8` → test `1f2a957` → kod `4451981` → docs `9029a47` → test `044c148`; state yok). PR notu `state/pr/16.md` 'PR 16-1'.
+**Tam test-int** (`16-1-test-int.log`, HEAD `9029a47`, OOM sonrası ikinci deneme; ilki `16-1-test-int-killed1.log`): **1310 passed, 42 skipped, 1 failed**: `test_03a_2_read_mode_get_parity` benim yeni tekil GET rotalarım yüzünden (dünyada kaynak yok → KeyError). Düzeltme yalnız test: `044c148` bu rotaları 05b/09/11 deseniyle muafiyet önekine ekler ve `test_16_1_read_mode_get_parity` ile kanıtlar; kod değişmedi. HEAD'de doğrulama `test_03a_read_side` + `test_16_1_api` 26/26, lint/format 0 (`16-1-int-parity.log`). Tam koşuyu `044c148`'de tekrarlamamı istersen slot ver.
+Diğer kapılar: kırmızı `16-1-red.log`; `make test` 2261 × iki profil; hedefli 16 37/37; ölçek 1.000 dosya delta 0,95 sn; silme yolu grubu 263/263; gen:api/check:api 0; compose config 0; smoke geçti.
+Bilerek değişen testler: `test_c3_common_columns.py` (`CHILD_TABLES` + 5), `test_57_alembic_merge.py` (`ABOVE_MERGE` + 6), `test_03a_read_side.py` (muafiyet öneki `/data-sources/{source_id}`). Zone dışı kabuller: `RESERVED_HOSTS += sync-worker` (K-16-0004), smoke `check_sync_worker`. İnceleme odakları: `sources/prune.py` + `engine._prune/prune_items` (karar ve sıra), `engine._reresolve_acl` (en özel klasör, yeniden eşleme), `sources/paths.py` + `fs.py` (C5), `knowledge/removal.py` (davranış aynı), `uq_sync_runs_one_active`, kimlik maskesi.

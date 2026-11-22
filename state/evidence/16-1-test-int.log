@@ -1,0 +1,81 @@
+HEAD=9029a475155865fa83b84f833646b927375c67f3 2026-11-22 20:10:43 full test-int (retry after OOM; frontend, agent-worker*, sync-worker, worker stopped)
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/model-catalog status=200 ms=23
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/model-catalog status=200 ms=20
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/44ee8cab-aa7e-40e3-87b9-d7da5c3e5ed3/models status=200 ms=33
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/44ee8cab-aa7e-40e3-87b9-d7da5c3e5ed3/models status=200 ms=34
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/44ee8cab-aa7e-40e3-87b9-d7da5c3e5ed3/models/c61a6ffb-f2df-4d4b-9efd-c091f3fd26ea status=200 ms=33
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/44ee8cab-aa7e-40e3-87b9-d7da5c3e5ed3/models/c61a6ffb-f2df-4d4b-9efd-c091f3fd26ea status=200 ms=34
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/audit status=200 ms=35
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/audit status=200 ms=37
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/audit.csv status=200 ms=65
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/audit.csv status=200 ms=79
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/44ee8cab-aa7e-40e3-87b9-d7da5c3e5ed3/pii-policies status=200 ms=43
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/44ee8cab-aa7e-40e3-87b9-d7da5c3e5ed3/pii-policies status=200 ms=32
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/44ee8cab-aa7e-40e3-87b9-d7da5c3e5ed3/guardrail-policies status=200 ms=34
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/44ee8cab-aa7e-40e3-87b9-d7da5c3e5ed3/guardrail-policies status=200 ms=29
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/44ee8cab-aa7e-40e3-87b9-d7da5c3e5ed3/tools status=200 ms=32
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/44ee8cab-aa7e-40e3-87b9-d7da5c3e5ed3/tools status=200 ms=30
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/44ee8cab-aa7e-40e3-87b9-d7da5c3e5ed3/agents status=200 ms=36
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/44ee8cab-aa7e-40e3-87b9-d7da5c3e5ed3/agents status=200 ms=36
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/44ee8cab-aa7e-40e3-87b9-d7da5c3e5ed3/runs status=200 ms=40
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/44ee8cab-aa7e-40e3-87b9-d7da5c3e5ed3/runs status=200 ms=35
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/44ee8cab-aa7e-40e3-87b9-d7da5c3e5ed3/chat/agents status=200 ms=37
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/44ee8cab-aa7e-40e3-87b9-d7da5c3e5ed3/chat/agents status=200 ms=32
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/44ee8cab-aa7e-40e3-87b9-d7da5c3e5ed3/conversations status=200 ms=33
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/44ee8cab-aa7e-40e3-87b9-d7da5c3e5ed3/conversations status=200 ms=36
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/44ee8cab-aa7e-40e3-87b9-d7da5c3e5ed3/approvals status=200 ms=41
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/44ee8cab-aa7e-40e3-87b9-d7da5c3e5ed3/approvals status=200 ms=33
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/44ee8cab-aa7e-40e3-87b9-d7da5c3e5ed3/approvals/count status=200 ms=34
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/44ee8cab-aa7e-40e3-87b9-d7da5c3e5ed3/approvals/count status=200 ms=31
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/44ee8cab-aa7e-40e3-87b9-d7da5c3e5ed3/api-keys status=200 ms=37
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/44ee8cab-aa7e-40e3-87b9-d7da5c3e5ed3/api-keys status=200 ms=33
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/44ee8cab-aa7e-40e3-87b9-d7da5c3e5ed3/quotas status=200 ms=37
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/44ee8cab-aa7e-40e3-87b9-d7da5c3e5ed3/quotas status=200 ms=33
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/44ee8cab-aa7e-40e3-87b9-d7da5c3e5ed3/usage status=200 ms=46
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/44ee8cab-aa7e-40e3-87b9-d7da5c3e5ed3/usage status=200 ms=32
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/alert-kinds status=200 ms=10
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/alert-kinds status=200 ms=11
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/44ee8cab-aa7e-40e3-87b9-d7da5c3e5ed3/alert-rules status=200 ms=33
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/44ee8cab-aa7e-40e3-87b9-d7da5c3e5ed3/alert-rules status=200 ms=31
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/44ee8cab-aa7e-40e3-87b9-d7da5c3e5ed3/alerts status=200 ms=35
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/44ee8cab-aa7e-40e3-87b9-d7da5c3e5ed3/alerts status=200 ms=31
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/44ee8cab-aa7e-40e3-87b9-d7da5c3e5ed3/alerts/count status=200 ms=30
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/44ee8cab-aa7e-40e3-87b9-d7da5c3e5ed3/alerts/count status=200 ms=31
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/alert-rules status=200 ms=30
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/alert-rules status=200 ms=28
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/alerts status=200 ms=31
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/alerts status=200 ms=31
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/alerts/count status=200 ms=31
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/alerts/count status=200 ms=32
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/44ee8cab-aa7e-40e3-87b9-d7da5c3e5ed3/notification-settings status=200 ms=36
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/44ee8cab-aa7e-40e3-87b9-d7da5c3e5ed3/notification-settings status=200 ms=31
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/notification-settings status=200 ms=30
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/notification-settings status=200 ms=30
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/retention/policies status=200 ms=37
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/retention/policies status=200 ms=31
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/retention/runs status=200 ms=43
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/retention/runs status=200 ms=34
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/44ee8cab-aa7e-40e3-87b9-d7da5c3e5ed3/eval-suites status=200 ms=35
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/44ee8cab-aa7e-40e3-87b9-d7da5c3e5ed3/eval-suites status=200 ms=31
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/44ee8cab-aa7e-40e3-87b9-d7da5c3e5ed3/mcp-servers status=200 ms=38
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/44ee8cab-aa7e-40e3-87b9-d7da5c3e5ed3/mcp-servers status=200 ms=35
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/44ee8cab-aa7e-40e3-87b9-d7da5c3e5ed3/memories status=200 ms=41
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/44ee8cab-aa7e-40e3-87b9-d7da5c3e5ed3/memories status=200 ms=37
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/44ee8cab-aa7e-40e3-87b9-d7da5c3e5ed3/memories/opt-out status=200 ms=38
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/44ee8cab-aa7e-40e3-87b9-d7da5c3e5ed3/memories/opt-out status=200 ms=38
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/44ee8cab-aa7e-40e3-87b9-d7da5c3e5ed3/memories/stats status=200 ms=40
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/44ee8cab-aa7e-40e3-87b9-d7da5c3e5ed3/memories/stats status=200 ms=38
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/44ee8cab-aa7e-40e3-87b9-d7da5c3e5ed3/memories/settings status=200 ms=40
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/44ee8cab-aa7e-40e3-87b9-d7da5c3e5ed3/memories/settings status=200 ms=41
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/44ee8cab-aa7e-40e3-87b9-d7da5c3e5ed3/data-sources status=200 ms=44
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/44ee8cab-aa7e-40e3-87b9-d7da5c3e5ed3/data-sources status=200 ms=33
+=============================== warnings summary ===============================
+tests/integration/test_04a_worker.py::test_04a_upload_job_runs_in_worker
+tests/integration/test_04a_worker.py::test_04a_job_for_missing_row_retries_then_fails_loud
+  /opt/venv/lib/python3.12/site-packages/arq/worker.py:877: DeprecationWarning: Call to deprecated close. (Use aclose() instead) -- Deprecated since version 5.0.1.
+    await self.pool.close(close_connection_pool=True)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/integration/test_03a_read_side.py::test_03a_2_read_mode_get_parity
+1 failed, 1310 passed, 42 skipped, 2 warnings in 1114.83s (0:18:34)

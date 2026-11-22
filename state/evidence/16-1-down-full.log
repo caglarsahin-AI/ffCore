@@ -1,0 +1,4 @@
+HEAD=044c148ee278494a6140a3e7e36ab916a0131c0e 2026-11-22 20:32:22
+ Volume ffcore-16_postgres_data  Removed
+ Volume ffcore-16_langfuse_minio_data  Removed
+containers=0 volumes=0
