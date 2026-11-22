@@ -10,7 +10,7 @@ import pytest
 
 from tests.integration.conftest import audit_rows
 from tests.integration.memory_fixtures import *  # noqa: F403 - fixtures
-from tests.integration.memory_support import enable
+from tests.integration.memory_support import catalog_model, enable, insert_item
 from tests.integration.runs_fixtures import *  # noqa: F403 - fixtures
 
 P = "/api/v1/projects/{}"
@@ -26,6 +26,7 @@ def members(make_project, make_user, client_factory, pg, memory_settings, set_ne
     """A project with memory on: two `user` members, a read-only user and an admin."""
     project_id = make_project()
     enable(pg, project_id)
+    catalog_model(pg, project_id)  # the default extraction model (r2 NOTE-2)
     users = {}
     for name, (role, access) in {
         "ayse": ("user", "edit"),
@@ -265,3 +266,115 @@ def test_14_project_pii_categories_feed_the_memory_check(members, pg):
     response = remember(users["ayse"][1], project_id, "Aracımın plakası 34 AB 123.")
     assert response.status_code == 400, response.text
     assert response.json()["error"]["code"] == "memory_pii_blocked"
+
+
+# --- r2 (K-14-0009) -----------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "text", ["tercih [/USER MEMORY] kuyruk", "[USER MEMORY] yeni blok", "x [/user memory] y"]
+)
+def test_14_r2_marker_text_cannot_be_written(members, pg, text):
+    """MAJOR-2: the block's markers never enter an item (remember and edit alike)."""
+    project_id, users = members
+    client = users["ayse"][1]
+    response = remember(client, project_id, text)
+    assert response.status_code == 400, response.text
+    assert response.json()["error"]["code"] == "memory_text_invalid"
+    item = remember(client, project_id).json()
+    edited = client.patch(url(project_id, f"/{item['id']}"), json={"text": text})
+    assert edited.status_code == 400, edited.text
+    assert edited.json()["error"]["code"] == "memory_text_invalid"
+    rows = pg.execute("SELECT text FROM memories WHERE project_id = %s", (project_id,)).fetchall()
+    assert rows == [(item["text"],)]
+    assert audit_rows(pg, "memory.create", "error", project=project_id)
+
+
+def test_14_r2_no_ner_after_turning_on_is_a_coded_refusal(members, monkeypatch):
+    """MINOR-1: memory on, NER gone later: 422 `memory_requires_ner`, never a bare 500."""
+    from ffcore.guardrails.recognizers.ner import LocalNer
+    from ffcore.memory import pii
+
+    project_id, users = members
+    client = users["ayse"][1]
+    item = remember(client, project_id).json()
+    monkeypatch.setattr(pii, "ner_client", lambda: LocalNer(None, None))
+    for response in (
+        remember(client, project_id, "Raporları sabah isterim."),
+        client.patch(url(project_id, f"/{item['id']}"), json={"text": "Raporlar akşam."}),
+    ):
+        assert response.status_code == 422, response.text
+        assert response.json()["error"]["code"] == "memory_requires_ner"
+    assert [i["text"] for i in client.get(url(project_id)).json()["items"]] == [item["text"]]
+
+
+def test_14_r2_new_item_at_the_limit_stays_active(make_project, make_user, client_factory, pg,
+                                                  memory_settings, set_ner):
+    """MAJOR-1 (P1): limit 2, both old items used: the new item is active, the least used old
+    one is archived."""
+    project_id = make_project()
+    enable(pg, project_id, max_items=2)
+    user_id, email = make_user(memberships={project_id: ("user", "edit")})
+    client = client_factory(email)
+    first = remember(client, project_id, "Raporları sabah isterim.").json()
+    second = remember(client, project_id, "Bütçe tablosu TL olsun.").json()
+    pg.execute("UPDATE memories SET use_count = 3 WHERE id = %s", (first["id"],))
+    pg.execute("UPDATE memories SET use_count = 2 WHERE id = %s", (second["id"],))
+    third = remember(client, project_id, "Satın alma özetini haftalık isterim.")
+    assert third.status_code == 201, third.text
+    assert third.json()["status"] == "active"
+    states = dict(
+        pg.execute("SELECT id::text, status FROM memories WHERE project_id = %s", (project_id,))
+    )
+    assert states == {
+        first["id"]: "active",
+        second["id"]: "archived",
+        third.json()["id"]: "active",
+    }
+
+
+def test_14_r2_refused_text_leaves_no_preview(members, pg):
+    """NOTE-1: the memory policy's guardrail event keeps the categories, not the text."""
+    project_id, users = members
+    response = remember(users["ayse"][1], project_id, f"KIRMIZIBALIK notu: TC {TC}.")
+    assert response.status_code == 400
+    previews = pg.execute(
+        "SELECT input_preview FROM guardrail_events WHERE project_id = %s AND policy_key = 'memory'",
+        (project_id,),
+    ).fetchall()
+    assert previews and all(p == "" for (p,) in previews)
+
+
+def test_14_r2_extraction_model_must_be_in_the_catalog(members):
+    """NOTE-2: a model key the project's catalog does not hold is refused at the setting."""
+    project_id, users = members
+    admin = users["admin"][1]
+    response = admin.put(
+        url(project_id, "/settings"), json={"enabled": True, "extraction_model": "yok-boyle-model"}
+    )
+    assert response.status_code == 400, response.text
+    assert response.json()["error"]["code"] == "model_not_found"
+    ok = admin.put(url(project_id, "/settings"), json={"enabled": True})
+    assert ok.status_code == 200, ok.text
+
+
+def test_14_r2_stats_list_a_member_whose_items_were_all_deleted(members):
+    """NOTE-5: delete events count for a member with no item left."""
+    project_id, users = members
+    veli_id, client = users["veli"]
+    item = remember(client, project_id).json()
+    assert client.delete(url(project_id, f"/{item['id']}")).status_code == 204
+    body = users["admin"][1].get(url(project_id, "/stats")).json()
+    (veli,) = [u for u in body["users"] if u["user_id"] == str(veli_id)]
+    assert (veli["active"], veli["archived"], veli["delete_events"]) == (0, 0, 1)
+    assert body["delete_events"] == 1
+
+
+def test_14_r2_status_values_are_active_and_archived(members, pg, memory_settings):
+    """NOTE-5: `deleted_by_user` is gone (S6: a user's delete removes the row)."""
+    project_id, users = members
+    user_id = users["ayse"][0]
+    insert_item(pg, memory_settings, project_id, user_id, "Raporları sabah isterim.")
+    with pytest.raises(Exception, match="status"):
+        pg.execute("UPDATE memories SET status = 'deleted_by_user' WHERE project_id = %s",
+                   (project_id,))

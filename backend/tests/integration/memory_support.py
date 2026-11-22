@@ -123,10 +123,16 @@ class DirectMemory:
                     raise MemoryConflict(exc.code) from exc
                 raise
 
-    async def recall(self, question):
+    async def recall(self, question, share):
         self.recalls.append(question)
-        out = await self._call(api.internal_recall, api.RecallRequest, question=question)
-        return Recall(out.off_reason, [i.model_dump(mode="json") for i in out.items])
+        out = await self._call(
+            api.internal_recall, api.RecallRequest, question=question, share=share
+        )
+        return Recall(
+            out.off_reason,
+            [i.model_dump(mode="json") for i in out.items],
+            dropped=[str(i) for i in out.dropped],
+        )
 
     async def related(self, text):
         out = await self._call(api.internal_related, api.RelatedRequest, text=text)
@@ -141,6 +147,42 @@ class DirectMemory:
             items=[api.CandidateIn(**i) for i in items],
         )
         return json.loads(out.model_dump_json())
+
+
+def insert_item(
+    pg, settings, project_id, user_id, text, *, kind="preference", use_count=0, agent_id=None
+):
+    """An item put straight into the table (no write rule), with the fake embedding."""
+    import asyncio
+
+    from ffcore.knowledge.embed import embed
+
+    vector = asyncio.run(embed(settings, [text])).dense[0]
+    item_id = uuid.uuid4()
+    pg.execute(
+        "INSERT INTO memories (id, project_id, user_id, agent_id, kind, text, embedding,"
+        " confidence, use_count) VALUES (%s, %s, %s, %s, %s, %s, %s::vector, 1, %s)",
+        (item_id, project_id, user_id, agent_id, kind, text, str(list(vector)), use_count),
+    )
+    return item_id
+
+
+def catalog_model(pg, project_id, key="memory-extract"):
+    """An active chat model of the project's catalog (the extraction model a setting names)."""
+    provider = uuid.uuid4()
+    pg.execute(
+        "INSERT INTO providers (id, key, label, driver, domains, config_encrypted, supports_test,"
+        " is_active, created_by) VALUES (%s, %s, 'P', 'openai_compatible', ARRAY['model'],"
+        " '\\x00', true, true, 'test')",
+        (provider, f"prov-{provider.hex[:8]}"),
+    )
+    pg.execute(
+        "INSERT INTO models (id, project_id, key, display_name, provider_id, category, model_id,"
+        " capabilities, input_types, pricing, limits, upstream_api, request_policy, is_active,"
+        " created_by) VALUES (%s, %s, %s, 'm', %s, 'llm', 'x', '{}', ARRAY['text'], '{}', '{}',"
+        " 'chat', '{}', true, 'test')",
+        (uuid.uuid4(), project_id, key, provider),
+    )
 
 
 def turn_of(content: str) -> ModelTurn:

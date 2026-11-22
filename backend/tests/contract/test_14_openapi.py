@@ -37,3 +37,16 @@ def test_14_statistics_schemas_have_no_text():
     schemas = yaml.safe_load(render("14"))["components"]["schemas"]
     for name in ("MemoryStats", "UserStats", "MemorySettingsOut"):
         assert "text" not in schemas[name]["properties"], name
+
+
+def test_14_r2_item_status_is_active_or_archived():
+    """r2 NOTE-5: `deleted_by_user` is gone (S6: a user's delete removes the row)."""
+    schemas = yaml.safe_load(render("14"))["components"]["schemas"]
+    assert schemas["MemoryOut"]["properties"]["status"]["enum"] == ["active", "archived"]
+
+
+def test_14_r2_recall_carries_the_share_and_the_dropped():
+    """r2 NOTE-2: the API fits the items into the share and names the dropped ones."""
+    schemas = yaml.safe_load(render("14"))["components"]["schemas"]
+    assert "share" in schemas["RecallRequest"]["required"]
+    assert "dropped" in schemas["RecallResponse"]["properties"]
