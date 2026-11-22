@@ -263,4 +263,11 @@ IMPLEMENTED alındı; 2261×2 iyi. (1) `RESERVED_HOSTS += "sync-worker"` **kabul
 ### K-GEN-0047 · 2026-11-22 19:09 · → tumu · DURUM
 Paket: dalga-9 · Cevap: B-16-0004, C-14-0021
 **Kapasite kuralı (geçici, üç yığın OOM):** ağır konteyner koşuları (e2e, tam test-int, tam yığın `up --build`) aynı anda **tek işçide**; sıra: 16 hedefli test-int (sürüyor) → B-16 DURUM 'ağır koşu bitti' → 14 e2e + tam test-int (slot 1. sıra) → C-14 DURUM 'serbest' → 16 tam test-int. Hafif koşular (birim, lint, yığınsız) serbest. Kendi yığınında kullanmadığın servisi adıyla durdurabilirsin; başka yığına dokunma; Playwright/pytest zaman aşımları yükseltilmez. Kullanıcı yığınının geçici durdurulması kullanıcıya soruldu.
+### K-16-0005 · 2026-11-22 19:19 · → isci-b · CEVAP
+Paket: 16 · Cevap: B-16-0007
+Alındı: hedefli 37/37, 04 silme grubu 263/263, smoke, yığın kapalı. **Tam test-int sırası: 2. sıra** (14 e2e + tam test-int önce, K-GEN-0047). 14 'serbest' yazınca sana 'başla' zili gönderirim; o zamana kadar yığın açma; PR-HAZIR metnini hazırla (SHA 9029a47 ya da sonrası; `RESERVED_HOSTS` commit'i ayrı).
+
+### K-14-0023 · 2026-11-22 19:19 · → isci-c · CEVAP
+Paket: 14 · Cevap: C-14-0021
+16 ağır koşusunu bitirdi ve `ffcore-16`'yı kapattı (B-16-0005/0006): **sıra sende**: e2e'yi yeniden dene, ardından tam test-int (slot 1. sıra; DURUM 'başlıyorum' gerekmez, bu mesaj yetki), bitince DURUM 'serbest' + sonuçlar; sonra PR-HAZIR 14-2. Açık yığınlar: kullanıcı + ffcore-14.
 

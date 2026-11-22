@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-b-16 (local_8354774b-cd7a-49fe-93ab-64f1ac4edd1c; önceki lease ffcore-isci-b-triage2 RETIRED K-TR2-0012)
 - Aktif paket: 16 (feat/16-kaynaklar)
 - Durum: ACTIVE
-- Son okunan: koordinator K-GEN-0046
+- Son okunan: koordinator K-GEN-0047
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/isci-b-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 309 mesaj); ID ile atıf orada bulunur.
@@ -32,3 +32,15 @@ PLAN-ONAY ve K-16-0003 alındı (varsayılan zamanlama `daily 02:00 UTC`; ilk ko
 ### B-16-0004 · 2026-11-22 19:08 · → koordinator · DURUM
 Paket: 16 · Cevap: K-16-0003, K-GEN-0046 · Durum: IMPLEMENTED
 16-1 kodlandı (commit'lenmedi; kırmızı test commit'i `8800fe8`, `16-1-red.log`). Yeşil: lint/format, heads tek, `make test` llmaas 2261 / airgap 2261 (`16-1-test-*.log`), gen:api/check:api 0, ilk hedefli test-int 36/37. **Ortam uyarısı:** makinede üç tam yığın (ffcore, ffcore-14, ffcore-16; 55 konteyner, 12,5 GB/7 CPU): test-int'te `postgres` ad çözümü ve Redis zaman aşımları, tools konteynerim `Killed`, daemon `unexpected EOF`; ffcore-16 ve kullanıcı yığınında `agent-worker-bg` 10-11 kez yeniden başladı. Kod hatası değil (aynı testler önce yeşildi); yükü azaltmak için ffcore-16'da test-int'in kullanmadığı servisleri adıyla durdurdum (frontend, agent-worker*, mcp-*, ticket-desk, sync-worker, backend, ingest worker). Hedefli koşuyu parçalı yeniden koşuyorum. **Zone dışı iki not (onayın/işin):** (1) `services/external_config.py` `RESERVED_HOSTS += "sync-worker"` tek satır (aksi halde `test_06b2_reserved_hosts_cover_compose` kırmızı; 12'nin egress-proxy deseni); (2) handbook/CONTRACTS.md C3 çocuk tablo listesine `source_items, source_attachments, sync_runs, source_sync_state, acl_mappings` (additive; test_c3 güncellendi). Smoke'a `check_sync_worker` (Redis `sync:health-check`) eklendi. Tam test-int slotu SORU'yu hedefli yeşilden sonra yazacağım.
+
+### B-16-0005 · 2026-11-22 19:19 · → koordinator · DURUM
+Paket: 16 · Cevap: K-16-0004, K-GEN-0047 · Durum: VERIFIED
+**Ağır koşu bitti** (sıra 14'te). 16-1 dört commit, HEAD `9029a475155865fa83b84f833646b927375c67f3` (`7f82b2e..9029a47`: test kırmızı `8800fe8` → test `1f2a957` → kod `4451981` → docs `9029a47`). Hedefli yeşil: 16 test-int 37/37 (`16-1-int-16.log`), ölçek 1.000 dosya + tek değişiklik delta **0,95 sn** (`16-1-int-scale.log`), silme yolu çıkarımı için 03a/03c/04a/04b/116/57/af/trj grubu 263/263 (`16-1-int-04-removal.log`; mevcut test değişmeden), birim/sözleşme hedefli 88, `make test` 2261×2, lint 0, compose config 0, `make smoke` geçti (`sync-worker sync:health-check present`, `16-1-smoke.log`). CONTRACTS C3'e dokunmadım. Yığın kapalı: `down -v`, ffcore-16 konteyner 0 / volume 0 (`16-1-down.log`).
+
+### B-16-0006 · 2026-11-22 19:19 · → koordinator · YIGIN-KAPA
+Paket: 16 · Cevap: B-16-0003 · Yigin: ffcore-16
+`down -v` tamam; killed koşudan kalan tools-run konteyneri ve `ffcore-16_model_cache` adıyla silindi (0/0).
+
+### B-16-0007 · 2026-11-22 19:19 · → koordinator · SORU
+Paket: 16 · Cevap: K-GEN-0047
+**Tam test-int slotu istiyorum (FOLLOWUP-216: `knowledge/worker.py`, `ingest.py`, `api/knowledge.py`, compose, OpenAPI dokunuşu).** SHA `9029a475155865fa83b84f833646b927375c67f3`. Sıran 14'ten sonra; slot gelince `ffcore-16`'yı `up -d --wait --build --pull never` ile açıp `QDRANT_URL=http://qdrant:6333 RUN_QDRANT_TESTS=1 pytest tests/integration` (ana kapı biçimi) tee `16-1-test-int-full.log`; ardından PR-HAZIR (`state/pr/16.md` 'PR 16-1').
