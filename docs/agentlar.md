@@ -75,6 +75,14 @@ checks only the hex form of `accent`; the console derives a tone per theme from 
 text on it stays readable (contrast 4.5:1 to the text, 3:1 to the page) and shows both in the
 Portal tab's preview, saying when the tone differs from the picked colour.
 
+### Memory settings (14-2)
+
+The wizard's **Memory** tab holds the agent's own memory settings row (on/off, allowed kinds,
+items per member, items recalled per question, keep for N days, extraction model). Like the
+Portal tab it is agent level, not versioned, and saved on its own; it needs `admin` (analysts see
+that it is an administrator's). Without its own row the agent uses the project default
+(Settings → Memory). See `docs/hafiza.md`.
+
 ### Manifest (06b)
 
 - `GET /agents/{id}/manifest?version=&format=json|yaml`: the agent (`key`, `name`, `description`,

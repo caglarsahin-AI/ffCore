@@ -4,6 +4,22 @@ Behaviour and configuration changes that a deployment or an API client notices, 
 (handbook/RELEASE_AND_ROLLBACK.md, CHANGE_CONTROL.md). Each entry names the package and what to do,
 if anything.
 
+## 2026-11-22 · 14-2 · User memory screens
+
+- **What:** the member's **My memory** page (`/memory`: list, edit, delete, delete all, remember
+  this, memory off/on), the "I took these into account" note with a one-click forget under an
+  answer and the "I noted: … [Delete]" line after a turn, the agent wizard's **Memory** tab and
+  **Settings → Memory** in the console (project default, the principle that administrators
+  never see the text, statistics). The console's Settings item is no longer "coming soon".
+  Guide: `docs/hafiza.md`.
+- **API (additive):** `budget.question_truncated: true` when a question longer than a run's
+  input limit was searched with its first 20,000 characters. `PUT …/memories/settings` now also
+  checks the extraction model when it changes while memory stays off; turning memory off with
+  the model in use always works.
+- **e2e:** global setup adds a `memory` project (analyst, analyst reader, project admin and a
+  `memory` account); memory specs need the NER weights in the stack's model cache and skip with
+  `memory_requires_ner` otherwise (`docs/onyuz.md`).
+
 ## 2026-11-22 · 14-1 · User memory (backend)
 
 - **What:** a member's assistant remembers lasting facts about them (role, preferences, recurring

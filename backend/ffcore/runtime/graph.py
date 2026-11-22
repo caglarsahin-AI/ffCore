@@ -97,7 +97,11 @@ async def _memory(ctx: RunContext, question: str, budget) -> tuple[str, list[str
             RunEventType.memory_used,
             {"items": [{"id": str(i["id"]), "kind": i["kind"]} for i in kept], "dropped": dropped},
         )
-    return (memory_recall.block(kept) if kept else ""), ids, {"memory": "on"}
+    note = {"memory": "on"}
+    if memory_recall.recall_query(question) != question:
+        # 14-2 NOTE-1: the recall query was the question's first RUN_INPUT_MAX characters.
+        note["question_truncated"] = True
+    return (memory_recall.block(kept) if kept else ""), ids, note
 
 
 async def prepare(state: RunState, runtime: Runtime[RunContext]) -> dict:

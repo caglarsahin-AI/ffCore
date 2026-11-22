@@ -1,6 +1,7 @@
 "use client";
 
 import { BrainIcon, ChevronsUpDownIcon, LogOutIcon, UserCircleIcon } from "lucide-react";
+import Link from "next/link";
 import { useTranslations } from "next-intl";
 
 import { useAccess, useSession } from "@/components/session-provider";
@@ -17,7 +18,7 @@ import {
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
 
 // User menu: who is signed in, role and access mode on the selected project (brief 10).
-// "My memory" is disabled until its screen exists (14).
+// "My memory" opens the member's own memory page (14-2).
 export function NavUser() {
   const t = useTranslations("UserMenu");
   const tAccess = useTranslations("Access");
@@ -56,7 +57,7 @@ export function NavUser() {
               </DropdownMenuLabel>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem disabled>
+            <DropdownMenuItem render={<Link href="/memory" />} data-testid="user-menu-memory">
               <BrainIcon />
               {t("memory")}
             </DropdownMenuItem>

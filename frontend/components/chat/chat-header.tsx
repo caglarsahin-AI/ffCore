@@ -19,6 +19,7 @@ import { chatPath } from "@/lib/chat-view";
 export function ChatHeader() {
   const t = useTranslations("Chat");
   const tBrand = useTranslations("Brand");
+  const tMemory = useTranslations("memory.page");
   const { menuRole, isSuperadmin } = useAccess();
   const signOut = useSignOut();
   return (
@@ -30,6 +31,9 @@ export function ChatHeader() {
       <ProjectSwitcher />
       <div className="ml-auto flex flex-wrap items-center gap-3">
         <ReadOnlyBadge />
+        <Link href="/memory" className="text-sm text-muted-foreground underline-offset-4 hover:underline" data-testid="chat-memory-link">
+          {tMemory("link")}
+        </Link>
         {(isSuperadmin || hasRole(menuRole, "analyst")) && (
           <Link href="/" className="text-sm text-muted-foreground underline-offset-4 hover:underline" data-testid="chat-console-link">
             {t("console")}

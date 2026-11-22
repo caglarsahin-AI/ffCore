@@ -162,6 +162,7 @@ def test_14_k1_profile_from_one_conversation_answers_the_next(
     assert used["items"] == [{"id": str(learned[0][0]), "kind": "profile"}]
     (budget,) = typed(pg, second, "budget")
     assert budget["memory"] == "on" and budget["used"]["memory"] > 0
+    assert "question_truncated" not in budget  # 14-2 NOTE-1: only when the query was shortened
     # S4: the recorded messages carry the ids, never the memory text.
     (call,) = typed(pg, second, "llm_call")
     recorded = json.dumps(call["request_messages"], ensure_ascii=False)

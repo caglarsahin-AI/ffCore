@@ -381,3 +381,25 @@ def test_14_r2_status_values_are_active_and_archived(members, pg, memory_setting
         pg.execute(
             "UPDATE memories SET status = 'deleted_by_user' WHERE project_id = %s", (project_id,)
         )
+
+
+# --- 14-2 NOTE-2 (K-14-0020 S7) -----------------------------------------------------------------
+
+
+def test_14_r3_turning_memory_off_always_works(make_project, make_user, client_factory):
+    """Without the default extraction model in the catalog, turning memory off still saves."""
+    project_id = make_project()
+    _, email = make_user(memberships={project_id: ("admin", "edit")})
+    response = client_factory(email).put(url(project_id, "/settings"), json={"enabled": False})
+    assert response.status_code == 200, response.text
+
+
+def test_14_r3_a_changed_model_is_checked_while_off(members):
+    """A model other than the one in use is checked even when memory stays off."""
+    project_id, users = members
+    admin = users["admin"][1]
+    response = admin.put(
+        url(project_id, "/settings"), json={"enabled": False, "extraction_model": "yok-boyle-model"}
+    )
+    assert response.status_code == 400, response.text
+    assert response.json()["error"]["code"] == "model_not_found"

@@ -313,6 +313,106 @@
     "inputPlaceholder": "Type here",
     "chart": "Chart palette"
   },
+  "memory": {
+    "kinds": {
+      "profile": "Profile",
+      "preference": "Preference",
+      "fact": "Fact",
+      "decision": "Decision"
+    },
+    "page": {
+      "title": "My memory",
+      "intro": "What the assistant remembers about you in this project. Only you can see these; you can change or delete any of them at any time.",
+      "link": "My memory",
+      "noProject": "Choose a project to see your memory.",
+      "rememberLabel": "Remember this",
+      "rememberHint": "A preference the assistant should keep in mind in every conversation. Personal data (ID numbers, names, phone numbers) is refused.",
+      "rememberSave": "Remember",
+      "listTitle": "Remembered",
+      "empty": "Nothing is remembered yet. The assistant notes lasting preferences from your conversations, or you can add one above.",
+      "learned": "Learned {date}",
+      "uses": "{count, plural, =0 {Not used yet} one {Used once} other {Used # times}}",
+      "edit": "Edit",
+      "editSave": "Save",
+      "editCancel": "Cancel",
+      "editLabel": "Text of this item",
+      "delete": "Delete",
+      "deleteAll": "Delete all",
+      "deleteAllTitle": "Delete everything the assistant remembers about you?",
+      "deleteAllBody": "Every item in this project is deleted at once and for good, archived ones too. This cannot be undone.",
+      "deleteAllConfirm": "Delete all",
+      "cancel": "Cancel",
+      "archived": "{count, plural, one {# archived item} other {# archived items}}",
+      "archivedHint": "Replaced by a newer item or over the limit; not used in answers.",
+      "optOutLabel": "Use memory",
+      "optOutHint": "When off, nothing is remembered and nothing is used in answers. Existing items stay until you delete them.",
+      "offNote": "Memory is off for you: nothing is remembered or used until you turn it on again.",
+      "loading": "Loading…"
+    },
+    "notes": {
+      "used": "{count, plural, one {I took # remembered item into account} other {I took # remembered items into account}}",
+      "show": "Show",
+      "hide": "Hide",
+      "forget": "Forget this",
+      "noted": "I noted:",
+      "notedDelete": "Delete",
+      "later": "Anything noted from this answer may appear later in My memory.",
+      "readFailed": "The memory notes could not be read ({code})."
+    },
+    "settings": {
+      "title": "Memory",
+      "intro": "What the assistant may remember about each member and use in later answers. Members see and control their own items.",
+      "enabled": "Memory on",
+      "nerMissing": "Memory needs the installation's NER model (NER_MODEL, NER_REVISION) to keep person names out. Ask the administrator of the installation; see docs/hafiza.md.",
+      "kinds": "Kinds that may be remembered",
+      "maxItems": "Items per member",
+      "maxItemsHint": "Over the limit the least used item is archived.",
+      "topK": "Items recalled per question",
+      "topKHint": "Profile items are always recalled; this many others, the closest to the question.",
+      "ttl": "Keep for (days)",
+      "ttlHint": "Empty: until the member deletes it or the data retention period ends.",
+      "model": "Extraction model",
+      "modelHint": "The project's chat model that finds lasting items after a run.",
+      "save": "Save memory settings",
+      "saved": "Saved.",
+      "adminOnly": "Memory settings are an administrator's.",
+      "source": {
+        "agent": "This agent's own settings",
+        "project": "Using the project default",
+        "default": "Using the built-in default (memory off)"
+      }
+    },
+    "settingsPage": {
+      "title": "Settings",
+      "description": "Project settings. Memory is the first section; others come with later packages."
+    },
+    "stats": {
+      "title": "Memory statistics",
+      "principle": "Administrators cannot see what is remembered: only counts, kinds and use. Audit records the event, never the text.",
+      "active": "Active items",
+      "archived": "Archived",
+      "useRate": "Used at least once",
+      "deletes": "Deletes by members",
+      "optedOut": "Members with memory off",
+      "member": "Member",
+      "byKind": "By kind",
+      "used": "Used",
+      "none": "No member has memory items yet.",
+      "unreadable": "—"
+    },
+    "errors": {
+      "line": "{message} ({code})",
+      "memory_pii_blocked": "Personal data cannot be stored in memory.",
+      "memory_text_invalid": "This text cannot be stored: it contains the memory block's markers.",
+      "memory_requires_ner": "Memory needs the installation's NER model.",
+      "memory_disabled": "Memory is turned off for this project.",
+      "memory_opted_out": "You turned memory off; turn it on to add items.",
+      "memory_kind_not_allowed": "This kind of item is not allowed in this project.",
+      "memory_not_owner": "Only its owner can change a memory item.",
+      "model_not_found": "The project has no active chat model with this key.",
+      "other": "The memory request failed."
+    }
+  },
   "Errors": {
     "readOnlyAccess": "Read-only access: your access mode does not allow changes here.",
     "insufficientRole": "Your role in this project does not allow this action.",
@@ -811,7 +911,8 @@
         "limits": "Safety and limits",
         "output": "Output",
         "versions": "Publish",
-        "portal": "Portal"
+        "portal": "Portal",
+        "memory": "Memory"
       },
       "editingVersion": "Version {version}",
       "publishedReadOnly": "This version is published and cannot be changed. Open a new draft on the Publish tab.",
