@@ -115,12 +115,13 @@ buttons behind the write gate as before).
 
 ## Memory (14-2)
 
-When memory is on for the project, the header links to **My memory** (`/memory`), the member's
-own items. Under an answer that used remembered items, "I took N remembered items into account"
+The header always links to **My memory** (`/memory`), the member's own items; when memory is off
+for the project, the page says so as soon as an item is added. Under an answer that used remembered items, "I took N remembered items into account"
 opens the list with a one-click **Forget this**; after a turn answered on screen, "I noted: …
 [Delete]" follows once the background extraction has written something (read for 2 minutes,
 then a note that it may appear later). Both are read from the run's events after it ended; an
-opted-out member or a run without memory shows neither. Details, settings and error codes:
+opted-out member or a run without memory shows neither. A failed read, forget or delete is
+shown with its code, and the count drops as items are forgotten. Details, settings and error codes:
 `docs/hafiza.md`.
 
 ## Screenshots

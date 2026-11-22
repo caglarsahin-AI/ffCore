@@ -63,6 +63,9 @@ Kinds: `profile` and `preference` are valid in every agent of the project; `fact
   something. The chat reads the run's events every 5 seconds for 2 minutes; the job may wait for
   its model slot, so after that the line says notes may appear later in My memory. Nothing is
   shown when memory is off, opted out or nothing was written.
+- **Failures are shown:** if the items cannot be read, a line with the code replaces the card; a
+  failed forget or delete leaves the item in place with an error and its code. N is the number of
+  items still there: a forgotten item drops out, and the card goes away when none is left.
 
 Read-only access does not limit any of this: memory is the member's own data.
 
