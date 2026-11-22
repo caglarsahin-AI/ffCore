@@ -1,0 +1,38 @@
+HEAD=bb5ad0d1de032b37077548ffd4d77def28d3ca99
+cmd: pytest tests/integration/test_rv_14_probe2.py -q -s
+
+RV Q1: model still receives the memory text = True
+RV Q1: llm_call copy masked = True
+
+RV Q1: guardrail_events rows = 4
+RV Q1: default egress log preview_len=60
+RV Q1: preview = "You help the hospital's finance team. Questions about access"
+RV Q1: default egress tokenize preview_len=60
+RV Q1: preview = "You help the hospital's finance team. Questions about access"
+RV Q1: default egress log preview_len=8
+RV Q1: preview = 'Doluluk?'
+RV Q1: default egress log preview_len=8
+RV Q1: preview = 'Doluluk?'
+RV Q1: MEMORY_TEXT_IN_GUARDRAIL_PREVIEW = []
+.
+RV Q2: guardrail_events rows = 4
+RV Q2: default egress log preview_len=60
+RV Q2: preview = "You help the hospital's finance team.\n\n[USER MEMORY]\nKnown a"
+RV Q2: default egress log preview_len=60
+RV Q2: preview = "You help the hospital's finance team.\n\n[USER MEMORY]\nKnown a"
+RV Q2: default egress log preview_len=8
+RV Q2: preview = 'Doluluk?'
+RV Q2: default egress log preview_len=8
+RV Q2: preview = 'Doluluk?'
+RV Q2: MEMORY_TEXT_IN_GUARDRAIL_PREVIEW = []
+.
+RV Q3: egress action = tokenize | phone tokenized = True
+
+RV Q3: guardrail_events rows = 2
+RV Q3: default egress log preview_len=60
+RV Q3: preview = "You keep a short memory about one user of an organisation's "
+RV Q3: default egress tokenize preview_len=60
+RV Q3: preview = "You keep a short memory about one user of an organisation's "
+RV Q3: MEMORY_TEXT_IN_GUARDRAIL_PREVIEW = []
+.
+3 passed in 6.97s

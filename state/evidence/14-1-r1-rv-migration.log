@@ -1,0 +1,10 @@
+HEAD=bb5ad0d1de032b37077548ffd4d77def28d3ca99
+cmd: tools sh -c 'cd backend && python rv_migration_probe.py'
+RV alembic heads exit 0 | 14_0001 (11, 05b, 04b, 04a, 08, 09, 03c, 03b, 06a, 14, 05a, 07, 03a, 12, 06b) (head)
+RV alembic upgrade heads exit 0 | 
+RV tables ['memories', 'memory_opt_outs', 'memory_settings'] indexes ['ix_memories_owner', 'pk_memories', 'pk_memory_opt_outs', 'pk_memory_settings', 'uq_memory_settings_agent', 'uq_memory_settings_project']
+RV alembic downgrade 11_0001 exit 0 | 
+RV tables [] indexes []
+RV alembic upgrade heads exit 0 | 
+RV tables ['memories', 'memory_opt_outs', 'memory_settings'] indexes ['ix_memories_owner', 'pk_memories', 'pk_memory_opt_outs', 'pk_memory_settings', 'uq_memory_settings_agent', 'uq_memory_settings_project']
+RV alembic current exit 0 | 14_0001 (head)

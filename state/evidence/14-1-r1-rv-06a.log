@@ -1,0 +1,4 @@
+HEAD=bb5ad0d1de032b37077548ffd4d77def28d3ca99
+cmd: pytest tests/integration/test_06a_graph.py tests/integration/test_06a_runs_api.py tests/integration/test_134_egress_real_engine.py -q
+.......................................                                  [100%]
+39 passed in 83.53s (0:01:23)
