@@ -1,0 +1,10 @@
+## stale stamp
+e2e_deps_stale: frontend/package-lock.json differs from the e2e image (or the e2e_node_modules volume predates it). Rebuild: docker compose --profile e2e up --build --pull never --no-start --no-deps e2e, then down -v (docs/onyuz.md).
+run_exit=1
+## volume removed (as down -v does)
+ffcore-tr2_e2e_node_modules
+ Volume "ffcore-tr2_e2e_node_modules"  Creating
+ Volume "ffcore-tr2_e2e_node_modules"  Created
+498
+lock-matches
+run_exit=0

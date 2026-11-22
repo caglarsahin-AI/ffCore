@@ -1,0 +1,1001 @@
+name: ffcore-tr2
+services:
+  agent-worker:
+    command:
+      - arq
+      - ffcore.runtime.worker.InteractiveWorker
+    depends_on:
+      backend:
+        condition: service_healthy
+        required: true
+    environment:
+      ALERT_SERVICE_DOWN_S: "300"
+      ALLOWED_INTERNAL_HOSTS: backend,litellm,langfuse-web,litellm,langfuse-web,mcp-search,mcp-sql,ticket-desk
+      ALLOWED_LANGUAGES: tr,en
+      API_KEY_AUTH_FAILURES_PER_MIN: "20"
+      API_KEY_LAST_USED_FLUSH_S: "60"
+      ARQ_QUEUE_BACKGROUND: llm-background
+      ARQ_QUEUE_INGEST: ingest
+      ARQ_QUEUE_INTERACTIVE: llm-interactive
+      BACKGROUND_WINDOW: ""
+      BACKGROUND_WINDOW_TZ: Europe/Istanbul
+      BACKGROUND_WINDOW_WEEKENDS: "false"
+      CONSOLE_ORIGINS: http://localhost:3000
+      CONVERT_CPU_LIMIT_SECONDS: "3600"
+      CONVERT_MEMORY_LIMIT_MB: "10240"
+      CONVERT_TIMEOUT_SECONDS: "600"
+      CONVERT_WORKER_START_TIMEOUT_SECONDS: "60"
+      DATABASE_URL: postgresql+psycopg://ffcore_app:dummy-not-secret-app-role@postgres:5432/ffcore
+      DEPLOY_PROFILE: llmaas
+      EGRESS_ALLOWLIST: ""
+      EMBED_DIM: "1024"
+      EMBED_MODEL: BAAI/bge-m3
+      EVAL_ADVANCE_INTERVAL_S: "5"
+      EVAL_JUDGE_CALL_S: "60"
+      EVAL_JUDGE_CALLS_PER_TICK: "20"
+      EVAL_JUDGE_MODEL: chat-default
+      EVAL_MAX_ITEM_RUNS: "500"
+      EVAL_PASS_THRESHOLD: "0.8"
+      FAKE_EMBED: "0"
+      FERNET_KEY: ZHVtbXktbm90LXNlY3JldC1mZXJuZXQta2V5LTAwMDA=
+      FFCORE_TEST_HOOKS: "0"
+      GUARDRAIL_EGRESS_ENABLED: "true"
+      GUARDRAIL_EGRESS_NER: "false"
+      HF_HUB_OFFLINE: "1"
+      INFERENCE_BACKEND: ollama
+      INTERNAL_API_URL: http://backend:8000
+      LANGFUSE_HOST: http://langfuse-web:3000
+      LANGFUSE_PUBLIC_KEY: pk-lf-dummy-not-secret-test
+      LANGFUSE_SECRET_KEY: sk-lf-dummy-not-secret-test
+      LITELLM_INTERNAL_KEY: sk-dummy-not-secret-litellm-internal
+      LITELLM_MASTER_KEY: sk-dummy-not-secret-litellm-master
+      LITELLM_URL: http://litellm:4000
+      LLM_CALL_TIMEOUT_S: "60"
+      LLM_SLOTS: "4"
+      LOG_LEVEL: INFO
+      NER_MODEL: ""
+      NER_REVISION: ""
+      OBO_JWT_SECRET: dummy-not-secret-obo-jwt-secret-0123456789
+      OCR_PDF_MAX_PAGES: "200"
+      OFFLINE: "false"
+      OLLAMA_CONTEXT_LENGTH: "32768"
+      PII_TOKEN_TTL_S: "1800"
+      QDRANT_URL: ""
+      REDIS_URL: redis://:dummy-not-secret-redis@redis:6379/0
+      RERANK_MIN_SCORE: "0.1"
+      RERANK_MODEL: BAAI/bge-reranker-v2-m3
+      RETENTION_AUDIT_DROP_ENABLED: "false"
+      RETENTION_BATCH: "5000"
+      RETENTION_DRY_RUN: "true"
+      RUN_ABANDON_GRACE_S: "120"
+      RUN_EVENT_STREAM_TTL_S: "86400"
+      RUN_TIMEOUT_S: "120"
+      SECRET_KEY: dummy-not-secret-session-key-0123456789
+      SERVICE_TOKEN: dummy-not-secret-service-token-0123456789
+      SESSION_TTL_S: "28800"
+      TEXT_NORMALIZE_TR: "false"
+      TRANSFORMERS_OFFLINE: "1"
+      UPLOAD_MAX_REQUEST_BYTES: "541065216"
+      VECTOR_BACKEND: pgvector
+      VIDEO_TRANSCRIPT_ENABLED: "false"
+    image: ffcore/backend:0.0.0-tr2
+    networks:
+      default: null
+    restart: unless-stopped
+  agent-worker-bg:
+    command:
+      - arq
+      - ffcore.runtime.worker.BackgroundWorker
+    depends_on:
+      backend:
+        condition: service_healthy
+        required: true
+    environment:
+      ALERT_SERVICE_DOWN_S: "300"
+      ALLOWED_INTERNAL_HOSTS: backend,litellm,langfuse-web,litellm,langfuse-web,mcp-search,mcp-sql,ticket-desk
+      ALLOWED_LANGUAGES: tr,en
+      API_KEY_AUTH_FAILURES_PER_MIN: "20"
+      API_KEY_LAST_USED_FLUSH_S: "60"
+      ARQ_QUEUE_BACKGROUND: llm-background
+      ARQ_QUEUE_INGEST: ingest
+      ARQ_QUEUE_INTERACTIVE: llm-interactive
+      BACKGROUND_WINDOW: ""
+      BACKGROUND_WINDOW_TZ: Europe/Istanbul
+      BACKGROUND_WINDOW_WEEKENDS: "false"
+      CONSOLE_ORIGINS: http://localhost:3000
+      CONVERT_CPU_LIMIT_SECONDS: "3600"
+      CONVERT_MEMORY_LIMIT_MB: "10240"
+      CONVERT_TIMEOUT_SECONDS: "600"
+      CONVERT_WORKER_START_TIMEOUT_SECONDS: "60"
+      DATABASE_URL: postgresql+psycopg://ffcore_app:dummy-not-secret-app-role@postgres:5432/ffcore
+      DEPLOY_PROFILE: llmaas
+      EGRESS_ALLOWLIST: ""
+      EMBED_DIM: "1024"
+      EMBED_MODEL: BAAI/bge-m3
+      EVAL_ADVANCE_INTERVAL_S: "5"
+      EVAL_JUDGE_CALL_S: "60"
+      EVAL_JUDGE_CALLS_PER_TICK: "20"
+      EVAL_JUDGE_MODEL: chat-default
+      EVAL_MAX_ITEM_RUNS: "500"
+      EVAL_PASS_THRESHOLD: "0.8"
+      FAKE_EMBED: "0"
+      FERNET_KEY: ZHVtbXktbm90LXNlY3JldC1mZXJuZXQta2V5LTAwMDA=
+      FFCORE_TEST_HOOKS: "0"
+      GUARDRAIL_EGRESS_ENABLED: "true"
+      GUARDRAIL_EGRESS_NER: "false"
+      HF_HUB_OFFLINE: "1"
+      INFERENCE_BACKEND: ollama
+      INTERNAL_API_URL: http://backend:8000
+      LANGFUSE_HOST: http://langfuse-web:3000
+      LANGFUSE_PUBLIC_KEY: pk-lf-dummy-not-secret-test
+      LANGFUSE_SECRET_KEY: sk-lf-dummy-not-secret-test
+      LITELLM_INTERNAL_KEY: sk-dummy-not-secret-litellm-internal
+      LITELLM_MASTER_KEY: sk-dummy-not-secret-litellm-master
+      LITELLM_URL: http://litellm:4000
+      LLM_CALL_TIMEOUT_S: "60"
+      LLM_SLOTS: "4"
+      LOG_LEVEL: INFO
+      NER_MODEL: ""
+      NER_REVISION: ""
+      OBO_JWT_SECRET: dummy-not-secret-obo-jwt-secret-0123456789
+      OCR_PDF_MAX_PAGES: "200"
+      OFFLINE: "false"
+      OLLAMA_CONTEXT_LENGTH: "32768"
+      PII_TOKEN_TTL_S: "1800"
+      QDRANT_URL: ""
+      REDIS_URL: redis://:dummy-not-secret-redis@redis:6379/0
+      RERANK_MIN_SCORE: "0.1"
+      RERANK_MODEL: BAAI/bge-reranker-v2-m3
+      RETENTION_AUDIT_DROP_ENABLED: "false"
+      RETENTION_BATCH: "5000"
+      RETENTION_DRY_RUN: "true"
+      RUN_ABANDON_GRACE_S: "120"
+      RUN_EVENT_STREAM_TTL_S: "86400"
+      RUN_TIMEOUT_S: "120"
+      SECRET_KEY: dummy-not-secret-session-key-0123456789
+      SERVICE_TOKEN: dummy-not-secret-service-token-0123456789
+      SESSION_TTL_S: "28800"
+      TEXT_NORMALIZE_TR: "false"
+      TRANSFORMERS_OFFLINE: "1"
+      UPLOAD_MAX_REQUEST_BYTES: "541065216"
+      VECTOR_BACKEND: pgvector
+      VIDEO_TRANSCRIPT_ENABLED: "false"
+    image: ffcore/backend:0.0.0-tr2
+    networks:
+      default: null
+    restart: unless-stopped
+  backend:
+    build:
+      context: C:\ai_paycore\ffcore\.worktrees\fix\followup-triage-2\backend
+      dockerfile: Dockerfile
+      args:
+        REGISTRY_PREFIX: ""
+      target: runtime
+    depends_on:
+      litellm:
+        condition: service_healthy
+        required: true
+      migrate:
+        condition: service_completed_successfully
+        required: true
+      postgres:
+        condition: service_healthy
+        required: true
+      redis:
+        condition: service_healthy
+        required: true
+    environment:
+      ALERT_SERVICE_DOWN_S: "300"
+      ALLOWED_INTERNAL_HOSTS: backend,litellm,langfuse-web,mcp-search,mcp-sql,ticket-desk
+      ALLOWED_LANGUAGES: tr,en
+      API_KEY_AUTH_FAILURES_PER_MIN: "20"
+      API_KEY_LAST_USED_FLUSH_S: "60"
+      ARQ_QUEUE_BACKGROUND: llm-background
+      ARQ_QUEUE_INGEST: ingest
+      ARQ_QUEUE_INTERACTIVE: llm-interactive
+      BACKGROUND_WINDOW: ""
+      BACKGROUND_WINDOW_TZ: Europe/Istanbul
+      BACKGROUND_WINDOW_WEEKENDS: "false"
+      CONSOLE_ORIGINS: http://localhost:3000
+      CONVERT_CPU_LIMIT_SECONDS: "3600"
+      CONVERT_MEMORY_LIMIT_MB: "10240"
+      CONVERT_TIMEOUT_SECONDS: "600"
+      CONVERT_WORKER_START_TIMEOUT_SECONDS: "60"
+      DATABASE_URL: postgresql+psycopg://ffcore_app:dummy-not-secret-app-role@postgres:5432/ffcore
+      DEPLOY_PROFILE: llmaas
+      EGRESS_ALLOWLIST: ""
+      EMBED_DIM: "1024"
+      EMBED_MODEL: BAAI/bge-m3
+      EVAL_ADVANCE_INTERVAL_S: "5"
+      EVAL_JUDGE_CALL_S: "60"
+      EVAL_JUDGE_CALLS_PER_TICK: "20"
+      EVAL_JUDGE_MODEL: chat-default
+      EVAL_MAX_ITEM_RUNS: "500"
+      EVAL_PASS_THRESHOLD: "0.8"
+      FAKE_EMBED: "0"
+      FERNET_KEY: ZHVtbXktbm90LXNlY3JldC1mZXJuZXQta2V5LTAwMDA=
+      FFCORE_TEST_HOOKS: "0"
+      GUARDRAIL_EGRESS_ENABLED: "true"
+      GUARDRAIL_EGRESS_NER: "false"
+      HF_HUB_OFFLINE: "1"
+      INFERENCE_BACKEND: ollama
+      LANGFUSE_HOST: http://langfuse-web:3000
+      LANGFUSE_PUBLIC_KEY: pk-lf-dummy-not-secret-test
+      LANGFUSE_SECRET_KEY: sk-lf-dummy-not-secret-test
+      LITELLM_INTERNAL_KEY: sk-dummy-not-secret-litellm-internal
+      LITELLM_MASTER_KEY: sk-dummy-not-secret-litellm-master
+      LITELLM_URL: http://litellm:4000
+      LLM_CALL_TIMEOUT_S: "60"
+      LLM_SLOTS: "4"
+      LOG_LEVEL: INFO
+      NER_MODEL: ""
+      NER_REVISION: ""
+      OBO_JWT_SECRET: dummy-not-secret-obo-jwt-secret-0123456789
+      OCR_PDF_MAX_PAGES: "200"
+      OFFLINE: "false"
+      OLLAMA_CONTEXT_LENGTH: "32768"
+      PII_TOKEN_TTL_S: "1800"
+      QDRANT_URL: ""
+      REDIS_URL: redis://:dummy-not-secret-redis@redis:6379/0
+      RERANK_MIN_SCORE: "0.1"
+      RERANK_MODEL: BAAI/bge-reranker-v2-m3
+      RETENTION_AUDIT_DROP_ENABLED: "false"
+      RETENTION_BATCH: "5000"
+      RETENTION_DRY_RUN: "true"
+      RUN_ABANDON_GRACE_S: "120"
+      RUN_EVENT_STREAM_TTL_S: "86400"
+      RUN_TIMEOUT_S: "120"
+      SECRET_KEY: dummy-not-secret-session-key-0123456789
+      SERVICE_TOKEN: dummy-not-secret-service-token-0123456789
+      SESSION_TTL_S: "28800"
+      TEXT_NORMALIZE_TR: "false"
+      TRANSFORMERS_OFFLINE: "1"
+      UPLOAD_MAX_REQUEST_BYTES: "541065216"
+      VECTOR_BACKEND: pgvector
+      VIDEO_TRANSCRIPT_ENABLED: "false"
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - import urllib.request; urllib.request.urlopen('http://localhost:8000/healthz', timeout=3)
+      timeout: 5s
+      interval: 10s
+      retries: 10
+    image: ffcore/backend:0.0.0-tr2
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 8000
+        published: "18220"
+        protocol: tcp
+    restart: unless-stopped
+    volumes:
+      - type: volume
+        source: model_cache
+        target: /models
+        volume: {}
+      - type: volume
+        source: knowledge_storage
+        target: /data/storage
+        volume: {}
+  e2e:
+    profiles:
+      - e2e
+    build:
+      context: C:\ai_paycore\ffcore\.worktrees\fix\followup-triage-2\frontend
+      dockerfile: Dockerfile.e2e
+      args:
+        PLAYWRIGHT_IMAGE: mcr.microsoft.com/playwright@sha256:47b510dd9230bf0b9bfc9b20102241e577ea7a99334ab4c3ca19f19770e9b8ea
+    command:
+      - npm
+      - run
+      - test:e2e
+    depends_on:
+      backend:
+        condition: service_healthy
+        required: true
+    environment:
+      E2E_SCREENSHOT_DIR: ""
+      FFCORE_BACKEND_URL: http://backend:8000
+      LITELLM_MASTER_KEY: sk-dummy-not-secret-litellm-master
+      LITELLM_URL: http://litellm:4000
+      NEXT_TELEMETRY_DISABLED: "1"
+    image: ffcore/e2e:0.0.0-tr2
+    ipc: host
+    networks:
+      default: null
+    volumes:
+      - type: bind
+        source: C:\ai_paycore\ffcore\.worktrees\fix\followup-triage-2
+        target: /work
+        bind:
+          create_host_path: true
+      - type: volume
+        source: e2e_node_modules
+        target: /work/frontend/node_modules
+        volume: {}
+    working_dir: /work/frontend
+  fake-llm:
+    profiles:
+      - test
+    command:
+      - python
+      - /fakes/fake_openai.py
+    image: ffcore/backend:0.0.0-tr2
+    networks:
+      default: null
+    restart: "no"
+    volumes:
+      - type: bind
+        source: C:\ai_paycore\ffcore\.worktrees\fix\followup-triage-2\backend\tests\fakes
+        target: /fakes
+        read_only: true
+        bind:
+          create_host_path: true
+  frontend:
+    build:
+      context: C:\ai_paycore\ffcore\.worktrees\fix\followup-triage-2\frontend
+      dockerfile: Dockerfile
+      args:
+        FFCORE_BACKEND_URL: http://backend:8000
+        REGISTRY_PREFIX: ""
+    depends_on:
+      backend:
+        condition: service_healthy
+        required: true
+    environment:
+      FFCORE_BACKEND_URL: http://backend:8000
+    image: ffcore/frontend:0.0.0-tr2
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 3000
+        published: "13220"
+        protocol: tcp
+    restart: unless-stopped
+  langfuse-clickhouse:
+    environment:
+      CLICKHOUSE_DB: default
+      CLICKHOUSE_PASSWORD: dummy-not-secret-langfuse-clickhouse
+      CLICKHOUSE_USER: clickhouse
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - wget --no-verbose --tries=1 --spider http://localhost:8123/ping || exit 1
+      timeout: 5s
+      interval: 5s
+      retries: 20
+    image: clickhouse/clickhouse-server:25.8.2.29
+    networks:
+      default: null
+    restart: unless-stopped
+    user: 101:101
+    volumes:
+      - type: volume
+        source: langfuse_clickhouse_data
+        target: /var/lib/clickhouse
+        volume: {}
+      - type: volume
+        source: langfuse_clickhouse_logs
+        target: /var/log/clickhouse-server
+        volume: {}
+  langfuse-minio:
+    command:
+      - mkdir -p /data/langfuse && exec minio server /data --address :9000 --console-address :9001
+    entrypoint:
+      - sh
+      - -c
+    environment:
+      MINIO_ROOT_PASSWORD: dummy-not-secret-langfuse-minio
+      MINIO_ROOT_USER: minio
+    healthcheck:
+      test:
+        - CMD
+        - mc
+        - ready
+        - local
+      timeout: 5s
+      interval: 5s
+      retries: 20
+    image: cgr.dev/chainguard/minio@sha256:e70b2b1e74d79457f808710483bd726ff364529ca30736eaa15a6ab547d3a5a7
+    networks:
+      default: null
+    restart: unless-stopped
+    volumes:
+      - type: volume
+        source: langfuse_minio_data
+        target: /data
+        volume: {}
+  langfuse-postgres:
+    environment:
+      PGTZ: UTC
+      POSTGRES_DB: langfuse
+      POSTGRES_PASSWORD: dummy-not-secret-langfuse-postgres
+      POSTGRES_USER: langfuse
+      TZ: UTC
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U "$$POSTGRES_USER"
+      timeout: 5s
+      interval: 5s
+      retries: 20
+    image: postgres:17.6-alpine
+    networks:
+      default: null
+    restart: unless-stopped
+    volumes:
+      - type: volume
+        source: langfuse_postgres_data
+        target: /var/lib/postgresql/data
+        volume: {}
+  langfuse-redis:
+    command:
+      - redis-server
+      - --requirepass
+      - dummy-not-secret-langfuse-redis
+    environment:
+      REDIS_PASSWORD: dummy-not-secret-langfuse-redis
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - redis-cli -a "$$REDIS_PASSWORD" --no-auth-warning ping | grep -q PONG
+      timeout: 5s
+      interval: 5s
+      retries: 20
+    image: redis:7.4.6-alpine
+    networks:
+      default: null
+    restart: unless-stopped
+  langfuse-web:
+    depends_on:
+      langfuse-clickhouse:
+        condition: service_healthy
+        required: true
+      langfuse-minio:
+        condition: service_healthy
+        required: true
+      langfuse-postgres:
+        condition: service_healthy
+        required: true
+      langfuse-redis:
+        condition: service_healthy
+        required: true
+    environment:
+      CLICKHOUSE_CLUSTER_ENABLED: "false"
+      CLICKHOUSE_MIGRATION_URL: clickhouse://langfuse-clickhouse:9000
+      CLICKHOUSE_PASSWORD: dummy-not-secret-langfuse-clickhouse
+      CLICKHOUSE_URL: http://langfuse-clickhouse:8123
+      CLICKHOUSE_USER: clickhouse
+      DATABASE_URL: postgresql://langfuse:dummy-not-secret-langfuse-postgres@langfuse-postgres:5432/langfuse
+      ENCRYPTION_KEY: "0000000000000000000000000000000000000000000000000000000000000000"
+      LANGFUSE_ENABLE_EXPERIMENTAL_FEATURES: "false"
+      LANGFUSE_INIT_ORG_ID: ffcore
+      LANGFUSE_INIT_ORG_NAME: FFCore
+      LANGFUSE_INIT_PROJECT_ID: ffcore
+      LANGFUSE_INIT_PROJECT_NAME: FFCore
+      LANGFUSE_INIT_PROJECT_PUBLIC_KEY: pk-lf-dummy-not-secret-test
+      LANGFUSE_INIT_PROJECT_SECRET_KEY: sk-lf-dummy-not-secret-test
+      LANGFUSE_INIT_USER_EMAIL: admin@example.test
+      LANGFUSE_INIT_USER_NAME: FFCore admin
+      LANGFUSE_INIT_USER_PASSWORD: dummy-not-secret-langfuse-admin
+      LANGFUSE_S3_EVENT_UPLOAD_ACCESS_KEY_ID: minio
+      LANGFUSE_S3_EVENT_UPLOAD_BUCKET: langfuse
+      LANGFUSE_S3_EVENT_UPLOAD_ENDPOINT: http://langfuse-minio:9000
+      LANGFUSE_S3_EVENT_UPLOAD_FORCE_PATH_STYLE: "true"
+      LANGFUSE_S3_EVENT_UPLOAD_PREFIX: events/
+      LANGFUSE_S3_EVENT_UPLOAD_REGION: auto
+      LANGFUSE_S3_EVENT_UPLOAD_SECRET_ACCESS_KEY: dummy-not-secret-langfuse-minio
+      LANGFUSE_S3_MEDIA_UPLOAD_ACCESS_KEY_ID: minio
+      LANGFUSE_S3_MEDIA_UPLOAD_BUCKET: langfuse
+      LANGFUSE_S3_MEDIA_UPLOAD_ENDPOINT: http://langfuse-minio:9000
+      LANGFUSE_S3_MEDIA_UPLOAD_FORCE_PATH_STYLE: "true"
+      LANGFUSE_S3_MEDIA_UPLOAD_PREFIX: media/
+      LANGFUSE_S3_MEDIA_UPLOAD_REGION: auto
+      LANGFUSE_S3_MEDIA_UPLOAD_SECRET_ACCESS_KEY: dummy-not-secret-langfuse-minio
+      NEXTAUTH_SECRET: dummy-not-secret-langfuse-nextauth
+      NEXTAUTH_URL: http://localhost:3000
+      REDIS_AUTH: dummy-not-secret-langfuse-redis
+      REDIS_HOST: langfuse-redis
+      REDIS_PORT: "6379"
+      SALT: dummy-not-secret-langfuse-salt
+      TELEMETRY_ENABLED: "false"
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - wget -q -O /dev/null http://$$(hostname):3000/api/public/health || exit 1
+      timeout: 5s
+      interval: 5s
+      retries: 60
+      start_period: 1m0s
+    image: langfuse/langfuse:3.120.0
+    networks:
+      default: null
+    restart: unless-stopped
+  langfuse-worker:
+    depends_on:
+      langfuse-clickhouse:
+        condition: service_healthy
+        required: true
+      langfuse-minio:
+        condition: service_healthy
+        required: true
+      langfuse-postgres:
+        condition: service_healthy
+        required: true
+      langfuse-redis:
+        condition: service_healthy
+        required: true
+    environment:
+      CLICKHOUSE_CLUSTER_ENABLED: "false"
+      CLICKHOUSE_MIGRATION_URL: clickhouse://langfuse-clickhouse:9000
+      CLICKHOUSE_PASSWORD: dummy-not-secret-langfuse-clickhouse
+      CLICKHOUSE_URL: http://langfuse-clickhouse:8123
+      CLICKHOUSE_USER: clickhouse
+      DATABASE_URL: postgresql://langfuse:dummy-not-secret-langfuse-postgres@langfuse-postgres:5432/langfuse
+      ENCRYPTION_KEY: "0000000000000000000000000000000000000000000000000000000000000000"
+      LANGFUSE_ENABLE_EXPERIMENTAL_FEATURES: "false"
+      LANGFUSE_S3_EVENT_UPLOAD_ACCESS_KEY_ID: minio
+      LANGFUSE_S3_EVENT_UPLOAD_BUCKET: langfuse
+      LANGFUSE_S3_EVENT_UPLOAD_ENDPOINT: http://langfuse-minio:9000
+      LANGFUSE_S3_EVENT_UPLOAD_FORCE_PATH_STYLE: "true"
+      LANGFUSE_S3_EVENT_UPLOAD_PREFIX: events/
+      LANGFUSE_S3_EVENT_UPLOAD_REGION: auto
+      LANGFUSE_S3_EVENT_UPLOAD_SECRET_ACCESS_KEY: dummy-not-secret-langfuse-minio
+      LANGFUSE_S3_MEDIA_UPLOAD_ACCESS_KEY_ID: minio
+      LANGFUSE_S3_MEDIA_UPLOAD_BUCKET: langfuse
+      LANGFUSE_S3_MEDIA_UPLOAD_ENDPOINT: http://langfuse-minio:9000
+      LANGFUSE_S3_MEDIA_UPLOAD_FORCE_PATH_STYLE: "true"
+      LANGFUSE_S3_MEDIA_UPLOAD_PREFIX: media/
+      LANGFUSE_S3_MEDIA_UPLOAD_REGION: auto
+      LANGFUSE_S3_MEDIA_UPLOAD_SECRET_ACCESS_KEY: dummy-not-secret-langfuse-minio
+      NEXTAUTH_URL: http://localhost:3000
+      REDIS_AUTH: dummy-not-secret-langfuse-redis
+      REDIS_HOST: langfuse-redis
+      REDIS_PORT: "6379"
+      SALT: dummy-not-secret-langfuse-salt
+      TELEMETRY_ENABLED: "false"
+    image: langfuse/langfuse-worker:3.120.0
+    networks:
+      default: null
+    restart: unless-stopped
+  litellm:
+    command:
+      - --config
+      - /app/config.yaml
+      - --port
+      - "4000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+        required: true
+    environment:
+      DATABASE_URL: postgresql://ffcore:dummy-not-secret-postgres@postgres:5432/litellm
+      DISABLE_ADMIN_UI: "True"
+      LANGFUSE_HOST: http://langfuse-web:3000
+      LANGFUSE_PUBLIC_KEY: pk-lf-dummy-not-secret-test
+      LANGFUSE_SECRET_KEY: sk-lf-dummy-not-secret-test
+      LITELLM_DATABASE_URL: postgresql://ffcore:dummy-not-secret-postgres@postgres:5432/litellm
+      LITELLM_MASTER_KEY: sk-dummy-not-secret-litellm-master
+      LITELLM_SALT_KEY: dummy-not-secret-litellm-salt
+      STORE_MODEL_IN_DB: "True"
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - |
+          import os, urllib.error, urllib.request as r
+          r.urlopen("http://localhost:4000/health/liveliness", timeout=4)
+          probe = r.Request(
+              "http://localhost:4000/key/info?key=sk-ffcore-healthcheck-not-a-key",
+              headers={"Authorization": "Bearer " + os.environ["LITELLM_MASTER_KEY"]},
+          )
+          try:
+              r.urlopen(probe, timeout=4)
+          except urllib.error.HTTPError as exc:
+              raise SystemExit(exc.code >= 500)  # 500: half-migrated schema
+      timeout: 5s
+      interval: 5s
+      retries: 60
+      start_period: 1m0s
+    image: ghcr.io/berriai/litellm:v1.80.0-stable
+    networks:
+      default: null
+    restart: unless-stopped
+    volumes:
+      - type: bind
+        source: C:\ai_paycore\ffcore\.worktrees\fix\followup-triage-2\deploy\litellm\config.yaml
+        target: /app/config.yaml
+        read_only: true
+        bind:
+          create_host_path: true
+  mcp-search:
+    command:
+      - python
+      - -m
+      - ffcore.services.mcp_search_server
+    depends_on:
+      backend:
+        condition: service_healthy
+        required: true
+    environment:
+      ALLOWED_INTERNAL_HOSTS: backend
+      INTERNAL_API_URL: http://backend:8000
+      LOG_LEVEL: INFO
+      OFFLINE: "false"
+      SERVICE_TOKEN: dummy-not-secret-service-token-0123456789
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - import urllib.request; urllib.request.urlopen('http://localhost:8000/healthz')
+      timeout: 5s
+      interval: 10s
+      retries: 12
+    image: ffcore/backend:0.0.0-tr2
+    mem_limit: "536870912"
+    networks:
+      default: null
+    restart: unless-stopped
+  mcp-sql:
+    command:
+      - python
+      - -m
+      - ffcore.services.mcp_sql_server
+    depends_on:
+      backend:
+        condition: service_healthy
+        required: true
+      postgres:
+        condition: service_healthy
+        required: true
+    environment:
+      ALLOWED_INTERNAL_HOSTS: backend
+      INTERNAL_API_URL: http://backend:8000
+      LOG_LEVEL: INFO
+      OFFLINE: "false"
+      SERVICE_TOKEN: dummy-not-secret-service-token-0123456789
+      SQL_DEMO_DATABASE_URL: postgresql://mcp_sql:dummy-not-secret-agent-demo@postgres:5432/agent_demo
+      SQL_MAX_ROWS: "500"
+      SQL_TIMEOUT_S: "20"
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - import urllib.request; urllib.request.urlopen('http://localhost:8000/healthz')
+      timeout: 5s
+      interval: 10s
+      retries: 12
+    image: ffcore/backend:0.0.0-tr2
+    mem_limit: "536870912"
+    networks:
+      default: null
+    restart: unless-stopped
+  migrate:
+    command:
+      - sh
+      - -c
+      - alembic upgrade heads && python -m ffcore.cli load-model-catalog --path /app/seed/model_catalog.yaml && python -m ffcore.cli setup-checkpointer
+    depends_on:
+      postgres:
+        condition: service_healthy
+        required: true
+    environment:
+      ALERT_SERVICE_DOWN_S: "300"
+      ALLOWED_INTERNAL_HOSTS: litellm,langfuse-web,mcp-search,mcp-sql,ticket-desk
+      ALLOWED_LANGUAGES: tr,en
+      API_KEY_AUTH_FAILURES_PER_MIN: "20"
+      API_KEY_LAST_USED_FLUSH_S: "60"
+      ARQ_QUEUE_BACKGROUND: llm-background
+      ARQ_QUEUE_INGEST: ingest
+      ARQ_QUEUE_INTERACTIVE: llm-interactive
+      BACKGROUND_WINDOW: ""
+      BACKGROUND_WINDOW_TZ: Europe/Istanbul
+      BACKGROUND_WINDOW_WEEKENDS: "false"
+      CONSOLE_ORIGINS: http://localhost:3000
+      CONVERT_CPU_LIMIT_SECONDS: "3600"
+      CONVERT_MEMORY_LIMIT_MB: "10240"
+      CONVERT_TIMEOUT_SECONDS: "600"
+      CONVERT_WORKER_START_TIMEOUT_SECONDS: "60"
+      DATABASE_URL: postgresql+psycopg://ffcore:dummy-not-secret-postgres@postgres:5432/ffcore
+      DEPLOY_PROFILE: llmaas
+      EGRESS_ALLOWLIST: ""
+      EMBED_DIM: "1024"
+      EMBED_MODEL: BAAI/bge-m3
+      EVAL_ADVANCE_INTERVAL_S: "5"
+      EVAL_JUDGE_CALL_S: "60"
+      EVAL_JUDGE_CALLS_PER_TICK: "20"
+      EVAL_JUDGE_MODEL: chat-default
+      EVAL_MAX_ITEM_RUNS: "500"
+      EVAL_PASS_THRESHOLD: "0.8"
+      FAKE_EMBED: "0"
+      FERNET_KEY: ZHVtbXktbm90LXNlY3JldC1mZXJuZXQta2V5LTAwMDA=
+      FFCORE_TEST_HOOKS: "0"
+      GUARDRAIL_EGRESS_ENABLED: "true"
+      GUARDRAIL_EGRESS_NER: "false"
+      HF_HUB_OFFLINE: "1"
+      INFERENCE_BACKEND: ollama
+      LANGFUSE_HOST: http://langfuse-web:3000
+      LANGFUSE_PUBLIC_KEY: pk-lf-dummy-not-secret-test
+      LANGFUSE_SECRET_KEY: sk-lf-dummy-not-secret-test
+      LITELLM_INTERNAL_KEY: sk-dummy-not-secret-litellm-internal
+      LITELLM_MASTER_KEY: sk-dummy-not-secret-litellm-master
+      LITELLM_URL: http://litellm:4000
+      LLM_CALL_TIMEOUT_S: "60"
+      LLM_SLOTS: "4"
+      LOG_LEVEL: INFO
+      NER_MODEL: ""
+      NER_REVISION: ""
+      OBO_JWT_SECRET: dummy-not-secret-obo-jwt-secret-0123456789
+      OCR_PDF_MAX_PAGES: "200"
+      OFFLINE: "false"
+      OLLAMA_CONTEXT_LENGTH: "32768"
+      PII_TOKEN_TTL_S: "1800"
+      QDRANT_URL: ""
+      REDIS_URL: redis://:dummy-not-secret-redis@redis:6379/0
+      RERANK_MIN_SCORE: "0.1"
+      RERANK_MODEL: BAAI/bge-reranker-v2-m3
+      RETENTION_AUDIT_DROP_ENABLED: "false"
+      RETENTION_BATCH: "5000"
+      RETENTION_DRY_RUN: "true"
+      RUN_ABANDON_GRACE_S: "120"
+      RUN_EVENT_STREAM_TTL_S: "86400"
+      RUN_TIMEOUT_S: "120"
+      SECRET_KEY: dummy-not-secret-session-key-0123456789
+      SERVICE_TOKEN: dummy-not-secret-service-token-0123456789
+      SESSION_TTL_S: "28800"
+      TEXT_NORMALIZE_TR: "false"
+      TRANSFORMERS_OFFLINE: "1"
+      UPLOAD_MAX_REQUEST_BYTES: "541065216"
+      VECTOR_BACKEND: pgvector
+      VIDEO_TRANSCRIPT_ENABLED: "false"
+    image: ffcore/backend:0.0.0-tr2
+    networks:
+      default: null
+    restart: "no"
+    volumes:
+      - type: bind
+        source: C:\ai_paycore\ffcore\.worktrees\fix\followup-triage-2\deploy\seed
+        target: /app/seed
+        read_only: true
+        bind:
+          create_host_path: true
+  postgres:
+    environment:
+      APP_DB_PASSWORD: dummy-not-secret-app-role
+      APP_DB_USER: ffcore_app
+      POSTGRES_DB: ffcore
+      POSTGRES_PASSWORD: dummy-not-secret-postgres
+      POSTGRES_USER: ffcore
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
+      timeout: 5s
+      interval: 5s
+      retries: 20
+    image: pgvector/pgvector:0.8.1-pg16
+    networks:
+      default: null
+    restart: unless-stopped
+    volumes:
+      - type: volume
+        source: postgres_data
+        target: /var/lib/postgresql/data
+        volume: {}
+      - type: bind
+        source: C:\ai_paycore\ffcore\.worktrees\fix\followup-triage-2\deploy\postgres\initdb
+        target: /docker-entrypoint-initdb.d
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\ai_paycore\ffcore\.worktrees\fix\followup-triage-2\deploy\postgres\app-role.sql
+        target: /ffcore/app-role.sql
+        read_only: true
+        bind:
+          create_host_path: true
+  qdrant:
+    profiles:
+      - qdrant
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - bash -c ':> /dev/tcp/127.0.0.1/6333' || exit 1
+      timeout: 5s
+      interval: 5s
+      retries: 20
+    image: qdrant/qdrant:v1.11.3@sha256:da426bb8aa0ba0a3032b3110e71d0d1516d51a686aa17b39bde4e090ce3b8e7c
+    networks:
+      default: null
+    restart: unless-stopped
+    volumes:
+      - type: volume
+        source: qdrant_data
+        target: /qdrant/storage
+        volume: {}
+  redis:
+    command:
+      - redis-server
+      - --requirepass
+      - dummy-not-secret-redis
+      - --appendonly
+      - "yes"
+    environment:
+      REDIS_PASSWORD: dummy-not-secret-redis
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - redis-cli -a "$$REDIS_PASSWORD" --no-auth-warning ping | grep -q PONG
+      timeout: 5s
+      interval: 5s
+      retries: 20
+    image: redis:7.4.6-alpine
+    networks:
+      default: null
+    restart: unless-stopped
+    volumes:
+      - type: volume
+        source: redis_data
+        target: /data
+        volume: {}
+  ticket-desk:
+    profiles:
+      - test
+    command:
+      - python
+      - /svc/ticket_desk_server.py
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - import urllib.request; urllib.request.urlopen('http://localhost:8000/healthz')
+      timeout: 5s
+      interval: 10s
+      retries: 12
+    image: ffcore/backend:0.0.0-tr2
+    networks:
+      default: null
+    restart: "no"
+    volumes:
+      - type: bind
+        source: C:\ai_paycore\ffcore\.worktrees\fix\followup-triage-2\services\ticket-desk
+        target: /svc
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\ai_paycore\ffcore\.worktrees\fix\followup-triage-2\data\samples\tickets
+        target: /data/tickets
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\ai_paycore\ffcore\.worktrees\fix\followup-triage-2\data\samples\poison
+        target: /data/poison
+        read_only: true
+        bind:
+          create_host_path: true
+  worker:
+    command:
+      - arq
+      - ffcore.knowledge.worker.WorkerSettings
+    depends_on:
+      backend:
+        condition: service_healthy
+        required: true
+    environment:
+      ALERT_SERVICE_DOWN_S: "300"
+      ALLOWED_INTERNAL_HOSTS: backend,litellm,langfuse-web,mcp-search,mcp-sql,ticket-desk
+      ALLOWED_LANGUAGES: tr,en
+      API_KEY_AUTH_FAILURES_PER_MIN: "20"
+      API_KEY_LAST_USED_FLUSH_S: "60"
+      ARQ_QUEUE_BACKGROUND: llm-background
+      ARQ_QUEUE_INGEST: ingest
+      ARQ_QUEUE_INTERACTIVE: llm-interactive
+      BACKGROUND_WINDOW: ""
+      BACKGROUND_WINDOW_TZ: Europe/Istanbul
+      BACKGROUND_WINDOW_WEEKENDS: "false"
+      CONSOLE_ORIGINS: http://localhost:3000
+      CONVERT_CPU_LIMIT_SECONDS: "3600"
+      CONVERT_MEMORY_LIMIT_MB: "10240"
+      CONVERT_TIMEOUT_SECONDS: "600"
+      CONVERT_WORKER_START_TIMEOUT_SECONDS: "60"
+      DATABASE_URL: postgresql+psycopg://ffcore_app:dummy-not-secret-app-role@postgres:5432/ffcore
+      DEPLOY_PROFILE: llmaas
+      EGRESS_ALLOWLIST: ""
+      EMBED_DIM: "1024"
+      EMBED_MODEL: BAAI/bge-m3
+      EVAL_ADVANCE_INTERVAL_S: "5"
+      EVAL_JUDGE_CALL_S: "60"
+      EVAL_JUDGE_CALLS_PER_TICK: "20"
+      EVAL_JUDGE_MODEL: chat-default
+      EVAL_MAX_ITEM_RUNS: "500"
+      EVAL_PASS_THRESHOLD: "0.8"
+      FAKE_EMBED: "0"
+      FERNET_KEY: ZHVtbXktbm90LXNlY3JldC1mZXJuZXQta2V5LTAwMDA=
+      FFCORE_TEST_HOOKS: "0"
+      GUARDRAIL_EGRESS_ENABLED: "true"
+      GUARDRAIL_EGRESS_NER: "false"
+      HF_HUB_OFFLINE: "1"
+      INFERENCE_BACKEND: ollama
+      INTERNAL_API_URL: http://backend:8000
+      LANGFUSE_HOST: http://langfuse-web:3000
+      LANGFUSE_PUBLIC_KEY: pk-lf-dummy-not-secret-test
+      LANGFUSE_SECRET_KEY: sk-lf-dummy-not-secret-test
+      LITELLM_INTERNAL_KEY: sk-dummy-not-secret-litellm-internal
+      LITELLM_MASTER_KEY: sk-dummy-not-secret-litellm-master
+      LITELLM_URL: http://litellm:4000
+      LLM_CALL_TIMEOUT_S: "60"
+      LLM_SLOTS: "4"
+      LOG_LEVEL: INFO
+      NER_MODEL: ""
+      NER_REVISION: ""
+      OBO_JWT_SECRET: dummy-not-secret-obo-jwt-secret-0123456789
+      OCR_PDF_MAX_PAGES: "200"
+      OFFLINE: "false"
+      OLLAMA_CONTEXT_LENGTH: "32768"
+      PII_TOKEN_TTL_S: "1800"
+      QDRANT_URL: ""
+      REDIS_URL: redis://:dummy-not-secret-redis@redis:6379/0
+      RERANK_MIN_SCORE: "0.1"
+      RERANK_MODEL: BAAI/bge-reranker-v2-m3
+      RETENTION_AUDIT_DROP_ENABLED: "false"
+      RETENTION_BATCH: "5000"
+      RETENTION_DRY_RUN: "true"
+      RUN_ABANDON_GRACE_S: "120"
+      RUN_EVENT_STREAM_TTL_S: "86400"
+      RUN_TIMEOUT_S: "120"
+      SECRET_KEY: dummy-not-secret-session-key-0123456789
+      SERVICE_TOKEN: dummy-not-secret-service-token-0123456789
+      SESSION_TTL_S: "28800"
+      TEXT_NORMALIZE_TR: "false"
+      TRANSFORMERS_OFFLINE: "1"
+      UPLOAD_MAX_REQUEST_BYTES: "541065216"
+      VECTOR_BACKEND: pgvector
+      VIDEO_TRANSCRIPT_ENABLED: "false"
+    image: ffcore/backend:0.0.0-tr2
+    mem_limit: "6442450944"
+    networks:
+      default: null
+    restart: unless-stopped
+    volumes:
+      - type: volume
+        source: model_cache
+        target: /models
+        volume: {}
+      - type: volume
+        source: knowledge_storage
+        target: /data/storage
+        volume: {}
+networks:
+  default:
+    name: ffcore-tr2_default
+volumes:
+  e2e_node_modules:
+    name: ffcore-tr2_e2e_node_modules
+  knowledge_storage:
+    name: ffcore-tr2_knowledge_storage
+  langfuse_clickhouse_data:
+    name: ffcore-tr2_langfuse_clickhouse_data
+  langfuse_clickhouse_logs:
+    name: ffcore-tr2_langfuse_clickhouse_logs
+  langfuse_minio_data:
+    name: ffcore-tr2_langfuse_minio_data
+  langfuse_postgres_data:
+    name: ffcore-tr2_langfuse_postgres_data
+  model_cache:
+    name: ffcore-tr2_model_cache
+  postgres_data:
+    name: ffcore-tr2_postgres_data
+  qdrant_data:
+    name: ffcore-tr2_qdrant_data
+  redis_data:
+    name: ffcore-tr2_redis_data

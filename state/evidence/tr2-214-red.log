@@ -1,0 +1,408 @@
+FFFFFFFFFFFFFF.............                                              [100%]
+================================== FAILURES ===================================
+_ test_214_apostrophe_in_comment_does_not_hide_later_commands[# don't touch this\npytest backend/tests-KAPI] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\followup-triage-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-111/test_214_apostrophe_in_comment0/ffcore')
+cmd = "# don't touch this\npytest backend/tests", rule = 'KAPI'
+
+    @pytest.mark.parametrize(
+        ("cmd", "rule"),
+        [
+            ("# don't touch this\npytest backend/tests", "KAPI"),
+            ("echo hi  # it's fine\ngit push origin x", "PUSH"),
+            ("# can't build here\ndocker build .", "PROSES-175"),
+            ("cd backend # the worker's tree\nmake test", "KAPI"),
+            ("# don't\nsh <<EOF\ngit push\nEOF", "PUSH"),
+            ("# it's\ncat > x.txt <<EOF\nbody\nEOF\ngit push", "PUSH"),
+            ("(cd x # don't\n git push)", "PUSH"),
+        ],
+    )
+    def test_214_apostrophe_in_comment_does_not_hide_later_commands(guard, main_root, cmd, rule):
+>       assert rule in rules(guard, cmd, main_root), cmd
+E       AssertionError: # don't touch this
+E         pytest backend/tests
+E       assert 'KAPI' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\followup-triage-2\\.claude\\hooks\\ffcore_guard.py'>, "# don't touch this\npytest backend/tests", WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-111/test_214_apostrophe_in_comment0/ffcore'))
+
+tests\hooks\test_comments_timeout.py:33: AssertionError
+_ test_214_apostrophe_in_comment_does_not_hide_later_commands[echo hi  # it's fine\ngit push origin x-PUSH] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\followup-triage-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-111/test_214_apostrophe_in_comment1/ffcore')
+cmd = "echo hi  # it's fine\ngit push origin x", rule = 'PUSH'
+
+    @pytest.mark.parametrize(
+        ("cmd", "rule"),
+        [
+            ("# don't touch this\npytest backend/tests", "KAPI"),
+            ("echo hi  # it's fine\ngit push origin x", "PUSH"),
+            ("# can't build here\ndocker build .", "PROSES-175"),
+            ("cd backend # the worker's tree\nmake test", "KAPI"),
+            ("# don't\nsh <<EOF\ngit push\nEOF", "PUSH"),
+            ("# it's\ncat > x.txt <<EOF\nbody\nEOF\ngit push", "PUSH"),
+            ("(cd x # don't\n git push)", "PUSH"),
+        ],
+    )
+    def test_214_apostrophe_in_comment_does_not_hide_later_commands(guard, main_root, cmd, rule):
+>       assert rule in rules(guard, cmd, main_root), cmd
+E       AssertionError: echo hi  # it's fine
+E         git push origin x
+E       assert 'PUSH' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\followup-triage-2\\.claude\\hooks\\ffcore_guard.py'>, "echo hi  # it's fine\ngit push origin x", WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-111/test_214_apostrophe_in_comment1/ffcore'))
+
+tests\hooks\test_comments_timeout.py:33: AssertionError
+_ test_214_apostrophe_in_comment_does_not_hide_later_commands[# can't build here\ndocker build .-PROSES-175] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\followup-triage-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-111/test_214_apostrophe_in_comment2/ffcore')
+cmd = "# can't build here\ndocker build .", rule = 'PROSES-175'
+
+    @pytest.mark.parametrize(
+        ("cmd", "rule"),
+        [
+            ("# don't touch this\npytest backend/tests", "KAPI"),
+            ("echo hi  # it's fine\ngit push origin x", "PUSH"),
+            ("# can't build here\ndocker build .", "PROSES-175"),
+            ("cd backend # the worker's tree\nmake test", "KAPI"),
+            ("# don't\nsh <<EOF\ngit push\nEOF", "PUSH"),
+            ("# it's\ncat > x.txt <<EOF\nbody\nEOF\ngit push", "PUSH"),
+            ("(cd x # don't\n git push)", "PUSH"),
+        ],
+    )
+    def test_214_apostrophe_in_comment_does_not_hide_later_commands(guard, main_root, cmd, rule):
+>       assert rule in rules(guard, cmd, main_root), cmd
+E       AssertionError: # can't build here
+E         docker build .
+E       assert 'PROSES-175' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\followup-triage-2\\.claude\\hooks\\ffcore_guard.py'>, "# can't build here\ndocker build .", WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-111/test_214_apostrophe_in_comment2/ffcore'))
+
+tests\hooks\test_comments_timeout.py:33: AssertionError
+_ test_214_apostrophe_in_comment_does_not_hide_later_commands[cd backend # the worker's tree\nmake test-KAPI] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\followup-triage-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-111/test_214_apostrophe_in_comment3/ffcore')
+cmd = "cd backend # the worker's tree\nmake test", rule = 'KAPI'
+
+    @pytest.mark.parametrize(
+        ("cmd", "rule"),
+        [
+            ("# don't touch this\npytest backend/tests", "KAPI"),
+            ("echo hi  # it's fine\ngit push origin x", "PUSH"),
+            ("# can't build here\ndocker build .", "PROSES-175"),
+            ("cd backend # the worker's tree\nmake test", "KAPI"),
+            ("# don't\nsh <<EOF\ngit push\nEOF", "PUSH"),
+            ("# it's\ncat > x.txt <<EOF\nbody\nEOF\ngit push", "PUSH"),
+            ("(cd x # don't\n git push)", "PUSH"),
+        ],
+    )
+    def test_214_apostrophe_in_comment_does_not_hide_later_commands(guard, main_root, cmd, rule):
+>       assert rule in rules(guard, cmd, main_root), cmd
+E       AssertionError: cd backend # the worker's tree
+E         make test
+E       assert 'KAPI' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\followup-triage-2\\.claude\\hooks\\ffcore_guard.py'>, "cd backend # the worker's tree\nmake test", WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-111/test_214_apostrophe_in_comment3/ffcore'))
+
+tests\hooks\test_comments_timeout.py:33: AssertionError
+_ test_214_apostrophe_in_comment_does_not_hide_later_commands[# don't\nsh <<EOF\ngit push\nEOF-PUSH] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\followup-triage-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-111/test_214_apostrophe_in_comment4/ffcore')
+cmd = "# don't\nsh <<EOF\ngit push\nEOF", rule = 'PUSH'
+
+    @pytest.mark.parametrize(
+        ("cmd", "rule"),
+        [
+            ("# don't touch this\npytest backend/tests", "KAPI"),
+            ("echo hi  # it's fine\ngit push origin x", "PUSH"),
+            ("# can't build here\ndocker build .", "PROSES-175"),
+            ("cd backend # the worker's tree\nmake test", "KAPI"),
+            ("# don't\nsh <<EOF\ngit push\nEOF", "PUSH"),
+            ("# it's\ncat > x.txt <<EOF\nbody\nEOF\ngit push", "PUSH"),
+            ("(cd x # don't\n git push)", "PUSH"),
+        ],
+    )
+    def test_214_apostrophe_in_comment_does_not_hide_later_commands(guard, main_root, cmd, rule):
+>       assert rule in rules(guard, cmd, main_root), cmd
+E       AssertionError: # don't
+E         sh <<EOF
+E         git push
+E         EOF
+E       assert 'PUSH' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\followup-triage-2\\.claude\\hooks\\ffcore_guard.py'>, "# don't\nsh <<EOF\ngit push\nEOF", WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-111/test_214_apostrophe_in_comment4/ffcore'))
+
+tests\hooks\test_comments_timeout.py:33: AssertionError
+_ test_214_apostrophe_in_comment_does_not_hide_later_commands[# it's\ncat > x.txt <<EOF\nbody\nEOF\ngit push-PUSH] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\followup-triage-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-111/test_214_apostrophe_in_comment5/ffcore')
+cmd = "# it's\ncat > x.txt <<EOF\nbody\nEOF\ngit push", rule = 'PUSH'
+
+    @pytest.mark.parametrize(
+        ("cmd", "rule"),
+        [
+            ("# don't touch this\npytest backend/tests", "KAPI"),
+            ("echo hi  # it's fine\ngit push origin x", "PUSH"),
+            ("# can't build here\ndocker build .", "PROSES-175"),
+            ("cd backend # the worker's tree\nmake test", "KAPI"),
+            ("# don't\nsh <<EOF\ngit push\nEOF", "PUSH"),
+            ("# it's\ncat > x.txt <<EOF\nbody\nEOF\ngit push", "PUSH"),
+            ("(cd x # don't\n git push)", "PUSH"),
+        ],
+    )
+    def test_214_apostrophe_in_comment_does_not_hide_later_commands(guard, main_root, cmd, rule):
+>       assert rule in rules(guard, cmd, main_root), cmd
+E       AssertionError: # it's
+E         cat > x.txt <<EOF
+E         body
+E         EOF
+E         git push
+E       assert 'PUSH' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\followup-triage-2\\.claude\\hooks\\ffcore_guard.py'>, "# it's\ncat > x.txt <<EOF\nbody\nEOF\ngit push", WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-111/test_214_apostrophe_in_comment5/ffcore'))
+
+tests\hooks\test_comments_timeout.py:33: AssertionError
+_ test_214_apostrophe_in_comment_does_not_hide_later_commands[(cd x # don't\n git push)-PUSH] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\followup-triage-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-111/test_214_apostrophe_in_comment6/ffcore')
+cmd = "(cd x # don't\n git push)", rule = 'PUSH'
+
+    @pytest.mark.parametrize(
+        ("cmd", "rule"),
+        [
+            ("# don't touch this\npytest backend/tests", "KAPI"),
+            ("echo hi  # it's fine\ngit push origin x", "PUSH"),
+            ("# can't build here\ndocker build .", "PROSES-175"),
+            ("cd backend # the worker's tree\nmake test", "KAPI"),
+            ("# don't\nsh <<EOF\ngit push\nEOF", "PUSH"),
+            ("# it's\ncat > x.txt <<EOF\nbody\nEOF\ngit push", "PUSH"),
+            ("(cd x # don't\n git push)", "PUSH"),
+        ],
+    )
+    def test_214_apostrophe_in_comment_does_not_hide_later_commands(guard, main_root, cmd, rule):
+>       assert rule in rules(guard, cmd, main_root), cmd
+E       AssertionError: (cd x # don't
+E          git push)
+E       assert 'PUSH' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\followup-triage-2\\.claude\\hooks\\ffcore_guard.py'>, "(cd x # don't\n git push)", WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-111/test_214_apostrophe_in_comment6/ffcore'))
+
+tests\hooks\test_comments_timeout.py:33: AssertionError
+_ test_214_timeout_nice_nohup_wrappers_are_checked[timeout 600 pytest backend/tests-KAPI] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\followup-triage-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-111/test_214_timeout_nice_nohup_wr0/ffcore')
+cmd = 'timeout 600 pytest backend/tests', rule = 'KAPI'
+
+    @pytest.mark.parametrize(
+        ("cmd", "rule"),
+        [
+            ("timeout 600 pytest backend/tests", "KAPI"),
+            ("timeout 10m make test", "KAPI"),
+            ("timeout --foreground 60 make test", "KAPI"),
+            ("timeout -s KILL 5 git push", "PUSH"),
+            ("timeout -k 5 60 git push", "PUSH"),
+            ("timeout --signal=TERM 5 git push", "PUSH"),
+            ("env X=1 timeout 5 git push", "PUSH"),
+            ("timeout 5m docker compose up -d", "PROSES-175"),
+            ("timeout 900 docker compose -p x run --rm tools make test", "KAPI"),
+            ("nohup make test", "KAPI"),
+            ("nice -n 5 pytest backend/tests", "KAPI"),
+        ],
+    )
+    def test_214_timeout_nice_nohup_wrappers_are_checked(guard, main_root, cmd, rule):
+>       assert rule in rules(guard, cmd, main_root), cmd
+E       AssertionError: timeout 600 pytest backend/tests
+E       assert 'KAPI' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\followup-triage-2\\.claude\\hooks\\ffcore_guard.py'>, 'timeout 600 pytest backend/tests', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-111/test_214_timeout_nice_nohup_wr0/ffcore'))
+
+tests\hooks\test_comments_timeout.py:53: AssertionError
+_ test_214_timeout_nice_nohup_wrappers_are_checked[timeout 10m make test-KAPI] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\followup-triage-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-111/test_214_timeout_nice_nohup_wr1/ffcore')
+cmd = 'timeout 10m make test', rule = 'KAPI'
+
+    @pytest.mark.parametrize(
+        ("cmd", "rule"),
+        [
+            ("timeout 600 pytest backend/tests", "KAPI"),
+            ("timeout 10m make test", "KAPI"),
+            ("timeout --foreground 60 make test", "KAPI"),
+            ("timeout -s KILL 5 git push", "PUSH"),
+            ("timeout -k 5 60 git push", "PUSH"),
+            ("timeout --signal=TERM 5 git push", "PUSH"),
+            ("env X=1 timeout 5 git push", "PUSH"),
+            ("timeout 5m docker compose up -d", "PROSES-175"),
+            ("timeout 900 docker compose -p x run --rm tools make test", "KAPI"),
+            ("nohup make test", "KAPI"),
+            ("nice -n 5 pytest backend/tests", "KAPI"),
+        ],
+    )
+    def test_214_timeout_nice_nohup_wrappers_are_checked(guard, main_root, cmd, rule):
+>       assert rule in rules(guard, cmd, main_root), cmd
+E       AssertionError: timeout 10m make test
+E       assert 'KAPI' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\followup-triage-2\\.claude\\hooks\\ffcore_guard.py'>, 'timeout 10m make test', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-111/test_214_timeout_nice_nohup_wr1/ffcore'))
+
+tests\hooks\test_comments_timeout.py:53: AssertionError
+_ test_214_timeout_nice_nohup_wrappers_are_checked[timeout --foreground 60 make test-KAPI] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\followup-triage-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-111/test_214_timeout_nice_nohup_wr2/ffcore')
+cmd = 'timeout --foreground 60 make test', rule = 'KAPI'
+
+    @pytest.mark.parametrize(
+        ("cmd", "rule"),
+        [
+            ("timeout 600 pytest backend/tests", "KAPI"),
+            ("timeout 10m make test", "KAPI"),
+            ("timeout --foreground 60 make test", "KAPI"),
+            ("timeout -s KILL 5 git push", "PUSH"),
+            ("timeout -k 5 60 git push", "PUSH"),
+            ("timeout --signal=TERM 5 git push", "PUSH"),
+            ("env X=1 timeout 5 git push", "PUSH"),
+            ("timeout 5m docker compose up -d", "PROSES-175"),
+            ("timeout 900 docker compose -p x run --rm tools make test", "KAPI"),
+            ("nohup make test", "KAPI"),
+            ("nice -n 5 pytest backend/tests", "KAPI"),
+        ],
+    )
+    def test_214_timeout_nice_nohup_wrappers_are_checked(guard, main_root, cmd, rule):
+>       assert rule in rules(guard, cmd, main_root), cmd
+E       AssertionError: timeout --foreground 60 make test
+E       assert 'KAPI' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\followup-triage-2\\.claude\\hooks\\ffcore_guard.py'>, 'timeout --foreground 60 make test', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-111/test_214_timeout_nice_nohup_wr2/ffcore'))
+
+tests\hooks\test_comments_timeout.py:53: AssertionError
+_ test_214_timeout_nice_nohup_wrappers_are_checked[timeout -s KILL 5 git push-PUSH] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\followup-triage-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-111/test_214_timeout_nice_nohup_wr3/ffcore')
+cmd = 'timeout -s KILL 5 git push', rule = 'PUSH'
+
+    @pytest.mark.parametrize(
+        ("cmd", "rule"),
+        [
+            ("timeout 600 pytest backend/tests", "KAPI"),
+            ("timeout 10m make test", "KAPI"),
+            ("timeout --foreground 60 make test", "KAPI"),
+            ("timeout -s KILL 5 git push", "PUSH"),
+            ("timeout -k 5 60 git push", "PUSH"),
+            ("timeout --signal=TERM 5 git push", "PUSH"),
+            ("env X=1 timeout 5 git push", "PUSH"),
+            ("timeout 5m docker compose up -d", "PROSES-175"),
+            ("timeout 900 docker compose -p x run --rm tools make test", "KAPI"),
+            ("nohup make test", "KAPI"),
+            ("nice -n 5 pytest backend/tests", "KAPI"),
+        ],
+    )
+    def test_214_timeout_nice_nohup_wrappers_are_checked(guard, main_root, cmd, rule):
+>       assert rule in rules(guard, cmd, main_root), cmd
+E       AssertionError: timeout -s KILL 5 git push
+E       assert 'PUSH' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\followup-triage-2\\.claude\\hooks\\ffcore_guard.py'>, 'timeout -s KILL 5 git push', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-111/test_214_timeout_nice_nohup_wr3/ffcore'))
+
+tests\hooks\test_comments_timeout.py:53: AssertionError
+_ test_214_timeout_nice_nohup_wrappers_are_checked[timeout -k 5 60 git push-PUSH] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\followup-triage-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-111/test_214_timeout_nice_nohup_wr4/ffcore')
+cmd = 'timeout -k 5 60 git push', rule = 'PUSH'
+
+    @pytest.mark.parametrize(
+        ("cmd", "rule"),
+        [
+            ("timeout 600 pytest backend/tests", "KAPI"),
+            ("timeout 10m make test", "KAPI"),
+            ("timeout --foreground 60 make test", "KAPI"),
+            ("timeout -s KILL 5 git push", "PUSH"),
+            ("timeout -k 5 60 git push", "PUSH"),
+            ("timeout --signal=TERM 5 git push", "PUSH"),
+            ("env X=1 timeout 5 git push", "PUSH"),
+            ("timeout 5m docker compose up -d", "PROSES-175"),
+            ("timeout 900 docker compose -p x run --rm tools make test", "KAPI"),
+            ("nohup make test", "KAPI"),
+            ("nice -n 5 pytest backend/tests", "KAPI"),
+        ],
+    )
+    def test_214_timeout_nice_nohup_wrappers_are_checked(guard, main_root, cmd, rule):
+>       assert rule in rules(guard, cmd, main_root), cmd
+E       AssertionError: timeout -k 5 60 git push
+E       assert 'PUSH' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\followup-triage-2\\.claude\\hooks\\ffcore_guard.py'>, 'timeout -k 5 60 git push', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-111/test_214_timeout_nice_nohup_wr4/ffcore'))
+
+tests\hooks\test_comments_timeout.py:53: AssertionError
+_ test_214_timeout_nice_nohup_wrappers_are_checked[timeout --signal=TERM 5 git push-PUSH] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\followup-triage-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-111/test_214_timeout_nice_nohup_wr5/ffcore')
+cmd = 'timeout --signal=TERM 5 git push', rule = 'PUSH'
+
+    @pytest.mark.parametrize(
+        ("cmd", "rule"),
+        [
+            ("timeout 600 pytest backend/tests", "KAPI"),
+            ("timeout 10m make test", "KAPI"),
+            ("timeout --foreground 60 make test", "KAPI"),
+            ("timeout -s KILL 5 git push", "PUSH"),
+            ("timeout -k 5 60 git push", "PUSH"),
+            ("timeout --signal=TERM 5 git push", "PUSH"),
+            ("env X=1 timeout 5 git push", "PUSH"),
+            ("timeout 5m docker compose up -d", "PROSES-175"),
+            ("timeout 900 docker compose -p x run --rm tools make test", "KAPI"),
+            ("nohup make test", "KAPI"),
+            ("nice -n 5 pytest backend/tests", "KAPI"),
+        ],
+    )
+    def test_214_timeout_nice_nohup_wrappers_are_checked(guard, main_root, cmd, rule):
+>       assert rule in rules(guard, cmd, main_root), cmd
+E       AssertionError: timeout --signal=TERM 5 git push
+E       assert 'PUSH' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\followup-triage-2\\.claude\\hooks\\ffcore_guard.py'>, 'timeout --signal=TERM 5 git push', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-111/test_214_timeout_nice_nohup_wr5/ffcore'))
+
+tests\hooks\test_comments_timeout.py:53: AssertionError
+_ test_214_timeout_nice_nohup_wrappers_are_checked[env X=1 timeout 5 git push-PUSH] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\followup-triage-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-111/test_214_timeout_nice_nohup_wr6/ffcore')
+cmd = 'env X=1 timeout 5 git push', rule = 'PUSH'
+
+    @pytest.mark.parametrize(
+        ("cmd", "rule"),
+        [
+            ("timeout 600 pytest backend/tests", "KAPI"),
+            ("timeout 10m make test", "KAPI"),
+            ("timeout --foreground 60 make test", "KAPI"),
+            ("timeout -s KILL 5 git push", "PUSH"),
+            ("timeout -k 5 60 git push", "PUSH"),
+            ("timeout --signal=TERM 5 git push", "PUSH"),
+            ("env X=1 timeout 5 git push", "PUSH"),
+            ("timeout 5m docker compose up -d", "PROSES-175"),
+            ("timeout 900 docker compose -p x run --rm tools make test", "KAPI"),
+            ("nohup make test", "KAPI"),
+            ("nice -n 5 pytest backend/tests", "KAPI"),
+        ],
+    )
+    def test_214_timeout_nice_nohup_wrappers_are_checked(guard, main_root, cmd, rule):
+>       assert rule in rules(guard, cmd, main_root), cmd
+E       AssertionError: env X=1 timeout 5 git push
+E       assert 'PUSH' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\followup-triage-2\\.claude\\hooks\\ffcore_guard.py'>, 'env X=1 timeout 5 git push', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-111/test_214_timeout_nice_nohup_wr6/ffcore'))
+
+tests\hooks\test_comments_timeout.py:53: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/hooks/test_comments_timeout.py::test_214_apostrophe_in_comment_does_not_hide_later_commands[# don't touch this\npytest backend/tests-KAPI]
+FAILED tests/hooks/test_comments_timeout.py::test_214_apostrophe_in_comment_does_not_hide_later_commands[echo hi  # it's fine\ngit push origin x-PUSH]
+FAILED tests/hooks/test_comments_timeout.py::test_214_apostrophe_in_comment_does_not_hide_later_commands[# can't build here\ndocker build .-PROSES-175]
+FAILED tests/hooks/test_comments_timeout.py::test_214_apostrophe_in_comment_does_not_hide_later_commands[cd backend # the worker's tree\nmake test-KAPI]
+FAILED tests/hooks/test_comments_timeout.py::test_214_apostrophe_in_comment_does_not_hide_later_commands[# don't\nsh <<EOF\ngit push\nEOF-PUSH]
+FAILED tests/hooks/test_comments_timeout.py::test_214_apostrophe_in_comment_does_not_hide_later_commands[# it's\ncat > x.txt <<EOF\nbody\nEOF\ngit push-PUSH]
+FAILED tests/hooks/test_comments_timeout.py::test_214_apostrophe_in_comment_does_not_hide_later_commands[(cd x # don't\n git push)-PUSH]
+FAILED tests/hooks/test_comments_timeout.py::test_214_timeout_nice_nohup_wrappers_are_checked[timeout 600 pytest backend/tests-KAPI]
+FAILED tests/hooks/test_comments_timeout.py::test_214_timeout_nice_nohup_wrappers_are_checked[timeout 10m make test-KAPI]
+FAILED tests/hooks/test_comments_timeout.py::test_214_timeout_nice_nohup_wrappers_are_checked[timeout --foreground 60 make test-KAPI]
+FAILED tests/hooks/test_comments_timeout.py::test_214_timeout_nice_nohup_wrappers_are_checked[timeout -s KILL 5 git push-PUSH]
+FAILED tests/hooks/test_comments_timeout.py::test_214_timeout_nice_nohup_wrappers_are_checked[timeout -k 5 60 git push-PUSH]
+FAILED tests/hooks/test_comments_timeout.py::test_214_timeout_nice_nohup_wrappers_are_checked[timeout --signal=TERM 5 git push-PUSH]
+FAILED tests/hooks/test_comments_timeout.py::test_214_timeout_nice_nohup_wrappers_are_checked[env X=1 timeout 5 git push-PUSH]
+14 failed, 13 passed in 0.80s

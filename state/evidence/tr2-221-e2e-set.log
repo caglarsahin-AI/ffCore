@@ -1,0 +1,14 @@
+
+Running 4 tests using 1 worker
+
+  ✓  1 [chromium] › tests/e2e/test_10mrk_5_both_themes.spec.ts:13:9 › test_10mrk_5_both_themes: login light (1.8s)
+  ✓  2 [chromium] › tests/e2e/test_10mrk_5_both_themes.spec.ts:13:9 › test_10mrk_5_both_themes: login dark (1.6s)
+  ✓  3 [chromium] › tests/e2e/test_10mrk_5_both_themes.spec.ts:13:9 › test_10mrk_5_both_themes: projects light (3.0s)
+  ✓  4 [chromium] › tests/e2e/test_10mrk_5_both_themes.spec.ts:13:9 › test_10mrk_5_both_themes: projects dark (3.0s)
+
+  4 passed (1.7m)
+exit=0
+10mrk-login-dark.png
+10mrk-login-light.png
+10mrk-projects-dark.png
+10mrk-projects-light.png

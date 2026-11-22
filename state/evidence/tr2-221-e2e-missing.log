@@ -1,0 +1,38 @@
+
+Running 4 tests using 1 worker
+
+  ✘  1 [chromium] › tests/e2e/test_10mrk_5_both_themes.spec.ts:13:9 › test_10mrk_5_both_themes: login light (4.3s)
+Testing stopped early after 1 maximum allowed failures.
+
+
+  1) [chromium] › tests/e2e/test_10mrk_5_both_themes.spec.ts:13:9 › test_10mrk_5_both_themes: login light 
+
+    Error: E2E_SCREENSHOT_DIR=/tmp/missing is not a directory (relative paths start at /work/frontend)
+
+       at screenshots.ts:20
+
+      18 |   }
+      19 |   if (!isDir) {
+    > 20 |     throw new Error(`E2E_SCREENSHOT_DIR=${dir} is not a directory (relative paths start at /work/frontend)`);
+         |           ^
+      21 |   }
+      22 |   return dir;
+      23 | }
+        at screenshotDir (/work/frontend/tests/e2e/screenshots.ts:20:11)
+        at saveScreenshot (/work/frontend/tests/e2e/screenshots.ts:27:15)
+        at /work/frontend/tests/e2e/test_10mrk_5_both_themes.spec.ts:19:27
+
+    Error Context: test-results/test_10mrk_5_both_themes-t-2407d-k-5-both-themes-login-light-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/test_10mrk_5_both_themes-t-2407d-k-5-both-themes-login-light-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/test_10mrk_5_both_themes-t-2407d-k-5-both-themes-login-light-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [chromium] › tests/e2e/test_10mrk_5_both_themes.spec.ts:13:9 › test_10mrk_5_both_themes: login light 
+  3 did not run
+  1 error was not a part of any test, see above for details

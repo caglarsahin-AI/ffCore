@@ -1,0 +1,18 @@
+...F..                                                                   [100%]
+=================================== FAILURES ===================================
+______________ test_hke_215_import_failures_are_the_expected_ones ______________
+
+    def test_hke_215_import_failures_are_the_expected_ones():
+        _, failed = _settings_classes()
+>       assert set(failed) == set(EXPECTED_IMPORT_FAILURES), failed
+E       AssertionError: {'ffcore.knowledge.worker': 'RuntimeError: REDIS_URL is not set; the ingest worker needs Redis'}
+E       assert {'ffcore.knowledge.worker'} == set()
+E         
+E         Extra items in the left set:
+E         'ffcore.knowledge.worker'
+E         Use -v to get more diff
+
+tests/unit/test_hke_208_settings_classes.py:77: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/test_hke_208_settings_classes.py::test_hke_215_import_failures_are_the_expected_ones
+1 failed, 5 passed in 13.63s

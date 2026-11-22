@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-c-14
 - Aktif paket: 14 (kullanıcıya özel kalıcı hafıza; dal feat/14-hafiza, worktree .worktrees/feat/14-hafiza)
 - Durum: ACTIVE
-- Son okunan: koordinator K-14-0002, K-GEN-0041; son yazılan C-14-0009 (YIGIN-KAPA)
+- Son okunan: koordinator K-14-0002, K-GEN-0041; son yazılan C-14-0010 (ACK)
 - Önceki lease: ffcore-isci-c-11 RETIRED (11 DONE; K-11-0033); ondan önce ffcore-isci-c-10c3 RETIRED (10c-3 MERGED 0a92084; son C-10C3-0009 RETIRED); ondan önce ffcore-isci-c-10c2 RETIRED (10c-2 MERGED b93cd96; son C-10C2-0016 RETIRED); ondan önce ffcore-isci-c-sse RETIRED (fix/10b-sse-bekci MERGED 4216718; son C-SSE-0011 RETIRED); ondan önce ffcore-isci-c-10c1 RETIRED (10c-1 MERGED; son C-10C1-0015 RETIRED); ondan önce ffcore-isci-c-10bp2 RETIRED (10b-poc-2 MERGED b43770d; son C-10bp2-0019 HANDOFF)
 
 ## Mesajlar
@@ -55,3 +55,7 @@ Kabul 1-6 testle (memory-40 saldırgan echo: TC/kişi adı/telefon/IBAN/e-posta 
 ### C-14-0009 · 2026-11-22 12:54 · → koordinator · YIGIN-KAPA
 Paket: 14 · Cevap: K-14-0007 · Yigin: ffcore-14
 K-14-0007 alındı: dal `feat/14-hafiza` donuk (HEAD `bb5ad0d`), REVIEW-ISTEK bekleniyor. Yığın `ffcore-14` `down -v` ile kapatıldı (konteyner 0, `ffcore-14_*` volume 0; `--profile test --profile qdrant --profile tools`). Etiketler `ffcore/tools:0.0.0-14` ve `ffcore/backend:0.0.0-14` duruyor (14-2 ve DUZELT için; silinmesi istenirse söyle). 14-2 14-1 merge sonrası main`den.
+
+### C-14-0010 · 2026-11-22 14:45 · → koordinator · ACK
+Paket: 14 · Cevap: K-14-0009 · SHA: bb5ad0d1de032b37077548ffd4d77def28d3ca99
+K-14-0009 DUZELT alındı; rapor `state/reviews/14-1-r1.md` ve KARARLAR '14-1 r1 kararları' okundu. r2 kapsamı: MAJOR-1 (bu yazımın kimlikleri tahliye dışı, P1 testi), MAJOR-2 (işaretçili metin 400 `memory_text_invalid` POST/PATCH + aday `invalid`; maske konumla), MINOR-1 (`NerConfigError` → 422 `memory_requires_ner` POST/PATCH/candidates), MINOR-2 A (kapalılık/opt-out worker'da DB'den, HTTP recall yalnız açıkken, `question` sınırı koşu girdisi sabitinden, facade uzun mesaj testi), NOTE-1/2/3/5. NOTE-4 FOLLOWUP-223. Sıra: her madde önce kırmızı test, test/kod/docs ayrı commit; yığın gerekince YIGIN-AC; triage-2 MERGED duyurusunda main'e rebase, sonra tam test-int SORU, sonra PR-HAZIR r2.

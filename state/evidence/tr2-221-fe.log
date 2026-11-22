@@ -1,0 +1,6 @@
+lint_exit=0
+
+> ffcore-frontend@0.1.0 typecheck
+> tsc --noEmit
+
+typecheck_exit=0

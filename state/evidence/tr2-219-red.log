@@ -1,0 +1,321 @@
+..FF.FFFFF..FF.F.                                                        [100%]
+=================================== FAILURES ===================================
+__________________ test_04a_17b_context_configuration_invalid __________________
+
+client_factory = <function client_factory.<locals>.make at 0x7fea280085e0>
+ready_app = {'settings': Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('****...lush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)}
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_7a9898a3f5fc) at 0x7fea281d2840>
+make_project = <function make_project.<locals>.make at 0x7fea06f123e0>
+
+    def test_04a_17b_context_configuration_invalid(client_factory, ready_app, pg, make_project):
+        asyncio.run(readiness.warmup(ready_app["settings"]))
+        client = client_factory()
+        base = ready_app["settings"].model_copy(update={"inference_backend": "ollama"})
+    
+        ready_app["settings"] = base.model_copy(update={"ollama_context_length": None})
+        none_yet = client.get("/readyz")
+        assert _checks(none_yet)["ollama_context"]["status"] == "skipped"
+    
+        project_id = make_project()
+        _ollama_model(pg, project_id, 16000)
+        ready_app["settings"] = base.model_copy(update={"ollama_context_length": 8192})
+        small = client.get("/readyz")
+>       assert small.status_code == 503
+E       assert 200 == 503
+E        +  where 200 = <Response [200 OK]>.status_code
+
+tests/integration/test_04a_readyz.py:96: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-22 08:01:37,145 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-22 08:01:37,195 INFO ffcore.access access method=GET path=/readyz status=200 ms=120
+2026-11-22 08:01:37,264 INFO ffcore.access access method=GET path=/readyz status=200 ms=58
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:377 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=GET path=/readyz status=200 ms=120
+INFO     ffcore.access:logging.py:263 access method=GET path=/readyz status=200 ms=58
+____________ test_04a_17b_legacy_context_tokens_key_is_not_counted _____________
+
+client_factory = <function client_factory.<locals>.make at 0x7fea06f114e0>
+ready_app = {'settings': Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('****...lush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)}
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_7a9898a3f5fc) at 0x7fea06f0b9b0>
+make_project = <function make_project.<locals>.make at 0x7fea28008cc0>
+
+    def test_04a_17b_legacy_context_tokens_key_is_not_counted(
+        client_factory, ready_app, pg, make_project
+    ):
+        """FOLLOWUP-219 A (S5): a model's window is `limits.context_window` only. The old
+        `context_tokens` key (not writable through the API) is not a second path: it is not counted."""
+        asyncio.run(readiness.warmup(ready_app["settings"]))
+        project_id = make_project()
+        _ollama_model(pg, project_id, 900000, key="context_tokens")
+        ready_app["settings"] = ready_app["settings"].model_copy(
+            update={"inference_backend": "ollama", "ollama_context_length": 32768}
+        )
+        try:
+            response = client_factory().get("/readyz")
+            check = _checks(response)["ollama_context"]
+>           assert check["status"] in ("ok", "skipped"), check
+E           AssertionError: {'name': 'ollama_context', 'status': 'failed', 'code': 'context_configuration_invalid', 'detail': 'OLLAMA_CONTEXT_LENGTH=32768, largest context_tokens=900000'}
+E           assert 'failed' in ('ok', 'skipped')
+
+tests/integration/test_04a_readyz.py:124: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-22 08:01:37,502 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-96de333b8c.chat-default code=provider_not_assigned
+2026-11-22 08:01:37,503 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-c9263deb63.chat-default code=provider_not_assigned
+2026-11-22 08:01:37,503 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=2
+2026-11-22 08:01:37,548 INFO ffcore.access access method=GET path=/readyz status=503 ms=97
+------------------------------ Captured log call -------------------------------
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:376 litellm_model_not_written model=p-96de333b8c.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:376 litellm_model_not_written model=p-c9263deb63.chat-default code=provider_not_assigned
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:377 litellm_reconciled created=0 updated=0 deleted=0 problems=2
+INFO     ffcore.access:logging.py:263 access method=GET path=/readyz status=503 ms=97
+________________ test_04b_2_s7_loaded_model_context_is_checked _________________
+
+client_factory = <function client_factory.<locals>.make at 0x7fea06fac4a0>
+ready_app = {'settings': Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('****...lush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)}
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fea06f25c70>
+ollama_project = UUID('73d87646-da07-4cab-8977-0be85d44041e')
+
+    def test_04b_2_s7_loaded_model_context_is_checked(
+        client_factory, ready_app, monkeypatch, ollama_project
+    ):
+        _ollama(ready_app, monkeypatch, [{"name": MODEL, "context_length": 32768}])
+        ok = client_factory().get("/readyz")
+        assert ok.status_code == 200, ok.text
+        check = _checks(ok)["ollama_runtime_context"]
+>       assert check["status"] == "ok" and f"{MODEL}=32768" in check["detail"]
+E       AssertionError: assert ('skipped' == 'ok'
+E         
+E         - ok
+E         + skipped)
+
+tests/integration/test_04b_2_readyz.py:53: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-22 08:01:37,891 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-73d87646da.chat-default code=provider_not_assigned
+2026-11-22 08:01:37,891 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-96de333b8c.chat-default code=provider_not_assigned
+2026-11-22 08:01:37,891 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=2
+2026-11-22 08:01:37,937 INFO ffcore.access access method=GET path=/readyz status=200 ms=106
+------------------------------ Captured log call -------------------------------
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:376 litellm_model_not_written model=p-73d87646da.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:376 litellm_model_not_written model=p-96de333b8c.chat-default code=provider_not_assigned
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:377 litellm_reconciled created=0 updated=0 deleted=0 problems=2
+INFO     ffcore.access:logging.py:263 access method=GET path=/readyz status=200 ms=106
+_________________ test_04b_2_s7_smaller_runtime_context_is_503 _________________
+
+client_factory = <function client_factory.<locals>.make at 0x7fea06faf600>
+ready_app = {'settings': Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('****...lush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)}
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fea06fd0980>
+ollama_project = UUID('9632fa6a-7022-4a1f-9842-61846034dd0c')
+
+    def test_04b_2_s7_smaller_runtime_context_is_503(
+        client_factory, ready_app, monkeypatch, ollama_project
+    ):
+        _ollama(ready_app, monkeypatch, [{"name": MODEL, "context_length": 8192}])
+        small = client_factory().get("/readyz")
+>       assert small.status_code == 503
+E       assert 200 == 503
+E        +  where 200 = <Response [200 OK]>.status_code
+
+tests/integration/test_04b_2_readyz.py:61: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-22 08:01:38,103 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-9632fa6a70.chat-default code=provider_not_assigned
+2026-11-22 08:01:38,104 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-96de333b8c.chat-default code=provider_not_assigned
+2026-11-22 08:01:38,104 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=2
+2026-11-22 08:01:38,149 INFO ffcore.access access method=GET path=/readyz status=200 ms=106
+------------------------------ Captured log call -------------------------------
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:376 litellm_model_not_written model=p-9632fa6a70.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:376 litellm_model_not_written model=p-96de333b8c.chat-default code=provider_not_assigned
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:377 litellm_reconciled created=0 updated=0 deleted=0 problems=2
+INFO     ffcore.access:logging.py:263 access method=GET path=/readyz status=200 ms=106
+___________ test_04b_2_219_model_window_is_checked_without_an_agent ____________
+
+client_factory = <function client_factory.<locals>.make at 0x7fea06f105e0>
+ready_app = {'settings': Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('****...lush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)}
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fea06fd1b20>
+ollama_project = UUID('d61bbe4b-8a3a-451c-b43d-6a27708a6c33')
+
+    def test_04b_2_219_model_window_is_checked_without_an_agent(
+        client_factory, ready_app, monkeypatch, ollama_project
+    ):
+        """FOLLOWUP-219 A: no published agent; the model's own window (16000) is what Ollama must
+        hold, so a runtime context of 8192 is 503 and not skipped."""
+        _ollama(ready_app, monkeypatch, [{"name": MODEL, "context_length": 8192}])
+        small = client_factory().get("/readyz")
+>       assert small.status_code == 503
+E       assert 200 == 503
+E        +  where 200 = <Response [200 OK]>.status_code
+
+tests/integration/test_04b_2_readyz.py:73: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-22 08:01:38,319 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-96de333b8c.chat-default code=provider_not_assigned
+2026-11-22 08:01:38,319 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-d61bbe4b8a.chat-default code=provider_not_assigned
+2026-11-22 08:01:38,319 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=2
+2026-11-22 08:01:38,362 INFO ffcore.access access method=GET path=/readyz status=200 ms=99
+------------------------------ Captured log call -------------------------------
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:376 litellm_model_not_written model=p-96de333b8c.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:376 litellm_model_not_written model=p-d61bbe4b8a.chat-default code=provider_not_assigned
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:377 litellm_reconciled created=0 updated=0 deleted=0 problems=2
+INFO     ffcore.access:logging.py:263 access method=GET path=/readyz status=200 ms=99
+___________________ test_04b_2_s7_missing_field_is_an_error ____________________
+
+client_factory = <function client_factory.<locals>.make at 0x7fea06fcade0>
+ready_app = {'settings': Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('****...lush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)}
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fea06fd2b10>
+ollama_project = UUID('268ebc47-bc44-4dc4-a3f9-426c6a1c8918')
+
+    def test_04b_2_s7_missing_field_is_an_error(client_factory, ready_app, monkeypatch, ollama_project):
+        _ollama(ready_app, monkeypatch, [{"name": MODEL, "size": 1}])
+        response = client_factory().get("/readyz")
+>       assert response.status_code == 503
+E       assert 200 == 503
+E        +  where 200 = <Response [200 OK]>.status_code
+
+tests/integration/test_04b_2_readyz.py:82: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-22 08:01:38,536 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-268ebc47bc.chat-default code=provider_not_assigned
+2026-11-22 08:01:38,536 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-96de333b8c.chat-default code=provider_not_assigned
+2026-11-22 08:01:38,536 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=2
+2026-11-22 08:01:38,583 INFO ffcore.access access method=GET path=/readyz status=200 ms=112
+------------------------------ Captured log call -------------------------------
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:376 litellm_model_not_written model=p-268ebc47bc.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:376 litellm_model_not_written model=p-96de333b8c.chat-default code=provider_not_assigned
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:377 litellm_reconciled created=0 updated=0 deleted=0 problems=2
+INFO     ffcore.access:logging.py:263 access method=GET path=/readyz status=200 ms=112
+_______________ test_04b_2_s7_not_loaded_is_skipped_with_detail ________________
+
+client_factory = <function client_factory.<locals>.make at 0x7fea06f3eac0>
+ready_app = {'settings': Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('****...lush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)}
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fea281d2900>
+ollama_project = UUID('68768a20-db02-4949-a90c-ec15c66ec12e')
+
+    def test_04b_2_s7_not_loaded_is_skipped_with_detail(
+        client_factory, ready_app, monkeypatch, ollama_project
+    ):
+        _ollama(ready_app, monkeypatch, [])
+        response = client_factory().get("/readyz")
+        assert response.status_code == 200, response.text
+        check = _checks(response)["ollama_runtime_context"]
+>       assert check["status"] == "skipped" and MODEL in check["detail"]
+E       AssertionError: assert ('skipped' == 'skipped'
+E         
+E           skipped and 'qwen3.5:35b' in 'no active Ollama model with limits.context_tokens')
+
+tests/integration/test_04b_2_readyz.py:94: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-22 08:01:38,786 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-68768a20db.chat-default code=provider_not_assigned
+2026-11-22 08:01:38,786 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-96de333b8c.chat-default code=provider_not_assigned
+2026-11-22 08:01:38,786 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=2
+2026-11-22 08:01:38,833 INFO ffcore.access access method=GET path=/readyz status=200 ms=126
+------------------------------ Captured log call -------------------------------
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:376 litellm_model_not_written model=p-68768a20db.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:376 litellm_model_not_written model=p-96de333b8c.chat-default code=provider_not_assigned
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:377 litellm_reconciled created=0 updated=0 deleted=0 problems=2
+INFO     ffcore.access:logging.py:263 access method=GET path=/readyz status=200 ms=126
+_________________ test_04b_2_r2_untagged_model_matches_latest __________________
+
+client_factory = <function client_factory.<locals>.make at 0x7fea04653240>
+ready_app = {'settings': Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('****...lush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)}
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fea04669550>
+untagged_project = UUID('15bb57f4-ddd5-4eb3-8299-3ac1739208aa')
+
+    def test_04b_2_r2_untagged_model_matches_latest(
+        client_factory, ready_app, monkeypatch, untagged_project
+    ):
+        """MINOR-2: `llama3` and `llama3:latest` are one model; a small context is caught."""
+        _ollama(ready_app, monkeypatch, [{"name": "llama3:latest", "context_length": 8192}])
+        small = client_factory().get("/readyz")
+>       assert small.status_code == 503
+E       assert 200 == 503
+E        +  where 200 = <Response [200 OK]>.status_code
+
+tests/integration/test_04b_2_readyz.py:154: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-22 08:01:39,397 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-15bb57f4dd.chat-untagged code=provider_not_assigned
+2026-11-22 08:01:39,397 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-96de333b8c.chat-default code=provider_not_assigned
+2026-11-22 08:01:39,398 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=2
+2026-11-22 08:01:39,446 INFO ffcore.access access method=GET path=/readyz status=200 ms=109
+------------------------------ Captured log call -------------------------------
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:376 litellm_model_not_written model=p-15bb57f4dd.chat-untagged code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:376 litellm_model_not_written model=p-96de333b8c.chat-default code=provider_not_assigned
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:377 litellm_reconciled created=0 updated=0 deleted=0 problems=2
+INFO     ffcore.access:logging.py:263 access method=GET path=/readyz status=200 ms=109
+__________________ test_04b_2_r2_ps_shape_error_is_unexpected __________________
+
+client_factory = <function client_factory.<locals>.make at 0x7fea0460d300>
+ready_app = {'settings': Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('****...lush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)}
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fea0466a750>
+ollama_project = UUID('a9d1e348-98fb-4af9-8cea-cba8ae9d6154')
+
+    def test_04b_2_r2_ps_shape_error_is_unexpected(
+        client_factory, ready_app, monkeypatch, ollama_project
+    ):
+        """NOTE-1 (P4): Ollama answered, but not in the documented shape."""
+    
+        async def odd_ps(config_encrypted, settings):
+            raise readiness.OllamaPsUnexpected("/api/ps answer has no models list")
+    
+        asyncio.run(readiness.warmup(ready_app["settings"]))
+        monkeypatch.setattr(readiness, "_ollama_ps", odd_ps)
+        ready_app["settings"] = ready_app["settings"].model_copy(
+            update={"inference_backend": "ollama", "ollama_context_length": 32768}
+        )
+        response = client_factory().get("/readyz")
+>       assert response.status_code == 503
+E       assert 200 == 503
+E        +  where 200 = <Response [200 OK]>.status_code
+
+tests/integration/test_04b_2_readyz.py:173: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-22 08:01:39,604 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-96de333b8c.chat-default code=provider_not_assigned
+2026-11-22 08:01:39,605 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-a9d1e34898.chat-default code=provider_not_assigned
+2026-11-22 08:01:39,605 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=2
+2026-11-22 08:01:39,651 INFO ffcore.access access method=GET path=/readyz status=200 ms=100
+------------------------------ Captured log call -------------------------------
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:376 litellm_model_not_written model=p-96de333b8c.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:376 litellm_model_not_written model=p-a9d1e34898.chat-default code=provider_not_assigned
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:377 litellm_reconciled created=0 updated=0 deleted=0 problems=2
+INFO     ffcore.access:logging.py:263 access method=GET path=/readyz status=200 ms=100
+____________ test_06a_219_model_window_and_agent_budget_both_count _____________
+
+client_factory = <function client_factory.<locals>.make at 0x7fea046536a0>
+ready_app = {'settings': Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('****...lush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)}
+published_with_window = UUID('0051fb0f-c5ad-453d-92ec-c8a200830a84')
+
+    def test_06a_219_model_window_and_agent_budget_both_count(
+        client_factory, ready_app, published_with_window
+    ):
+        asyncio.run(readiness.warmup(ready_app["settings"]))
+        client = client_factory()
+        base = ready_app["settings"].model_copy(update={"inference_backend": "ollama"})
+    
+        ready_app["settings"] = base.model_copy(update={"ollama_context_length": 24000})
+        small = client.get("/readyz")
+>       assert small.status_code == 503
+E       assert 200 == 503
+E        +  where 200 = <Response [200 OK]>.status_code
+
+tests/integration/test_06a_readyz.py:100: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-22 08:01:40,100 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-0051fb0fc5.chat-default code=provider_not_assigned
+2026-11-22 08:01:40,101 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-532ea3ea7f.chat-default code=provider_not_assigned
+2026-11-22 08:01:40,101 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-96de333b8c.chat-default code=provider_not_assigned
+2026-11-22 08:01:40,101 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=3
+2026-11-22 08:01:40,154 INFO ffcore.access access method=GET path=/readyz status=200 ms=107
+------------------------------ Captured log call -------------------------------
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:376 litellm_model_not_written model=p-0051fb0fc5.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:376 litellm_model_not_written model=p-532ea3ea7f.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:376 litellm_model_not_written model=p-96de333b8c.chat-default code=provider_not_assigned
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:377 litellm_reconciled created=0 updated=0 deleted=0 problems=3
+INFO     ffcore.access:logging.py:263 access method=GET path=/readyz status=200 ms=107
+=========================== short test summary info ============================
+FAILED tests/integration/test_04a_readyz.py::test_04a_17b_context_configuration_invalid
+FAILED tests/integration/test_04a_readyz.py::test_04a_17b_legacy_context_tokens_key_is_not_counted
+FAILED tests/integration/test_04b_2_readyz.py::test_04b_2_s7_loaded_model_context_is_checked
+FAILED tests/integration/test_04b_2_readyz.py::test_04b_2_s7_smaller_runtime_context_is_503
+FAILED tests/integration/test_04b_2_readyz.py::test_04b_2_219_model_window_is_checked_without_an_agent
+FAILED tests/integration/test_04b_2_readyz.py::test_04b_2_s7_missing_field_is_an_error
+FAILED tests/integration/test_04b_2_readyz.py::test_04b_2_s7_not_loaded_is_skipped_with_detail
+FAILED tests/integration/test_04b_2_readyz.py::test_04b_2_r2_untagged_model_matches_latest
+FAILED tests/integration/test_04b_2_readyz.py::test_04b_2_r2_ps_shape_error_is_unexpected
+FAILED tests/integration/test_06a_readyz.py::test_06a_219_model_window_and_agent_budget_both_count
+10 failed, 7 passed in 13.94s
