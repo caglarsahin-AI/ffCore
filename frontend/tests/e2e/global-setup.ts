@@ -63,8 +63,10 @@ export default async function globalSetup() {
     lonely: await user("lonely"),
     memberCandidate: await user("candidate"),
     expiring: await user("expiring"),
+    memoryUser: await user("memory"),
     alpha: await project("alpha"),
     beta: await project("beta"),
+    memory: await project("memory"),
   };
   await member(fixture.alpha.id, fixture.projectAdmin.id, "admin", "edit");
   await member(fixture.beta.id, fixture.projectAdmin.id, "admin", "read");
@@ -72,5 +74,10 @@ export default async function globalSetup() {
   await member(fixture.alpha.id, fixture.analystReader.id, "analyst", "read");
   await member(fixture.alpha.id, fixture.stale.id, "admin", "edit");
   await member(fixture.alpha.id, fixture.expiring.id, "admin", "edit");
+  // 14-2: memory is turned on for this project only, so the other specs on alpha are unchanged.
+  await member(fixture.memory.id, fixture.analyst.id, "analyst", "edit");
+  await member(fixture.memory.id, fixture.analystReader.id, "analyst", "read");
+  await member(fixture.memory.id, fixture.projectAdmin.id, "admin", "edit");
+  await member(fixture.memory.id, fixture.memoryUser.id, "admin", "edit");
   process.env.E2E_FIXTURE = JSON.stringify(fixture);
 }

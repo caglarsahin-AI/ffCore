@@ -18,8 +18,10 @@ export type Fixture = {
   lonely: Account; // no membership
   memberCandidate: Account; // not a member anywhere, added in the members test
   expiring: Account; // admin+edit on alpha; its session is revoked during a test (401 path)
+  memoryUser: Account; // 14-2: admin+edit on memory only (the screenshots spec)
   alpha: { id: string; key: string };
   beta: { id: string; key: string };
+  memory: { id: string; key: string }; // 14-2: memory on; analyst, analystReader, projectAdmin
 };
 
 export function fixture(): Fixture {

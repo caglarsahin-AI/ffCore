@@ -56,3 +56,9 @@ def test_14_r2_facade_run_with_a_long_message_recalls_within_the_limit(
     assert row["user_id"] == user_id and row["status"] == "completed"
     (port,) = ports
     assert port.recalls == [question[:RUN_INPUT_MAX]]
+    # 14-2 NOTE-1 (K-14-0020 S6): the shortened recall query is recorded, never silent.
+    budget = pg.execute(
+        "SELECT payload FROM run_events WHERE run_id = %s AND type = 'budget'",
+        (response.headers["X-Run-Id"],),
+    ).fetchone()[0]
+    assert budget["memory"] == "on" and budget["question_truncated"] is True
