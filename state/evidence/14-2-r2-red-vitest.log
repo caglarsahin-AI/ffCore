@@ -1,0 +1,264 @@
+$ MSYS_NO_PATHCONV=1 docker run --rm --network none -v C:/ai_paycore/ffcore/.worktrees/feat/14-2-hafiza-ui:/w -v ffcore-10a-nm:/w/frontend/node_modules -w /w/frontend node:20.19.5-alpine sh -c 'npx vitest run tests/unit/test_14_memory_notes.test.tsx'
+HEAD=8f07072ce80f18c7104ddc0058541416102db5d5 (uncommitted files: 1)
+date=2026-11-22T20:51:36+03:00
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.12 [39m[90m/w/frontend[39m
+
+ [31m❯[39m tests/unit/test_14_memory_notes.test.tsx [2m([22m[2m11 tests[22m[2m | [22m[31m5 failed[39m[2m)[22m[33m 4712[2mms[22m[39m
+     [32m✓[39m shows the items the answer used and forgets one with a click[32m 117[2mms[22m[39m
+     [32m✓[39m shows nothing when the run used no memory (memory off, opted out)[32m 8[2mms[22m[39m
+     [32m✓[39m reads the run again until the extraction outcome arrives, then shows what was noted[32m 143[2mms[22m[39m
+     [32m✓[39m says nothing when the job wrote nothing or skipped[32m 9[2mms[22m[39m
+     [32m✓[39m says that notes may come later when the job has not run within the time[32m 259[2mms[22m[39m
+     [32m✓[39m does not read again for a stored answer (watch off)[32m 107[2mms[22m[39m
+[31m     [31m×[31m says, with the code, that the used items could not be read (P2: memory_not_owner)[39m[33m 1013[2mms[22m[39m
+[31m     [31m×[31m says, with the code, that the used items could not be read (P2: internal_error)[39m[33m 1005[2mms[22m[39m
+[31m     [31m×[31m says, with the code, that a forget failed and keeps the item (P3)[39m[33m 1019[2mms[22m[39m
+[31m     [31m×[31m counts only the items still there after one is forgotten (P4)[39m[32m 26[2mms[22m[39m
+[31m     [31m×[31m says, with the code, that the noted items could not be read or deleted[39m[33m 1004[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 5 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m tests/unit/test_14_memory_notes.test.tsx[2m > [22mtest_14_memory_notes[2m > [22msays, with the code, that the used items could not be read (P2: memory_not_owner)
+[41m[1m FAIL [22m[49m tests/unit/test_14_memory_notes.test.tsx[2m > [22mtest_14_memory_notes[2m > [22msays, with the code, that the used items could not be read (P2: internal_error)
+[31m[1mTestingLibraryElementError[22m: Unable to find an element by: [data-testid="memory-used-error"]
+
+Ignored nodes: comments, script, style
+[36m<body>[31m
+  [36m<div>[31m
+    [36m<span[31m
+      [33mdata-testid[31m=[32m"memory-notes-read"[31m
+      [33mhidden[31m=[32m""[31m
+    [36m/>[31m
+    [36m<div[31m
+      [33mclass[31m=[32m"flex flex-col gap-1 rounded-md border border-dashed px-3 py-2 text-xs text-muted-foreground"[31m
+      [33mdata-testid[31m=[32m"memory-used"[31m
+    [36m>[31m
+      [36m<div[31m
+        [33mclass[31m=[32m"flex items-center justify-between gap-2"[31m
+      [36m>[31m
+        [36m<span>[31m
+          [0mI took 1 remembered item into account[0m
+        [36m</span>[31m
+        [36m<button[31m
+          [33maria-expanded[31m=[32m"false"[31m
+          [33mclass[31m=[32m"group/button inline-flex shrink-0 items-center justify-center border border-transparent bg-clip-padding font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50 h-6 gap-1 rounded-[min(var(--radius-md),10px)] px-2 text-xs in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3"[31m
+          [33mdata-slot[31m=[32m"button"[31m
+          [33mdata-testid[31m=[32m"memory-used-toggle"[31m
+          [33mtabindex[31m=[32m"0"[31m
+          [33mtype[31m=[32m"button"[31m
+        [36m>[31m
+          [0mShow[0m
+        [36m</button>[31m
+      [36m</div>[31m
+    [36m</div>[31m
+  [36m</div>[31m
+[36m</body>[31m
+
+Ignored nodes: comments, script, style
+[36m<body>[31m
+  [36m<div>[31m
+    [36m<span[31m
+      [33mdata-testid[31m=[32m"memory-notes-read"[31m
+      [33mhidden[31m=[32m""[31m
+    [36m/>[31m
+    [36m<div[31m
+      [33mclass[31m=[32m"flex flex-col gap-1 rounded-md border border-dashed px-3 py-2 text-xs text-muted-foreground"[31m
+      [33mdata-testid[31m=[32m"memory-used"[31m
+    [36m>[31m
+      [36m<div[31m
+        [33mclass[31m=[32m"flex items-center justify-between gap-2"[31m
+      [36m>[31m
+        [36m<span>[31m
+          [0mI took 1 remembered item into account[0m
+        [36m</span>[31m
+        [36m<button[31m
+          [33maria-expanded[31m=[32m"false"[31m
+          [33mclass[31m=[32m"group/button inline-flex shrink-0 items-center justify-center border border-transparent bg-clip-padding font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50 h-6 gap-1 rounded-[min(var(--radius-md),10px)] px-2 text-xs in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3"[31m
+          [33mdata-slot[31m=[32m"button"[31m
+          [33mdata-testid[31m=[32m"memory-used-toggle"[31m
+          [33mtabindex[31m=[32m"0"[31m
+          [33mtype[31m=[32m"button"[31m
+        [36m>[31m
+          [0mShow[0m
+        [36m</button>[31m
+      [36m</div>[31m
+    [36m</div>[31m
+  [36m</div>[31m
+[36m</body>[31m[39m
+[90m [2m❯[22m waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:[2m163:27[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m86:33[22m[39m
+[36m [2m❯[22m tests/unit/test_14_memory_notes.test.tsx:[2m151:31[22m[39m
+    [90m149|[39m     serve(() => [BUDGET_ON, USED, DONE], {}, { byIds: failure(code, st…
+    [90m150|[39m     renderAs("user", "edit", <MemoryNotes projectId="p1" runId="r1" wa…
+    [90m151|[39m     [35mconst[39m line [33m=[39m [35mawait[39m screen[33m.[39m[34mfindByTestId[39m([32m"memory-used-error"[39m)[33m;[39m
+    [90m   |[39m                               [31m^[39m
+    [90m152|[39m     [34mexpect[39m(line[33m.[39mtextContent)[33m.[39m[34mtoContain[39m([32m`([39m[36m${[39mcode[36m}[39m[32m)`[39m)[33m;[39m
+    [90m153|[39m     [34mexpect[39m(screen[33m.[39m[34mqueryByTestId[39m([32m"memory-used"[39m))[33m.[39m[34mtoBeNull[39m()[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/test_14_memory_notes.test.tsx[2m > [22mtest_14_memory_notes[2m > [22msays, with the code, that a forget failed and keeps the item (P3)
+[31m[1mTestingLibraryElementError[22m[39m: Unable to find role="alert"
+
+Ignored nodes: comments, script, style
+[36m<div[39m
+  [33mclass[39m=[32m"flex flex-col gap-1 rounded-md border border-dashed px-3 py-2 text-xs text-muted-foreground"[39m
+  [33mdata-testid[39m=[32m"memory-used"[39m
+[36m>[39m
+  [36m<div[39m
+    [33mclass[39m=[32m"flex items-center justify-between gap-2"[39m
+  [36m>[39m
+    [36m<span>[39m
+      [0mI took 1 remembered item into account[0m
+    [36m</span>[39m
+    [36m<button[39m
+      [33maria-expanded[39m=[32m"true"[39m
+      [33mclass[39m=[32m"group/button inline-flex shrink-0 items-center justify-center border border-transparent bg-clip-padding font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50 h-6 gap-1 rounded-[min(var(--radius-md),10px)] px-2 text-xs in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3"[39m
+      [33mdata-slot[39m=[32m"button"[39m
+      [33mdata-testid[39m=[32m"memory-used-toggle"[39m
+      [33mtabindex[39m=[32m"0"[39m
+      [33mtype[39m=[32m"button"[39m
+    [36m>[39m
+      [0mHide[0m
+    [36m</button>[39m
+  [36m</div>[39m
+  [36m<ul[39m
+    [33mclass[39m=[32m"flex flex-col gap-1"[39m
+  [36m>[39m
+    [36m<li[39m
+      [33mclass[39m=[32m"flex items-start justify-between gap-2"[39m
+      [33mdata-testid[39m=[32m"memory-used-item"[39m
+    [36m>[39m
+      [36m<span[39m
+        [33mclass[39m=[32m"whitespace-pre-wrap text-foreground"[39m
+      [36m>[39m
+        [0mTabloları TL cinsinden isterim.[0m
+      [36m</span>[39m
+      [36m<button[39m
+        [33mclass[39m=[32m"group/button inline-flex shrink-0 items-center justify-center border border-transparent bg-clip-padding font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50 h-6 gap-1 rounded-[min(var(--radius-md),10px)] px-2 text-xs in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3"[39m
+        [33mdata-slot[39m=[32m"button"[39m
+        [33mdata-testid[39m=[32m"memory-forget"[39m
+        [33mtabindex[39m=[32m"0"[39m
+        [33mtype[39m=[32m"button"[39m
+      [36m>[39m
+        [0mForget this[0m
+      [36m</button>[39m
+    [36m</li>[39m
+  [36m</ul>[39m
+[36m</div>[39m
+
+Ignored nodes: comments, script, style
+[36m<div[39m
+  [33mclass[39m=[32m"flex flex-col gap-1 rounded-md border border-dashed px-3 py-2 text-xs text-muted-foreground"[39m
+  [33mdata-testid[39m=[32m"memory-used"[39m
+[36m>[39m
+  [36m<div[39m
+    [33mclass[39m=[32m"flex items-center justify-between gap-2"[39m
+  [36m>[39m
+    [36m<span>[39m
+      [0mI took 1 remembered item into account[0m
+    [36m</span>[39m
+    [36m<button[39m
+      [33maria-expanded[39m=[32m"true"[39m
+      [33mclass[39m=[32m"group/button inline-flex shrink-0 items-center justify-center border border-transparent bg-clip-padding font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50 h-6 gap-1 rounded-[min(var(--radius-md),10px)] px-2 text-xs in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3"[39m
+      [33mdata-slot[39m=[32m"button"[39m
+      [33mdata-testid[39m=[32m"memory-used-toggle"[39m
+      [33mtabindex[39m=[32m"0"[39m
+      [33mtype[39m=[32m"button"[39m
+    [36m>[39m
+      [0mHide[0m
+    [36m</button>[39m
+  [36m</div>[39m
+  [36m<ul[39m
+    [33mclass[39m=[32m"flex flex-col gap-1"[39m
+  [36m>[39m
+    [36m<li[39m
+      [33mclass[39m=[32m"flex items-start justify-between gap-2"[39m
+      [33mdata-testid[39m=[32m"memory-used-item"[39m
+    [36m>[39m
+      [36m<span[39m
+        [33mclass[39m=[32m"whitespace-pre-wrap text-foreground"[39m
+      [36m>[39m
+        [0mTabloları TL cinsinden isterim.[0m
+      [36m</span>[39m
+      [36m<button[39m
+        [33mclass[39m=[32m"group/button inline-flex shrink-0 items-center justify-center border border-transparent bg-clip-padding font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50 h-6 gap-1 rounded-[min(var(--radius-md),10px)] px-2 text-xs in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3"[39m
+        [33mdata-slot[39m=[32m"button"[39m
+        [33mdata-testid[39m=[32m"memory-forget"[39m
+        [33mtabindex[39m=[32m"0"[39m
+        [33mtype[39m=[32m"button"[39m
+      [36m>[39m
+        [0mForget this[0m
+      [36m</button>[39m
+    [36m</li>[39m
+  [36m</ul>[39m
+[36m</div>[39m
+[90m [2m❯[22m waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:[2m163:27[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m86:33[22m[39m
+[36m [2m❯[22m tests/unit/test_14_memory_notes.test.tsx:[2m166:38[22m[39m
+    [90m164|[39m       fireEvent[33m.[39m[34mclick[39m([34mwithin[39m(note)[33m.[39m[34mgetByTestId[39m([32m"memory-forget"[39m))[33m;[39m
+    [90m165|[39m     })[33m;[39m
+    [90m166|[39m     [35mconst[39m alert [33m=[39m [35mawait[39m [34mwithin[39m(note)[33m.[39m[34mfindByRole[39m([32m"alert"[39m)[33m;[39m
+    [90m   |[39m                                      [31m^[39m
+    [90m167|[39m     [34mexpect[39m(alert[33m.[39mtextContent)[33m.[39m[34mtoContain[39m([32m"(internal_error)"[39m)[33m;[39m
+    [90m168|[39m     [34mexpect[39m([34mwithin[39m(note)[33m.[39m[34mgetByTestId[39m([32m"memory-used-item"[39m))[33m.[39m[34mtoBeTruthy[39m()[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/test_14_memory_notes.test.tsx[2m > [22mtest_14_memory_notes[2m > [22mcounts only the items still there after one is forgotten (P4)
+[31m[1mAssertionError[22m: expected 'I took 2 remembered items into accoun…' to contain '1 remembered item '[39m
+
+Expected: [32m"[7m1[27m remembered item[7m [27m"[39m
+Received: [31m"[7mI took 2[27m remembered item[7ms into accountHideRaporları sabah ister.Forget this[27m"[39m
+
+[36m [2m❯[22m tests/unit/test_14_memory_notes.test.tsx:[2m184:30[22m[39m
+    [90m182|[39m     })[33m;[39m
+    [90m183|[39m     await waitFor(() => expect(within(note).getAllByTestId("memory-use…
+    [90m184|[39m     [34mexpect[39m(note[33m.[39mtextContent)[33m.[39m[34mtoContain[39m([32m"1 remembered item "[39m)[33m;[39m
+    [90m   |[39m                              [31m^[39m
+    [90m185|[39m   })[33m;[39m
+    [90m186|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/test_14_memory_notes.test.tsx[2m > [22mtest_14_memory_notes[2m > [22msays, with the code, that the noted items could not be read or deleted
+[31m[1mTestingLibraryElementError[22m: Unable to find an element by: [data-testid="memory-noted-error"]
+
+Ignored nodes: comments, script, style
+[36m<body>[31m
+  [36m<div>[31m
+    [36m<span[31m
+      [33mdata-testid[31m=[32m"memory-notes-read"[31m
+      [33mhidden[31m=[32m""[31m
+    [36m/>[31m
+  [36m</div>[31m
+[36m</body>[31m
+
+Ignored nodes: comments, script, style
+[36m<body>[31m
+  [36m<div>[31m
+    [36m<span[31m
+      [33mdata-testid[31m=[32m"memory-notes-read"[31m
+      [33mhidden[31m=[32m""[31m
+    [36m/>[31m
+  [36m</div>[31m
+[36m</body>[31m[39m
+[90m [2m❯[22m waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:[2m163:27[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m86:33[22m[39m
+[36m [2m❯[22m tests/unit/test_14_memory_notes.test.tsx:[2m191:26[22m[39m
+    [90m189|[39m     serve(() => [BUDGET_ON, DONE, noted], {}, { byIds: failure("intern…
+    [90m190|[39m     renderAs("user", "edit", <MemoryNotes projectId="p1" runId="r1" wa…
+    [90m191|[39m     expect((await screen.findByTestId("memory-noted-error")).textConte…
+    [90m   |[39m                          [31m^[39m
+    [90m192|[39m     [34mcleanup[39m()[33m;[39m
+    [90m193|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m5 failed[39m[22m[2m | [22m[1m[32m6 passed[39m[22m[90m (11)[39m
+[2m   Start at [22m 17:51:40
+[2m   Duration [22m 7.02s[2m (transform 738ms, setup 0ms, import 1.06s, tests 4.71s, environment 1.08s)[22m
+

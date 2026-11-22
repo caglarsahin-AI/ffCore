@@ -1,0 +1,13 @@
+$ MSYS_NO_PATHCONV=1 docker run --rm --network none -v C:/ai_paycore/ffcore/.worktrees/feat/14-2-hafiza-ui:/w -v ffcore-10a-nm:/w/frontend/node_modules -w /w/frontend node:20.19.5-alpine sh -c 'npx vitest run tests/unit/test_14_memory_notes.test.tsx'
+HEAD=a73003204e4d8de589e6d5168f23e5bc6c61f315 (uncommitted files: 1)
+date=2026-11-22T20:52:36+03:00
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.12 [39m[90m/w/frontend[39m
+
+ [32m✓[39m tests/unit/test_14_memory_notes.test.tsx [2m([22m[2m11 tests[22m[2m)[22m[33m 820[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m11 passed[39m[22m[90m (11)[39m
+[2m   Start at [22m 17:52:39
+[2m   Duration [22m 2.67s[2m (transform 760ms, setup 0ms, import 977ms, tests 820ms, environment 677ms)[22m
+

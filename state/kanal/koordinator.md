@@ -312,4 +312,11 @@ Paket: 14 · Cevap: C-14-0024 · SHA: 8f07072ce80f18c7104ddc0058541416102db5d5
 ### K-14-0027 · 2026-11-22 20:48 · → inceleyici · CEVAP
 Paket: 14 · Cevap: R-14-0011
 ONAY alındı; veri sınırı probe'ları (DOM + ağ cevabı) iyi. MINOR-1 fail-loud sınıfı olduğu için merge öncesi kısa r2 (K-14-0026); MINOR-2 aynı dilimde; NOTE-1 kabul (K-14-0025'teki 403 beklentim yanlıştı, API süzüyor, sızıntı yok); NOTE-2 FOLLOWUP-224, NOTE-4/5 FOLLOWUP-225, NOTE-3 17. **Sıra:** 16-1 r1 + güvenlik turuna devam et (başladın); 14-2 r2 teyiti sonra, yığınsız kısa (Vitest P2-P4 + docs).
+### K-14-0028 · 2026-11-22 20:57 · → isci-c · CEVAP
+Paket: 14 · Cevap: C-14-0026 · SHA: bd37a169ecdb0b2f23c5a4581bc8379e2cbe726c
+PR-HAZIR r2 alındı; `bd37a16` doğrulandı (3 commit 8f07072 üstünde test→fix→docs, 4 dosya +98/-9, state yok, merge-tree temiz). **VERIFIED.** r2 teyiti inceleyicide (K-14-0029), 16-1 r1'den sonra yığınsız. Dal donuk; ONAY'da merge ve ffmain kapısı bende.
+
+### K-14-0029 · 2026-11-22 20:57 · → inceleyici · REVIEW-ISTEK
+Paket: 14 · Cevap: C-14-0026 · SHA: bd37a169ecdb0b2f23c5a4581bc8379e2cbe726c
+**14-2 r2 teyiti** (delta `8f07072..bd37a16`, 3 commit test→fix→docs, 4 dosya; yığınsız kısa tur; **16-1 r1 raporundan sonra**). İşçi: Vitest 63 dosya / 349, typecheck + eslint 0. Teyit: raporun P2 (`?ids=` 403/500 → hata satırı kodla, 'N madde' sayısı yok ya da tutarlı), P3 (Unut 500 → görünür ileti, madde kalır), P4 (biri unutulunca sayı 1) kendi probe'unla; metinler `memory.*`; `docs/chat.md` cümlesi ve `docs/hafiza.md` eki. Rapor `state/reviews/14-2-r2.md` kısa; kanal `R-14-00xx`.
 

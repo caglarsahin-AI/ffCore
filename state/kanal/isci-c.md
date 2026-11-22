@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-c-14
 - Aktif paket: 14 (kullanıcıya özel kalıcı hafıza; dal feat/14-hafiza, worktree .worktrees/feat/14-hafiza)
 - Durum: ACTIVE
-- Son okunan: koordinator K-14-0002, K-GEN-0041; son yazılan C-14-0024 (PR-HAZIR)
+- Son okunan: koordinator K-14-0002, K-GEN-0041; son yazılan C-14-0026 (PR-HAZIR)
 - Önceki lease: ffcore-isci-c-11 RETIRED (11 DONE; K-11-0033); ondan önce ffcore-isci-c-10c3 RETIRED (10c-3 MERGED 0a92084; son C-10C3-0009 RETIRED); ondan önce ffcore-isci-c-10c2 RETIRED (10c-2 MERGED b93cd96; son C-10C2-0016 RETIRED); ondan önce ffcore-isci-c-sse RETIRED (fix/10b-sse-bekci MERGED 4216718; son C-SSE-0011 RETIRED); ondan önce ffcore-isci-c-10c1 RETIRED (10c-1 MERGED; son C-10C1-0015 RETIRED); ondan önce ffcore-isci-c-10bp2 RETIRED (10b-poc-2 MERGED b43770d; son C-10bp2-0019 HANDOFF)
 
 ## Mesajlar
@@ -124,3 +124,13 @@ Paket: 14 · Cevap: K-14-0017 · SHA: 8f07072ce80f18c7104ddc0058541416102db5d5
 **PR 14-2 [B] feat(14): user memory screens.** Dal `feat/14-2-hafiza-ui`, baz main `ff951fa` (14-1 `5c0354a`), delta `ff951fa..8f07072` 5 commit: test `1873026`, test `254160e`, kod `562c573`, docs `6c8257c`, docs görüntüleri `8f07072`; 47 dosya +2049/−11; `state/` yok; main (`707e9fd`) ile `git merge-tree` temiz (bazdan sonra main'de yalnız state ve koordinatör belgeleri). PR notu `state/pr/14.md` "PR 14-2 · [B]" (ne yapıldı, kabul→test, kanıt, sapmalar, zone, felsefe).
 Kapsam: `/memory` Hafızam (liste, düzenle, sil, tümünü sil onaylı, bunu hatırla, kapat/aç), cevap altında "dikkate aldım" + Unut ve canlı turdan sonra "Şunu not ettim … [Sil]" (5 sn × 2 dk, gecikme metni), sihirbaz `memory` sekmesi (admin; analyst'e neden), `/settings` hazır: Hafıza bölümü (proje varsayılanı, ilke, istatistik); backend NOTE-1 `budget.question_truncated`, NOTE-2 model doğrulaması (kapatma hep çalışır). i18n yalnız `memory` ad alanı + `Agents.wizard.tabs.memory`.
 Kapılar (`state/evidence/14-2-*.log`, komut + `HEAD=`): kırmızı Vitest 3 dosya + backend 2 failed; Vitest 63 dosya / 344 test; typecheck + eslint temiz; backend hedefli 99 passed + ruff; `make lint` + `make test` llmaas **2202** / airgap **2202**; e2e `test_14_*` **8 passed** (NER `ffcore_model_cache`'ten ağsız kopya, S8); görüntüler 12 yeni (`E2E_SCREENSHOT_DIR=../docs/images`); **tam test-int tam yığın 1262/42/0**. Sapma: kabul 1 (`user` rolü) e2e yerine Vitest + backend (K-14-0022). Bilerek değişen testler: `test_14_runs::k1` (kısa soruda `question_truncated` yok), `test_14_facade` (işaret var), e2e `global-setup`/`fixtures` (`memory` projesi, `memoryUser`). Yığın kapalı.
+
+### C-14-0025 · 2026-11-22 20:50 · → koordinator · ACK
+Paket: 14 · Cevap: K-14-0026
+K-14-0026 alındı, r2 kısa dilim başlıyor (yığınsız). (1) MINOR-1: önce kırmızı Vitest (P2 `?ids=` 403/500 → kodlu hata satırı; P3 Unut/Sil `DELETE` 500 → görünür ileti; P4 unutulan madde düşer, sayı dönen maddeyle tutarlı), tee `14-2-r2-vitest.log`; sonra `memory-notes.tsx`; metinler yalnız `memory.*`. (2) MINOR-2 `docs/chat.md` ilk cümle. (3) PR notu NOTE-1 / FOLLOWUP-224 / FOLLOWUP-225 atıfları. Kapı: Vitest tam, typecheck/eslint, en/tr eşliği. test/kod/docs ayrı commit; ardından PR-HAZIR r2.
+
+### C-14-0026 · 2026-11-22 20:56 · → koordinator · PR-HAZIR
+Paket: 14 · Cevap: K-14-0026 · SHA: bd37a169ecdb0b2f23c5a4581bc8379e2cbe726c
+**PR 14-2 r2 (K-14-0026).** Dal `feat/14-2-hafiza-ui`, delta `8f07072..bd37a16` 3 commit: test `a730032`, kod `2f7044e`, docs `bd37a16`; yığınsız; worktree temiz. PR notu `state/pr/14.md` "r2" bölümü.
+(1) MINOR-1 `memory-notes.tsx`: `?ids=` okuması düşerse kart yerine kodlu satır (`memory-used-error` / `memory-noted-error`, `memory.notes.readFailed`); Unut/Sil düşerse madde durur, kartta `MemoryError` alert (kodlu); sayı dönen madde sayısı (unutulan düşer, hiç kalmazsa kart kaybolur); yeni mesaj anahtarı yok. (2) MINOR-2 `docs/chat.md` ilk cümle düzeltildi (bağlantı koşulsuz; kapalı projede sayfa madde eklerken söyler) + `docs/hafiza.md` hata/sayı maddesi. (3) PR notu: NOTE-1 (`?ids=` 200 boş liste, tasarım), NOTE-2 → FOLLOWUP-224, NOTE-4/5 → FOLLOWUP-225, NOTE-3 → 17.
+Kapılar: kırmızı `14-2-r2-red-vitest.log` 5 failed / 6 passed (P2×2, P3, P4, not-ettim hata yolu); `14-2-r2-vitest.log` 11 passed; `14-2-r2-vitest-all.log` 63 dosya / 349 test (en/tr eşliği dâhil; HEAD `a730032` + `2f7044e` içeriği, commit öncesi); `14-2-r2-check.log` typecheck + eslint temiz. Docs commit'i kodu değiştirmez.
