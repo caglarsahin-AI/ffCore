@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-b-16 (local_8354774b-cd7a-49fe-93ab-64f1ac4edd1c; önceki lease ffcore-isci-b-triage2 RETIRED K-TR2-0012)
 - Aktif paket: 16 (feat/16-kaynaklar)
 - Durum: ACTIVE
-- Son okunan: koordinator K-16-0007
+- Son okunan: koordinator K-16-0009
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/isci-b-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 309 mesaj); ID ile atıf orada bulunur.
@@ -73,3 +73,7 @@ Paket: 16 · Cevap: K-16-0007 · Durum: PLANNED
 **16-2 Confluence + Jira (DC ve Cloud) planı:** ayrıntı `state/pr/16.md` 'PR 16-2 plan'. Dal `feat/16-2-atlassian` 16-1 merge'ünden sonra. Yeni: `sources/{atlassian,confluence,jira,storage_format}.py`, `tests/fakes/fake_atlassian.py` (DC + Cloud uçları, `/_requests` sayacı, `/_fault`, 429), compose `fake-atlassian` (test profili) + RESERVED_HOSTS, `data/samples/openapi/jira.yaml`; additive C6 `shared_attachments`. Kurulum K-16-0003: `base_url` + kimlik + isteğe bağlı kapsam (space_keys / JQL; boş = servis hesabının gördüğü her şey). Delta göreli pencere (`now("-Nm")`, PayCore kuralı), istek sayacıyla 'yalnız değişen sayfa' kanıtı. Makro kuralları, breadcrumb D5, ACL `group:/user:/space:/project:/security:` eşlemeleri, kabul → test tablosu dosyada.
 **Sorular (A önerilen):** S1 atanan/raporlayan/yorum yazarı adı indekse girmez (B: plan metadata'sı gibi girer); S2 Jira Cloud kesin sayım için anahtar-alanlı ek listeleme (B: yaklaşık sayım → Cloud'da hiç silme yok); S3 Confluence Cloud v1 CQL arama + v2 gövde/ek (B: yalnız v1); S4 kaynak kartı bağlantısı için `SearchHit.source_url` + runtime `Source.public` additive alanı 16-2'de, tıklanabilir kart 16-3'te 14-2 sonrası (touch-zone eki: `api/knowledge_schemas.py`, `knowledge/search.py`, `runtime/prompting.py`, 04a/06a OpenAPI; tam test-int) (B: önyüz ayrı istekle türetir); S5 egress overlay'e `sync-worker` proxy'si + `test_hke_208` (B: proxy'li Cloud 16-3'e).
 PLAN-ONAY bekleniyor; dal donuk, kod yok.
+
+### B-16-0014 · 2026-11-22 20:40 · → koordinator · CEVAP
+Paket: 16 · Cevap: K-16-0009, K-16-0008
+PLAN-ONAY 16-2 alındı (S1-S5 A, `count_method` → 16-2'de additive göç `16_0002`). Yığınsız hazırlık başlıyor (sahte Atlassian, `storage_format` + birim testleri, `jira.yaml`; scratchpad'de, dal açılınca taşınır). **K-16-0008 notu:** odak listesindeki 'kaynaktan gelen belge DELETE 409 `document_from_source`' onaylı planda (B-16-0002 S3 c, K-16-0002) **16-3**'e yazılı; 16-1'de yok (`api/knowledge.py` yalnız silme sırası çıkarımı). İnceleyiciye eksik bulgu olarak geçmemesi için iletir misin? Zamanlama saatleri UTC (docs/veri-kaynaklari.md 'Schedule').

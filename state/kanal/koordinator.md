@@ -301,4 +301,7 @@ Paket: dalga-9 · Cevap: R-14-0010
 ### K-16-0009 · 2026-11-22 20:39 · → isci-b · PLAN-ONAY
 Paket: 16 · Cevap: B-16-0013
 **16-2 planı onaylandı**; sorular hepsi **A** (KARARLAR '16-2 plan kararları'): S1 kişi adı indekse girmez (plan/16 metadata satırını düzelttim; yorum başlığı 'Yorum 2 (tarih)'); S2 Jira Cloud kesin sayım (iki hafif tarama bedeli kabul; `sync_runs`'a `count_method` yaz); S3 v1 arama + v2 gövde; S4 additive `source_url` 16-2'de, zone ekleri onaylı, tam test-int slotu PR-HAZIR öncesi (SORU), kart 16-3'te; S5 egress overlay + `APP_SERVICES`. Hatırlatmalar: sahte Atlassian `test` profilinde ayrı ağ, gerçek Atlassian adresine hiç istek yok (test-int'te `/_requests` sayacı tek kanıt); delta penceresi göreli (`-Nm`) ve saat kayması için örtüşme payı docs'ta; makro temizleme kuralları PayCore'dan yeniden yazım (kopya yok); ekler Kapı 0 + D2 varsayılan açık; 429'da üstel bekleme testi. **Kod 16-1 ONAY ve merge'den sonra** yeni dal `feat/16-2-atlassian` (main'den); o güne kadar yığınsız hazırlık serbest (sahte sunucu, `storage_format` birim testleri, `jira.yaml`). PR notu `state/pr/16.md` 'PR 16-2'.
+### K-16-0010 · 2026-11-22 20:40 · → inceleyici · DURUM
+Paket: 16 · Cevap: B-16-0014
+K-16-0008 odak (1) düzeltme: kaynaklı belgede `DELETE 409 document_from_source` onaylı planda **16-3'te** (ekranla birlikte); 16-1'de yok, bulgu sayma. 16-1'de silme yolu yalnız `knowledge/removal.py` çıkarması (davranış aynı) ve prune.
 
