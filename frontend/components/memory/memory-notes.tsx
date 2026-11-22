@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 
-import { errorCode } from "@/components/memory/memory-error";
+import { errorCode, MemoryError } from "@/components/memory/memory-error";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api/client";
 import { useDeleteMemory, useMemoriesByIds } from "@/lib/api/memories-queries";
@@ -37,6 +37,9 @@ function extraction(events: RunEvent[]): Extraction | null {
 // account" lists the owner's items by id (`GET /memories?ids=`), each with a one-click forget;
 // `watch` (the turn just answered here) keeps reading until the extraction outcome is in and shows
 // "I noted: … [Delete]". No memory for the run (off, opted out, none used): nothing is shown.
+// Every failure is on screen with its code (r1 MINOR-1): a failed id read is a line instead of the
+// card, a failed forget or delete is an alert in it; the count is the items still there, so a
+// forgotten one drops out and a card whose items are all gone disappears.
 export function MemoryNotes({
   projectId,
   runId,
@@ -93,8 +96,18 @@ export function MemoryNotes({
   return (
     <>
       <span hidden data-testid="memory-notes-read" />
-      {used.length > 0 && <UsedNote projectId={projectId} count={used.length} items={usedItems.data ?? []} />}
-      {written.length > 0 && (notedItems.data ?? []).length > 0 && <NotedLine projectId={projectId} items={notedItems.data ?? []} />}
+      {used.length > 0 && usedItems.isError && (
+        <p className="text-xs text-muted-foreground" data-testid="memory-used-error">
+          {t("readFailed", { code: errorCode(usedItems.error) })}
+        </p>
+      )}
+      {used.length > 0 && usedItems.isSuccess && usedItems.data.length > 0 && <UsedNote projectId={projectId} items={usedItems.data} />}
+      {written.length > 0 && notedItems.isError && (
+        <p className="text-xs text-muted-foreground" data-testid="memory-noted-error">
+          {t("readFailed", { code: errorCode(notedItems.error) })}
+        </p>
+      )}
+      {written.length > 0 && notedItems.isSuccess && notedItems.data.length > 0 && <NotedLine projectId={projectId} items={notedItems.data} />}
       {waiting && expired && (
         <p className="text-xs text-muted-foreground" data-testid="memory-noted-later">
           {t("later")}
@@ -104,14 +117,14 @@ export function MemoryNotes({
   );
 }
 
-function UsedNote({ projectId, count, items }: { projectId: string; count: number; items: { id: string; text: string }[] }) {
+function UsedNote({ projectId, items }: { projectId: string; items: { id: string; text: string }[] }) {
   const t = useTranslations("memory.notes");
   const forget = useDeleteMemory(projectId);
   const [open, setOpen] = useState(false);
   return (
     <div className="flex flex-col gap-1 rounded-md border border-dashed px-3 py-2 text-xs text-muted-foreground" data-testid="memory-used">
       <div className="flex items-center justify-between gap-2">
-        <span>{t("used", { count })}</span>
+        <span>{t("used", { count: items.length })}</span>
         <Button variant="ghost" size="xs" aria-expanded={open} onClick={() => setOpen((o) => !o)} data-testid="memory-used-toggle">
           {open ? t("hide") : t("show")}
         </Button>
@@ -128,6 +141,7 @@ function UsedNote({ projectId, count, items }: { projectId: string; count: numbe
           ))}
         </ul>
       )}
+      <MemoryError error={forget.error} />
     </div>
   );
 }
@@ -148,6 +162,7 @@ function NotedLine({ projectId, items }: { projectId: string; items: { id: strin
           </li>
         ))}
       </ul>
+      <MemoryError error={remove.error} />
     </div>
   );
 }
