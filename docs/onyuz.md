@@ -451,8 +451,16 @@ refresh the docs images on purpose: `export E2E_SCREENSHOT_DIR=../docs/images` b
 fails the test). Prefer the relative value: Git Bash rewrites an absolute `/work/…` value into a
 Windows path (`C:/Program Files/Git/work/…`) unless `MSYS_NO_PATHCONV=1` is set. The images
 are `docs/images/<package>-<screen>-<theme>.png` (10a, 10bp1, 10mrk, 10bp2, 10c1, 10c2, 10c3,
-11). The main gate script needs no change: it does not set the variable, so the gate's e2e
+11, 14). The main gate script needs no change: it does not set the variable, so the gate's e2e
 stage leaves the checkout's `docs/images` as it is.
+
+**Memory tests (14).** Memory can be turned on only with the installation's NER model, so the
+`test_14_*` specs need `NER_MODEL`/`NER_REVISION` exported in the shell (the values of
+`.env.example`; `run e2e` recreates the backend from them, `.env.test` stays as it is) and the
+weights in the stack's own `model_cache` volume. Each stack has its own volume, so copy them
+from the machine's filled cache instead of downloading (no network):
+`docker compose -p <project> --env-file .env.test --profile tools run --rm --no-deps -T -v ffcore_model_cache:/src:ro tools sh -c 'mkdir -p /models/huggingface/hub && cp -a /src/huggingface/hub/models--akdeniz27--bert-base-turkish-cased-ner /models/huggingface/hub/'`.
+Without them the specs are skipped with the reason `memory_requires_ner`, never passed.
 
 The exam tests (10c-1) need nothing more than the agent tests: Langfuse and the background
 worker's advancer are default services, fake-llm answers "hello", and each test adds its exam
