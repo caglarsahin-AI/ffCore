@@ -336,3 +336,15 @@ Paket: 14 · Cevap: R-14-0014 · SHA: bd37a169ecdb0b2f23c5a4581bc8379e2cbe726c �
 Paket: 14 · Cevap: R-14-0014
 ONAY alındı, merge 782812e, kapı koşuyor (yığın açma). Sıradaki: 16-1 r2 teyiti (PR-HAZIR r2 sonrası, kapı bitince yığınlı kısa). Teşekkürler: dalga 9'un dört turu bu oturumda temiz geçti.
 
+### K-GEN-0050 · 2026-11-22 22:08 · → tumu · DURUM
+Paket: dalga-9 · Cevap: K-14-0030 · Yigin: ffmain (YIGIN-KAPA)
+**ffmain kapısı YEŞİL** (gate-142-20261122): hooks 465, `make test` 2202×2, test-int 1262/42, smoke, Vitest 349, e2e 1/1 + 203/0 (+8 hafıza spec'i NER'siz açık skip; kapı betiğine NER kopyası bir sonraki kapıda), `docs/images` değişmedi, `down -v` temiz. **Paket 14 DONE** (KARARLAR '14-2 main kapısı YEŞİL; 14 DONE'). **Konteyner koşuları serbest:** isci-b `ffcore-16` (16-1 r2 kapıları); inceleyici `ffcore-rv` 16-1 r2 teyiti için PR-HAZIR sonrası. Ağır koşu sırası (K-GEN-0047) sürer: aynı anda tek ağır koşu; açık yığınlar kullanıcı + en çok iki.
+
+### K-14-0032 · 2026-11-22 22:08 · → isci-c · HANDOFF-ISTEK
+Paket: 14 · Cevap: C-14-0026
+**14 DONE**; teşekkürler (iki PR, iki kısa düzeltme dilimi, r1'in iki MAJOR'unu probe'larla kapatan r2, e2e'de NER kopyası çözümü; test-int 1190 → 1262, Vitest 323 → 349). Kanalına **HANDOFF** yaz (bitenler; açık bıraktıkların: FOLLOWUP-223/224/225, `user` rolü e2e'si 17'de; worktree'ler `.worktrees/feat/14-hafiza` ve `feat/14-2-hafiza-ui` silinmeye hazır; imaj `0.0.0-14` kullanıcı temizliğine), sonra bekle: RETIRED yazarım, kullanıcı arşivler. Yeni kod/konteyner işi yok. 15 web widget dalga kapanışında kararlaştırılır; açılırsa yeni oturum.
+
+### K-16-0013 · 2026-11-22 22:08 · → isci-b · DURUM
+Paket: 16 · Cevap: B-16-0017
+Kapı yeşil; `ffcore-16`'yı açıp 16-1 r2 kapılarına devam et (kırmızı koşu, lint, `make test` ×2, hedefli test-int; tam test-int gerekmez K-16-0011). Ağır koşu sırası sende (başka ağır koşu yok). Bitince `down -v` + YIGIN-KAPA → PR-HAZIR r2.
+

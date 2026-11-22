@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-b-16 (local_8354774b-cd7a-49fe-93ab-64f1ac4edd1c; önceki lease ffcore-isci-b-triage2 RETIRED K-TR2-0012)
 - Aktif paket: 16 (feat/16-kaynaklar)
 - Durum: ACTIVE
-- Son okunan: koordinator K-16-0009
+- Son okunan: koordinator K-16-0011
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/isci-b-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 309 mesaj); ID ile atıf orada bulunur.
@@ -77,3 +77,15 @@ PLAN-ONAY bekleniyor; dal donuk, kod yok.
 ### B-16-0014 · 2026-11-22 20:40 · → koordinator · CEVAP
 Paket: 16 · Cevap: K-16-0009, K-16-0008
 PLAN-ONAY 16-2 alındı (S1-S5 A, `count_method` → 16-2'de additive göç `16_0002`). Yığınsız hazırlık başlıyor (sahte Atlassian, `storage_format` + birim testleri, `jira.yaml`; scratchpad'de, dal açılınca taşınır). **K-16-0008 notu:** odak listesindeki 'kaynaktan gelen belge DELETE 409 `document_from_source`' onaylı planda (B-16-0002 S3 c, K-16-0002) **16-3**'e yazılı; 16-1'de yok (`api/knowledge.py` yalnız silme sırası çıkarımı). İnceleyiciye eksik bulgu olarak geçmemesi için iletir misin? Zamanlama saatleri UTC (docs/veri-kaynaklari.md 'Schedule').
+
+### B-16-0015 · 2026-11-22 21:17 · → koordinator · ACK
+Paket: 16 · Cevap: K-16-0011
+DUZELT r2 alındı (MAJOR-1 A süperadmin, MINOR-1 409 + kb_deleted, MINOR-2 mem_limit, docs NOTE-2/4/5). Kırmızı test commit'i hazır; kod, docs sonra.
+
+### B-16-0016 · 2026-11-22 21:17 · → koordinator · YIGIN-AC
+Paket: 16 · Cevap: K-16-0011 · Yigin: ffcore-16
+r2: kırmızı koşu, lint, `make test` ×2, hedefli 16 + 04b silme + 03a yetki test-int, compose config. `up -d --wait --build --pull never`, `--profile test --profile qdrant`; gereksiz servisler (frontend, agent-worker*, worker) adıyla durdurulur. Log `16-1-r2-*.log`.
+
+### B-16-0017 · 2026-11-22 21:20 · → koordinator · YIGIN-KAPA
+Paket: 16 · Cevap: K-14-0030, B-16-0016 · Yigin: ffcore-16
+ffmain kapısı nedeniyle kapatıldı: yarım kalan `up --build` durduruldu (yetim compose süreçleri adıyla sonlandırıldı), `down -v`, konteyner 0 / volume 0 (`16-1-r2-down.log`). Hiçbir test koşmadı. r2'nin yığınsız kısmına (kod, docs) devam; kapı yeşil duyurusundan sonra YIGIN-AC ile kırmızı + yeşil kapılar.

@@ -1,0 +1,358 @@
+=== gate-142 main 782812e HEAD=782812ef255391cb8353ccbaeecf5ad5a416bf8e 2026-11-22 21:17:08
+
+=== 21:17:08 hook tests (host py -3.12, FOLLOWUP-212)
+.................................                                        [100%]
+465 passed in 115.69s (0:01:55)
+hooks exit=0
+
+=== 21:19:09 compose config
+config exit=0
+
+=== 21:19:20 compose config egress+tls
+config-egress-tls exit=0
+
+=== 21:19:28 compose config vllm
+config-vllm exit=0
+
+=== 21:19:37 compose config e2e
+config-e2e exit=0
+
+=== 21:19:46 up -d --build --pull never --wait
+ Container ffmain-redis-1  Healthy
+ Container ffmain-langfuse-clickhouse-1  Healthy
+ Container ffmain-migrate-1  Exited
+ Container ffmain-postgres-1  Healthy
+ Container ffmain-frontend-1  Healthy
+ Container ffmain-langfuse-minio-1  Healthy
+ Container ffmain-langfuse-web-1  Healthy
+ Container ffmain-backend-1  Healthy
+ Container ffmain-mcp-sql-1  Healthy
+ Container ffmain-mcp-search-1  Healthy
+up exit=0
+ffcore/frontend:0.0.0-main 2026-11-22 21:20:58 +0300 +03
+ffcore/backend:0.0.0-main 2026-11-22 21:19:56 +0300 +03
+ffcore/e2e:0.0.0-main 2026-11-22 17:19:27 +0300 +03
+ffcore/tools:0.0.0-main 2026-11-05 21:09:24 +0300 +03
+
+=== 21:21:58 lint
+ruff check backend scripts data/samples/scripts services tests/deploy
+All checks passed!
+ruff format --check backend scripts data/samples/scripts services tests/deploy
+580 files already formatted
+lint exit=0
+
+=== 21:22:11 alembic heads
+14_0001 (05a, 06b, 08, 04b, 09, 03b, 05b, 07, 03c, 14, 04a, 03a, 06a, 12, 11) (head)
+heads exit=0
+
+=== 21:22:20 make test llmaas
+........................................................................ [  3%]
+........................................................................ [  6%]
+........................................................................ [  9%]
+.........................................----------------------------------------
+Exception occurred during processing of request from ('127.0.0.1', 59390)
+............................... [ 13%]
+........................................................................ [ 16%]
+..................................--- Logging error ---
+.Traceback (most recent call last):
+..................................... [ 19%]
+.........................................Message: 'StreamableHTTP session manager shutting down'
+Arguments: ()
+............................... [ 22%]
+.................................................--- Logging error ---
+.Call stack:
+...................... [ 26%]
+........................................................................ [ 29%]
+........................................................................ [ 32%]
+........................................................................ [ 35%]
+........................................................................ [ 39%]
+........................................................................ [ 42%]
+........................................................................ [ 45%]
+........................................................................ [ 49%]
+........................................................................ [ 52%]
+........................................................................ [ 55%]
+........................................................................ [ 58%]
+........................................................................ [ 62%]
+........................................................................ [ 65%]
+........................................................................ [ 68%]
+........................................................................ [ 71%]
+........................................................................ [ 75%]
+........................................................................ [ 78%]
+........................................................................ [ 81%]
+........................................................................ [ 85%]
+........................................................................ [ 88%]
+........................................................................ [ 91%]
+........................................................................ [ 94%]
+........................................................................ [ 98%]
+..........................................                               [100%]
+2202 passed in 170.86s (0:02:50)
+test exit=0
+
+=== 21:25:25 make test airgap
+........................................................................ [  3%]
+........................................................................ [  6%]
+........................................................................ [  9%]
+........................................................................ [ 13%]
+........................................................................ [ 16%]
+........................................................................ [ 19%]
+...........................................Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/logging/__init__.py", line 1163, in emit
+    stream.write(msg + self.terminator)
+ValueError: I/O operation on closed file.
+.Message: 'StreamableHTTP session manager shutting down'
+Arguments: ()
+............................ [ 22%]
+............................................................--- Logging error ---
+.Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/logging/__init__.py", line 1163, in emit
+    stream.write(msg + self.terminator)
+.ValueError: I/O operation on closed file.
+Call stack:
+..  File "/usr/local/lib/python3.12/threading.py", line 1032, in _bootstrap
+    self._bootstrap_inner()
+  File "/usr/local/lib/python3.12/threading.py", line 1075, in _bootstrap_inner
+    self.run()
+  File "/usr/local/lib/python3.12/threading.py", line 1012, in run
+    self._target(*self._args, **self._kwargs)
+  File "/opt/venv/lib/python3.12/site-packages/uvicorn/server.py", line 86, in run
+    return asyncio_run(self.serve(sockets=sockets), loop_factory=self.config.get_loop_factory())
+  File "/usr/local/lib/python3.12/asyncio/runners.py", line 195, in run
+    return runner.run(main)
+  File "/usr/local/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+  File "/opt/venv/lib/python3.12/site-packages/anyio/_core/_tasks.py", line 327, in _run_coro
+    retval = await self._coro
+  File "/opt/venv/lib/python3.12/site-packages/mcp/shared/jsonrpc_dispatcher.py", line 702, in run
+    await fn(*args)
+  File "/opt/venv/lib/python3.12/site-packages/mcp/shared/jsonrpc_dispatcher.py", line 764, in _handle_request
+    await self._final_write(
+.  File "/opt/venv/lib/python3.12/site-packages/mcp/shared/jsonrpc_dispatcher.py", line 846, in _final_write
+    logger.warning("%s gave up: transport write blocked", describe)
+Message: '%s gave up: transport write blocked'
+Arguments: ('shutdown error response for request 2',)
+--- Logging error ---
+.....Traceback (most recent call last):
+.  File "/opt/venv/lib/python3.12/site-packages/anyio/streams/memory.py", line 118, in receive
+    return self.receive_nowait()
+           ^^^^^^^^^^^^^^^^^^^^^
+.  File "/opt/venv/lib/python3.12/site-packages/anyio/streams/memory.py", line 113, in receive_nowait
+    raise WouldBlock
+anyio._core._exceptions.WouldBlock
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+ [ 26%]
+  File "/opt/venv/lib/python3.12/site-packages/mcp/server/streamable_http_manager.py", line 357, in run_server
+    await serve_loop(
+  File "/opt/venv/lib/python3.12/site-packages/mcp/server/runner.py", line 499, in serve_loop
+    await serve_connection(
+  File "/opt/venv/lib/python3.12/site-packages/mcp/server/runner.py", line 465, in serve_connection
+    await dispatcher.run(runner.on_request, runner.on_notify, task_status=task_status)
+  File "/opt/venv/lib/python3.12/site-packages/mcp/shared/jsonrpc_dispatcher.py", line 510, in run
+    async with anyio.create_task_group() as tg:
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 851, in __aexit__
+    raise exc_val
+  File "/opt/venv/lib/python3.12/site-packages/mcp/shared/jsonrpc_dispatcher.py", line 517, in run
+    async for item in self._read_stream:
+  File "/opt/venv/lib/python3.12/site-packages/mcp/shared/_context_streams.py", line 89, in __anext__
+    return await self.receive()
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/mcp/shared/_context_streams.py", line 71, in receive
+    ctx, item = await self._inner.receive()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/anyio/streams/memory.py", line 126, in receive
+    await receive_event.wait()
+  File "/opt/venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 1936, in wait
+    await self._event.wait()
+  File "/usr/local/lib/python3.12/asyncio/locks.py", line 212, in wait
+    await fut
+asyncio.exceptions.CancelledError: Cancelled via cancel scope 7f6cd37523f0 by <Task pending name='Task-608' coro=<LifespanOn.main() running at /opt/venv/lib/python3.12/site-packages/uvicorn/lifespan/on.py:86>>
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/logging/__init__.py", line 1163, in emit
+    stream.write(msg + self.terminator)
+ValueError: I/O operation on closed file.
+Call stack:
+........................................................................ [ 29%]
+........................................................................ [ 32%]
+........................................................................ [ 35%]
+........................................................................ [ 39%]
+........................................................................ [ 42%]
+........................................................................ [ 45%]
+........................................................................ [ 49%]
+........................................................................ [ 52%]
+........................................................................ [ 55%]
+........................................................................ [ 58%]
+........................................................................ [ 62%]
+........................................................................ [ 65%]
+........................................................................ [ 68%]
+........................................................................ [ 71%]
+........................................................................ [ 75%]
+........................................................................ [ 78%]
+........................................................................ [ 81%]
+........................................................................ [ 85%]
+........................................................................ [ 88%]
+........................................................................ [ 91%]
+........................................................................ [ 94%]
+........................................................................ [ 98%]
+..........................................                               [100%]
+2202 passed in 160.70s (0:02:40)
+test-airgap exit=0
+
+=== 21:28:21 test-samples
+
+----------------------------------------------------------------------
+Ran 54 tests in 2.754s
+
+OK (skipped=5)
+samples exit=0
+
+=== 21:28:33 test-int
+........................................................................ [  5%]
+........................................................................ [ 11%]
+........................................................................ [ 16%]
+.......................................................s................ [ 22%]
+........................................................................ [ 27%]
+..............................................s......................... [ 33%]
+........................................................................ [ 38%]
+.............................................s.......................... [ 44%]
+........................................................................ [ 49%]
+........................................................................ [ 55%]
+........................................................................ [ 60%]
+........................................................................ [ 66%]
+........................................................................ [ 71%]
+...................................................................sssss [ 77%]
+sss..................................................................... [ 82%]
+...................................................sssssssssssssssssssss [ 88%]
+sssssssss............................................................... [ 93%]
+.......s................................................................ [ 99%]
+........                                                                 [100%]
+=============================== warnings summary ===============================
+tests/integration/test_04a_worker.py::test_04a_upload_job_runs_in_worker
+tests/integration/test_04a_worker.py::test_04a_job_for_missing_row_retries_then_fails_loud
+  /opt/venv/lib/python3.12/site-packages/arq/worker.py:877: DeprecationWarning: Call to deprecated close. (Use aclose() instead) -- Deprecated since version 5.0.1.
+    await self.pool.close(close_connection_pool=True)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/integration/test_03b_egress_dns.py: NOT_RUN: needs RUN_DNS_TESTS=1
+SKIPPED [1] tests/integration/test_04a_ingest.py:280: NOT_RUN: needs RUN_MODEL_TESTS=1
+SKIPPED [1] tests/integration/test_05a_sql.py:301: NOT_RUN: needs RUN_MODEL_TESTS=1
+SKIPPED [1] tests/integration/test_09_exam_stack.py:83: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_09_exam_stack.py:92: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_09_exam_stack.py:98: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_09_exam_stack.py:123: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_09_exam_stack.py:129: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_09_exam_stack.py:140: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_09_exam_stack.py:155: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_09_exam_stack.py:166: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_12_egress.py:48: NOT_RUN: needs RUN_EGRESS_TESTS=1 and the egress test stack (module docstring)
+SKIPPED [1] tests/integration/test_12_egress.py:54: NOT_RUN: needs RUN_EGRESS_TESTS=1 and the egress test stack (module docstring)
+SKIPPED [1] tests/integration/test_12_egress.py:58: NOT_RUN: needs RUN_EGRESS_TESTS=1 and the egress test stack (module docstring)
+SKIPPED [1] tests/integration/test_12_egress.py:62: NOT_RUN: needs RUN_EGRESS_TESTS=1 and the egress test stack (module docstring)
+SKIPPED [1] tests/integration/test_12_egress.py:66: NOT_RUN: needs RUN_EGRESS_TESTS=1 and the egress test stack (module docstring)
+SKIPPED [1] tests/integration/test_12_egress.py:73: NOT_RUN: needs RUN_EGRESS_TESTS=1 and the egress test stack (module docstring)
+SKIPPED [1] tests/integration/test_12_egress.py:79: NOT_RUN: needs RUN_EGRESS_TESTS=1 and the egress test stack (module docstring)
+SKIPPED [1] tests/integration/test_12_egress.py:119: NOT_RUN: needs RUN_EGRESS_TESTS=1 and the egress test stack (module docstring)
+SKIPPED [1] tests/integration/test_12_egress.py:126: NOT_RUN: needs RUN_EGRESS_TESTS=1 and the egress test stack (module docstring)
+SKIPPED [1] tests/integration/test_12_egress.py:167: NOT_RUN: needs RUN_EGRESS_TESTS=1 and the egress test stack (module docstring)
+SKIPPED [3] tests/integration/test_12_egress.py:173: NOT_RUN: needs RUN_EGRESS_TESTS=1 and the egress test stack (module docstring)
+SKIPPED [1] tests/integration/test_12_egress.py:184: NOT_RUN: needs RUN_EGRESS_TESTS=1 and the egress test stack (module docstring)
+SKIPPED [1] tests/integration/test_12_egress.py:193: NOT_RUN: needs RUN_EGRESS_TESTS=1 and the egress test stack (module docstring)
+SKIPPED [1] tests/integration/test_12_egress.py:201: NOT_RUN: needs RUN_EGRESS_TESTS=1 and the egress test stack (module docstring)
+SKIPPED [1] tests/integration/test_12_egress.py:209: NOT_RUN: needs RUN_EGRESS_TESTS=1 and the egress test stack (module docstring)
+SKIPPED [1] tests/integration/test_12_tls.py:31: NOT_RUN: needs RUN_TLS_TESTS=1 and the TLS test stack (test_12_egress.py docstring)
+SKIPPED [1] tests/integration/test_12_tls.py:38: NOT_RUN: needs RUN_TLS_TESTS=1 and the TLS test stack (test_12_egress.py docstring)
+SKIPPED [1] tests/integration/test_12_tls.py:44: NOT_RUN: needs RUN_TLS_TESTS=1 and the TLS test stack (test_12_egress.py docstring)
+SKIPPED [5] tests/integration/test_12_tls.py:49: NOT_RUN: needs RUN_TLS_TESTS=1 and the TLS test stack (test_12_egress.py docstring)
+SKIPPED [1] tests/integration/test_12_tls.py:56: NOT_RUN: needs RUN_TLS_TESTS=1 and the TLS test stack (test_12_egress.py docstring)
+SKIPPED [3] tests/integration/test_12_tls.py:81: NOT_RUN: needs RUN_TLS_TESTS=1 and the TLS test stack (test_12_egress.py docstring)
+SKIPPED [1] tests/integration/test_12_tls.py:98: NOT_RUN: needs RUN_TLS_TESTS=1 and the TLS test stack (test_12_egress.py docstring)
+SKIPPED [1] tests/integration/test_19_ingest_raw.py:157: root ignores file modes; the mount test runs :ro
+1262 passed, 42 skipped, 2 warnings in 1014.54s (0:16:54)
+test-int exit=0
+
+=== 21:45:45 smoke
+python scripts/smoke.py
+ok    DEPLOY_PROFILE=llmaas INFERENCE_BACKEND=ollama
+ok    database: application connects as ffcore_app
+ok    backend /healthz 200
+ok    litellm /health/liveliness 200, /key/info 404 (schema present)
+ok    langfuse /api/public/health 200, /api/public/projects 200
+ok    mcp-search /healthz 200
+ok    mcp-sql /healthz 200
+ok    skipped: ollama profile inactive
+smoke: passed
+smoke exit=0
+
+=== 21:45:53 frontend typecheck/check:api/vitest (node, --network none, repo root)
+typecheck_exit=0
+> ffcore-frontend@0.1.0 typecheck
+> tsc --noEmit
+
+checkapi_exit=0
+> node scripts/check-api.mjs
+
+API contract copies and generated types are current.
+vitest_exit=0
+
+[2m Test Files [22m [1m[32m63 passed[39m[22m[90m (63)[39m
+[2m      Tests [22m [1m[32m349 passed[39m[22m[90m (349)[39m
+[2m   Start at [22m 18:46:30
+[2m   Duration [22m 44.11s[2m (transform 98.69s, setup 0ms, import 141.58s, tests 56.12s, environment 38.50s)[22m
+
+
+=== 21:47:15 e2e image (up --build --pull never --no-start --no-deps e2e)
+#9 [e2e] exporting to image
+#9 exporting layers done
+#9 writing image sha256:70082add7d8d542e53c0c6324254c33712d9213b97917d3beb0a7b67b59e4641 done
+#9 naming to docker.io/ffcore/e2e:0.0.0-main done
+ Volume "ffmain_e2e_node_modules"  Creating
+ Volume "ffmain_e2e_node_modules"  Created
+ Container ffmain-e2e-1  Creating
+ Container ffmain-e2e-1  Created
+e2e-image exit=0
+
+=== 21:47:41 e2e A. stack FAKE_EMBED=0 (model-missing stage)
+ Container ffmain-litellm-1  Healthy
+ Container ffmain-mcp-sql-1  Healthy
+ Container ffmain-mcp-search-1  Healthy
+upA exit=0
+
+=== 21:48:23 e2e A. seed (prompts + superadmin)
+2026-11-22 18:48:41,794 WARNING langfuse Prompt 'platform_rules-label:production' not found during refresh, evicting from cache.
+prompts created: ['eval_judge_rubric_v2', 'memory_extract', 'platform_rules']
+prompts already present: -
+superadmin created: 243485dc-8c6b-41b2-817e-3fcd84e4f173
+
+=== 21:48:54 e2e A. @model-missing
+  ✓  1 [chromium] › tests/e2e/test_10bp1_10_readiness.spec.ts:10:5 › test_10bp1_10_readiness: @model-missing without weights the page says why and how to fix it (2.0s)
+  1 passed (1.6m)
+e2e-mm exit=0
+
+=== 21:50:53 e2e B. whole stack FAKE_EMBED=1
+ Container ffmain-langfuse-web-1  Healthy
+ Container ffmain-mcp-sql-1  Healthy
+ Container ffmain-mcp-search-1  Healthy
+upB exit=0
+FAKE_EMBED=1
+
+=== 21:51:41 e2e B. main run (grep-invert @model-missing, fake upstream)
+  ✓   67 [chromium] › tests/e2e/test_10af_3_provider_test.spec.ts:12:5 › test_10af_3_provider_test: an unsaved configuration is tested, and a failed test does not block saving (2.2s)
+  ✓   87 [chromium] › tests/e2e/test_10bp1_12_query_failures.spec.ts:7:5 › test_10bp1_12_query_failures: a failed knowledge base read is an error, never an empty screen (1.4s)
+  ✓   93 [chromium] › tests/e2e/test_10bp1_4_gate_reject.spec.ts:10:5 › test_10bp1_4_gate_reject: a rejected and a failed file stay in the list with their reason and code (3.8s)
+  ✓  119 [chromium] › tests/e2e/test_10bp2_13_query_failures.spec.ts:9:5 › test_10bp2_13_query_failures: a missing record or a failed list is an error, never an empty screen (3.3s)
+  8 skipped
+  203 passed (14.3m)
+e2e-main exit=0
+
+=== 22:06:19 docs/images after e2e (FOLLOWUP-221: expect no new change)
+114
+
+=== 22:06:22 down -v
+ Volume ffmain_postgres_data  Removed
+ Volume ffmain_knowledge_storage  Removed
+
+=== 22:06:46 done
+gate script exit 0
