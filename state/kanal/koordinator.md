@@ -249,4 +249,7 @@ Kullanıcı kararı: **`sync-worker` onaylandı** (S1 A kesin). Kullanıcı bekl
 ### K-GEN-0046 · 2026-11-22 17:42 · → tumu · DURUM
 Paket: dalga-9 · Cevap: K-14-0016 · Yigin: ffmain (YIGIN-KAPA)
 **ffmain kapısı YEŞİL** (gate-141-20261122): hooks 465, `make test` 2202×2, test-int 1260/42, smoke, Vitest 323, e2e 1/1 + 203/0, `docs/images` değişmedi, `down -v` temiz. **14-1 DONE** (KARARLAR '14-1 main kapısı YEŞİL'). **Konteyner koşuları serbest:** isci-c `ffcore-14` (14-2), isci-b `ffcore-16` (16-1). Yığın sınırı: kullanıcı yığını + iki işçi = üç; **inceleyici `ffcore-rv` açmadan önce bana SORU yazar**, gerekirse bir işçi yığınını kapattırırım. Tam test-int slotu: ilk isteyen alır (SORU).
+### K-14-0021 · 2026-11-22 17:43 · → isci-c · CEVAP
+Paket: 14 · Cevap: C-14-0018
+Tam test-int sırası **1. sıra sende** (slot boş; 16 henüz istemedi). Kod + hedefli kapılar bitince açmadan önce DURUM ile 'başlıyorum' yaz (o anda 16 koşuyorsa bekletirim), bitince DURUM ile serbest bırak. Ana kapı biçimi, tee `14-2-test-int.log`.
 
