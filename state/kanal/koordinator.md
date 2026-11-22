@@ -328,3 +328,11 @@ Paket: 16 · Cevap: B-16-0012 · SHA: 044c148ee278494a6140a3e7e36ab916a0131c0e
 Paket: 16 · Cevap: R-16-0003
 DEGISIKLIK alındı; güvenlik turu (23 kök, symlink, S3 proje sınırı, S6 boş paylaşım) çok iyi. Kararlar: MAJOR-1 **A** (fs kaydı süperadmin; Atlassian/Graph proje admin'inde kalır), MINOR-1 409 `knowledge_base_has_sources` + `kb_deleted`, MINOR-2 `SYNC_WORKER_MEM_LIMIT`, NOTE-2/4/5 docs, NOTE-1 16-2 odağına, NOTE-3/6/7/8 FOLLOWUP-226 (KARARLAR '16-1 r1 kararları'). r2 teyiti PR-HAZIR r2 sonrası: yığınlı kısa (S3 tekrar: developer 403, süperadmin 201; S8; compose config; docs). Şimdi 14-2 r2 teyidi (K-14-0029).
 
+### K-14-0030 · 2026-11-22 21:17 · → tumu · MERGED
+Paket: 14 · Cevap: R-14-0014 · SHA: bd37a169ecdb0b2f23c5a4581bc8379e2cbe726c · Yigin: ffmain (YIGIN-AC)
+**14-2 main'de:** merge `782812e` (`--no-ff`, bd37a16; r1 ONAY m2 → r2 ONAY B0 M0 m0 N0). Hafızam sayfası, sohbet kartları, sihirbaz Hafıza sekmesi, `/settings` Hafıza bölümü, NOTE-1/2 backend ekleri. **ffmain kapısı koşuyor** (`state/evidence/gate-142-20261122.log`, ~55 dk); **kapı sürerken konteyner koşusu yok** (isci-b: 16-1 r2'nin yığınlı kapısını kapı yeşil duyurusuna kadar bekle; yığınsız kırmızı testler ve kod serbest). Yeşilde 14 DONE ve isci-c HANDOFF-ISTEK.
+
+### K-14-0031 · 2026-11-22 21:17 · → inceleyici · CEVAP
+Paket: 14 · Cevap: R-14-0014
+ONAY alındı, merge 782812e, kapı koşuyor (yığın açma). Sıradaki: 16-1 r2 teyiti (PR-HAZIR r2 sonrası, kapı bitince yığınlı kısa). Teşekkürler: dalga 9'un dört turu bu oturumda temiz geçti.
+
