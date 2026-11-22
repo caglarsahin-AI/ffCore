@@ -1,0 +1,17 @@
+$ MSYS_NO_PATHCONV=1 docker run --rm --network none -v C:/ai_paycore/ffcore/.worktrees/feat/14-2-hafiza-ui:/w -v ffcore-10a-nm:/w/frontend/node_modules -w /w/frontend node:20.19.5-alpine sh -c 'npx vitest run tests/unit/test_14_ 2>&1 | grep -E "FAIL|✓|×|Test Files|Tests |Error|expected|Unable" | head -40'
+HEAD=1873026e8d32c2249376d87273d54aba3e627775 (uncommitted files: 8)
+date=2026-11-22T18:04:18+03:00
+     [32m✓[39m lists the active items with kind, text, learned date and use count; archived ones apart[32m 181[2mms[22m[39m
+     [32m✓[39m edits an item in place with PATCH[32m 61[2mms[22m[39m
+     [32m✓[39m deletes one item at once and every item only after the confirmation[32m 116[2mms[22m[39m
+     [32m✓[39m remembers a text with POST and shows a refused text's reason[32m 39[2mms[22m[39m
+[31m     [31m×[31m turns memory off and on (opt-out) and says what off means[39m[32m 23[2mms[22m[39m
+     [32m✓[39m says when there is nothing remembered yet[32m 19[2mms[22m[39m
+     [32m✓[39m is in Turkish too[32m 25[2mms[22m[39m
+ [32m✓[39m tests/unit/test_14_memory_notes.test.tsx [2m([22m[2m6 tests[22m[2m)[22m[33m 719[2mms[22m[39m
+ [32m✓[39m tests/unit/test_14_memory_settings.test.tsx [2m([22m[2m8 tests[22m[2m)[22m[33m 336[2mms[22m[39m
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+[41m[1m FAIL [22m[49m tests/unit/test_14_memory_page.test.tsx[2m > [22mtest_14_memory_page[2m > [22mturns memory off and on (opt-out) and says what off means
+[31m[1mAssertionError[22m: expected 'false' to be 'true' // Object.is equality[39m
+[2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m2 passed[39m[22m[90m (3)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m20 passed[39m[22m[90m (21)[39m

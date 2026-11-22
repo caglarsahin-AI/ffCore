@@ -1,0 +1,6 @@
+HEAD=9029a475155865fa83b84f833646b927375c67f3 2026-11-22 19:17:53
+ Volume ffcore-16_qdrant_data  Removed
+ Volume ffcore-16_langfuse_postgres_data  Removed
+ Volume ffcore-16_knowledge_storage  Removed
+containers=1 volumes=1
+after-clean containers=0 volumes=0

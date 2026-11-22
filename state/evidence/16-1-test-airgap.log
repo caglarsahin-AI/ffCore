@@ -1,0 +1,16 @@
+HEAD=8800fe8a1396df2b84d85039013f0c47db8c366d + uncommitted 16-1 code profile=airgap 2026-11-22 18:11:55
+tests/contract/test_07_openapi.py ....                                   [ 97%]
+tests/contract/test_08_openapi.py .......                                [ 97%]
+tests/contract/test_09_openapi.py ...                                    [ 97%]
+tests/contract/test_14_openapi.py .....                                  [ 97%]
+tests/contract/test_16_openapi.py ....                                   [ 98%]
+tests/contract/test_57_alembic_single_head.py ...                        [ 98%]
+tests/contract/test_c11_facade.py .....                                  [ 98%]
+tests/contract/test_c1_namespace.py ...............                      [ 99%]
+tests/contract/test_c2_api_key_scopes.py ..                              [ 99%]
+tests/contract/test_c2_on_behalf_of.py ..                                [ 99%]
+tests/contract/test_c3_common_columns.py .....                           [ 99%]
+tests/contract/test_c5_vectorstore.py ...                                [ 99%]
+tests/contract/test_c9_runs.py .......                                   [100%]
+
+======================= 2261 passed in 164.34s (0:02:44) =======================

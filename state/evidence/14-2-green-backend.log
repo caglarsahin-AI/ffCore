@@ -1,0 +1,6 @@
+$ FFCORE_VERSION=0.0.0-14 BACKEND_PORT=18140 FRONTEND_PORT=13140 docker compose -p ffcore-14 --env-file .env.test  run --rm -T tools sh -c 'cd backend && ruff check . && ruff format --check . && pytest tests/unit/test_14_extract.py tests/unit/test_14_recall.py tests/unit/test_14_pii.py tests/contract/test_14_openapi.py tests/integration/test_14_api.py tests/integration/test_14_runs.py tests/integration/test_14_facade.py -q -p no:cacheprovider 2>&1 | grep -E "^(FAILED|ERROR)|passed|failed"'
+HEAD=1873026e8d32c2249376d87273d54aba3e627775 (uncommitted files: 15)
+date=2026-11-22T18:10:38+03:00
+All checks passed!
+543 files already formatted
+99 passed in 301.36s (0:05:01)

@@ -1,0 +1,102 @@
+$ (env: ALLOWED_INTERNAL_HOSTS=litellm,langfuse-web,mcp-search,mcp-sql,ticket-desk,fake-llm FFCORE_VERSION=0.0.0-14 FAKE_EMBED=1 NER_MODEL=akdeniz27/bert-base-turkish-cased-ner NER_REVISION=99995f7d2be4b3a28c74f0d36ee97f8c04ee0571 E2E_SCREENSHOT_DIR=)
+$ docker compose -p ffcore-14 --env-file .env.test --profile test --profile e2e run --rm e2e npx playwright test tests/e2e/test_14_ --workers=1 --reporter=line
+HEAD=562c5737f4f38dbe534876d878a096294354019c (uncommitted files: 5)
+date=2026-11-22T18:41:11+03:00
+===== playwright
+ Container ffcore-14-redis-1  Running
+ Container ffcore-14-postgres-1  Running
+ Container ffcore-14-litellm-1  Running
+ Container ffcore-14-migrate-1  Created
+ Container ffcore-14-backend-1  Running
+ Container ffcore-14-postgres-1  Waiting
+ Container ffcore-14-postgres-1  Waiting
+ Container ffcore-14-postgres-1  Healthy
+ Container ffcore-14-postgres-1  Healthy
+ Container ffcore-14-migrate-1  Starting
+ Container ffcore-14-migrate-1  Started
+ Container ffcore-14-redis-1  Waiting
+ Container ffcore-14-litellm-1  Waiting
+ Container ffcore-14-migrate-1  Waiting
+ Container ffcore-14-postgres-1  Waiting
+ Container ffcore-14-postgres-1  Healthy
+ Container ffcore-14-litellm-1  Healthy
+ Container ffcore-14-redis-1  Healthy
+ Container ffcore-14-migrate-1  Exited
+
+Running 8 tests using 1 worker
+
+[1/8] [chromium] › tests/e2e/test_14_1_memory.spec.ts:18:5 › test_14_1_used_note_and_forget: the next run has no memory block
+[2/8] [chromium] › tests/e2e/test_14_1_memory.spec.ts:42:5 › test_14_1_delete_on_the_memory_page: the next run has no memory block
+
+
+[WebServer] Failed to proxy http://backend:8000/api/v1/projects/df89539f-7b0b-4f9e-82a4-d266e579cb93/chat/agents [Error: getaddrinfo EAI_AGAIN backend] {
+[WebServer]   errno: -3001,
+[WebServer]   code: 'EAI_AGAIN',
+[WebServer]   syscall: 'getaddrinfo',
+[WebServer]   hostname: 'backend'
+[WebServer] }
+[WebServer] [Error: getaddrinfo EAI_AGAIN backend] {
+[WebServer]   errno: -3001,
+[WebServer]   code: 'EAI_AGAIN',
+[WebServer]   syscall: 'getaddrinfo',
+[WebServer]   hostname: 'backend'
+[WebServer] }
+  1) [chromium] › tests/e2e/test_14_1_memory.spec.ts:42:5 › test_14_1_delete_on_the_memory_page: the next run has no memory block 
+
+    Test timeout of 300000ms exceeded.
+
+    Error: locator.fill: Target crashed 
+    Call log:
+      - waiting for getByTestId('chat-input')
+
+
+       at memory.ts:61
+
+      59 | export async function ask(page: Page, agentKey: string, question: string) {
+      60 |   await page.goto(`/chat/${agentKey}`);
+    > 61 |   await page.getByTestId("chat-input").fill(question);
+         |                                        ^
+      62 |   await page.getByTestId("chat-send").click();
+      63 |   await page.getByTestId("chat-answer").first().waitFor({ timeout: 120_000 });
+      64 | }
+        at ask (/work/frontend/tests/e2e/memory.ts:61:40)
+        at /work/frontend/tests/e2e/test_14_1_memory.spec.ts:56:3
+
+    Error Context: test-results/test_14_1_memory-test-14-1-953bd-ext-run-has-no-memory-block-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/test_14_1_memory-test-14-1-953bd-ext-run-has-no-memory-block-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/test_14_1_memory-test-14-1-953bd-ext-run-has-no-memory-block-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[3/8] [chromium] › tests/e2e/test_14_1_memory.spec.ts:61:5 › test_14_1_opt_out: no memory is used while the member has it off
+[4/8] [chromium] › tests/e2e/test_14_1_memory.spec.ts:81:5 › test_14_1_admin_sees_numbers_not_text
+[5/8] [chromium] › tests/e2e/test_14_2_screens_themes.spec.ts:31:9 › test_14_2_screens_themes: light desktop
+  2) [chromium] › tests/e2e/test_14_2_screens_themes.spec.ts:31:9 › test_14_2_screens_themes: light desktop 
+
+    TypeError: fetch failed
+    [cause]: Error: getaddrinfo EAI_AGAIN backend
+
+    Error Context: test-results/test_14_2_screens_themes-t-04444-creens-themes-light-desktop-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/test_14_2_screens_themes-t-04444-creens-themes-light-desktop-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/test_14_2_screens_themes-t-04444-creens-themes-light-desktop-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[6/8] [chromium] › tests/e2e/test_14_2_screens_themes.spec.ts:31:9 › test_14_2_screens_themes: light mobile
+[7/8] [chromium] › tests/e2e/test_14_2_screens_themes.spec.ts:31:9 › test_14_2_screens_themes: dark desktop
+[8/8] [chromium] › tests/e2e/test_14_2_screens_themes.spec.ts:31:9 › test_14_2_screens_themes: dark mobile
+  2 failed
+    [chromium] › tests/e2e/test_14_1_memory.spec.ts:42:5 › test_14_1_delete_on_the_memory_page: the next run has no memory block 
+    [chromium] › tests/e2e/test_14_2_screens_themes.spec.ts:31:9 › test_14_2_screens_themes: light desktop 
+  5 did not run
+  1 passed (16.4m)

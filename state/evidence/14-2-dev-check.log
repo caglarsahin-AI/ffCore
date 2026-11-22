@@ -1,0 +1,11 @@
+$ MSYS_NO_PATHCONV=1 docker run --rm --network none -v C:/ai_paycore/ffcore/.worktrees/feat/14-2-hafiza-ui:/w -v ffcore-10a-nm:/w/frontend/node_modules -w /w/frontend node:20.19.5-alpine sh -c 'npx prettier --version >/dev/null 2>&1 && echo has-prettier; npm run typecheck 2>&1 | tail -20; npm run lint 2>&1 | tail -25'
+HEAD=1873026e8d32c2249376d87273d54aba3e627775 (uncommitted files: 15)
+date=2026-11-22T18:06:54+03:00
+
+> ffcore-frontend@0.1.0 typecheck
+> tsc --noEmit
+
+
+> ffcore-frontend@0.1.0 lint
+> eslint
+

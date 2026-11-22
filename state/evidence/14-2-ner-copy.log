@@ -1,0 +1,14 @@
+$ FFCORE_VERSION=0.0.0-14 BACKEND_PORT=18140 FRONTEND_PORT=13140 docker compose -p ffcore-14 --env-file .env.test --profile tools run --rm --no-deps -T -v ffcore_model_cache:/src:ro tools sh -c 'ls /src; ls /src/huggingface/hub 2>&1; ls /models'
+HEAD=562c5737f4f38dbe534876d878a096294354019c
+huggingface
+paddleocr
+models--BAAI--bge-m3
+models--BAAI--bge-reranker-v2-m3
+models--akdeniz27--bert-base-turkish-cased-ner
+models--docling-project--docling-layout-heron
+models--docling-project--docling-models
+---models
+$ ... --profile tools run --rm --no-deps -T -v ffcore_model_cache:/src:ro tools sh -c 'ls /src/huggingface/hub/models--akdeniz27--bert-base-turkish-cased-ner/snapshots; mkdir -p /models/huggingface/hub && cp -a /src/huggingface/hub/models--akdeniz27--bert-base-turkish-cased-ner /models/huggingface/hub/ && ls /models/huggingface/hub/models--akdeniz27--bert-base-turkish-cased-ner/snapshots && du -sh /models/huggingface/hub'
+99995f7d2be4b3a28c74f0d36ee97f8c04ee0571
+99995f7d2be4b3a28c74f0d36ee97f8c04ee0571
+421M	/models/huggingface/hub

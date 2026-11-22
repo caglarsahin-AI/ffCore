@@ -1,0 +1,10 @@
+$ FFCORE_VERSION=0.0.0-14 BACKEND_PORT=18140 FRONTEND_PORT=13140 docker compose -p ffcore-14 --env-file .env.test  run --rm -T tools sh -c 'cd backend && pytest tests/integration/test_14_facade.py tests/integration/test_14_api.py tests/integration/test_14_runs.py -q -p no:cacheprovider -k "facade or r3 or k1_profile" 2>&1 | grep -E "^(FAILED|ERROR)|passed|failed"'
+HEAD=ff951fa8dc63a3553e66d6336ab51fa6caf8e01a (uncommitted files: 11)
+date=2026-11-22T17:57:08+03:00
+2026-11-22 14:57:39,021 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-22 14:57:41,926 ERROR ffcore.tracing trace_delivery_failed spans=7 reason=deadline
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+ERROR    ffcore.tracing:tracing.py:116 trace_delivery_failed spans=7 reason=deadline
+FAILED tests/integration/test_14_facade.py::test_14_r2_facade_run_with_a_long_message_recalls_within_the_limit
+FAILED tests/integration/test_14_api.py::test_14_r3_a_changed_model_is_checked_while_off
+2 failed, 2 passed, 54 deselected in 39.05s

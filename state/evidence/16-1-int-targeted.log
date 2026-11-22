@@ -1,0 +1,46 @@
+HEAD=8800fe8a1396df2b84d85039013f0c47db8c366d + uncommitted 16-1 code 2026-11-22 18:46:48
+/opt/venv/lib/python3.12/site-packages/psycopg/_conninfo_attempts_async.py:53: OperationalError
+        too. Raise `OperationalError` if no host could be resolved.
+            except OSError as ex:
+                last_exc = e.OperationalError(
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+/opt/venv/lib/python3.12/site-packages/psycopg/_conninfo_attempts.py:55: OperationalError
+        too. Raise `OperationalError` if no host could be resolved.
+            except OSError as ex:
+                last_exc = e.OperationalError(
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+/opt/venv/lib/python3.12/site-packages/psycopg/_conninfo_attempts_async.py:53: OperationalError
+        too. Raise `OperationalError` if no host could be resolved.
+            except OSError as ex:
+                last_exc = e.OperationalError(
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           sqlalchemy.exc.OperationalError: (psycopg.OperationalError) failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+E           (Background on this error at: https://sqlalche.me/e/21/e3q8)
+/opt/venv/lib/python3.12/site-packages/psycopg/_conninfo_attempts_async.py:53: OperationalError
+        too. Raise `OperationalError` if no host could be resolved.
+            except OSError as ex:
+                last_exc = e.OperationalError(
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+/opt/venv/lib/python3.12/site-packages/psycopg/_conninfo_attempts_async.py:53: OperationalError
+        too. Raise `OperationalError` if no host could be resolved.
+            except OSError as ex:
+                last_exc = e.OperationalError(
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           sqlalchemy.exc.OperationalError: (psycopg.OperationalError) failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+E           (Background on this error at: https://sqlalche.me/e/21/e3q8)
+/opt/venv/lib/python3.12/site-packages/psycopg/_conninfo_attempts_async.py:53: OperationalError
+                error = AuditWriteError(f"audit event for {action} could not be written")
+E               ffcore.core.audit.AuditWriteError: audit event for create_data_source could not be written
+E               original failure: OperationalError
+ffcore/core/audit.py:320: AuditWriteError
+FAILED tests/integration/test_16_1_api.py::test_16_1_validation_codes[extra3-secret_unexpected]
+FAILED tests/integration/test_16_1_api.py::test_16_1_patch_pause_and_sync_refused_while_paused
+2 failed, 32 passed, 4 errors in 594.33s (0:09:54)
+time="2026-11-22T19:04:58+03:00" level=error msg="error getting events from daemon: unexpected EOF"
+Killed
+.........F.............................................................. [ 27%]
+........................................................................ [ 54%]
+...............................................

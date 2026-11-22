@@ -1,0 +1,12 @@
+$ FFCORE_VERSION=0.0.0-14 BACKEND_PORT=18140 FRONTEND_PORT=13140 docker compose -p ffcore-14 --env-file .env.test  run --rm -T tools sh -c 'make lint && DEPLOY_PROFILE=llmaas make test 2>&1 | tail -4'
+HEAD=6c8257c51c836aa9dba6ea07b7d4d2db3bee8738 (uncommitted files: 0)
+date=2026-11-22T19:00:32+03:00
+ruff check backend scripts data/samples/scripts services tests/deploy
+All checks passed!
+ruff format --check backend scripts data/samples/scripts services tests/deploy
+580 files already formatted
+time="2026-11-22T19:04:54+03:00" level=error msg="error waiting for container: "
+tests/contract/test_c5_vectorstore.py ...                                [ 99%]
+tests/contract/test_c9_runs.py .......                                   [100%]
+
+======================= 2202 passed in 460.61s (0:07:40) =======================

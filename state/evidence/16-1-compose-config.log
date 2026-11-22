@@ -1,0 +1,3 @@
+HEAD=9029a475155865fa83b84f833646b927375c67f3 2026-11-22 19:11:25
+compose config ok
+sync-worker

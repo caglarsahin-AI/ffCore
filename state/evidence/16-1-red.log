@@ -1,0 +1,26 @@
+HEAD=8800fe8a1396df2b84d85039013f0c47db8c366d (test commit only, no 16 code) 2026-11-22 17:59:06
+________________ ERROR collecting tests/unit/test_16_1_rules.py ________________
+ImportError while importing test module '/work/backend/tests/unit/test_16_1_rules.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/local/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/unit/test_16_1_rules.py:9: in <module>
+    from ffcore.sources import acl, gate0, paths, prune, schedule
+E   ModuleNotFoundError: No module named 'ffcore.sources'
+______________ ERROR collecting tests/unit/test_16_1_fs_driver.py ______________
+ImportError while importing test module '/work/backend/tests/unit/test_16_1_fs_driver.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/local/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/unit/test_16_1_fs_driver.py:12: in <module>
+    from ffcore.sources import registry
+E   ModuleNotFoundError: No module named 'ffcore.sources'
+=========================== short test summary info ============================
+ERROR tests/unit/test_16_1_rules.py
+ERROR tests/unit/test_16_1_fs_driver.py
+!!!!!!!!!!!!!!!!!!! Interrupted: 2 errors during collection !!!!!!!!!!!!!!!!!!!!
+2 errors in 9.54s

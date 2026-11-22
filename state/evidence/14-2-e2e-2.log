@@ -1,0 +1,26 @@
+$ (env: ALLOWED_INTERNAL_HOSTS=litellm,langfuse-web,mcp-search,mcp-sql,ticket-desk,fake-llm FFCORE_VERSION=0.0.0-14 FAKE_EMBED=1 NER_MODEL=akdeniz27/bert-base-turkish-cased-ner NER_REVISION=99995f7d2be4b3a28c74f0d36ee97f8c04ee0571 E2E_SCREENSHOT_DIR=)
+$ docker compose -p ffcore-14 --env-file .env.test --profile test --profile e2e run --rm e2e npx playwright test tests/e2e/test_14_ --workers=1 --reporter=line
+HEAD=562c5737f4f38dbe534876d878a096294354019c (uncommitted files: 5)
+date=2026-11-22T18:29:05+03:00
+===== playwright
+ Container ffcore-14-postgres-1  Running
+ Container ffcore-14-redis-1  Running
+ Container ffcore-14-litellm-1  Running
+ Container ffcore-14-migrate-1  Created
+ Container ffcore-14-backend-1  Running
+ Container ffcore-14-postgres-1  Waiting
+ Container ffcore-14-postgres-1  Waiting
+ Container ffcore-14-postgres-1  Healthy
+ Container ffcore-14-migrate-1  Starting
+ Container ffcore-14-postgres-1  Healthy
+ Container ffcore-14-migrate-1  Started
+ Container ffcore-14-postgres-1  Waiting
+ Container ffcore-14-redis-1  Waiting
+ Container ffcore-14-litellm-1  Waiting
+ Container ffcore-14-migrate-1  Waiting
+ Container ffcore-14-postgres-1  Healthy
+ Container ffcore-14-litellm-1  Healthy
+ Container ffcore-14-redis-1  Healthy
+ Container ffcore-14-migrate-1  Exited
+Error: Timed out waiting 300000ms from config.webServer.
+

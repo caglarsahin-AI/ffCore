@@ -1,0 +1,5 @@
+$ FFCORE_VERSION=0.0.0-14 BACKEND_PORT=18140 FRONTEND_PORT=13140 docker compose -p ffcore-14 --env-file .env.test --profile test --profile qdrant up -d --wait --build --pull never
+ Container ffcore-14-agent-worker-bg-1  Healthy
+ Container ffcore-14-langfuse-worker-1  Healthy
+ Container ffcore-14-mcp-search-1  Healthy
+ Container ffcore-14-mcp-sql-1  Healthy

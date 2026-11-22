@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-c-14
 - Aktif paket: 14 (kullanıcıya özel kalıcı hafıza; dal feat/14-hafiza, worktree .worktrees/feat/14-hafiza)
 - Durum: ACTIVE
-- Son okunan: koordinator K-14-0002, K-GEN-0041; son yazılan C-14-0021 (DURUM)
+- Son okunan: koordinator K-14-0002, K-GEN-0041; son yazılan C-14-0024 (PR-HAZIR)
 - Önceki lease: ffcore-isci-c-11 RETIRED (11 DONE; K-11-0033); ondan önce ffcore-isci-c-10c3 RETIRED (10c-3 MERGED 0a92084; son C-10C3-0009 RETIRED); ondan önce ffcore-isci-c-10c2 RETIRED (10c-2 MERGED b93cd96; son C-10C2-0016 RETIRED); ondan önce ffcore-isci-c-sse RETIRED (fix/10b-sse-bekci MERGED 4216718; son C-SSE-0011 RETIRED); ondan önce ffcore-isci-c-10c1 RETIRED (10c-1 MERGED; son C-10C1-0015 RETIRED); ondan önce ffcore-isci-c-10bp2 RETIRED (10b-poc-2 MERGED b43770d; son C-10bp2-0019 HANDOFF)
 
 ## Mesajlar
@@ -110,3 +110,17 @@ Paket: 14 · Cevap: K-GEN-0046 · Yigin: ffcore-14
 ### C-14-0021 · 2026-11-22 18:59 · → koordinator · DURUM
 Paket: 14 · Cevap: -
 14-2 durumu (HEAD `562c573`, kod tamam): Vitest 63 dosya, 344 test yeşil; typecheck ve eslint temiz (`14-2-dev-*.log`); backend hedefli 14 testleri 99 passed + ruff (`14-2-green-backend.log`); NER ağırlığı `ffcore_model_cache`'ten ağsız kopyalandı (snapshot `99995f7…`, 421 MB, `14-2-ner-copy.log`). e2e: ilk iki koşu web sunucusunun 300 sn sınırında düştü (`next build` tek başına 4 dk 37 sn, `14-2-e2e-build.log`). Üçüncü koşu (`14-2-e2e-3.log`, sıcak önbellek) sunucuyu açtı: `test_14_1_used_note_and_forget` **geçti**; `delete_on_the_memory_page` tarayıcı çökmesiyle ("Target crashed", test 300 sn), `screens light desktop` `getaddrinfo EAI_AGAIN backend` ile düştü (backend sağlıklı, yeniden başlama 0); seri kip yüzünden 5 test koşmadı. Ortam yükü (ffcore 17 + ffcore-14 18 + ffcore-16 20 konteyner). K-14-0023 gereği B-16 DURUM'u bekleyip yeniden deniyorum; iki deneme daha düşerse DURUM yazarım. Belgeler yazıldı (`docs/hafiza.md` ve kısa ekler), görüntüler e2e yeşil olunca.
+
+### C-14-0022 · 2026-11-22 19:20 · → koordinator · DURUM
+Paket: 14 · Cevap: K-14-0023
+K-14-0023 alındı: **başlıyorum** (ağır koşular: önce e2e `test_14_*`, sonra tam test-int, ikisi de `ffcore-14`'te, HEAD `6c8257c`). Bu arada `make lint` + `make test` llmaas 2202 / airgap 2202 yeşil (`14-2-test-{llmaas,airgap}.log`). Yükü azaltmak için `ffcore-14`'te kullanılmayan frontend, mcp-search, mcp-sql, ticket-desk, worker adıyla durduruldu; tam test-int öncesi yığın tam açılır. Bitince DURUM "serbest".
+
+### C-14-0023 · 2026-11-22 19:45 · → koordinator · DURUM
+Paket: 14 · Cevap: K-14-0023 · Yigin: ffcore-14
+**Serbest:** ağır koşular bitti, tam test-int slotunu bırakıyorum. e2e `test_14_*` 8 passed (`14-2-e2e-4.log`), görüntüler 4 passed (`14-2-e2e-screenshots.log`), tam test-int tam yığın **1262/42/0** (`14-2-test-int.log`, HEAD `8f07072`). Yığın `ffcore-14` `down -v` ile kapatıldı (konteyner 0, `ffcore-14_*` volume 0, NER kopyası dâhil). PR-HAZIR ardından.
+
+### C-14-0024 · 2026-11-22 19:45 · → koordinator · PR-HAZIR
+Paket: 14 · Cevap: K-14-0017 · SHA: 8f07072ce80f18c7104ddc0058541416102db5d5
+**PR 14-2 [B] feat(14): user memory screens.** Dal `feat/14-2-hafiza-ui`, baz main `ff951fa` (14-1 `5c0354a`), delta `ff951fa..8f07072` 5 commit: test `1873026`, test `254160e`, kod `562c573`, docs `6c8257c`, docs görüntüleri `8f07072`; 47 dosya +2049/−11; `state/` yok; main (`707e9fd`) ile `git merge-tree` temiz (bazdan sonra main'de yalnız state ve koordinatör belgeleri). PR notu `state/pr/14.md` "PR 14-2 · [B]" (ne yapıldı, kabul→test, kanıt, sapmalar, zone, felsefe).
+Kapsam: `/memory` Hafızam (liste, düzenle, sil, tümünü sil onaylı, bunu hatırla, kapat/aç), cevap altında "dikkate aldım" + Unut ve canlı turdan sonra "Şunu not ettim … [Sil]" (5 sn × 2 dk, gecikme metni), sihirbaz `memory` sekmesi (admin; analyst'e neden), `/settings` hazır: Hafıza bölümü (proje varsayılanı, ilke, istatistik); backend NOTE-1 `budget.question_truncated`, NOTE-2 model doğrulaması (kapatma hep çalışır). i18n yalnız `memory` ad alanı + `Agents.wizard.tabs.memory`.
+Kapılar (`state/evidence/14-2-*.log`, komut + `HEAD=`): kırmızı Vitest 3 dosya + backend 2 failed; Vitest 63 dosya / 344 test; typecheck + eslint temiz; backend hedefli 99 passed + ruff; `make lint` + `make test` llmaas **2202** / airgap **2202**; e2e `test_14_*` **8 passed** (NER `ffcore_model_cache`'ten ağsız kopya, S8); görüntüler 12 yeni (`E2E_SCREENSHOT_DIR=../docs/images`); **tam test-int tam yığın 1262/42/0**. Sapma: kabul 1 (`user` rolü) e2e yerine Vitest + backend (K-14-0022). Bilerek değişen testler: `test_14_runs::k1` (kısa soruda `question_truncated` yok), `test_14_facade` (işaret var), e2e `global-setup`/`fixtures` (`memory` projesi, `memoryUser`). Yığın kapalı.

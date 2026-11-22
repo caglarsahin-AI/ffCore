@@ -1,0 +1,5 @@
+$ MSYS_NO_PATHCONV=1 docker run --rm --network none -v C:/ai_paycore/ffcore/.worktrees/feat/14-2-hafiza-ui:/w -v ffcore-10a-nm:/w/frontend/node_modules -w /w/frontend node:20.19.5-alpine sh -c 'npx vitest run 2>&1 | grep -E "FAIL|×|Test Files|Tests " | head -40'
+HEAD=1873026e8d32c2249376d87273d54aba3e627775 (uncommitted files: 15)
+date=2026-11-22T18:09:18+03:00
+[2m Test Files [22m [1m[32m63 passed[39m[22m[90m (63)[39m
+[2m      Tests [22m [1m[32m344 passed[39m[22m[90m (344)[39m

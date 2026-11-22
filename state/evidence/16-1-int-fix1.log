@@ -1,0 +1,46 @@
+HEAD=8800fe8a1396df2b84d85039013f0c47db8c366d + uncommitted 16-1 code 2026-11-22 18:19:51
+.F...                                                                    [100%]
+=================================== FAILURES ===================================
+_________ test_16_1_full_removes_three_deleted_files_from_every_layer __________
+
+src_world = {'settings': Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('****..._d0/sources/paylasim'), 'sync_queue': <tests.integration.sources_support.RecordingQueue object at 0x7f2c9c6e7860>, ...}
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_ba06276672e5) at 0x7f2cb0577b00>
+
+    def test_16_1_full_removes_three_deleted_files_from_every_layer(src_world, pg):
+        w = src_world
+        write_tree(w["root"], TWENTY)
+        source = create_fs_source(w)
+        open_to_analysts(w, source["id"])
+        full_sync(w, source["id"])
+        gone = ["belgeler/belge-03.md", "belgeler/belge-04.md", "belgeler/belge-05.md"]
+        before = {
+            row[0]: (row[1], row[2])
+            for row in pg.execute(
+                "SELECT external_id, raw_path, document_id FROM source_items WHERE data_source_id = %s",
+                (source["id"],),
+            ).fetchall()
+        }
+        silver = {
+            row[0]: row[1]
+            for row in pg.execute(
+                "SELECT id, silver_path FROM documents WHERE id = ANY(%s)",
+                ([before[g][1] for g in gone],),
+            ).fetchall()
+        }
+        for rel in gone:
+            (w["root"] / rel).unlink()
+        (raw,) = full_sync(w, source["id"])
+        # 3 of the 17 the source still holds: 0.18 <= PRUNE_MAX_RATIO 0.2 (C20 denominator).
+        assert raw["prune_decision"] == "done" and raw["deleted"] == 3
+>       assert (raw["count_before"], raw["count_after"]) == (17, 17)
+                ^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'count_before'
+
+tests/integration/test_16_1_sync.py:128: KeyError
+---------------------------- Captured stderr setup -----------------------------
+------------------------------ Captured log setup ------------------------------
+----------------------------- Captured stderr call -----------------------------
+------------------------------ Captured log call -------------------------------
+=========================== short test summary info ============================
+FAILED tests/integration/test_16_1_sync.py::test_16_1_full_removes_three_deleted_files_from_every_layer
+1 failed, 4 passed in 30.50s

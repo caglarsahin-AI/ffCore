@@ -1,0 +1,12 @@
+HEAD=9029a475155865fa83b84f833646b927375c67f3 2026-11-22 19:17:33
+python scripts/smoke.py
+ok    DEPLOY_PROFILE=llmaas INFERENCE_BACKEND=ollama
+ok    database: application connects as ffcore_app
+ok    backend /healthz 200
+ok    litellm /health/liveliness 200, /key/info 404 (schema present)
+ok    langfuse /api/public/health 200, /api/public/projects 200
+ok    mcp-search /healthz 200
+ok    mcp-sql /healthz 200
+ok    sync-worker sync:health-check present
+ok    skipped: ollama profile inactive
+smoke: passed
