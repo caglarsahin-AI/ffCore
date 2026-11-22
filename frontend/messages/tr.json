@@ -313,6 +313,106 @@
     "inputPlaceholder": "Buraya yazın",
     "chart": "Grafik paleti"
   },
+  "memory": {
+    "kinds": {
+      "profile": "Profil",
+      "preference": "Tercih",
+      "fact": "Bilgi",
+      "decision": "Karar"
+    },
+    "page": {
+      "title": "Hafızam",
+      "intro": "Asistanın bu projede senin hakkında hatırladıkları. Bunları yalnız sen görürsün; istediğin zaman değiştirebilir ya da silebilirsin.",
+      "link": "Hafızam",
+      "noProject": "Hafızanı görmek için bir proje seç.",
+      "rememberLabel": "Bunu hatırla",
+      "rememberHint": "Asistanın her konuşmada aklında tutması gereken bir tercih. Kişisel veri (kimlik numarası, ad, telefon) reddedilir.",
+      "rememberSave": "Hatırla",
+      "listTitle": "Hatırlananlar",
+      "empty": "Henüz hatırlanan bir şey yok. Asistan kalıcı tercihlerini konuşmalardan not eder, ya da yukarıdan kendin ekleyebilirsin.",
+      "learned": "Öğrenildi: {date}",
+      "uses": "{count, plural, =0 {Henüz kullanılmadı} one {Bir kez kullanıldı} other {# kez kullanıldı}}",
+      "edit": "Düzenle",
+      "editSave": "Kaydet",
+      "editCancel": "Vazgeç",
+      "editLabel": "Maddenin metni",
+      "delete": "Sil",
+      "deleteAll": "Tümünü sil",
+      "deleteAllTitle": "Asistanın senin hakkında hatırladığı her şey silinsin mi?",
+      "deleteAllBody": "Bu projedeki bütün maddeler, arşivdekiler de, hemen ve kalıcı olarak silinir. Geri alınamaz.",
+      "deleteAllConfirm": "Tümünü sil",
+      "cancel": "Vazgeç",
+      "archived": "{count, plural, one {# arşivli madde} other {# arşivli madde}}",
+      "archivedHint": "Daha yeni bir maddeyle değişti ya da sınırı aştı; cevaplarda kullanılmaz.",
+      "optOutLabel": "Hafızayı kullan",
+      "optOutHint": "Kapalıyken hiçbir şey hatırlanmaz ve cevaplarda kullanılmaz. Var olan maddeler sen silene kadar durur.",
+      "offNote": "Hafızan kapalı: yeniden açana kadar hiçbir şey hatırlanmaz ya da kullanılmaz.",
+      "loading": "Yükleniyor…"
+    },
+    "notes": {
+      "used": "{count, plural, one {Hatırladığım # maddeyi dikkate aldım} other {Hatırladığım # maddeyi dikkate aldım}}",
+      "show": "Göster",
+      "hide": "Gizle",
+      "forget": "Bunu unut",
+      "noted": "Şunu not ettim:",
+      "notedDelete": "Sil",
+      "later": "Bu cevaptan not alınanlar daha sonra Hafızam'da görünebilir.",
+      "readFailed": "Hafıza notları okunamadı ({code})."
+    },
+    "settings": {
+      "title": "Hafıza",
+      "intro": "Asistanın her üye hakkında neyi hatırlayıp sonraki cevaplarda kullanabileceği. Üyeler kendi maddelerini görür ve yönetir.",
+      "enabled": "Hafıza açık",
+      "nerMissing": "Kişi adlarını dışarıda tutmak için hafıza kurulumun NER modelini (NER_MODEL, NER_REVISION) ister. Kurulumun yöneticisine sor; docs/hafiza.md.",
+      "kinds": "Hatırlanabilecek türler",
+      "maxItems": "Üye başına madde",
+      "maxItemsHint": "Sınır aşılınca en az kullanılan madde arşivlenir.",
+      "topK": "Soru başına çağrılan madde",
+      "topKHint": "Profil maddeleri her zaman çağrılır; diğerlerinden soruya en yakın bu kadarı.",
+      "ttl": "Saklama süresi (gün)",
+      "ttlHint": "Boş: üye silene ya da veri saklama süresi bitene kadar.",
+      "model": "Çıkarma modeli",
+      "modelHint": "Koşudan sonra kalıcı maddeleri bulan, projenin chat modeli.",
+      "save": "Hafıza ayarlarını kaydet",
+      "saved": "Kaydedildi.",
+      "adminOnly": "Hafıza ayarları yöneticinindir.",
+      "source": {
+        "agent": "Bu agent'ın kendi ayarı",
+        "project": "Proje varsayılanı kullanılıyor",
+        "default": "Yerleşik varsayılan kullanılıyor (hafıza kapalı)"
+      }
+    },
+    "settingsPage": {
+      "title": "Ayarlar",
+      "description": "Proje ayarları. İlk bölüm hafıza; diğerleri sonraki paketlerle gelir."
+    },
+    "stats": {
+      "title": "Hafıza istatistikleri",
+      "principle": "Yöneticiler hatırlananları göremez: yalnız sayı, tür ve kullanım. Audit olayı kaydeder, metni asla.",
+      "active": "Aktif madde",
+      "archived": "Arşivli",
+      "useRate": "En az bir kez kullanılan",
+      "deletes": "Üyelerin silmeleri",
+      "optedOut": "Hafızası kapalı üye",
+      "member": "Üye",
+      "byKind": "Türe göre",
+      "used": "Kullanılan",
+      "none": "Henüz hiçbir üyenin hafıza maddesi yok.",
+      "unreadable": "—"
+    },
+    "errors": {
+      "line": "{message} ({code})",
+      "memory_pii_blocked": "Kişisel veri hafızaya kaydedilemez.",
+      "memory_text_invalid": "Bu metin kaydedilemez: hafıza bloğunun işaretlerini içeriyor.",
+      "memory_requires_ner": "Hafıza, kurulumun NER modelini ister.",
+      "memory_disabled": "Bu projede hafıza kapalı.",
+      "memory_opted_out": "Hafızanı kapattın; madde eklemek için aç.",
+      "memory_kind_not_allowed": "Bu türde madde bu projede izinli değil.",
+      "memory_not_owner": "Hafıza maddesini yalnız sahibi değiştirebilir.",
+      "model_not_found": "Projede bu anahtarla etkin bir chat modeli yok.",
+      "other": "Hafıza isteği başarısız oldu."
+    }
+  },
   "Errors": {
     "readOnlyAccess": "Salt-okunur erişim: erişim modunuz burada değişiklik yapmaya izin vermiyor.",
     "insufficientRole": "Bu projedeki rolünüz bu işleme izin vermiyor.",
@@ -811,7 +911,8 @@
         "limits": "Güvenlik ve limitler",
         "output": "Çıktı",
         "versions": "Yayın",
-        "portal": "Portal"
+        "portal": "Portal",
+        "memory": "Hafıza"
       },
       "editingVersion": "Sürüm {version}",
       "publishedReadOnly": "Bu sürüm yayında ve değiştirilemez. Yayın sekmesinden yeni taslak açın.",

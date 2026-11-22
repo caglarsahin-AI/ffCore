@@ -49,7 +49,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { key: "audit", href: "/audit", minRole: "admin", ready: false, superadmin: true },
       // 10c-2 S1: the backend serves retention (reads too) to superadmins only.
       { key: "retention", href: "/retention", minRole: "admin", ready: true, superadmin: true },
-      { key: "settings", href: "/settings", minRole: "admin", ready: false },
+      { key: "settings", href: "/settings", minRole: "admin", ready: true },
     ],
   },
 ];

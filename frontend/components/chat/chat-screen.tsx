@@ -13,6 +13,7 @@ import { QuestionBox } from "@/components/chat/question-box";
 import { SourceCards } from "@/components/chat/source-cards";
 import type { CitedSource } from "@/components/chat/source-cards";
 import { ToolCallCard } from "@/components/chat/tool-call-card";
+import { MemoryNotes } from "@/components/memory/memory-notes";
 import { turnShownIn, useChatRun } from "@/components/chat/use-chat-run";
 import { QueryError } from "@/components/screen";
 import { useAccess } from "@/components/session-provider";
@@ -133,7 +134,14 @@ function AgentChat({ projectId, agent, conversationId }: { projectId: string; ag
           {conversationId !== null && messages.isPending && <p className="text-sm text-muted-foreground" role="status">{t("loading")}</p>}
           {messages.isError && <QueryError error={messages.error} />}
           {stored.map((message) => (
-            <StoredMessage key={message.id} projectId={projectId} message={message} stored={stored} hideFailure={live && !liveSettled && message.run_id === run.view.runId} />
+            <StoredMessage
+              key={message.id}
+              projectId={projectId}
+              message={message}
+              stored={stored}
+              hideFailure={live && !liveSettled && message.run_id === run.view.runId}
+              watchMemory={message.run_id !== null && message.run_id === run.view.runId}
+            />
           ))}
           {live && !liveSettled && (
             <LiveTurn
@@ -201,7 +209,21 @@ function Bubble({ role, children, testId = "chat-message" }: { role: "user" | "a
   );
 }
 
-function StoredMessage({ projectId, message, stored, hideFailure }: { projectId: string; message: ChatMessage; stored: ChatMessage[]; hideFailure: boolean }) {
+// 14-2: under an answer, the memory it used and (for the turn just answered here, watchMemory)
+// what was noted from it (components/memory/memory-notes.tsx).
+function StoredMessage({
+  projectId,
+  message,
+  stored,
+  hideFailure,
+  watchMemory,
+}: {
+  projectId: string;
+  message: ChatMessage;
+  stored: ChatMessage[];
+  hideFailure: boolean;
+  watchMemory: boolean;
+}) {
   const t = useTranslations("Chat");
   if (message.role === "user") {
     const answered = stored.some((m) => m.role === "assistant" && m.run_id === message.run_id);
@@ -231,6 +253,7 @@ function StoredMessage({ projectId, message, stored, hideFailure }: { projectId:
         {message.content}
       </p>
       <SourceCards sources={(message.sources ?? []) as CitedSource[]} variant="chat" projectId={projectId} runId={message.run_id} />
+      {message.run_id && <MemoryNotes projectId={projectId} runId={message.run_id} watch={watchMemory} />}
       {message.run_id && <MessageFeedback projectId={projectId} runId={message.run_id} stored={storedVote(message)} />}
     </Bubble>
   );

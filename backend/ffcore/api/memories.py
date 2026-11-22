@@ -602,7 +602,10 @@ async def put_memory_settings(
             "Memory needs the installation's NER model (NER_MODEL, NER_REVISION) to keep "
             "person names out; set it up first (docs/hafiza.md).",
         )
-    if body.enabled:
+    # Checked when memory is turned on or the model is changed (14-2 NOTE-2); turning memory off
+    # with the model in use always works, even when the catalog no longer holds it.
+    current = await memory_settings.effective(session, project_id, agent_id)
+    if body.enabled or body.extraction_model != current.extraction_model:
         await _catalog_model(session, project_id, body.extraction_model)
     row = await memory_settings.setting_row(session, project_id, agent_id)
     if row is None:
