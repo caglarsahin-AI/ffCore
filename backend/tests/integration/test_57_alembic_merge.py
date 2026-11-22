@@ -19,8 +19,16 @@ PRE_MERGE_ROWS = {"03c_0002", "04a_0001", "05a_0001", "08_0001"}
 LIFETIME = {"checkpoint_deleted_at", "source_deleted_at"}  # 06a_0002
 RETENTION = {"retention_policies", "retention_runs", "alert_rules", "alerts"}  # 03c_0002
 # Tables of the plain chain above the merge (06b_0001 adds a column only; 09_0001 two tables;
-# 05b_0001 two tables).
-ABOVE_MERGE = {"eval_suites", "eval_runs", "mcp_servers", "mcp_server_calls"}
+# 05b_0001 two tables; 14_0001 three tables).
+ABOVE_MERGE = {
+    "eval_suites",
+    "eval_runs",
+    "mcp_servers",
+    "mcp_server_calls",
+    "memories",
+    "memory_settings",
+    "memory_opt_outs",
+}
 
 
 def _head() -> str:
