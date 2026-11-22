@@ -130,9 +130,10 @@ class ApprovalGate(Protocol):
 
 
 class MemoryPort(Protocol):
-    """14: recall for `prepare` (memory.recall.HttpMemory in the worker)."""
+    """14: recall for `prepare` (memory.recall.HttpMemory, or OffMemory when memory does
+    nothing for the run); `share` is the budget's memory share in tokens."""
 
-    async def recall(self, question: str) -> Any: ...
+    async def recall(self, question: str, share: int) -> Any: ...
 
 
 class StopRun(Exception):

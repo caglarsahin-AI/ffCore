@@ -127,8 +127,12 @@ class RollbackRequest(Strict):
     version: int = Field(ge=1, description="A version that was published before.")
 
 
+# A run's input limit; 14 bounds its recall query by it (memory.recall.recall_query).
+RUN_INPUT_MAX = 20000
+
+
 class RunCreate(Strict):
-    input: str = Field(min_length=1, max_length=20000)
+    input: str = Field(min_length=1, max_length=RUN_INPUT_MAX)
     variables: dict[str, str] = Field(default_factory=dict)
     conversation_id: UUID | None = Field(
         default=None, description="Continue this conversation; omitted: a new one."

@@ -26,7 +26,7 @@ branch_labels = ("14",)
 depends_on = None
 
 KINDS = ("profile", "preference", "fact", "decision")
-STATUSES = ("active", "archived", "deleted_by_user")
+STATUSES = ("active", "archived")
 
 
 def _embed_dim() -> int:

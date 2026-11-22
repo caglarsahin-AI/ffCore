@@ -12,7 +12,9 @@ and must stay under their control. Settings are an administrator's (`admin`, edi
 
 "Remember this" (`POST /memories`) skips the extraction model (`kind=preference`,
 `confidence=1`) but never the PII check (C19): a finding answers 400 `memory_pii_blocked`, the
-guardrail event is committed before the refusal and the audit row records the error.
+guardrail event is committed before the refusal and the audit row records the error. A text
+with the memory block's markers is 400 `memory_text_invalid` (r2 MAJOR-2); without the NER
+model every write is 422 `memory_requires_ner` (r2 MINOR-1).
 
 The internal routes (`/internal/memories/...`, service account only) are the worker's: the API
 process holds the embedding model and NER (06a), so recall and extraction writes happen here.
@@ -28,6 +30,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from ffcore.api.agents_schemas import RUN_INPUT_MAX
 from ffcore.api.common import (
     ERROR_RESPONSES,
     SessionDep,
@@ -42,11 +45,13 @@ from ffcore.core.audit import audited
 from ffcore.core.auth import Actor, require_role
 from ffcore.core.config import Settings, get_settings
 from ffcore.core.errors import ApiError
+from ffcore.memory import recall as memory_recall
 from ffcore.memory import settings as memory_settings
 from ffcore.memory import store
 from ffcore.memory.pii import check_memory_text
 from ffcore.models.agents import Agent
 from ffcore.models.audit import AuditEvent
+from ffcore.models.catalog import Model
 from ffcore.models.memory import (
     DEFAULT_EXTRACTION_MODEL,
     DEFAULT_MAX_ITEMS,
@@ -85,7 +90,7 @@ class MemoryOut(BaseModel):
     kind: Kind
     text: str
     agent_id: UUID | None
-    status: Literal["active", "archived", "deleted_by_user"]
+    status: Literal["active", "archived"]
     confidence: float
     source_run_id: UUID | None
     supersedes_id: UUID | None
@@ -162,7 +167,10 @@ class RecallRequest(BaseModel):
     project_id: UUID
     user_id: UUID
     run_id: UUID
-    question: str = Field(max_length=20_000)
+    # The recall query (memory.recall.recall_query bounds a longer facade question).
+    question: str = Field(max_length=RUN_INPUT_MAX)
+    # The budget's memory share in tokens: only the items that fit are marked used (NOTE-2).
+    share: int = Field(ge=0)
 
 
 class RecalledItem(BaseModel):
@@ -177,6 +185,8 @@ class RecallResponse(BaseModel):
     items: list[RecalledItem]
     # `related` only: the model the extraction job calls (the effective settings').
     extraction_model: str | None = None
+    # `recall` only: the ids that did not fit the share (not marked used).
+    dropped: list[UUID] = Field(default_factory=list)
 
 
 class RelatedRequest(BaseModel):
@@ -275,6 +285,15 @@ async def _writable(session, project_id, user_id, agent_id=None):
     return effective
 
 
+def _text_invalid() -> ApiError:
+    return ApiError(
+        400,
+        "invalid_request_error",
+        "memory_text_invalid",
+        "A memory cannot contain the memory block's markers ([USER MEMORY], [/USER MEMORY]).",
+    )
+
+
 def _ner_ready(settings: Settings) -> bool:
     return bool(settings.ner_model and settings.ner_revision)
 
@@ -327,6 +346,8 @@ async def remember(
         candidates=[store.Candidate("preference", body.text.strip(), 1.0)],
         min_confidence=0.0,
     )
+    if result.rejected["invalid"]:
+        raise _text_invalid()
     if result.rejected["pii"]:
         await session.commit()  # the guardrail event stays; the audit row records the error
         raise _pii_blocked(result.pii_reference_id)
@@ -353,6 +374,8 @@ async def update_memory(
     """The owner's correction: the new text is PII-checked and embedded again."""
     item = await _own(session, project_id, memory_id, actor)
     text = body.text.strip()
+    if memory_recall.has_marker(text):
+        raise _text_invalid()
     checked = await check_memory_text(session, project_id, text)
     if checked.blocked:
         await session.commit()
@@ -456,8 +479,9 @@ async def memory_stats(project_id: UUID, actor: AdminReader, session: SessionDep
         ).all()
     )
     users: dict[UUID, UserStats] = {}
-    for user_id, state, kind, count, used in rows:
-        entry = users.setdefault(
+
+    def entry_of(user_id: UUID) -> UserStats:
+        return users.setdefault(
             user_id,
             UserStats(
                 user_id=user_id,
@@ -468,6 +492,13 @@ async def memory_stats(project_id: UUID, actor: AdminReader, session: SessionDep
                 delete_events=int(deletes.get(str(user_id), 0)),
             ),
         )
+
+    # A member whose items were all deleted is listed with the delete count (NOTE-5); the
+    # delete routes are user-only (`_user_id`), so every actor id is a user id.
+    for actor_id in deletes:
+        entry_of(UUID(str(actor_id)))
+    for user_id, state, kind, count, used in rows:
+        entry = entry_of(user_id)
         if state == "active":
             entry.active += count
             entry.used += used
@@ -531,6 +562,27 @@ async def get_memory_settings(
     return _settings_out(effective, agent_id, settings)
 
 
+async def _catalog_model(session, project_id: UUID, key: str) -> None:
+    """The extraction model must be an active chat model of the project (NOTE-2): an unknown
+    key is refused here, not at the first extraction."""
+    found = await session.scalar(
+        select(Model.id).where(
+            Model.project_id == project_id,
+            Model.key == key,
+            Model.category == "llm",
+            Model.is_active.is_(True),
+            Model.deleted_at.is_(None),
+        )
+    )
+    if found is None:
+        raise ApiError(
+            400,
+            "invalid_request_error",
+            "model_not_found",
+            f"No active chat model {key} in this project.",
+        )
+
+
 @router.put("/memories/settings", response_model=MemorySettingsOut)
 @audited("memory.settings_update", "memory_settings", audit_payload=False)
 async def put_memory_settings(
@@ -550,6 +602,8 @@ async def put_memory_settings(
             "Memory needs the installation's NER model (NER_MODEL, NER_REVISION) to keep "
             "person names out; set it up first (docs/hafiza.md).",
         )
+    if body.enabled:
+        await _catalog_model(session, project_id, body.extraction_model)
     row = await memory_settings.setting_row(session, project_id, agent_id)
     if row is None:
         row = MemorySetting(id=uuid.uuid4(), project_id=project_id, agent_id=agent_id)
@@ -593,7 +647,7 @@ async def internal_recall(
     if reason is not None:
         return RecallResponse(off_reason=reason, items=[])
     effective = await memory_settings.effective(session, body.project_id, run.agent_id)
-    items = await store.recall(
+    found = await store.recall(
         session,
         settings,
         project_id=body.project_id,
@@ -601,10 +655,16 @@ async def internal_recall(
         agent_id=run.agent_id,
         question=body.question,
         top_k=effective.recall_top_k,
+        kinds=effective.allowed_kinds,
     )
+    items = [{"id": str(i.id), "kind": i.kind, "text": i.text} for i in found]
+    kept, dropped, _ = memory_recall.fit(items, body.share)
+    await store.mark_used(session, [i["id"] for i in kept])
     await session.commit()
     return RecallResponse(
-        off_reason=None, items=[RecalledItem(id=i.id, kind=i.kind, text=i.text) for i in items]
+        off_reason=None,
+        items=[RecalledItem(**i) for i in kept],
+        dropped=[UUID(i) for i in dropped],
     )
 
 
@@ -617,6 +677,7 @@ async def internal_related(
     reason = await memory_settings.off_reason(session, body.project_id, run.agent_id, body.user_id)
     if reason is not None:
         return RecallResponse(off_reason=reason, items=[])
+    effective = await memory_settings.effective(session, body.project_id, run.agent_id)
     items = await store.related(
         session,
         settings,
@@ -625,8 +686,8 @@ async def internal_related(
         agent_id=run.agent_id,
         text=body.text,
         n=RELATED_ITEMS,
+        kinds=effective.allowed_kinds,
     )
-    effective = await memory_settings.effective(session, body.project_id, run.agent_id)
     return RecallResponse(
         off_reason=None,
         items=[RecalledItem(id=i.id, kind=i.kind, text=i.text) for i in items],

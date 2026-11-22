@@ -80,10 +80,14 @@ async def _memory(ctx: RunContext, question: str, budget) -> tuple[str, list[str
     why nothing was recalled). No memory port (a run without a user): nothing at all."""
     if ctx.memory is None:
         return "", [], {}
-    found = await ctx.memory.recall(question)
+    share = budget.shares["memory"]
+    found = await ctx.memory.recall(memory_recall.recall_query(question), share)
     if found.off_reason is not None:
         return "", [], {"memory": found.off_reason}
-    kept, dropped, used = memory_recall.fit(found.items, budget.shares["memory"])
+    # The API fitted the items already (only the kept ones are marked used); fit again here so
+    # the block can never exceed the share whatever the port returned.
+    kept, dropped, used = memory_recall.fit(found.items, share)
+    dropped = [*found.dropped, *dropped]
     budget.used["memory"] = used
     if dropped:
         budget.dropped["memory"] = dropped

@@ -10,6 +10,10 @@ policy key `memory`, stage `input.pre`: the text is entering the platform's stor
 that carries an egress placeholder (`<<PII_n>>`) refers to tokenized personal data and is
 refused the same way, without an engine call, and recorded as a `pii` block with the category
 `egress_placeholder` (no value: the placeholder is all there is).
+
+r2 (K-14-0009): the memory policy's events keep no text preview (NOTE-1: the categories say
+why; a refused "remember this" text is shown to nobody), and a missing NER model is the coded
+422 `memory_requires_ner` on every write path (MINOR-1), never an unhandled error.
 """
 
 import uuid
@@ -17,10 +21,11 @@ from dataclasses import dataclass
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from ffcore.core.errors import ApiError
 from ffcore.guardrails import engine
 from ffcore.guardrails.builtin import BUILTIN_KEY, builtin_egress_pii
 from ffcore.guardrails.masking import PLACEHOLDER
-from ffcore.guardrails.recognizers.ner import local_ner
+from ffcore.guardrails.recognizers.ner import NerConfigError, local_ner
 from ffcore.guardrails.schemas import BlockMessage, PolicySpec, ResolvedPolicy, Rule
 from ffcore.guardrails.service import pii_spec, record_events, stored_pii
 
@@ -35,6 +40,16 @@ class PiiOutcome:
     # The categories found (codes only; never the value).
     categories: tuple[str, ...] = ()
     reason: str | None = None
+
+
+def requires_ner() -> ApiError:
+    return ApiError(
+        422,
+        "invalid_request_error",
+        "memory_requires_ner",
+        "Memory needs the installation's NER model (NER_MODEL, NER_REVISION) to keep person "
+        "names out; set it up first (docs/hafiza.md).",
+    )
 
 
 def ner_client():
@@ -85,15 +100,20 @@ async def check_memory_text(
         record_events(session, uuid.UUID(str(project_id)), [event], reference_id)
         return PiiOutcome(True, reference_id, ("egress_placeholder",), "placeholder")
     policy = await memory_policy(session, project_id)
-    ctx = engine.EvalContext(
-        run_id=str(run_id) if run_id else None,
-        project_id=str(project_id),
-        source=source,
-        ner=ner_client(),
-    )
-    decision = await engine.evaluate(text, STAGE, policy, ctx=ctx)
+    try:
+        ctx = engine.EvalContext(
+            run_id=str(run_id) if run_id else None,
+            project_id=str(project_id),
+            source=source,
+            ner=ner_client(),
+        )
+        decision = await engine.evaluate(text, STAGE, policy, ctx=ctx)
+    except NerConfigError as exc:
+        raise requires_ner() from exc
     if decision.action != "block":
         return PiiOutcome(False)
+    for event in decision.events:
+        event.input_preview = ""
     record_events(session, uuid.UUID(str(project_id)), decision.events, decision.reference_id)
     categories = sorted(
         {f["category"] for e in decision.events for f in e.findings if f.get("category")}

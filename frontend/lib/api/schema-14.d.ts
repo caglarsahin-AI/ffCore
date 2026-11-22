@@ -284,7 +284,7 @@ export interface components {
              * Status
              * @enum {string}
              */
-            status: "active" | "archived" | "deleted_by_user";
+            status: "active" | "archived";
             /** Confidence */
             confidence: number;
             /** Source Run Id */
@@ -411,6 +411,8 @@ export interface components {
             run_id: string;
             /** Question */
             question: string;
+            /** Share */
+            share: number;
         };
         /** RecallResponse */
         RecallResponse: {
@@ -420,6 +422,8 @@ export interface components {
             items: components["schemas"]["RecalledItem"][];
             /** Extraction Model */
             extraction_model?: string | null;
+            /** Dropped */
+            dropped?: string[];
         };
         /** RecalledItem */
         RecalledItem: {

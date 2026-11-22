@@ -34,7 +34,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from ffcore.models.base import Base
 
 KINDS = ("profile", "preference", "fact", "decision")
-STATUSES = ("active", "archived", "deleted_by_user")
+STATUSES = ("active", "archived")
 
 DEFAULT_MAX_ITEMS = 200
 DEFAULT_TOP_K = 5

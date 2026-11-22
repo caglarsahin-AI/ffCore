@@ -1039,7 +1039,6 @@ components:
           enum:
           - active
           - archived
-          - deleted_by_user
           title: Status
         confidence:
           type: number
@@ -1277,6 +1276,10 @@ components:
           type: string
           maxLength: 20000
           title: Question
+        share:
+          type: integer
+          minimum: 0.0
+          title: Share
       additionalProperties: false
       type: object
       required:
@@ -1284,6 +1287,7 @@ components:
       - user_id
       - run_id
       - question
+      - share
       title: RecallRequest
     RecallResponse:
       properties:
@@ -1306,6 +1310,12 @@ components:
           - type: string
           - type: 'null'
           title: Extraction Model
+        dropped:
+          items:
+            type: string
+            format: uuid
+          type: array
+          title: Dropped
       type: object
       required:
       - off_reason

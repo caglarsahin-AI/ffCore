@@ -2,6 +2,8 @@
 
 Write, per candidate, in this order; every refusal is counted by reason, nothing is skipped
 silently:
+0. a text carrying the memory block's markers -> `invalid` (r2 MAJOR-2: it could close the
+   block early);
 1. `kind` outside the effective `allowed_kinds` -> `kind`;
 2. `confidence` below the threshold (MEMORY_MIN_CONFIDENCE; "remember this" is 1.0)
    -> `low_confidence`;
@@ -9,7 +11,12 @@ silently:
 4. embedding, then dedupe: a valid `supersedes_id` of the same user, or the most similar active
    item of the same scope with cosine similarity > 0.9, is archived and the new item points to
    it (`supersedes_id`); the old one is never deleted (brief: contradictions);
-5. over `max_items_per_user` active items, the least used are archived.
+5. over `max_items_per_user` active items, the least used are archived; the items this write
+   added are the last candidates (r2 MAJOR-1: a user at the limit keeps learning), so
+   `written` and `archived` never share an id.
+
+Recall reads only the kinds the effective settings allow and marks used only what reached the
+prompt (`mark_used`, r2 NOTE-2).
 
 Scope: `profile` and `preference` are valid in every agent of the project (`agent_id` NULL),
 `fact` and `decision` only in the agent of the run that taught them.
@@ -19,12 +26,14 @@ import uuid
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 
+from sqlalchemy import false as sql_false
 from sqlalchemy import func, or_, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ffcore.core.config import Settings
 from ffcore.knowledge.embed import embed
 from ffcore.memory.pii import check_memory_text
+from ffcore.memory.recall import has_marker
 from ffcore.memory.settings import Effective
 from ffcore.models.memory import Memory
 
@@ -111,7 +120,9 @@ async def _supersede_target(
     return None
 
 
-async def _enforce_limit(session, project_id, user_id, limit: int) -> list[uuid.UUID]:
+async def _enforce_limit(
+    session, project_id, user_id, limit: int, protected: list[uuid.UUID]
+) -> list[uuid.UUID]:
     active = await session.scalar(
         select(func.count()).where(
             Memory.project_id == project_id, Memory.user_id == user_id, Memory.status == "active"
@@ -128,7 +139,14 @@ async def _enforce_limit(session, project_id, user_id, limit: int) -> list[uuid.
                 Memory.user_id == user_id,
                 Memory.status == "active",
             )
-            .order_by(Memory.use_count, Memory.last_used_at.asc().nullsfirst(), Memory.created_at)
+            .order_by(
+                # This write's items go last (False sorts first); they are archived only when
+                # the limit is smaller than the write itself.
+                Memory.id.in_(protected) if protected else sql_false(),
+                Memory.use_count,
+                Memory.last_used_at.asc().nullsfirst(),
+                Memory.created_at,
+            )
             .limit(excess)
         )
     )
@@ -154,6 +172,9 @@ async def write(
     result = WriteResult()
     kept: list[Candidate] = []
     for candidate in candidates:
+        if has_marker(candidate.text):
+            result.rejected["invalid"] += 1
+            continue
         if candidate.kind not in effective.allowed_kinds:
             result.rejected["kind"] += 1
             continue
@@ -195,9 +216,13 @@ async def write(
         session.add(item)
         await session.flush()
         result.written.append(item.id)
-    result.archived.extend(
-        await _enforce_limit(session, project_id, user_id, effective.max_items_per_user)
+    evicted = await _enforce_limit(
+        session, project_id, user_id, effective.max_items_per_user, result.written
     )
+    result.archived.extend(evicted)
+    # An item of this write superseded by a later one of the same write is archived too.
+    gone = set(result.archived)
+    result.written = [i for i in result.written if i not in gone]
     return result
 
 
@@ -217,9 +242,10 @@ async def recall(
     agent_id,
     question: str,
     top_k: int,
+    kinds: tuple[str, ...],
 ) -> list[Recalled]:
-    """Every active `profile` item, then the `top_k` other items closest to the question; the
-    returned items are marked used (`last_used_at`, `use_count`)."""
+    """Every active `profile` item, then the `top_k` other items closest to the question, of
+    the allowed `kinds` only. Not marked used: the caller marks what reached the prompt."""
     project_id, user_id = uuid.UUID(str(project_id)), uuid.UUID(str(user_id))
     now = _now()
     base = (
@@ -228,6 +254,7 @@ async def recall(
         Memory.status == "active",
         _live(now),
         _visible_in(agent_id),
+        Memory.kind.in_(kinds),
     )
     profiles = list(
         await session.scalars(
@@ -245,21 +272,34 @@ async def recall(
                 .limit(top_k)
             )
         )
-    items = [*profiles, *others]
-    if items:
-        await session.execute(
-            update(Memory)
-            .where(Memory.id.in_([m.id for m in items]))
-            .values(last_used_at=now, use_count=Memory.use_count + 1)
-            .execution_options(synchronize_session=False)
-        )
-    return [Recalled(m.id, m.kind, m.text) for m in items]
+    return [Recalled(m.id, m.kind, m.text) for m in [*profiles, *others]]
+
+
+async def mark_used(session: AsyncSession, ids: list) -> None:
+    """The items that reached the prompt: `last_used_at`, `use_count`."""
+    if not ids:
+        return
+    await session.execute(
+        update(Memory)
+        .where(Memory.id.in_([uuid.UUID(str(i)) for i in ids]))
+        .values(last_used_at=_now(), use_count=Memory.use_count + 1)
+        .execution_options(synchronize_session=False)
+    )
 
 
 async def related(
-    session: AsyncSession, settings: Settings, *, project_id, user_id, agent_id, text: str, n: int
+    session: AsyncSession,
+    settings: Settings,
+    *,
+    project_id,
+    user_id,
+    agent_id,
+    text: str,
+    n: int,
+    kinds: tuple[str, ...],
 ) -> list[Recalled]:
-    """The extraction's context (brief: the 5 related items); not marked used."""
+    """The extraction's context (brief: the 5 related items, of the allowed kinds); not marked
+    used."""
     vector = (await embed(settings, [text])).dense[0]
     rows = await session.scalars(
         select(Memory)
@@ -269,6 +309,7 @@ async def related(
             Memory.status == "active",
             _live(_now()),
             _visible_in(agent_id),
+            Memory.kind.in_(kinds),
         )
         .order_by(Memory.embedding.cosine_distance(vector))
         .limit(n)

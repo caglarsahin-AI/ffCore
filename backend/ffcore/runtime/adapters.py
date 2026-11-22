@@ -41,7 +41,7 @@ from ffcore.guardrails.recognizers import ner as ner_recognizers
 from ffcore.guardrails.service import record_events, resolve_policy
 from ffcore.guardrails.settings import get_guardrail_settings
 from ffcore.knowledge.chunking import approx_tokens
-from ffcore.memory.recall import HttpMemory
+from ffcore.memory.recall import memory_port
 from ffcore.models.knowledge import KnowledgeBase
 from ffcore.models.runs import Message
 from ffcore.models.tools import Tool, ToolAction
@@ -701,12 +701,9 @@ def context_factory(
             ),
             stream_live=guard.streams_live,
             approvals=RunApprovalGate(session, settings, project_id=run.project_id, run_id=run.id),
-            # 14: recall through the API (it holds the embeddings); a key's run has no user.
-            memory=(
-                HttpMemory(settings, run_id=run.id, project_id=run.project_id, user_id=run.user_id)
-                if run.user_id is not None
-                else None
-            ),
+            # 14: off or opted out is read here; recall through the API (it holds the
+            # embeddings) only when memory works for the run; a key's run has no user.
+            memory=await memory_port(session, settings, run),
         )
 
     return build
