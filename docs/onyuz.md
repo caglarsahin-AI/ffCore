@@ -446,8 +446,10 @@ remove the volume `<project>_e2e_node_modules`) so the volume is filled again.
 **Screenshots (FOLLOWUP-221).** The screenshot tests write only when `E2E_SCREENSHOT_DIR` is set
 (`frontend/tests/e2e/screenshots.ts`); empty, the default, writes nothing, so a run on the
 repository checkout (the `e2e` service mounts it at `/work`) never rewrites `docs/images`. To
-refresh the docs images on purpose: `export E2E_SCREENSHOT_DIR=/work/docs/images` before the
-`run` (an existing directory inside the container; a missing one fails the test). The images
+refresh the docs images on purpose: `export E2E_SCREENSHOT_DIR=../docs/images` before the
+`run` (an existing directory inside the container, relative to `/work/frontend`; a missing one
+fails the test). Prefer the relative value: Git Bash rewrites an absolute `/work/…` value into a
+Windows path (`C:/Program Files/Git/work/…`) unless `MSYS_NO_PATHCONV=1` is set. The images
 are `docs/images/<package>-<screen>-<theme>.png` (10a, 10bp1, 10mrk, 10bp2, 10c1, 10c2, 10c3,
 11). The main gate script needs no change: it does not set the variable, so the gate's e2e
 stage leaves the checkout's `docs/images` as it is.

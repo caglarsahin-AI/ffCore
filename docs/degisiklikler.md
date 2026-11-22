@@ -20,7 +20,9 @@ if anything.
 - **Action:** an install with `INFERENCE_BACKEND=ollama` whose `OLLAMA_CONTEXT_LENGTH` is below
   an active Ollama model's `context_window` now gets 503 `context_configuration_invalid` from
   `/readyz` (it was hidden before): raise `OLLAMA_CONTEXT_LENGTH` or lower the model's window in
-  the console. e2e: build the image once per stack
+  the console. An active Ollama model with no published agent while Ollama does not answer now
+  gets 503 `ollama_unreachable` from `ollama_runtime_context` (it was `skipped`, 200 before):
+  start Ollama or deactivate the model. e2e: build the image once per stack
   (`docker compose --profile e2e up --build --pull never --no-start --no-deps e2e`, docs/onyuz.md)
   and drop `npm ci &&` from `run e2e` commands.
 
