@@ -1,0 +1,8 @@
+HEAD=89df92829fa76c6eea1975fcad5136c1091e36d5 host py -3.12
+cmd: py -3.12 -m pytest tests/hooks tests/scripts -q -p no:cacheprovider
+........................................................................ [ 75%]
+........................................................................ [ 90%]
+............................................                             [100%]
+476 passed in 104.62s (0:01:44)
+cmd: py -3.12 -m pytest tests/hooks -q -p no:cacheprovider (hooks only)
+465 passed in 93.76s (0:01:33)

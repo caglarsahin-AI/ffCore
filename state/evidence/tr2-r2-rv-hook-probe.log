@@ -1,0 +1,154 @@
+HEAD=89df92829fa76c6eea1975fcad5136c1091e36d5 r1=135c369 base=d6d2029
+cmd: py -3.12 rv_tr2_r2_hook_probe_20261122.py <r2> <r1> <base>
+C:\Users\CAGLAR~1.SAH\AppData\Local\Temp/claude/9398d5fca5badfb5/d866dade-595b-43f0-b74a-a212bc018d6b/scratchpad/rv_tr2_r2_hook_probe_20261122.py:45: SyntaxWarning: invalid escape sequence '\ '
+  ("R8 escaped blank foo\ #x", "echo foo" + BS + " #x; git push origin x", "run"),
+C:\Users\CAGLAR~1.SAH\AppData\Local\Temp/claude/9398d5fca5badfb5/d866dade-595b-43f0-b74a-a212bc018d6b/scratchpad/rv_tr2_r2_hook_probe_20261122.py:46: SyntaxWarning: invalid escape sequence '\<'
+  ("R9 quote then glue 'a'\<nl>#b", "echo 'a'" + BS + NL + "#b; git push origin x", "run"),
+R1 X1 ${a/ #x/y}                              expect=run     base=['PUSH'] r1=[] r2=['PUSH'] ok
+      cmd='echo ${a/ #x/y}; git push origin x'
+R2 X2 ${a# #}                                 expect=run     base=['PUSH'] r1=[] r2=['PUSH'] ok
+      cmd='echo ${a# #}; git push origin x'
+R3 X3 glued push                              expect=run     base=['PUSH'] r1=[] r2=['PUSH'] ok
+      cmd='echo foo\\\n#bar; git push origin x'
+R4 X4 glued pytest                            expect=run     base=['KAPI'] r1=[] r2=['KAPI'] ok
+      cmd='echo foo\\\n#bar; pytest backend/tests'
+R5 X24 ${a// #}                               expect=run     base=['KAPI'] r1=[] r2=['KAPI'] ok
+      cmd='echo ${a// #}; pytest backend/tests'
+R6 nested ${a:-${b# #}}                       expect=run     base=['PUSH'] r1=[] r2=['PUSH'] ok
+      cmd='echo ${a:-${b# #}}; git push origin x'
+R7 nested then real comment                   expect=run     base=['PUSH'] r1=['PUSH'] r2=['PUSH'] ok
+      cmd='echo ${a:-${b# #}} # c\ngit push origin x'
+R8 escaped blank foo\ #x                      expect=run     base=['PUSH'] r1=[] r2=['PUSH'] ok
+      cmd='echo foo\\ #x; git push origin x'
+R9 quote then glue 'a'\<nl>#b                 expect=run     base=['PUSH'] r1=[] r2=['PUSH'] ok
+      cmd="echo 'a'\\\n#b; git push origin x"
+R10 dquote then glue                          expect=run     base=['PUSH'] r1=[] r2=['PUSH'] ok
+      cmd='echo "a"\\\n#b; git push origin x'
+R11 glue inside single quote                  expect=run     base=['PUSH'] r1=['PUSH'] r2=['PUSH'] ok
+      cmd="echo 'foo\\\n#bar'; git push origin x"
+R12 quoted line then comment line             expect=comment base=['PUSH'] r1=[] r2=[] ok
+      cmd="echo 'foo'\n# x; git push"
+R13 blank before backslash                    expect=comment base=[] r1=[] r2=[] ok
+      cmd='echo foo \\\n# git push origin x'
+R14 >#b                                       expect=comment base=['PUSH'] r1=['PUSH'] r2=[] ok
+      cmd='echo a >#b; git push origin x'
+R15 <#x                                       expect=comment base=['PUSH'] r1=['PUSH'] r2=[] ok
+      cmd='cat <#x; git push origin x'
+R16 [[ =~ #b ]]                               expect=comment base=['PUSH'] r1=[] r2=[] ok
+      cmd='[[ a =~ #b ]] ; git push origin x'
+R17 comment ending in backslash               expect=run     base=[] r1=['PUSH'] r2=['PUSH'] ok
+      cmd='# c \\\ngit push origin x'
+R18 comment ending in backslash then #        expect=comment base=[] r1=[] r2=[] ok
+      cmd='# c \\\n# git push origin x'
+R19 ${ in double quotes                       expect=run     base=['PUSH'] r1=['PUSH'] r2=['PUSH'] ok
+      cmd='echo "${a/ #x/y}"; git push origin x'
+R20 ${ closed, then comment                   expect=comment base=[] r1=[] r2=[] ok
+      cmd='echo ${a/ #x/y} # git push origin x'
+R21 quoted } inside ${                        expect=run     base=['PUSH'] r1=[] r2=['PUSH'] ok
+      cmd="echo ${a/'}'/ #x}; git push origin x"
+R22 escaped } inside ${                       expect=run     base=['PUSH'] r1=[] r2=['PUSH'] ok
+      cmd='echo ${a/\\}/ #x}; git push origin x'
+R23 ${a/}/ #x} first } closes                 expect=comment base=['PUSH'] r1=[] r2=[] ok
+      cmd='echo ${a/}/ #x}; git push origin x'
+R24 unclosed ${ then comment with apostrophe  expect=?       base=[] r1=['PUSH'] r2=[] 
+      cmd="echo ${a\n# don't\ngit push origin x"
+R25 heredoc <<#EOF                            expect=?       base=['PUSH'] r1=['PUSH'] r2=['PUSH'] 
+      cmd='cat <<#EOF\ngit push origin x\n#EOF'
+R26 heredoc op then comment                   expect=run     base=['PUSH'] r1=['PUSH'] r2=['PUSH'] ok
+      cmd='cat <<EOF # c\nbody\nEOF\ngit push origin x'
+R27 >>#x                                      expect=comment base=['PUSH'] r1=['PUSH'] r2=[] ok
+      cmd='echo a >>#b; git push origin x'
+R28 2>#x                                      expect=comment base=['PUSH'] r1=['PUSH'] r2=[] ok
+      cmd='echo a 2>#b; git push origin x'
+R29 glue after operator &&\                   expect=comment base=['PUSH'] r1=[] r2=[] ok
+      cmd='true &&\\\n#c; git push origin x'
+R30 two glues                                 expect=run     base=['PUSH'] r1=[] r2=['PUSH'] ok
+      cmd='echo a\\\nb\\\n#c; git push origin x'
+R31 glue then blank line start                expect=comment base=['PUSH'] r1=[] r2=[] ok
+      cmd='echo a\\\n #c; git push origin x'
+R32 brace group                               expect=run     base=['PUSH'] r1=['PUSH'] r2=['PUSH'] ok
+      cmd='{ echo a; } # c\ngit push origin x'
+R33 ${#a} then comment apostrophe             expect=run     base=[] r1=['PUSH'] r2=['PUSH'] ok
+      cmd="echo ${#a} # don't\ngit push origin x"
+R34 $# then comment apostrophe                expect=run     base=[] r1=['KAPI'] r2=['KAPI'] ok
+      cmd="echo $# # don't\npytest backend/tests"
+R35 sh -c inner ${ #                          expect=run     base=['PUSH'] r1=[] r2=['PUSH'] ok
+      cmd="sh -c 'echo ${a/ #x/y}; git push origin x'"
+R36 sh -c inner glue                          expect=?       base=['PUSH'] r1=[] r2=['PUSH'] 
+      cmd='sh -c "echo foo\\\\\n#bar; git push origin x"'
+R37 A1 regression comment apostrophe          expect=run     base=[] r1=['KAPI'] r2=['KAPI'] ok
+      cmd="# don't\npytest backend/tests"
+R38 timeout pytest                            expect=run     base=[] r1=['KAPI'] r2=['KAPI'] ok
+      cmd='timeout 600 pytest backend/tests'
+R39 tee in comment                            expect=run     base=[] r1=['KAPI'] r2=['KAPI'] ok
+      cmd='pytest backend/tests # | tee x.log'
+R40 ENV in comment                            expect=run     base=['ENV'] r1=['ENV'] r2=['ENV'] ok
+      cmd='git status # cat .env'
+cases=40 missed=0
+--- r1 probe (70 forms) rerun: r2 vs base
+* A1 comment apostrophe then pytest        base=[]  branch=['KAPI']
+* A2 comment apostrophe then push          base=[]  branch=['PUSH']
+* A3 comment apostrophe then build         base=[]  branch=['PROSES-175']
+  A4 same line comment only                base=[]  branch=[]
+  B1 echo '#x' then push                   base=['PUSH']  branch=['PUSH']
+  B2 $# then push                          base=['PUSH']  branch=['PUSH']
+  B3 ${#a} then push                       base=['PUSH']  branch=['PUSH']
+  B4 url fragment then push                base=['PUSH']  branch=['PUSH']
+  B5 url fragment harmless                 base=[]  branch=[]
+  B6 heredoc data body with #              base=['PUSH']  branch=['PUSH']
+  B7 heredoc data body only                base=[]  branch=[]
+* B8 heredoc code body comment             base=[]  branch=['PUSH']
+* C1 timeout pytest no tee                 base=[]  branch=['KAPI']
+* C2 timeout -k 5 10 push                  base=[]  branch=['PUSH']
+  C3 timeout pytest with tee               base=[]  branch=[]
+  D1 ENV in comment                        base=['ENV']  branch=['ENV']
+  D2 ENV comment line                      base=['ENV']  branch=['ENV']
+  D3 ENV real                              base=['ENV']  branch=['ENV']
+  D4 ENV behind timeout                    base=['ENV']  branch=['ENV']
+  X1 ${a/ #x/y} then push                  base=['PUSH']  branch=['PUSH']
+  X2 ${a# #} then push                     base=['PUSH']  branch=['PUSH']
+  X3 continuation glue foo\<nl>#bar; push  base=['PUSH']  branch=['PUSH']
+  X4 continuation glue pytest              base=['KAPI']  branch=['KAPI']
+* X5 dquote multi-line inner comment       base=[]  branch=['PUSH']
+  X6 squote multi-line inner               base=['PUSH']  branch=['PUSH']
+* X7 $(...) with comment inside            base=[]  branch=['PUSH']
+* X8 backtick                              base=[]  branch=['PUSH']
+  X9 escaped hash                          base=['PUSH']  branch=['PUSH']
+* X10 hash after redirect                  base=['PUSH']  branch=[]
+* X11 arithmetic $(( 1 #                   base=['PUSH']  branch=[]
+* X12 [[ =~ #                              base=['PUSH']  branch=[]
+  X13 ANSI-C quote                         base=[]  branch=[]
+  X14 heredoc line comment hides op?       base=['PUSH']  branch=['PUSH']
+* X15 comment with heredoc op              base=[]  branch=['PUSH']
+* X16 tab before hash                      base=[]  branch=['PUSH']
+* X17 hash after {                         base=[]  branch=['PUSH']
+  X18 hash after `                         base=['PUSH']  branch=['PUSH']
+* X19 hash after $(                        base=[]  branch=['PUSH']
+* X20 comment ends with backslash          base=[]  branch=['PUSH']
+* X21 hash after <                         base=['PUSH']  branch=[]
+* X22 word#  # c                           base=[]  branch=['PUSH']
+* X23 compose run inner comment            base=[]  branch=['KAPI']
+  X24 extglob ${a// #}                     base=['KAPI']  branch=['KAPI']
+  T1 timeout alone                         base=[]  branch=[]
+  T2 timeout -k                            base=[]  branch=[]
+  T3 timeout 5                             base=[]  branch=[]
+* T4 timeout -k5 10 push                   base=[]  branch=['PUSH']
+* T5 timeout 5 timeout 5 push              base=[]  branch=['PUSH']
+* T6 timeout 5 sh -c push                  base=[]  branch=['PUSH']
+* T7 nice timeout pytest                   base=[]  branch=['KAPI']
+* T8 timeout nohup pytest                  base=[]  branch=['KAPI']
+* T9 timeout -- 5 push                     base=[]  branch=['PUSH']
+* T10 timeout --kill-after=5 10 push       base=[]  branch=['PUSH']
+* T11 timeout --kill-after 5 10 push       base=[]  branch=['PUSH']
+* T12 timeout docker build                 base=[]  branch=['PROSES-175']
+  T13 timeout heredoc reader               base=['PUSH']  branch=['PUSH']
+* T14 timeout -v 5 push                    base=[]  branch=['PUSH']
+* T15 timeout --preserve-status 5 pytest   base=[]  branch=['KAPI']
+* T16 /usr/bin/timeout                     base=[]  branch=['PUSH']
+* T17 timeout.exe                          base=[]  branch=['PUSH']
+  T18 xargs (known limit)                  base=[]  branch=[]
+* T19 timeout 5 env push                   base=[]  branch=['PUSH']
+  T20 timeout compose run cat .env         base=['ENV']  branch=['ENV']
+* T21 timeout -s KILL -k 3 5 make test     base=[]  branch=['KAPI']
+  T22 timeout 5 git status (ok)            base=[]  branch=[]
+cases=65 changed=35

@@ -1,0 +1,52 @@
+bash 5.2.12(1)-release
+--R6
+x #x y
+RAN
+--R8
+foo #x
+RAN
+--R9
+a#b
+RAN
+--R12
+foo
+--R13
+foo
+--R14
+bash: -c: line 1: syntax error near unexpected token `newline'
+bash: -c: line 1: `echo a >#b; echo RAN'
+--R15
+bash: -c: line 1: syntax error near unexpected token `newline'
+bash: -c: line 1: `cat <#x; echo RAN'
+--R17
+RAN
+--R21
+x #x y
+RAN
+--R22
+x #x y
+RAN
+--R23
+x #x y/
+--R24
+bash: -c: line 1: unexpected EOF while looking for matching `}'
+--R24b
+bash: line 3: ${a
+# dont
+}: bad substitution
+--R27
+bash: -c: line 1: syntax error near unexpected token `newline'
+bash: -c: line 1: `echo a >>#b; echo RAN'
+--R28
+bash: -c: line 1: syntax error near unexpected token `newline'
+bash: -c: line 1: `echo a 2>#b; echo RAN'
+--R29
+bash: -c: line 3: syntax error: unexpected end of file
+--R30
+ab#c
+RAN
+--R31
+a
+--R25
+bash: -c: line 1: syntax error near unexpected token `newline'
+bash: -c: line 1: `cat <<#EOF'
