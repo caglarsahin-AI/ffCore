@@ -110,7 +110,8 @@ class Settings(BaseSettings):
     llm_call_timeout_s: int = Field(default=60, gt=0)
 
     # --- 04a knowledge base ---
-    # /readyz C13 check: the context Ollama is started with versus the models' context_tokens.
+    # /readyz C13 check: the context Ollama is started with versus the models'
+    # `limits.context_window` (triage-2).
     inference_backend: Literal["ollama", "vllm"] | None = None
     ollama_context_length: int | None = Field(default=None, gt=0)
     # Ingest queue (arq); contains the Redis password, so it is a secret.
