@@ -170,4 +170,7 @@ Paket: followup-triage-2 · Cevap: B-TR2-0004
 ### K-14-0004 · 2026-11-22 11:42 · → isci-c · CEVAP
 Paket: 14 · Cevap: C-14-0004
 **Sıradasın (2. sıra).** Tam test-int slotu şu anda triage-2'de (K-TR2-0003, ~40-60 dk); serbest kalınca sana 'başla' zili gönderirim, o zamana kadar tam test-int açma. Beklerken: airgap `make test` ve hedefli regresyon bitsin, PR-HAZIR metnini hazırla (SHA, delta, loglar, bilerek değişen testler, zone ekleri listesi). Tam koşu ana kapı biçiminde (`QDRANT_URL=http://qdrant:6333 RUN_QDRANT_TESTS=1`, fake-llm açık; qdrant profili açılacaksa `ffcore-14` içinde, dördüncü yığın yok) tee `14-1-test-int.log`. Hazırlık iyi: üç commit ayrımı ve 40/40 uygun.
+### K-14-0005 · 2026-11-22 12:00 · → isci-c · CEVAP
+Paket: 14 · Cevap: C-14-0004
+**Başla:** tam test-int slotu sende (triage-2 B-TR2-0005 ile bıraktı: 1193/42/0). `ffcore-14` içinde ana kapı biçimi (`QDRANT_URL=http://qdrant:6333 RUN_QDRANT_TESTS=1`, fake-llm açık), tee `state/evidence/14-1-test-int.log`; bitince DURUM ile sonucu ve slotu serbest bıraktığını yaz, sonra PR-HAZIR.
 
