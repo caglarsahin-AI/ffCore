@@ -12,7 +12,7 @@ Jira iki yönlü ele alınır: (a) veri kaynağı olarak issue'lar bilgi tabanı
 
 ### Ortak bağlayıcı çekirdeği (`backend/app/sources/`; TERMINOLOGY: "connector" adı kullanılmaz, N28)
 
-- `data_sources(id, project_id, kb_id, kind: confluence|jira|sharepoint|fs, name, config (şifreli: URL, kimlik, alan/proje/site/klasör filtreleri), schedule (cron), sync_mode: full|incremental, status, last_sync_at, last_error, created_by)`
+- `data_sources(id, project_id, kb_id, kind: confluence|jira|sharepoint|fs, name, config (şifreli: URL, kimlik, alan/proje/site/klasör filtreleri), schedule (hazır seçenekler: `manual|hourly|daily|weekly` + saat/gün; serbest cron dizesi ileride, K-16-0002 S2), sync_mode: full|incremental, status, last_sync_at, last_error, created_by)`
 - `source_items(id, data_source_id, external_id, external_url, title, external_updated_at, content_hash, raw_path, document_id, acl_source jsonb, state: active|deleted, gate0_status, gate0_reason)`; ekler 04'teki `attachments` tablosunda (`source_item_id` ile).
 - `sync_runs(id, data_source_id, layer: raw|silver|gold, mode: full|delta, started_at, ended_at, status, listed, added, updated, deleted, skipped, reused, errors jsonb, count_before, count_after, prune_decision)` (PayCore düzeltmesi D3, D4)
 - `sync_state(data_source_id, layer, cursor, completed_at)`: her katmanın kendi ilerleme işareti; önceki bitmeden sonraki koşmaz. (PayCore düzeltmesi D3)
