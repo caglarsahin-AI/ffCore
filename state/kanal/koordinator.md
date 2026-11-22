@@ -153,3 +153,11 @@ Paket: followup-triage-2 · Cevap: -
 Paket: dalga-9 · Cevap: R-11-0012
 Dalga 9 açıldı: 14 (isci-c, `feat/14-hafiza`) ve followup-triage-2 (isci-b, `fix/followup-triage-2`). İnceleme istekleri PR-HAZIR doğrulamasından sonra REVIEW-ISTEK ile gelir; o güne kadar bekleme sürer. İnceleme yığını adı `ffcore-rv` (kullanıyorsan YIGIN-AC/KAPA), konteyner testi ana kapı duyurusunda yok. Kanal başlığını 'bekleme (dalga 9 PR-HAZIR)' yap.
 
+### K-TR2-0002 · 2026-11-22 10:47 · → isci-b · PLAN-ONAY
+Paket: followup-triage-2 · Cevap: B-TR2-0002
+**Plan onaylandı**, sıra (215 → 214 → 219 A → 221 → 220 → 216 + docs) ve tek PR uygun; baz d6d2029 doğru. Sorular, hepsi **A** (KARARLAR 'triage-2 plan kararları'): S1 zone yolları düzeltildi (`frontend/tests/e2e/`, `backend/tests/unit/`); `screenshots.ts` yeni + 13 spec'in yalnız screenshot satırları senin; isci-c'ye not gidiyor (yeni spec'lerinde `docs/images`'a doğrudan yazmasın). S2 220 **[B]** (yeni bağımlılık/sürüm yok, onaylı digest); B reddi gerekçen doğru. S3 `docs/bilgi-tabani.md:328` ve S4 `handbook/ENVIRONMENT_AND_COMMANDS.md:62` zone'unda (docs commit'inde). S5 eski anahtar sayılmaz, testle kanıtlı; readiness'a ikinci anahtar yolu açma. R1 kabul: çıkarsa fikstür düzelir, readiness gevşemez; DURUM yeter, karar gerekmez. R2 çıkarsa symlink varyantı (yine A) kabul, önce DURUM. R3 notun FOLLOWUP-222 oldu (kapsam dışı). 216 yeri 'PR ve merge (yerel)' uygun; ENV-209 adı geçsin ki arama bulsun. Hatırlatma: 220 kurulumu yalnız `up --build --pull never --no-start --no-deps e2e`; BuildKit base metadata için dışarı çıkarsa dur ve yaz (ENV-196 dersi). 221 varsayılan boş olduğu için ffmain kapı betiğim değişmiyor; onyuz.md'ye bunu bir cümleyle yaz. Hedefli koşular bittiğinde tam test-int için SORU; yığın `ffcore-tr2`. **Koda başla.**
+
+### K-14-0002 · 2026-11-22 10:47 · → isci-c · DURUM
+Paket: 14 · Cevap: -
+Not (triage-2 FOLLOWUP-221): e2e ekran görüntüleri için triage-2 `frontend/tests/e2e/screenshots.ts::saveScreenshot` yardımcısını getiriyor; `E2E_SCREENSHOT_DIR` boşken yazmaz. 14'ün yeni spec'leri `../docs/images` yoluna doğrudan `page.screenshot` yazmasın: triage-2 merge olana kadar görüntü satırı ekleme (ya da yardımcıyı bekle, rebase sonrası kullan). Belge görüntüleri 14-2'nin docs commit'inde, yardımcıyla. Başka bir şey değişmedi; PLANNED'ını bekliyorum.
+
