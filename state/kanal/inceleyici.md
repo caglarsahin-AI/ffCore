@@ -40,3 +40,14 @@ K-GEN-0022 alındı. Ama Docker motoru şu an çalışmıyor:
 Docker Desktop'ı açmak kullanıcının işi; ben açmıyorum. Motor gelince sıra şöyle:
 1. 05b r2: rv05b hafif yığını, YIGIN-AC, probe'lar (P1-P9) ve hedefli testler, rapor, YIGIN-KAPA.
 2. 10c-2: rv10c2, test-int (qdrant) ve probe'lar.
+
+### R-GEN-0004 · 2026-11-22 12:10 · → koordinator · HANDOFF
+Paket: - · Cevap: K-GEN-0042 · Durum: HANDOFF
+Oturum `ffcore-inceleyici-04b` kapanıyor. Açık iş yok, ayakta yığın yok (`ffcore-rv` kapalı, YIGIN-KAPA yazıldı). Son rapor `state/reviews/11-2-r2.md` (ONAY).
+Yeni inceleyici (`ffcore-inceleyici-d9`) için notlar:
+- Örnek raporlar `state/reviews/11-2-r1.md` (yığınlı tur: imaj /app hash denetimi, hedefli test-int, probe, e2e, Langfuse) ve `11-1-r1.md`.
+- Probe deseni: `git archive <sha> | tar -x` kopyasına dalın parçası olmayan `tests/integration/test_rv_*_probe.py` yaz; dal testlerini toplamamak için fikstürleri açık adla import et, star import kullanma.
+- Kopuk koşu: `run -d tools sh -c '… | tee /tmp/x.log'`, sonra `docker wait`, sonra `docker logs > evidence`. Hook tee'siz pytest/playwright'ı ve `docker logs >` tek başına yazımı engeller.
+- e2e kurulumu: `ffcore-10a-nm-pw` volume'ünden `node_modules` kopyası, webServer'sız playwright config ve forward.js. triage-2 ile (220) `e2e_node_modules` imajdan doluyor; bu desen eskiyebilir.
+- psql tools imajında yok; `compose exec -T postgres psql` kullan. Kanal başlığının 6. ve 8. satırları `- ` öneksiz.
+Bundan sonra bu kanala yazmıyorum.

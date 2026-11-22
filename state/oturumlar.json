@@ -9,7 +9,9 @@
       "rol": "inceleyici",
       "paket": "10c-1",
       "lease": "ffcore-inceleyici-10c1",
-      "acildi": "2026-11-16T12:30"
+      "acildi": "2026-11-16T12:30",
+      "durum": "RETIRED",
+      "kapandi": "2026-11-22T12:06"
     },
     "local_a8bfcc13-4ea9-436e-a533-6695bea49970": {
       "rol": "isci-a",
