@@ -1,0 +1,40 @@
+HEAD=044c148ee278494a6140a3e7e36ab916a0131c0e stack=ffcore-rv (git archive copy + rv probe file)
+cmd: docker compose -p ffcore-rv --env-file .env.test config -q ; docker compose -p ffcore-rv --env-file .env.test up -d --wait --build --pull never postgres redis sync-worker
+compose config: 0
+ Container ffcore-rv-redis-1  Healthy
+ Container ffcore-rv-migrate-1  Exited
+ Container ffcore-rv-sync-worker-1  Starting
+ Container ffcore-rv-sync-worker-1  Started
+ Container ffcore-rv-postgres-1  Waiting
+ Container ffcore-rv-migrate-1  Waiting
+ Container ffcore-rv-redis-1  Waiting
+ Container ffcore-rv-sync-worker-1  Waiting
+ Container ffcore-rv-redis-1  Healthy
+ Container ffcore-rv-postgres-1  Healthy
+ Container ffcore-rv-migrate-1  Exited
+ Container ffcore-rv-sync-worker-1  Healthy
+up_exit=0
+cmd: docker compose -p ffcore-rv --env-file .env.test --profile tools up --build --pull never --no-start --no-deps tools
+
+ Container ffcore-rv-tools-1  Creating
+ Container ffcore-rv-tools-1  Created
+ffcore-rv-postgres-1 Up 48 seconds (healthy)
+ffcore-rv-redis-1 Up 48 seconds (healthy)
+ffcore-rv-sync-worker-1 Restarting (1) 2 seconds ago
+--- sync-worker: mounts, health key, log tail
+/data/storage rw=true | /data/sources rw=false |  mem=0 ports=map[]
+sync-worker-1  |                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sync-worker-1  |   File "/opt/venv/lib/python3.12/site-packages/arq/utils.py", line 149, in import_string
+sync-worker-1  |     module = import_module(module_path)
+sync-worker-1  |              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+sync-worker-1  |   File "/usr/local/lib/python3.12/importlib/__init__.py", line 90, in import_module
+sync-worker-1  |     return _bootstrap._gcd_import(name[level:], package, level)
+sync-worker-1  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sync-worker-1  |   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+sync-worker-1  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+sync-worker-1  |   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+sync-worker-1  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+sync-worker-1  |   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+sync-worker-1  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+sync-worker-1  |   File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+sync-worker-1  | ModuleNotFoundError: No module named 'ffcore.sources'

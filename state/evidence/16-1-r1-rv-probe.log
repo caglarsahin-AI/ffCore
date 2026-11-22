@@ -1,0 +1,81 @@
+HEAD=044c148ee278494a6140a3e7e36ab916a0131c0e stack=ffcore-rv (git archive copy + rv probe file)
+cmd: tools sh -c 'cd backend && pytest tests/integration/test_rv_16_probe.py -q -s -p no:cacheprovider'
+RV16 S1 root='/etc' -> 400 path_outside_base stored=None
+RV16 S1 root='/' -> 400 path_outside_base stored=None
+RV16 S1 root='../..' -> 400 path_outside_base stored=None
+RV16 S1 root='..' -> 400 path_outside_base stored=None
+RV16 S1 root='paylasim/..' -> 400 path_outside_base stored=None
+RV16 S1 root='paylasim/../..' -> 400 path_outside_base stored=None
+RV16 S1 root='paylasim/../../etc' -> 400 path_outside_base stored=None
+RV16 S1 root='%2e%2e/%2e%2e' -> 422 fs_root_missing stored=None
+RV16 S1 root='..%2f..' -> 422 fs_root_missing stored=None
+RV16 S1 root='~' -> 400 path_outside_base stored=None
+RV16 S1 root='~/x' -> 400 path_outside_base stored=None
+RV16 S1 root='C:\\Windows' -> 400 path_outside_base stored=None
+RV16 S1 root='paylasim\\..\\..' -> 400 path_outside_base stored=None
+RV16 S1 root='kacis' -> 400 path_outside_base stored=None
+RV16 S1 root='icbag' -> 400 path_outside_base stored=None
+RV16 S1 root='paylasim/altbag' -> 400 path_outside_base stored=None
+RV16 S1 root='paylasim/altbag/..' -> 400 path_outside_base stored=None
+RV16 S1 root='./paylasim/./alt' -> 201 None stored='paylasim/alt'
+RV16 S1 root='paylasim//alt' -> 201 None stored='paylasim/alt'
+RV16 S1 root=' paylasim ' -> 201 None stored='paylasim'
+RV16 S1 root='' -> 201 None stored='.'
+RV16 S1 root='.' -> 201 None stored='.'
+RV16 S1 root='yok' -> 422 fs_root_missing stored=None
+RV16 S1 root with NUL -> 400 path_outside_base
+RV16 S1 PATCH root=kacis -> 400 path_outside_base
+RV16 S1 PATCH root=../.. -> 400 path_outside_base
+2026-11-22 17:55:02,946 INFO ffcore.sources source_raw source=d1d7497f-b2a1-4aaf-932f-5965e370bfe0 run=37906f26-fedb-43fb-b3de-7b9e1c65c4ae status=completed listed=6 added=3 updated=0 unchanged=0 deleted=0 skipped=3 errors=3 prune=none
+RV16 S2 raw status=completed listed=6 added=3 skipped=3 errors=[{'code': 'symlink_refused', 'external_id': 'a/icbag.md', 'detail': 'refused while listing'}, {'code': 'path_outside_base', 'external_id': 'a/tek.md', 'detail': 'refused while listing'}, {'code': 'path_outside_base', 'external_id': 'kacis', 'detail': 'refused while listing'}]
+RV16 S2 chunks hold DISARISIR=False HARDLINKSIR=True IYIMARK=True; storage files with DISARISIR=0
+RV16 S2 hard link created=True (a hard link cannot be told from a file)
+RV16 S2 items: [('a/hard.md', None, True), ('a/icbag.md', 'symlink_refused', False), ('a/iyi.md', None, True), ('a/tek.md', 'path_outside_base', False), ('b/ic.md', None, True), ('kacis', 'path_outside_base', False)]
+RV16 S2 root swapped for a symlink: run={'status': 'failed', 'error': 'path_outside_base', 'listed': None}
+RV16 S2 test connection on swapped root: {'reachable': False, 'count': None, 'error_code': 'path_outside_base', 'detail': "root resolves outside FS_SOURCES_BASE (symlink or '..')"}
+2026-11-22 17:55:06,348 INFO ffcore.sources source_raw source=ca025280-ff2e-4191-9252-80e129739f1d run=03ac28e5-52d7-4667-9e38-ba34b237cb12 status=completed listed=1 added=1 updated=0 unchanged=0 deleted=0 skipped=0 errors=0 prune=none
+RV16 S3 other project's developer registers root='.' -> 201
+RV16 S3 other project's developer registers root='paylasim' -> 201
+RV16 S3 other project's developer registers root='paylasim/ik' -> 201
+RV16 S3 other project's developer syncs root '.' -> 202
+2026-11-22 17:55:07,687 INFO ffcore.sources source_raw source=d32e7378-70c2-44a2-8aa0-d98ddb9a5bca run=1267da33-eb88-474c-8331-295f01700070 status=completed listed=1 added=1 updated=0 unchanged=0 deleted=0 skipped=0 errors=0 prune=none
+RV16 S3 developer of the other project lists items: ['paylasim/ik/maas.md']
+RV16 S3 other project's admin finds project A's file text: True
+RV16 S3 other project's developer search -> 200 found=False
+.2026-11-22 17:55:09,446 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-22 17:55:09,506 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-22 17:55:10,631 INFO ffcore.sources source_raw source=f16d5d4c-5b0c-4d1d-9c74-3c06d48a13dd run=d4fa7f47-4df4-47bc-bd0c-8158c09b5d37 status=completed listed=3 added=3 updated=0 unchanged=0 deleted=0 skipped=0 errors=0 prune=none
+RV16 S5 no mapping: analyst sees genel=False gizli=False alt=False | developer gizli=False
+RV16 S5 mapping written, before a sync: analyst sees genel=False gizli=False alt=False | developer gizli=False
+2026-11-22 17:55:11,514 INFO ffcore.sources source_raw source=f16d5d4c-5b0c-4d1d-9c74-3c06d48a13dd run=7b30a816-e06d-4192-b728-c34737360e06 status=completed listed=0 added=0 updated=0 unchanged=0 deleted=0 skipped=0 errors=0 prune=none
+RV16 S5 delta after mapping: listed=0 layers=1
+RV16 S5 folder:/ -> analyst: analyst sees genel=True gizli=True alt=True | developer gizli=True
+RV16 S5 narrowing written, before a sync: analyst sees genel=True gizli=True alt=True | developer gizli=True
+2026-11-22 17:55:12,220 INFO ffcore.sources source_raw source=f16d5d4c-5b0c-4d1d-9c74-3c06d48a13dd run=2c069545-f70f-427f-9fe0-2acb735d3299 status=completed listed=0 added=0 updated=0 unchanged=0 deleted=0 skipped=0 errors=0 prune=none
+RV16 S5 folder:/gizli -> admin: analyst sees genel=True gizli=False alt=False | developer gizli=False
+2026-11-22 17:55:12,627 INFO ffcore.sources source_raw source=f16d5d4c-5b0c-4d1d-9c74-3c06d48a13dd run=e0425dc0-3833-4352-9834-dc2a1a22798a status=completed listed=0 added=0 updated=0 unchanged=0 deleted=0 skipped=0 errors=0 prune=none
+2026-11-22 17:55:12,636 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-22 17:55:12,789 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+RV16 S5 + folder:/gizli/alt -> analyst: analyst sees genel=True gizli=False alt=True | developer gizli=False
+2026-11-22 17:55:12,961 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-22 17:55:13,071 INFO ffcore.sources source_raw source=f16d5d4c-5b0c-4d1d-9c74-3c06d48a13dd run=9a8bd8a4-e2db-4b12-b15d-679888ebdaa6 status=completed listed=0 added=0 updated=0 unchanged=0 deleted=0 skipped=0 errors=0 prune=none
+RV16 S5 only folder:/gizli -> analyst user: analyst sees genel=False gizli=True alt=True | developer gizli=False
+RV16 S5 documents: [('paylasim/genel/a.md', ['admin'], []), ('paylasim/gizli/alt/c.md', [], ['4756262f-c7b0-436d-abf5-4cde95fdbd8a']), ('paylasim/gizli/b.md', [], ['4756262f-c7b0-436d-abf5-4cde95fdbd8a'])]
+2026-11-22 17:55:14,347 INFO ffcore.sources source_raw source=c781ff11-7fca-47ef-a315-32885f33edc4 run=79cc0b44-96a3-40d2-ae2a-d411b4aa59f3 status=completed listed=10 added=10 updated=0 unchanged=0 deleted=0 skipped=0 errors=0 prune=none
+2026-11-22 17:55:15,095 INFO ffcore.sources source_raw source=c781ff11-7fca-47ef-a315-32885f33edc4 run=38d03d4e-d965-498a-9237-aaa34ef8c355 status=completed listed=0 added=0 updated=0 unchanged=0 deleted=0 skipped=0 errors=0 prune=prune_refused
+RV16 S6 emptied share: status=completed prune=prune_refused before=0 after=0 deleted=0 live docs=10
+RV16 S6 prune_refused alerts=0
+RV16 S6 root missing: {'status': 'failed', 'error': 'fs_root_missing', 'prune_decision': None} live docs=10
+2026-11-22 17:55:15,441 INFO ffcore.sources source_raw source=c781ff11-7fca-47ef-a315-32885f33edc4 run=18b14d2b-10a8-405a-97f5-981e8f430a6d status=completed listed=8 added=0 updated=0 unchanged=8 deleted=0 skipped=0 errors=1 prune=prune_failed
+RV16 S6 store fails on the 2nd delete: status=completed prune=prune_failed deleted=0 errors=[{'code': 'prune_failed', 'detail': 'vector store: store_down'}] live docs=10 store calls=2
+RV16 S6 the two doomed documents after the failed prune (filename, status, chunk rows): [('paylasim/d/f08.md', 'indexed', 1), ('paylasim/d/f09.md', 'indexed', 1)]
+RV16 S6 raw cursor rows after the failed prune: 1
+2026-11-22 17:55:15,719 INFO ffcore.sources source_raw source=c781ff11-7fca-47ef-a315-32885f33edc4 run=dfb10c99-1524-43d7-9e5d-420420b60864 status=completed listed=8 added=0 updated=0 unchanged=8 deleted=2 skipped=0 errors=0 prune=forced
+RV16 S6 next forced full: prune=forced deleted=2 live docs=8
+2026-11-22 17:55:18,678 INFO ffcore.sources source_raw source=63096340-7a9b-4354-a5f3-9b6db043b6ff run=ae477f28-f501-4d89-848e-bd90d3467c11 status=completed listed=1 added=1 updated=0 unchanged=0 deleted=0 skipped=0 errors=0 prune=none
+RV16 S8 delete the KB a source feeds -> 204 
+RV16 S8 sync after the KB is gone -> 202 {"id":"66451f7f-553f-4455-b367-c9aa4e503afa","data_source_id":"63096340-7a9b-4354-a5f3-9b6db043b6ff","layer":"raw","mode":"full","trigger":"manual","requested_b
+2026-11-22 17:55:19,020 INFO ffcore.sources source_raw source=63096340-7a9b-4354-a5f3-9b6db043b6ff run=66451f7f-553f-4455-b367-c9aa4e503afa status=completed listed=2 added=1 updated=0 unchanged=1 deleted=0 skipped=0 errors=0 prune=none
+RV16 S8 runs: [{'status': 'completed', 'error': None, 'added': 1, 'errors': []}, {'status': 'completed', 'error': None, 'added': 1, 'errors': []}]
+RV16 S8 source after: 200 status=active last_error=None
+6 passed in 40.04s

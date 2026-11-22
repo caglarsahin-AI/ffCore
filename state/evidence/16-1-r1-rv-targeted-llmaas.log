@@ -1,0 +1,7 @@
+HEAD=044c148ee278494a6140a3e7e36ab916a0131c0e stack=ffcore-rv (git archive copy + rv probe file) DEPLOY_PROFILE=llmaas(.env.test)
+cmd: tools sh -c 'cd backend && pytest tests/unit/test_16_1_fs_driver.py tests/unit/test_16_1_rules.py tests/contract/test_16_openapi.py tests/contract/test_c3_common_columns.py tests/integration/test_16_1_api.py tests/integration/test_16_1_attachments.py tests/integration/test_16_1_migration.py tests/integration/test_16_1_scheduler.py tests/integration/test_16_1_sync.py tests/integration/test_57_alembic_merge.py -q -p no:cacheprovider; ruff check ffcore/sources ffcore/api/sources.py ffcore/knowledge/removal.py; ruff format --check ...'
+........................................................................ [ 65%]
+......................................                                   [100%]
+110 passed in 299.76s (0:04:59)
+All checks passed!
+17 files already formatted

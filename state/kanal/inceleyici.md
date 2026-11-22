@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-inceleyici-d9 (önceki: ffcore-inceleyici-04b; Fable 5.2, dalga 9'dan itibaren)
-Aktif paket: 16-1 r1 (044c148)
+Aktif paket: 14-2 r2 teyidi (bd37a16)
 - Durum: ACTIVE
-Son okunan: koordinator K-16-0010
+Son okunan: koordinator K-14-0029
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/inceleyici-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 335 mesaj); ID ile atıf orada bulunur.
@@ -124,3 +124,27 @@ Paket: 14 · Cevap: R-14-0009 · Yigin: ffcore-rv
 ### R-16-0001 · 2026-11-22 20:47 · → koordinator · ACK
 Paket: 16 · Cevap: K-16-0008, K-16-0010
 16-1 r1 + güvenlik turu isteği alındı (SHA `044c148ee278494a6140a3e7e36ab916a0131c0e`, yedi odak; K-16-0010: `document_from_source` 16-3'ün işi, bulgu sayılmayacak). Önce yığınsız okuma (51 dosya; `sources/**`, `api/sources.py`, göç, `knowledge/removal.py`), ardından `ffcore-rv` için YIGIN-AC (16-1 imajı, hedefli + güvenlik probe'ları; tam test-int yok). Rapor `state/reviews/16-1-r1.md`, güvenlik turu ayrı bölüm.
+
+### R-16-0002 · 2026-11-22 20:52 · → tumu · YIGIN-AC
+Paket: 16 · Cevap: K-16-0008 · Yigin: ffcore-rv
+16-1 r1 + güvenlik turu (SHA `044c148ee278494a6140a3e7e36ab916a0131c0e`) için hafif inceleme yığını: `ffcore-rv` (18540/13540), `git archive 044c148` kopyasından, `--env-file .env.test`, `--pull never`, imaj `0.0.0-rv` 16-1 koduyla yeniden (`up --build --pull never`). Servisler: `postgres`, `redis`, `migrate`, `sync-worker` (başlangıç ve bağlama kontrolü) + `tools` koşuları (16-1 hedefli iki profil, dalda olmayan güvenlik probe'u). Tam yığın, e2e ve tam test-int yok. Açık yığınlar: `ffcore` (kullanıcı) + `ffcore-rv`. Bitince `down -v` + YIGIN-KAPA.
+
+### R-16-0003 · 2026-11-22 21:11 · → koordinator · REVIEW-SONUC
+Paket: 16 · Cevap: K-16-0008 · SHA: 044c148ee278494a6140a3e7e36ab916a0131c0e · Sonuc: DEGISIKLIK · Bulgu: B0 M1 m2 N8
+16-1 r1 + güvenlik turu tamam; rapor `state/reviews/16-1-r1.md`, kanıt `state/evidence/16-1-r1-rv-*.log`.
+- **Koşular:** hedefli 110 ×2 profil, ruff 0, güvenlik probe'u 6/6 (gerçek dizin, symlink, hard link), `sync-worker` 16-1 imajıyla ayakta (tik çalışıyor, `/data/sources` salt-okunur, port yok). Tam test-int, `make test`, ölçek testi, 04b silme grubu, `check:api`, smoke ve Qdrant koşulmadı (işçi logları okundu).
+- **MAJOR-1 `fs-kok-proje-siniri-yok` (KARAR-GEREK):** `FS_SOURCES_BASE` kurulum genelinde tek ve kaydı her projenin developer'ı yapabiliyor. Probe S3: B projesinin developer'ı kök `"."` ile kaydedip senkronluyor (201/202), öğe listesinde A'nın `paylasim/ik/maas.md` yolunu görüyor; B'nin admin'i A'nın dosya metnini aramada buluyor. Seçenekler: **A (önerim)** ağ klasörü kaydı ve kök değişikliği superadmin'e (en küçük değişiklik; sağlayıcı ataması deseni); **B** proje başına taban `FS_SOURCES_BASE/<proje>` (dizin düzenini platform dayatır); **C** olduğu gibi + docs uyarısı (sınır operatöre kalır).
+- **Güvenlik turunun kalanı temiz:** 23 kök denemesi (mutlak, `..`, `~`, ters bölü, NUL, dışarı ve içeri symlink, URL-kodlu) kaçamadı; runtime'da dışarı symlink'ler `path_outside_base` ile atlandı, dışarıdaki metin ne parçada ne depoda; kök sonradan symlink'e çevrilince koşu `failed`. Kimlik `secret_encrypted` + `***` + audit maskesi (`config` düz JSONB, kimlik taşımıyor: NOTE-1). ACL: eşlemesiz yalnız admin; iç içe klasör eşlemesi dosya değişmeden bir sonraki koşuda yeniden çözülüyor.
+- **D4:** boşalmış paylaşım `prune_refused` (0 silme), kök yokken `failed`, vektör deposu düşünce `prune_failed` (0 silme, sonraki koşu tamamlıyor).
+- **MINOR-1 `kb-silinince-kaynak-surer`:** beslenen bilgi tabanı silinince (204) kaynak `active` kalıp silinmiş bilgi tabanına belge yazmayı sürdürüyor, hata yok.
+- **MINOR-2 `sync-worker-bellek-siniri-yok`:** `mem_limit` yok; `fetch_raw` dosyayı (≤ 500 MB) belleğe okuyor, `max_jobs=2`.
+- NOTE'lar: hard link ayırt edilemez; eşleme daraltması sonraki koşuya kadar etkisiz; `prune_refused` uyarısı kural ister; eski `mtime` ile kopyalanan dosyayı delta görmez; kayıp `queued` koşu kaynağı kilitler; Qdrant'ta kısmi vektör silme.
+- İnceleme notu: ilk `up`'ta `sync-worker` eski imajla döndü (serviste `build` yok); `backend` yeniden kurulunca düzeldi. Ürün hatası değil; kapı betiklerinde `backend` kurulumunun `sync-worker`'dan önce geldiği teyit edilmeli.
+
+### R-16-0004 · 2026-11-22 21:11 · → tumu · YIGIN-KAPA
+Paket: 16 · Cevap: R-16-0002 · Yigin: ffcore-rv
+`ffcore-rv` `down -v` temiz: konteyner 0, volume 0, ağ 0 (`state/evidence/16-1-r1-rv-down.log`). Açık FF yığını yalnız `ffcore` (kullanıcı). Kalan imaj etiketleri `ffcore/{backend,frontend,tools,e2e}:0.0.0-rv`. Sıradaki: K-14-0029 (14-2 r2 teyidi, yığınsız).
+
+### R-14-0013 · 2026-11-22 21:12 · → tumu · YIGIN-AC
+Paket: 14 · Cevap: K-14-0029 · Yigin: ffcore-rv
+14-2 r2 teyidi alındı (ACK; SHA `bd37a169ecdb0b2f23c5a4581bc8379e2cbe726c`). Servis açılmıyor; yalnız tek konteyner koşusu: `ffcore-rv` `e2e` servisi `--no-deps` ile Vitest (dal + probe), `git archive bd37a16` kopyasından, imaj `ffcore/e2e:0.0.0-rv` (kurulum yok). Koşu `e2e_node_modules` volume'unu açtığı için YIGIN-AC; bitince `down -v` + YIGIN-KAPA. Açık yığın: `ffcore` (kullanıcı).

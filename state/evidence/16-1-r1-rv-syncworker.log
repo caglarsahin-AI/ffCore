@@ -1,0 +1,31 @@
+HEAD=044c148ee278494a6140a3e7e36ab916a0131c0e stack=ffcore-rv
+NOT: ilk up'ta sync-worker eski (14-2) backend imajiyla kalkti: serviste build yok, imaj yalniz backend servisinden kurulur. Duzeltme:
+cmd: docker compose -p ffcore-rv --env-file .env.test up --build --pull never --no-start --no-deps backend ; docker compose -p ffcore-rv --env-file .env.test up -d --wait --pull never --force-recreate migrate sync-worker
+
+ Container ffcore-rv-backend-1  Creating
+ Container ffcore-rv-backend-1  Created
+ Container ffcore-rv-migrate-1  Exited
+ Container ffcore-rv-redis-1  Healthy
+ Container ffcore-rv-postgres-1  Healthy
+ Container ffcore-rv-sync-worker-1  Healthy
+image created 2026-11-22T18:06:43.2364269Z
+ffcore-rv-backend-1 Created
+ffcore-rv-migrate-1 Exited (0) About a minute ago
+ffcore-rv-postgres-1 Up 14 minutes (healthy)
+ffcore-rv-redis-1 Up 14 minutes (healthy)
+ffcore-rv-sync-worker-1 Up About a minute
+ffcore-rv-tools-1 Created
+/data/sources rw=false | /data/storage rw=true |  mem=0 ports=map[8000/tcp:[]] restarts=0
+sync-worker-1  | 18:07:15:   0.10s ← cron:tick_job ● {'abandoned': 0, 'started': []}
+sync-worker-1  | 2026-11-22 18:07:15,523 INFO arq.worker   0.10s ← cron:tick_job ● {'abandoned': 0, 'started': []}
+sync-worker-1  | 18:07:59: recording health: Nov-22 18:07:59 j_complete=1 j_failed=0 j_retried=0 j_ongoing=0 queued=0
+sync-worker-1  | 2026-11-22 18:07:59,025 INFO arq.worker recording health: Nov-22 18:07:59 j_complete=1 j_failed=0 j_retried=0 j_ongoing=0 queued=0
+sync-worker-1  | 18:08:15:   1.00s → cron:tick_job()
+sync-worker-1  | 2026-11-22 18:08:15,570 INFO arq.worker   1.00s → cron:tick_job()
+sync-worker-1  | 18:08:15:   0.01s ← cron:tick_job ● {'abandoned': 0, 'started': []}
+sync-worker-1  | 2026-11-22 18:08:15,575 INFO arq.worker   0.01s ← cron:tick_job ● {'abandoned': 0, 'started': []}
+NOAUTH Authentication required.
+
+touch: cannot touch '/data/sources/x': Read-only file system
+drwxrwxrwx 1 root root 0 Nov 22 17:53 /data/sources
+10001
