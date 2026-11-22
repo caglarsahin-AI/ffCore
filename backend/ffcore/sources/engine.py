@@ -42,7 +42,7 @@ from ffcore.knowledge import ingest, raw_staging, removal
 from ffcore.knowledge.jobs import JobQueue
 from ffcore.knowledge.vectorstore.base import VectorStore, VectorStoreError
 from ffcore.models.identity import ProjectMember, User
-from ffcore.models.knowledge import Document
+from ffcore.models.knowledge import Document, KnowledgeBase
 from ffcore.models.sources import (
     AclMapping,
     DataSource,
@@ -226,6 +226,17 @@ async def _begin(run_id: uuid.UUID, layer: str) -> tuple[SyncRun, DataSource]:
     return run, source
 
 
+async def _kb_alive(source: DataSource) -> bool:
+    """16-1 r1 MINOR-1: a run never writes into a deleted knowledge base."""
+    async with db.session_scope() as session:
+        alive = await session.scalar(
+            select(KnowledgeBase.id).where(
+                KnowledgeBase.id == source.kb_id, KnowledgeBase.deleted_at.is_(None)
+            )
+        )
+    return alive is not None
+
+
 async def _cancel_requested(run_id: uuid.UUID) -> bool:
     async with db.session_scope() as session:
         return bool(
@@ -322,6 +333,10 @@ async def run_raw(
     """One raw run (sync worker). Returns the run's counters."""
     run, source = await _begin(run_id, "raw")
     stats = Stats()
+    if not await _kb_alive(source):
+        stats.error(None, "kb_deleted", "the source's knowledge base was deleted")
+        await _finish(run_id, stats, status="failed", error="kb_deleted")
+        return {"status": "failed", "error": "kb_deleted"}
     try:
         driver = make_driver(source, settings, http)
     except SourceError as exc:
@@ -934,6 +949,10 @@ async def run_layer(
         raise SourceError("run_not_queued", f"run {run_id} is not a silver or gold run")
     run, source = await _begin(run_id, layer)
     stats = Stats()
+    if not await _kb_alive(source):
+        stats.error(None, "kb_deleted", "the source's knowledge base was deleted")
+        await _finish(run.id, stats, status="failed", error="kb_deleted")
+        return {"status": "failed", "error": "kb_deleted"}
     try:
         if layer == "gold":
             await _gold(run, source, stats, settings, store, embed_client)

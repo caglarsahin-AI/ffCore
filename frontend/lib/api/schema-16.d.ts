@@ -17,7 +17,7 @@ export interface paths {
         /**
          * Register a data source
          * @description The knowledge base must be in the project. The key is unique among the project's live
-         *     sources (409 data_source_key_taken).
+         *     sources (409 data_source_key_taken). Who may register which kind: sources/policy.py.
          */
         post: operations["create_source_api_v1_projects__project_id__data_sources_post"];
         delete?: never;
@@ -49,6 +49,7 @@ export interface paths {
         /**
          * Update a data source
          * @description Kind, deployment and knowledge base are fixed (register a new source to change them).
+         *     Changing what the source reads (config, credentials) needs its kind's registrar.
          */
         patch: operations["update_source_api_v1_projects__project_id__data_sources__source_id__patch"];
         trace?: never;

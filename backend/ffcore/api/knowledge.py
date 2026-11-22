@@ -55,6 +55,7 @@ from ffcore.knowledge.chunking import ChunkSettings
 from ffcore.knowledge.normalize import normalizer_config_id
 from ffcore.knowledge.vectorstore.base import VectorFilters, VectorStoreError, metadata_items
 from ffcore.models.knowledge import Chunk, Document, KnowledgeBase
+from ffcore.models.sources import DataSource
 from ffcore.runtime import checkpoints
 from ffcore.services import retention
 
@@ -318,6 +319,21 @@ async def delete_knowledge_base(
     resource_id: KbIdDep,
 ) -> None:
     kb = await _kb(session, project_id, kb_id)
+    # 16-1 r1 MINOR-1: a live data source would go on feeding a deleted knowledge base.
+    feeding = await session.scalar(
+        select(func.count())
+        .select_from(DataSource)
+        .where(
+            DataSource.kb_id == kb.id,
+            DataSource.deleted_at.is_(None),
+            DataSource.status == "active",
+        )
+    )
+    if feeding:
+        raise conflict(
+            "knowledge_base_has_sources",
+            f"{feeding} active data sources feed this knowledge base; pause or delete them first.",
+        )
     # Vector store first, for the same reason as delete_document.
     try:
         await jobs.get_vector_store(settings).drop_collection(kb.id)

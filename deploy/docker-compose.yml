@@ -402,6 +402,9 @@ services:
     image: ${REGISTRY_PREFIX}ffcore/backend:${FFCORE_VERSION:?FFCORE_VERSION tanımlı değil}
     command: ["arq", "ffcore.sources.worker.SyncWorkerSettings"]
     restart: unless-stopped
+    # 16-1 r1 MINOR-2: a file is read whole (Kapı 0 limit 500 MB) and hashed in memory, two
+    # jobs at once (a raw run and the tick).
+    mem_limit: ${SYNC_WORKER_MEM_LIMIT:-2g}
     environment:
       <<: *app-env
     volumes:

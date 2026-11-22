@@ -45,7 +45,7 @@ from ffcore.api.sources_schemas import (
     SyncRunOut,
 )
 from ffcore.core.audit import audited
-from ffcore.core.auth import Actor, authorize, require_role
+from ffcore.core.auth import Actor, authorize, require_role, require_superadmin
 from ffcore.core.config import Settings, get_settings
 from ffcore.core.errors import ApiError
 from ffcore.core.secrets import decrypt_json, encrypt_json
@@ -59,7 +59,7 @@ from ffcore.models.sources import (
     SourceItem,
     SyncRun,
 )
-from ffcore.sources import engine, paths, registry, scheduler
+from ffcore.sources import engine, paths, policy, registry, scheduler
 from ffcore.sources.base import SourceError
 from ffcore.sources.schedule import Schedule
 
@@ -73,6 +73,11 @@ Reader = Annotated[Actor, Depends(require_role("developer"))]
 Editor = Annotated[Actor, Depends(require_role("developer", write=True))]
 Admin = Annotated[Actor, Depends(require_role("admin", write=True))]
 FORCE_PRUNE = require_role("admin", write=True)
+# 16-1 r1 MAJOR-1 (A): who registers each kind and changes what it reads (sources/policy.py).
+REGISTRARS = {
+    policy.SUPERADMIN: require_superadmin(write=True),
+    policy.PROJECT_ADMIN: require_role("admin", write=True),
+}
 SettingsDep = Annotated[Settings, Depends(get_settings)]
 SourceIdDep = Annotated[str, Depends(path_resource("source_id"))]
 MASK = "***"
@@ -91,6 +96,30 @@ def sync_queue_dependency(settings: SettingsDep):
 
 IngestQueueDep = Annotated[jobs.JobQueue, Depends(ingest_queue_dependency)]
 SyncQueueDep = Annotated[object, Depends(sync_queue_dependency)]
+
+
+async def _require_registrar(request: Request, actor: Actor, project_id, kind: str) -> None:
+    """A network folder is the installation's (one FS_SOURCES_BASE for every project): only the
+    superadmin registers it or changes its root/filters (403 fs_source_superadmin_only). The
+    other kinds bring the project's own credentials: the project admin. The refusal is the
+    audit row's `denied` outcome (authorize records its reason)."""
+    rule = policy.registrar(kind)
+    scope = None if rule == policy.SUPERADMIN else str(project_id)
+    try:
+        await authorize(request, actor, scope, REGISTRARS[rule])
+    except ApiError as exc:
+        if rule != policy.SUPERADMIN or exc.status_code != 403:
+            raise
+        error = ApiError(
+            403,
+            "permission_error",
+            "fs_source_superadmin_only",
+            "A network folder is shared by the whole installation: its source and its root or "
+            "filters are set by a superadmin.",
+        )
+        if getattr(exc, "audit_detail", None) is not None:
+            error.audit_detail = exc.audit_detail
+        raise error from None
 
 
 def _source_error(exc: SourceError) -> ApiError:
@@ -233,7 +262,8 @@ async def create_source(
     settings: SettingsDep,
 ):
     """The knowledge base must be in the project. The key is unique among the project's live
-    sources (409 data_source_key_taken)."""
+    sources (409 data_source_key_taken). Who may register which kind: sources/policy.py."""
+    await _require_registrar(request, actor, project_id, body.kind.value)
     kb = await session.scalar(
         select(KnowledgeBase).where(
             KnowledgeBase.id == body.kb_id,
@@ -291,8 +321,11 @@ async def update_source(
     session: SessionDep,
     settings: SettingsDep,
 ):
-    """Kind, deployment and knowledge base are fixed (register a new source to change them)."""
+    """Kind, deployment and knowledge base are fixed (register a new source to change them).
+    Changing what the source reads (config, credentials) needs its kind's registrar."""
     source = await _source(session, project_id, source_id)
+    if policy.config_change_needs_registrar(body.model_dump()):
+        await _require_registrar(request, actor, project_id, source.kind)
     if body.config is not None or body.secret is not None:
         stored = decrypt_json(source.secret_encrypted, settings) if source.secret_encrypted else {}
         secret = stored
