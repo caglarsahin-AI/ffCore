@@ -101,6 +101,15 @@ python -m ffcore.cli ingest-raw --project <p> --kb <kb> --raw-dir <tree, read-on
   and chunks per filter the documents carry), `text_filter_mismatch` and `raw_manifest_sha256`.
 - Deleting a document keeps raw and silver files (FOLLOWUP-133).
 
+## Fed by a data source (package 16)
+
+A knowledge base can also be fed by data sources (network folder; Confluence, Jira and SharePoint
+follow): their items enter through the same pipeline (`ingest_from_raw`, C6), named
+`<source key>/<item id>` and carrying `metadata.source`, `source_item_id` and `source_url`.
+`make sync … LAYER=silver|gold` reprocesses one source's documents only; `make reindex` still
+covers the whole knowledge base. Permissions, schedules and the safe delete rule:
+docs/veri-kaynaklari.md.
+
 ## Conversion
 
 The first bytes decide, the extension only breaks ties: an MHTML web archive saved as `.doc` is

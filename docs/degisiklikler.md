@@ -4,6 +4,27 @@ Behaviour and configuration changes that a deployment or an API client notices, 
 (handbook/RELEASE_AND_ROLLBACK.md, CHANGE_CONTROL.md). Each entry names the package and what to do,
 if anything.
 
+## 2026-11-22 · 16-1 · Data sources: core and network folder
+
+- **What:** a knowledge base can be fed from a live source on a schedule instead of uploads
+  (docs/veri-kaynaklari.md). 16-1 ships the core (three layers raw/silver/gold, the safe delete
+  rule, Kapı 0 for attachments before download, permission mapping) and the **network folder**
+  source; Confluence/Jira come in 16-2, SharePoint and the console screen in 16-3.
+- **New service:** `sync-worker` (backend image, queue `sync`, C10) runs the raw layer and a
+  minute tick for schedules. The ingest `worker` gains `source_layer_job` (silver, gold). Both
+  start with the stack; no port is published.
+- **Settings and volumes:** `FS_SOURCES_HOST_DIR` (host directory, mounted read-only at
+  `/data/sources` in backend and sync-worker), `FS_SOURCES_BASE`, `PRUNE_MAX_RATIO` (0.2),
+  `ATTACHMENT_MIN_DATE` (empty = no rule), `ARQ_QUEUE_SYNC` (`sync`). Defaults work unchanged.
+- **API (additive, `backend/openapi/16.yaml`):** `…/data-sources` (register, test, sync, runs,
+  items, ACL mappings). New alert kind with an emitter: `prune_refused` (rules for it can be
+  created now). `make sync PROJECT= SOURCE= LAYER= MODE=` queues a run.
+- **Migration:** `16_0001` adds six tables (`data_sources`, `source_items`, `source_attachments`,
+  `sync_runs`, `source_sync_state`, `acl_mappings`); nothing existing changes.
+- **Unchanged behaviour, one code path:** deleting a document (`DELETE …/documents/{id}`) runs
+  the same removal steps as before from `knowledge/removal.py`, which a source's safe delete
+  uses too.
+
 ## 2026-11-22 · 14-2 · User memory screens
 
 - **What:** the member's **My memory** page (`/memory`: list, edit, delete, delete all, remember
