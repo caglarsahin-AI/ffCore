@@ -274,3 +274,27 @@ def test_16_1_credentials_are_masked_everywhere(src_world, secret_driver, pg, ca
     )
     assert refused.status_code == 422 and error_code(refused) == "source_kind_unavailable"
     assert TOKEN not in refused.text
+
+
+def test_16_1_read_mode_get_parity(src_world, make_user, client_factory):
+    """Read access sees exactly what edit access sees (03a rule) on every data source GET,
+    masked credentials included; test_03a_2 exempts these single-source routes."""
+    w = src_world
+    write_tree(w["root"], {"a.md": "# A\n\nmetin"})
+    source = create_fs_source(w)
+    run = sync(w, source["id"])
+    drain(w)
+    _, email = make_user(memberships={w["project"]: ("admin", "read")})
+    read = client_factory(email)
+    base = sources_url(w, f"/{source['id']}")
+    for url in (
+        sources_url(w),
+        base,
+        base + "/runs",
+        base + f"/runs/{run['id']}",
+        base + "/items",
+        base + "/acl-mappings",
+    ):
+        edit_answer, read_answer = w["admin"].get(url), read.get(url)
+        assert edit_answer.status_code == 200, (url, edit_answer.text)
+        assert (read_answer.status_code, read_answer.content) == (200, edit_answer.content), url
