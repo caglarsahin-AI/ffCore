@@ -50,11 +50,11 @@ from ffcore.core.audit import audited
 from ffcore.core.auth import ROLE_ORDER, Actor, authorize, require_role
 from ffcore.core.config import Settings, get_settings
 from ffcore.core.errors import ApiError
-from ffcore.knowledge import ingest, jobs, report, search, thresholds
+from ffcore.knowledge import ingest, jobs, removal, report, search, thresholds
 from ffcore.knowledge.chunking import ChunkSettings
 from ffcore.knowledge.normalize import normalizer_config_id
 from ffcore.knowledge.vectorstore.base import VectorFilters, VectorStoreError, metadata_items
-from ffcore.models.knowledge import Attachment, Chunk, Document, KnowledgeBase
+from ffcore.models.knowledge import Chunk, Document, KnowledgeBase
 from ffcore.runtime import checkpoints
 from ffcore.services import retention
 
@@ -335,7 +335,7 @@ async def delete_knowledge_base(
     document_ids = deleted.all()
     await checkpoints.mark_document_runs(session, document_ids)
     await retention.clear_document_content(session, document_ids)
-    await _remove_silver(session, document_ids)
+    await removal.remove_silver(session, document_ids)
 
 
 @router.get("/{kb_id}/documents", response_model=DocumentList)
@@ -577,26 +577,6 @@ def _acl_update(document: Document, acl: dict) -> tuple[list[str], list[UUID]]:
     return roles, users
 
 
-async def _remove_silver(session, document_ids: list[UUID]) -> None:
-    """FOLLOWUP-133: silver and text_raw of deleted documents (and their attachments) go;
-    raw stays (D3). Called last, after every database change of the request."""
-    if not document_ids:
-        return
-    documents = list(
-        (await session.scalars(select(Document).where(Document.id.in_(document_ids)))).all()
-    )
-    attachments = (
-        await session.scalars(
-            select(Attachment.silver_path).where(Attachment.document_id.in_(document_ids))
-        )
-    ).all()
-    paths = [d.silver_path for d in documents] + list(attachments)
-    for document in documents:
-        document.silver_path = None
-    await session.flush()
-    await asyncio.to_thread(ingest.remove_silver, paths)
-
-
 @router.get("/{kb_id}/ingest-report", response_model=IngestGateReport)
 async def ingest_report(
     project_id: UUID,
@@ -655,20 +635,13 @@ async def delete_document(
 ) -> None:
     """Soft delete: the document leaves search at once (chunks removed); raw stays (D3)."""
     document = await _managed_document(request, actor, session, project_id, kb_id, document_id)
-    # Vector store first: the pgvector driver writes chunks in its own session, which would wait
-    # forever on rows this request already deleted (and Qdrant must not keep points of a
-    # document that is gone). A store failure leaves the document as it was (503).
+    # One removal order for every caller (knowledge/removal.py): the vector store first, a
+    # store failure leaves the document as it was (503); then rows, runs, retention, silver.
     try:
-        await jobs.get_vector_store(settings).delete_by_document(document.id)
+        await removal.remove_vectors(jobs.get_vector_store(settings), [document.id])
     except VectorStoreError as exc:
         raise _vector_error(exc) from None
-    document.deleted_at = func.now()
-    await session.execute(Chunk.__table__.delete().where(Chunk.document_id == document.id))
-    # Live runs that showed this document end source_deleted (FOLLOWUP-116); finished ones lose
-    # the text they kept, in the same transaction (03c, FOLLOWUP-119).
-    await checkpoints.mark_document_runs(session, [document.id])
-    await retention.clear_document_content(session, [document.id])
-    await _remove_silver(session, [document.id])
+    await removal.remove_rows(session, [document.id])
 
 
 @router.post(

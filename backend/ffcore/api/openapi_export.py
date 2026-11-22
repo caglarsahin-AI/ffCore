@@ -80,6 +80,13 @@ PACKAGES = {
         "(package 14).",
         "tags": {"memories", "memories-internal"},
     },
+    "16": {
+        "version": "0.16",
+        "description": "Data sources: register a network folder (later Confluence, Jira, "
+        "SharePoint), test it, start raw/silver/gold sync runs, follow runs and items, and map "
+        "source groups to roles or users (package 16).",
+        "tags": {"data-sources"},
+    },
 }
 
 

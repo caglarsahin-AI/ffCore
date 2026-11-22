@@ -21,6 +21,8 @@ const SPECS = [
   { backend: "../backend/openapi/05b.yaml", copy: null, types: "lib/api/schema-05b.d.ts" },
   // 14: user memory (the chat's memory page and notes, the agent wizard's Memory tab).
   { backend: "../backend/openapi/14.yaml", copy: null, types: "lib/api/schema-14.d.ts" },
+  // 16: data sources (the console's Data sources screen, 16-3).
+  { backend: "../backend/openapi/16.yaml", copy: null, types: "lib/api/schema-16.d.ts" },
 ];
 
 const problems = [];

@@ -3,7 +3,7 @@
 # Servisleri başlatma/durdurma doğrudan compose ile: docker compose up -d --wait | down | logs -f
 # Önyüz lint'i ayrı konteynerde: docker compose run --rm frontend npm run lint
 
-.PHONY: lint format test test-samples test-int seed e2e eval test-models test-ner-latency models models-check smoke pull seed-models render-litellm reindex langfuse-init seed-prompts seed-sql-demo seed-sql-context seed-eval reconvert migrate-vectors preflight egress-list
+.PHONY: lint format test test-samples test-int seed e2e eval test-models test-ner-latency models models-check smoke pull seed-models render-litellm reindex langfuse-init seed-prompts seed-sql-demo seed-sql-context seed-eval reconvert sync migrate-vectors preflight egress-list
 
 lint:
 	ruff check backend scripts data/samples/scripts services tests/deploy
@@ -66,6 +66,13 @@ egress-list:
 # the source (D3); the worker logs reused=N embedded=M.
 reindex:
 	cd backend && python -m ffcore.cli reindex --project $(PROJECT) --kb $(KB) --layer $(LAYER) $(if $(FULL),--full,)
+
+# 16: make sync PROJECT=<key> SOURCE=<key> LAYER=raw|silver|gold MODE=full|delta [FORCE_PRUNE=1].
+# raw asks the source (then silver for what changed); silver and gold never do. The run is queued
+# for the sync or ingest worker; the command prints the run id and waits for nothing.
+sync:
+	@test -n "$(PROJECT)" -a -n "$(SOURCE)" -a -n "$(LAYER)" -a -n "$(MODE)" || (echo "usage: make sync PROJECT=<key> SOURCE=<key> LAYER=raw|silver|gold MODE=full|delta [FORCE_PRUNE=1]" >&2; exit 2)
+	cd backend && python -m ffcore.sources.cli sync --project $(PROJECT) --source $(SOURCE) --layer $(LAYER) --mode $(MODE) $(if $(FORCE_PRUNE),--force-prune,)
 
 # 04b: make reconvert PROJECT=<key> KB=<key> PRESET=encoding|timeout|mhtml|engine:<name>.
 # Only the documents that problem hit are reconverted from raw (pipeline step 10).

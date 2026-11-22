@@ -84,6 +84,8 @@ RESERVED_HOSTS = frozenset(
         "postgres",
         "qdrant",
         "redis",
+        # 16: the sync worker (raw layer of data sources).
+        "sync-worker",
         "tls-proxy",
         "ticket-desk",
         "vllm",

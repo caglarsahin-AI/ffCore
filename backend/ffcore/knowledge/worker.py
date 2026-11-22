@@ -89,8 +89,22 @@ def _redis_settings():
     return RedisSettings.from_dsn(url.get_secret_value())
 
 
+async def source_layer_job(ctx, run_id: str) -> dict:
+    """16 (additive): a data source's silver or gold run; conversion in this worker's pool."""
+    from ffcore.sources import engine
+
+    await engine.wait_for_run(ctx, uuid.UUID(run_id))
+    settings = get_settings()
+    return await engine.run_layer(
+        uuid.UUID(run_id),
+        settings=settings,
+        store=get_vector_store(settings),
+        embed_client=ingest.HttpEmbedClient(settings),
+    )
+
+
 class WorkerSettings:
-    functions = [ingest_document_job, reindex_job]
+    functions = [ingest_document_job, reindex_job, source_layer_job]
     on_startup = startup
     queue_name = get_settings().arq_queue_ingest
     # One document at a time per worker: conversion already runs in its own process pool.
