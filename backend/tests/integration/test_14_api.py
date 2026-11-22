@@ -308,8 +308,9 @@ def test_14_r2_no_ner_after_turning_on_is_a_coded_refusal(members, monkeypatch):
     assert [i["text"] for i in client.get(url(project_id)).json()["items"]] == [item["text"]]
 
 
-def test_14_r2_new_item_at_the_limit_stays_active(make_project, make_user, client_factory, pg,
-                                                  memory_settings, set_ner):
+def test_14_r2_new_item_at_the_limit_stays_active(
+    make_project, make_user, client_factory, pg, memory_settings, set_ner
+):
     """MAJOR-1 (P1): limit 2, both old items used: the new item is active, the least used old
     one is archived."""
     project_id = make_project()
@@ -339,7 +340,8 @@ def test_14_r2_refused_text_leaves_no_preview(members, pg):
     response = remember(users["ayse"][1], project_id, f"KIRMIZIBALIK notu: TC {TC}.")
     assert response.status_code == 400
     previews = pg.execute(
-        "SELECT input_preview FROM guardrail_events WHERE project_id = %s AND policy_key = 'memory'",
+        "SELECT input_preview FROM guardrail_events"
+        " WHERE project_id = %s AND policy_key = 'memory'",
         (project_id,),
     ).fetchall()
     assert previews and all(p == "" for (p,) in previews)
@@ -376,5 +378,6 @@ def test_14_r2_status_values_are_active_and_archived(members, pg, memory_setting
     user_id = users["ayse"][0]
     insert_item(pg, memory_settings, project_id, user_id, "Raporları sabah isterim.")
     with pytest.raises(Exception, match="status"):
-        pg.execute("UPDATE memories SET status = 'deleted_by_user' WHERE project_id = %s",
-                   (project_id,))
+        pg.execute(
+            "UPDATE memories SET status = 'deleted_by_user' WHERE project_id = %s", (project_id,)
+        )

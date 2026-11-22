@@ -201,3 +201,12 @@ def test_14_r2_transport_error_is_memory_unavailable(monkeypatch, auth):
 def test_14_r2_off_memory_answers_without_a_call():
     found = asyncio.run(recall.OffMemory("off").recall("Soru", 300))
     assert (found.off_reason, found.items, found.dropped) == ("off", [], [])
+
+
+def test_14_r2_coded_refusal_of_the_api_is_passed_on(monkeypatch, auth):
+    """MINOR-1: a 422 of the internal routes (no NER) keeps its code in the job's outcome."""
+    body = {"error": {"code": "memory_requires_ner", "message": "no NER"}}
+    monkeypatch.setattr(recall, "SafeOutboundClient", _client(422, body, []))
+    with pytest.raises(ApiError) as raised:
+        asyncio.run(_memory().write([]))
+    assert (raised.value.status_code, raised.value.code) == (422, "memory_requires_ner")

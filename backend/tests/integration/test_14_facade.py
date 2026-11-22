@@ -12,8 +12,7 @@ from tests.integration.memory_fixtures import *  # noqa: F403 - fixtures
 from tests.integration.memory_support import DirectMemory, enable
 from tests.integration.runs_fixtures import *  # noqa: F403 - fixtures
 from tests.integration.runs_fixtures import InlineQueue, publish
-from tests.integration.runtime_support import run_row
-from tests.integration.runtime_support import Ports, ScriptedModel, definition, turn
+from tests.integration.runtime_support import Ports, ScriptedModel, definition, run_row, turn
 
 
 class _Queue:
@@ -44,14 +43,14 @@ def test_14_r2_facade_run_with_a_long_message_recalls_within_the_limit(
     use_queue(
         InlineQueue(
             harness,
-            Ports(ScriptedModel(turn("Tamam.")), memory=DirectMemory.for_run(memory_settings, ports)),
+            Ports(
+                ScriptedModel(turn("Tamam.")), memory=DirectMemory.for_run(memory_settings, ports)
+            ),
         )
     )
     question = "uzun soru " * (RUN_INPUT_MAX // 10 + 50)
     assert len(question) > RUN_INPUT_MAX
-    response = facade(key).chat(
-        f"agent:{project_key(pg, project)}/asistan", question, user=email
-    )
+    response = facade(key).chat(f"agent:{project_key(pg, project)}/asistan", question, user=email)
     assert response.status_code == 200, response.text
     row = run_row(pg, response.headers["X-Run-Id"])
     assert row["user_id"] == user_id and row["status"] == "completed"
