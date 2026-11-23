@@ -1187,6 +1187,8 @@ export interface components {
             last_login_at?: string | null;
             /** Must Change Password */
             must_change_password?: boolean;
+            /** Temporary Password */
+            temporary_password?: string | null;
         };
         /** UserUpdate */
         UserUpdate: {
@@ -1199,10 +1201,10 @@ export interface components {
             superadmin_access?: components["schemas"]["AccessMode"] | null;
             /**
              * Auth Source
-             * @description Link this local account to the directory (ldap or oidc). Its password is deleted; it then signs in only with the organisation account.
+             * @description ldap or oidc: link this local account to a configured directory (its password is deleted; it then signs in only with the organisation account). local: take a link back before the first directory sign-in (a temporary password is returned once).
              * @enum {string}
              */
-            auth_source?: "ldap" | "oidc";
+            auth_source?: "ldap" | "oidc" | "local";
         };
     };
     responses: never;

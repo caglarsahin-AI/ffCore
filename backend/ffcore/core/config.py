@@ -278,6 +278,11 @@ class Settings(BaseSettings):
     auto_provision_from_channels: bool = False
     # OIDC accounts with no sign-in for this many days are deactivated by identity_sync.
     oidc_inactive_after_days: int = Field(default=90, gt=0)
+    # identity_sync refuses to deactivate when more than this share of the checked directory
+    # accounts is missing (or all of them are): a moved base or a narrowed service account looks
+    # like everyone left (r2 MAJOR-1; 16's PRUNE_MAX_RATIO pattern). `ffcore.cli identity-sync
+    # --force` overrides it once.
+    identity_sync_max_deactivate_ratio: float = Field(default=0.2, gt=0, le=1)
 
     # --- 03c governance ---
     # Wrong API keys from one client address per minute before 429 too_many_auth_failures.

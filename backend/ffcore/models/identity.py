@@ -34,6 +34,9 @@ AUTH_SOURCES = ("local", "ldap", "oidc")
 EXTERNAL_PROVIDERS = ("ldap", "oidc")
 # 17 (K-17-0002 S2): a manual membership is authoritative; group sync only touches `idp` rows.
 MEMBERSHIP_SOURCES = ("manual", "idp")
+# 17 r2: who switched an account off. identity_sync's own deactivation reopens when the
+# directory shows the account again; an administrator's never does by itself.
+DEACTIVATED_BY = ("identity_sync", "admin")
 # Same pattern as the API schema; enforced in the database too.
 PROJECT_KEY_REGEX = "^[a-z][a-z0-9-]{1,31}$"
 
@@ -58,6 +61,9 @@ class User(Timestamps, Base):
             "(auth_source = 'local') = (password_hash IS NOT NULL)", name="password_only_local"
         ),
         CheckConstraint("NOT is_superadmin OR auth_source = 'local'", name="superadmin_is_local"),
+        CheckConstraint(
+            f"deactivated_by IS NULL OR deactivated_by IN {DEACTIVATED_BY}", name="deactivated_by"
+        ),
         Index(
             "uq_users_external_id_live",
             "auth_source",
@@ -93,6 +99,7 @@ class User(Timestamps, Base):
     last_login_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     # Set by the CSV import (temporary password); the console forces a password change.
     must_change_password: Mapped[bool] = mapped_column(Boolean, server_default=text("false"))
+    deactivated_by: Mapped[str | None] = mapped_column(Text)
 
 
 class Project(Timestamps, Base):

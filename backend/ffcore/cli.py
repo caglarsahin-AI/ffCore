@@ -236,6 +236,16 @@ def build_parser() -> argparse.ArgumentParser:
     seed_eval.add_argument(
         "--without", action="append", default=[], help="leave a scorer out (explicit)"
     )
+    sync = commands.add_parser(
+        "identity-sync",
+        help="run the directory deactivation pass now (17; the daily cron runs it at 04:15)",
+    )
+    sync.add_argument(
+        "--force",
+        action="store_true",
+        help="deactivate even when more than IDENTITY_SYNC_MAX_DEACTIVATE_RATIO of the accounts "
+        "are missing (an operator's decision after checking the directory, docs/kimlik.md)",
+    )
     commands.add_parser(
         "setup-checkpointer",
         help="create the LangGraph checkpoint tables in the checkpoints schema (06a, idempotent)",
@@ -505,6 +515,13 @@ def main(argv: list[str] | None = None) -> int:
             print(f"suite: {'created' if report.suite_created else 'already present'}")
             for note in report.notes:
                 print(f"note: {note}")
+        elif args.command == "identity-sync":
+            from ffcore.core.identity import identity_sync
+
+            outcome = asyncio.run(identity_sync({}, force=args.force))
+            print(f"identity_sync: {outcome} (details in the audit row identity.sync)")
+            if outcome != "ok":
+                return 1
         elif args.command == "setup-checkpointer":
             settings = get_settings()
             if settings.database_url is None:

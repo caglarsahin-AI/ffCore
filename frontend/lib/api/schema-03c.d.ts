@@ -495,7 +495,7 @@ export interface components {
          * AlertKind
          * @enum {string}
          */
-        AlertKind: "budget_threshold" | "service_down" | "ingest_error" | "sync_error" | "prune_refused" | "approval_pending_age" | "guardrail_block_rate" | "quota_warn" | "convert_timeout" | "disk_memory" | "checkpoint_purge_overdue";
+        AlertKind: "budget_threshold" | "service_down" | "ingest_error" | "sync_error" | "prune_refused" | "approval_pending_age" | "guardrail_block_rate" | "quota_warn" | "convert_timeout" | "disk_memory" | "checkpoint_purge_overdue" | "identity_sync_refused";
         /** AlertKinds */
         AlertKinds: {
             /**

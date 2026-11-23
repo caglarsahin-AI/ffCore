@@ -203,6 +203,9 @@ async def change_password(
         raise ApiError(
             400, "invalid_request_error", "invalid_current_password", "Password is incorrect."
         )
+    if body.new_password == body.current_password:
+        # r1 NOTE-3: a temporary password "changed" to itself is not a change.
+        raise ApiError(400, "invalid_request_error", "password_unchanged", "Choose a new password.")
     user.password_hash = hash_password(body.new_password)
     user.must_change_password = False
     user.token_version += 1

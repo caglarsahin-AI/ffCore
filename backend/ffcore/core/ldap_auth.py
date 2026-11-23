@@ -89,6 +89,9 @@ def default_endpoint(settings: Settings) -> LdapEndpoint:
         tls=tls,
         get_info=NONE,
         connect_timeout=settings.ldap_timeout_s,
+        # r2 MINOR-2: no referral is followed (ldap3 defaults to any host): a referred host
+        # would get the credentials without the egress policy or the ldaps rule.
+        allowed_referral_hosts=[],
     )
     return LdapEndpoint(server=server, strategy=SYNC)
 
@@ -200,6 +203,7 @@ class LdapDirectory:
             receive_timeout=self.settings.ldap_timeout_s,
             raise_exceptions=False,
             auto_bind=False,
+            auto_referrals=False,
         )
 
     def _bind(self, user: str, password: str, *, service: bool):
@@ -214,11 +218,11 @@ class LdapDirectory:
             return conn
         code = (conn.result or {}).get("result")
         conn.unbind()
-        if code == 49 and not service:
-            raise InvalidCredentials("bind_failed")
         if service:
             raise ProviderUnavailable("service_bind_failed")
-        raise ProviderUnavailable("directory_error")
+        # r2 MINOR-3: the directory answered for this account (wrong password 49; locked,
+        # expired or disabled 19/50/53 and others): one 401, the code in the audit reason.
+        raise InvalidCredentials("bind_failed" if code == 49 else f"bind_rejected_{code}")
 
     def _service(self):
         return self._bind(
@@ -243,8 +247,12 @@ class LdapDirectory:
         except LDAPException:
             raise ProviderUnavailable("directory_unreachable") from None
         code = (conn.result or {}).get("result")
-        # 0 success, 4 size limit exceeded (more than one match), 32 no such object (empty base)
-        if code not in (0, 4, 32):
+        # r2 MAJOR-1: 32 (no such object) means LDAP_USER_BASE is gone or unreadable, never
+        # "nobody here": a sync must not read it as every account missing.
+        if code == 32:
+            raise ProviderUnavailable("directory_base_missing")
+        # 0 success, 4 size limit exceeded (more than one match)
+        if code not in (0, 4):
             raise ProviderUnavailable("directory_error")
         return [item for item in conn.response or [] if item.get("type") == "searchResEntry"]
 
@@ -297,25 +305,32 @@ class LdapDirectory:
         self._bind(found[0]["dn"], password, service=False).unbind()
         return user
 
-    def _find_one(self, search_filter: str) -> DirectoryUser | None:
+    def _find_one(self, search_filter: str, *, ambiguous_is_error: bool) -> DirectoryUser | None:
         service = self._service()
         try:
             found = self._search(service, search_filter)
         finally:
             service.unbind()
+        if len(found) > 1 and ambiguous_is_error:
+            raise ProviderUnavailable("directory_ambiguous")
         if len(found) != 1:
             return None
         return self._user(found[0])
 
     def _find(self, external_id: str) -> DirectoryUser | None:
+        # Two entries with one id is a broken directory, not a missing account (r2 MAJOR-1).
         attr = self.settings.ldap_id_attr
-        return self._find_one(f"({attr}={_id_filter_value(external_id, attr)})")
+        return self._find_one(
+            f"({attr}={_id_filter_value(external_id, attr)})", ambiguous_is_error=True
+        )
 
     def _find_by_email(self, email: str) -> DirectoryUser | None:
         from ldap3.utils.conv import escape_filter_chars
 
         value = escape_filter_chars(email.strip())
-        return self._find_one(f"(|(mail={value})(userPrincipalName={value}))")
+        return self._find_one(
+            f"(|(mail={value})(userPrincipalName={value}))", ambiguous_is_error=False
+        )
 
     def _probe(self) -> None:
         self._service().unbind()

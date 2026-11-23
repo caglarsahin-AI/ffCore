@@ -141,6 +141,9 @@ class UserOut(BaseModel):
     auth_source: AuthSource = Field(default="local", json_schema_extra=_additive)
     last_login_at: datetime | None = Field(default=None, json_schema_extra=_additive)
     must_change_password: bool = Field(default=False, json_schema_extra=_additive)
+    # 17 r2: only in the answer that takes a directory link back (PATCH auth_source=local);
+    # shown once, never stored in clear or audited.
+    temporary_password: str | None = Field(default=None, json_schema_extra=_additive)
 
 
 class UserCreate(Strict):
@@ -160,10 +163,11 @@ class UserUpdate(Patch):
     superadmin_access: AccessMode | None = Field(default=None)
     # 17 (K-17-0002 S1): link a local account to the directory. The password is removed and
     # every session ends; the next directory sign-in with the same email binds the account.
-    auth_source: Literal["ldap", "oidc"] = Field(
+    auth_source: Literal["ldap", "oidc", "local"] = Field(
         default=None,
-        description="Link this local account to the directory (ldap or oidc). Its password "
-        "is deleted; it then signs in only with the organisation account.",
+        description="ldap or oidc: link this local account to a configured directory (its "
+        "password is deleted; it then signs in only with the organisation account). local: take "
+        "a link back before the first directory sign-in (a temporary password is returned once).",
     )
 
 

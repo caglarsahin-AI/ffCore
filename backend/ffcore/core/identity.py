@@ -22,6 +22,7 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 
 from sqlalchemy import func, select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ffcore.core.audit import AuditEntry, write_event
@@ -152,6 +153,8 @@ async def sign_in(
         # An OIDC account signs in at its provider; the password form never knows it.
         raise invalid_credentials("oidc_account_password_form", "oidc", user.id)
     if user is None and directory is None:
+        # r1 MINOR-1: an unknown email costs one argon2 verification too (03a's timing rule).
+        verify_password(None, password)
         raise invalid_credentials("user_not_found", "local")
     if directory is None:
         # A directory account while LDAP is switched off: not a wrong password, an outage.
@@ -163,6 +166,10 @@ async def sign_in(
     except ProviderUnavailable as exc:
         raise provider_unavailable(exc.reason) from None
     account = await provision(session, found, settings)
+    if not account.is_active and found.active and account.deactivated_by == "identity_sync":
+        # r2 MAJOR-1: the sync's own deactivation ends when the directory accepts the account
+        # again; an administrator's deactivation never reopens by itself.
+        await reactivate(session, account, "directory_sign_in")
     if not account.is_active or not found.active:
         raise _inactive(account)
     diff = await apply_group_mappings(session, account, found.provider, found.groups, settings)
@@ -239,12 +246,20 @@ async def provision(session: AsyncSession, found: DirectoryUser, settings: Setti
                 auth_source=found.provider,
                 external_id=found.external_id,
             )
-            session.add(user)
-            await session.flush()
-            await write_event(
-                session, _system_entry("user_provisioned", user, {"provider": found.provider})
-            )
-            return user
+            try:
+                async with session.begin_nested():
+                    session.add(user)
+                    await session.flush()
+            except IntegrityError:
+                # r1 NOTE-5: a concurrent first sign-in created the same account; use that one.
+                user = await _live_user_by_external_id(session, found.provider, found.external_id)
+                if user is None:
+                    raise
+            else:
+                await write_event(
+                    session, _system_entry("user_provisioned", user, {"provider": found.provider})
+                )
+                return user
     if email and email.lower() != user.email.lower():
         other = await _live_user_by_email(session, email)
         if other is not None and other.id != user.id:
@@ -286,7 +301,9 @@ def normalise_group(provider: str, group: str) -> str:
     return group.lower() if provider == "ldap" else group
 
 
-async def _default_project(session: AsyncSession, settings: Settings) -> uuid.UUID | None:
+async def _default_project(
+    session: AsyncSession, settings: Settings, provider: str
+) -> uuid.UUID | None:
     key = settings.default_project_for_new_users
     if not key:
         return None
@@ -294,21 +311,27 @@ async def _default_project(session: AsyncSession, settings: Settings) -> uuid.UU
         select(Project.id).where(Project.key == key, Project.deleted_at.is_(None))
     )
     if project_id is None:
-        # Fail loud: a configured default that does not exist is a setup error, not "none".
-        raise ApiError(
+        # Fail loud: a configured default that does not exist is a setup error, not "none";
+        # a LoginRefused so the sign-in audit records it (r1 NOTE-7).
+        raise LoginRefused(
             503,
             "api_error",
             "default_project_missing",
             "DEFAULT_PROJECT_FOR_NEW_USERS names a project that does not exist.",
+            reason="default_project_missing",
+            source=provider,
         )
     return project_id
 
 
 def _better(a: tuple[str, str], b: tuple[str, str]) -> tuple[str, str]:
-    """Highest role wins; at the same role edit beats read."""
-    role = max(a[0], b[0], key=ROLE_ORDER.index)
-    access = "edit" if "edit" in (a[1], b[1]) else "read"
-    return role, access
+    """The mapping with the highest role wins with its own access; between mappings of the same
+    role edit beats read (r1 MINOR-5). (admin, read) + (user, edit) is (admin, read): never an
+    access no single mapping gave."""
+    rank_a, rank_b = ROLE_ORDER.index(a[0]), ROLE_ORDER.index(b[0])
+    if rank_a != rank_b:
+        return a if rank_a > rank_b else b
+    return a[0], "edit" if "edit" in (a[1], b[1]) else "read"
 
 
 async def desired_memberships(
@@ -336,7 +359,7 @@ async def desired_memberships(
             desired[project_id] = (
                 (role, access) if current is None else _better(current, (role, access))
             )
-    default = await _default_project(session, settings)
+    default = await _default_project(session, settings, provider)
     if default is not None and default not in desired:
         desired[default] = ("user", "read")
     return desired
@@ -467,14 +490,28 @@ def temporary_password() -> str:
 @dataclass
 class SyncReport:
     checked: int = 0
+    missing: int = 0
     deactivated: list[str] = field(default_factory=list)
+    reactivated: list[str] = field(default_factory=list)
     error: str | None = None
+    forced: bool = False
 
 
 async def deactivate(session: AsyncSession, user: User, reason: str) -> None:
+    """identity_sync's deactivation: marked, so the directory can reopen it (r2 MAJOR-1)."""
     user.is_active = False
+    user.deactivated_by = "identity_sync"
     user.token_version += 1  # every open session drops
     await write_event(session, _system_entry("user_deactivated", user, {"reason": reason}))
+
+
+async def reactivate(session: AsyncSession, user: User, reason: str) -> None:
+    """Only for identity_sync's own deactivation; an administrator's stays (r2 MAJOR-1)."""
+    if user.deactivated_by != "identity_sync":
+        raise ValueError("only an identity_sync deactivation reopens by itself")
+    user.is_active = True
+    user.deactivated_by = None
+    await write_event(session, _system_entry("user_reactivated", user, {"reason": reason}))
 
 
 async def run_identity_sync(
@@ -483,15 +520,23 @@ async def run_identity_sync(
     directory: LdapDirectory | None,
     *,
     now: datetime | None = None,
+    force: bool = False,
 ) -> SyncReport:
-    """Deactivate directory accounts the directory no longer has or has disabled, and OIDC
-    accounts unused for OIDC_INACTIVE_AFTER_DAYS. All directory answers are gathered first: an
-    unreachable directory changes nothing (no partial run). Commits."""
+    """Deactivate directory accounts the directory no longer has or has disabled, reopen the
+    sync's own deactivations the directory shows active again, and deactivate OIDC accounts
+    unused for OIDC_INACTIVE_AFTER_DAYS.
+
+    Every directory answer is gathered first; nothing changes when the directory cannot be
+    asked (missing base, refused search, ambiguous id are errors, not "missing"), or when more
+    than IDENTITY_SYNC_MAX_DEACTIVATE_RATIO of the checked accounts (or all of them) are missing
+    (`identity_sync_refused`, alert of the same kind) unless `force` (the superadmin's CLI).
+    Commits."""
     now = now or datetime.now(UTC)
-    report = SyncReport()
+    report = SyncReport(forced=force)
     decisions: list[tuple[User, str]] = []
+    reopen: list[User] = []
     if directory is not None:
-        users = (
+        active = (
             await session.scalars(
                 select(User).where(
                     User.auth_source == "ldap",
@@ -501,17 +546,39 @@ async def run_identity_sync(
                 )
             )
         ).all()
+        parked = (
+            await session.scalars(
+                select(User).where(
+                    User.auth_source == "ldap",
+                    User.external_id.is_not(None),
+                    User.is_active.is_(False),
+                    User.deactivated_by == "identity_sync",
+                    User.deleted_at.is_(None),
+                )
+            )
+        ).all()
         try:
-            for user in users:
+            for user in active:
                 found = await directory.find(user.external_id)
                 report.checked += 1
                 if found is None:
+                    report.missing += 1
                     decisions.append((user, "directory_missing"))
                 elif not found.active:
                     decisions.append((user, "directory_disabled"))
+            for user in parked:
+                found = await directory.find(user.external_id)
+                if found is not None and found.active:
+                    reopen.append(user)
         except ProviderUnavailable as exc:
             report.error = exc.reason
-            decisions = []
+        if report.error is None and report.missing and not force:
+            share = report.missing / report.checked
+            if (
+                report.missing == report.checked
+                or share > settings.identity_sync_max_deactivate_ratio
+            ):
+                report.error = "identity_sync_refused"
     if report.error is None:
         cutoff = now - timedelta(days=settings.oidc_inactive_after_days)
         idle = (
@@ -529,6 +596,9 @@ async def run_identity_sync(
         for user, reason in decisions:
             await deactivate(session, user, reason)
             report.deactivated.append(str(user.id))
+        for user in reopen:
+            await reactivate(session, user, "identity_sync")
+            report.reactivated.append(str(user.id))
     await write_event(
         session,
         AuditEntry(
@@ -539,26 +609,54 @@ async def run_identity_sync(
             actor_id=SYSTEM_ACTOR,
             after={
                 "checked": report.checked,
+                "missing": report.missing,
                 "deactivated": len(report.deactivated),
+                "reactivated": len(report.reactivated),
+                "forced": report.forced,
+                "max_ratio": settings.identity_sync_max_deactivate_ratio,
                 **({"error": report.error} if report.error else {}),
             },
         ),
     )
     await session.commit()
+    if report.error == "identity_sync_refused":
+        from ffcore.services import alerts
+
+        await alerts.emit(
+            settings,
+            "identity_sync_refused",
+            {
+                "checked": report.checked,
+                "missing": report.missing,
+                "max_ratio": settings.identity_sync_max_deactivate_ratio,
+            },
+            dedupe_key=f"identity_sync_refused:{now.date().isoformat()}",
+            severity="critical",
+        )
     return report
 
 
-async def identity_sync(ctx) -> str:
-    """arq cron (background worker, C9): the daily identity_sync."""
+async def identity_sync(ctx, *, force: bool = False) -> str:
+    """arq cron (background worker, C9): the daily identity_sync; the CLI passes `force`."""
     from ffcore.core import db
     from ffcore.core.config import get_settings
 
     settings = get_settings()
     directory = LdapDirectory(settings) if settings.ldap_enabled else None
     async with db.session_scope() as session:
-        report = await run_identity_sync(session, settings, directory)
+        report = await run_identity_sync(session, settings, directory, force=force)
     if report.error:
-        log.error("identity_sync stopped: directory %s; nothing changed", report.error)
+        log.error(
+            "identity_sync stopped: %s (checked %d, missing %d); nothing changed",
+            report.error,
+            report.checked,
+            report.missing,
+        )
         return "error"
-    log.info("identity_sync: %d checked, %d deactivated", report.checked, len(report.deactivated))
+    log.info(
+        "identity_sync: %d checked, %d deactivated, %d reactivated",
+        report.checked,
+        len(report.deactivated),
+        len(report.reactivated),
+    )
     return "ok"

@@ -18,6 +18,8 @@ from ffcore.api.common import (
 from ffcore.api.schemas import UserCreate, UserList, UserOut, UserUpdate
 from ffcore.core.audit import AuditEntry, audited, request_context, write_event
 from ffcore.core.auth import Actor, require_superadmin
+from ffcore.core.config import Settings, get_settings
+from ffcore.core.identity import temporary_password
 from ffcore.core.passwords import hash_password
 from ffcore.models.identity import User
 
@@ -87,7 +89,12 @@ async def get_user(user_id: UUID, actor: Reader, session: SessionDep):
 @router.patch("/{user_id}", response_model=UserOut, summary="Update a user")
 @audited("update_user", "user", load_before=_before)
 async def update_user(
-    user_id: UUID, body: UserUpdate, request: Request, actor: Writer, session: SessionDep
+    user_id: UUID,
+    body: UserUpdate,
+    request: Request,
+    actor: Writer,
+    session: SessionDep,
+    settings: Annotated[Settings, Depends(get_settings)],
 ):
     user = await _get(session, user_id)
     changes = body.model_dump(exclude_unset=True)
@@ -96,45 +103,102 @@ async def update_user(
     if superadmin and access is None:
         raise invalid("superadmin_access_required", "A superadmin needs an access mode.")
     # 17: a superadmin is always a local account (the recovery account).
-    link = changes.pop("auth_source", None)
-    source = link or user.auth_source
+    target = changes.pop("auth_source", None)
+    source = target or user.auth_source
     if superadmin and source != "local":
         raise invalid("superadmin_must_be_local", "A superadmin must be a local account.")
-    if link is not None and link != user.auth_source:
-        if user.auth_source != "local":
-            raise invalid(
-                "auth_source_change_invalid", "Only a local account can be linked to the directory."
-            )
-        # K-17-0002 S1: the password is deleted and every session ends; the next directory
-        # sign-in with this email binds the account (memberships and history stay).
-        user.auth_source = link
-        user.password_hash = None
-        user.external_id = None
-        user.must_change_password = False
-        user.token_version += 1
-        await write_event(
-            session,
-            AuditEntry(
-                action="user_identity_linked",
-                resource_type="user",
-                outcome="success",
-                actor_type=actor.actor_type,
-                actor_id=actor.actor_id,
-                resource_id=str(user.id),
-                after={"auth_source": link, "password_deleted": True},
-                request_id=request_context(request)[0],
-                ip=request_context(request)[1],
-            ),
-        )
+    temporary = None
+    if target is not None and target != user.auth_source:
+        if target == "local":
+            temporary = await _unlink(session, request, actor, user)
+        else:
+            await _link(session, request, actor, user, target, settings)
     for field, value in changes.items():
         setattr(user, field, value)
     if not superadmin:
         user.superadmin_access = None
     if changes.get("is_active") is False:
         user.token_version += 1  # signed out everywhere
+        user.deactivated_by = "admin"  # 17 r2: never reopened by the directory
+    elif changes.get("is_active") is True:
+        user.deactivated_by = None
     await session.flush()
     await session.refresh(user)
-    return user_out(user)
+    out = user_out(user)
+    if temporary is not None:
+        out.temporary_password = temporary  # this answer only; never stored in clear
+    return out
+
+
+def _provider_configured(target: str, settings: Settings) -> bool:
+    # OIDC arrives with 17-2; until then no account can be linked to it.
+    return settings.ldap_enabled if target == "ldap" else False
+
+
+def _audit(request: Request, actor: Actor, user: User, action: str, after: dict) -> AuditEntry:
+    request_id, ip = request_context(request)
+    return AuditEntry(
+        action=action,
+        resource_type="user",
+        outcome="success",
+        actor_type=actor.actor_type,
+        actor_id=actor.actor_id,
+        resource_id=str(user.id),
+        after=after,
+        request_id=request_id,
+        ip=ip,
+    )
+
+
+async def _link(session, request, actor, user: User, target: str, settings: Settings) -> None:
+    """K-17-0002 S1: the password is deleted and every session ends; the next directory
+    sign-in with this email binds the account (memberships and history stay)."""
+    if user.auth_source != "local":
+        raise invalid(
+            "auth_source_change_invalid", "Only a local account can be linked to the directory."
+        )
+    if not _provider_configured(target, settings):
+        # r1 MINOR-4: a link nobody can complete would leave the account without any sign-in.
+        raise invalid(
+            "identity_provider_not_configured",
+            f"{target} sign-in is not configured on this installation.",
+        )
+    user.auth_source = target
+    user.password_hash = None
+    user.external_id = None
+    user.must_change_password = False
+    user.token_version += 1
+    await write_event(
+        session,
+        _audit(
+            request,
+            actor,
+            user,
+            "user_identity_linked",
+            {"auth_source": target, "password_deleted": True},
+        ),
+    )
+
+
+async def _unlink(session, request, actor, user: User) -> str:
+    """r1 MINOR-4: until the directory has bound the account (no external_id yet) a superadmin
+    can take a link back; the account gets a temporary password it must change. Once bound, the
+    directory owns the identity and there is no way back."""
+    if user.auth_source == "local" or user.external_id is not None:
+        raise invalid(
+            "auth_source_change_invalid",
+            "Only an account linked but not yet signed in through the directory can go back.",
+        )
+    password = temporary_password()
+    previous = user.auth_source
+    user.auth_source = "local"
+    user.password_hash = hash_password(password)
+    user.must_change_password = True
+    user.token_version += 1
+    await write_event(
+        session, _audit(request, actor, user, "user_identity_unlinked", {"from": previous})
+    )
+    return password
 
 
 @router.delete("/{user_id}", status_code=204, summary="Delete a user (soft delete)")

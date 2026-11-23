@@ -32,6 +32,28 @@ depends_on = None
 AUTH_SOURCES = ("local", "ldap", "oidc")
 EXTERNAL_PROVIDERS = ("ldap", "oidc")
 MEMBERSHIP_SOURCES = ("manual", "idp")
+DEACTIVATED_BY = ("identity_sync", "admin")
+# ck_alert_rules_kind: 03c_0002's list (+ 16's prune_refused was already in it) and 17's kind.
+ALERT_KINDS = (
+    "budget_threshold",
+    "service_down",
+    "ingest_error",
+    "sync_error",
+    "prune_refused",
+    "approval_pending_age",
+    "guardrail_block_rate",
+    "quota_warn",
+    "convert_timeout",
+    "disk_memory",
+    "checkpoint_purge_overdue",
+)
+ALERT_KINDS_17 = (*ALERT_KINDS, "identity_sync_refused")
+
+
+def _in(column: str, values) -> str:
+    return f"{column} IN ({', '.join(repr(v) for v in values)})"
+
+
 ASSIGNABLE_ROLES = ("user", "analyst", "admin")
 ACCESS_MODES = ("edit", "read")
 
@@ -45,6 +67,17 @@ def upgrade() -> None:
     op.add_column(
         "users",
         sa.Column("must_change_password", sa.Boolean(), nullable=False, server_default=sa.false()),
+    )
+    op.add_column("users", sa.Column("deactivated_by", sa.Text(), nullable=True))
+    op.create_check_constraint(
+        op.f("ck_users_deactivated_by"),
+        "users",
+        f"deactivated_by IS NULL OR deactivated_by IN {DEACTIVATED_BY}",
+    )
+    # r2: the identity_sync_refused alert kind (additive value of 03c's list).
+    op.drop_constraint(op.f("ck_alert_rules_kind"), "alert_rules", type_="check")
+    op.create_check_constraint(
+        op.f("ck_alert_rules_kind"), "alert_rules", _in("kind", ALERT_KINDS_17)
     )
     op.alter_column("users", "password_hash", existing_type=sa.Text(), nullable=True)
     op.create_check_constraint(
@@ -116,6 +149,18 @@ def downgrade() -> None:
             f"17_0001 downgrade refused: {external} directory account(s) exist; they have no "
             "password and would break password_hash NOT NULL. Delete or convert them first."
         )
+    rules = op.get_bind().scalar(
+        sa.text("SELECT count(*) FROM alert_rules WHERE kind = 'identity_sync_refused'")
+    )
+    if rules:
+        raise RuntimeError(
+            f"17_0001 downgrade refused: {rules} alert rule(s) of kind identity_sync_refused "
+            "exist; delete them first."
+        )
+    op.drop_constraint(op.f("ck_alert_rules_kind"), "alert_rules", type_="check")
+    op.create_check_constraint(op.f("ck_alert_rules_kind"), "alert_rules", _in("kind", ALERT_KINDS))
+    op.drop_constraint(op.f("ck_users_deactivated_by"), "users", type_="check")
+    op.drop_column("users", "deactivated_by")
     op.drop_index("ix_identity_group_mappings_project", table_name="identity_group_mappings")
     op.drop_index("uq_identity_group_mappings_live", table_name="identity_group_mappings")
     op.drop_table("identity_group_mappings")

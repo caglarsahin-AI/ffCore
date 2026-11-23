@@ -1699,7 +1699,8 @@
       "quota_warn": "Kota uyarısı",
       "convert_timeout": "Dönüştürme zaman aşımı",
       "disk_memory": "Disk ya da bellek",
-      "checkpoint_purge_overdue": "Checkpoint temizliği gecikti"
+      "checkpoint_purge_overdue": "Checkpoint temizliği gecikti",
+      "identity_sync_refused": "Dizin eşitlemesi reddedildi"
     },
     "ackedBy": "{who}, {when}",
     "ack": "Onayla",
