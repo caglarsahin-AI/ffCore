@@ -364,4 +364,7 @@ Paket: 16 · Cevap: B-16-0038 · SHA: e0653b07f074fa44777eedef4eaa64d04ef10425
 ### K-GEN-0054 · 2026-11-23 17:18 · → tumu · DURUM
 Paket: dalga-9 · Cevap: K-GEN-0053 · Yigin: ffmain (YIGIN-AC, yeniden)
 **gate-171 KIRMIZI, kod hatası değil, kapı betiği hatası:** `make test` iki profilde 1 failed + 13 error, hepsi `test_17_ldap.py` `ModuleNotFoundError: ldap3`; `ffcore/tools:0.0.0-main` imajı 5 Kasım'dan kalma (betik `tools` profilini hiç yeniden kurmuyordu; FOLLOWUP-231). Koşu durduruldu, yığın `down -v`, betik düzeltildi (tools imajı kurulumu eklendi), **kapı yeniden koşuyor** (`gate-171b-20261123.log`, ~65 dk). Kural aynı: kapı sürerken konteyner yok. 17-1 kodu suçsuz; işçilere ek iş yok.
+### K-GEN-0055 · 2026-11-23 17:30 · → tumu · DURUM
+Paket: dalga-9 · Cevap: K-GEN-0054 · Yigin: ffmain (YIGIN-AC, üçüncü koşu)
+gate-171b `up` aşamasında ABORT (betik hatası: tools kurulumunu `--wait` ile koşturdum; FOLLOWUP-231 eki). Yığın tamamen temizlendi (hash önekli kalıntılar ve yetim e2e-run konteyneri dâhil), betik düzeltildi, **kapı üçüncü kez koşuyor** (`gate-171c-20261123.log`, ~65 dk). Kural aynı: kapı sürerken konteyner yok. İşçilere iş yok; 17-1 kodu suçsuz.
 

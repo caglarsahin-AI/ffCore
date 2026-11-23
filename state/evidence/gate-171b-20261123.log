@@ -1,0 +1,68 @@
+=== gate-171b main 88129d8 HEAD=88129d84aa28b2031e6f5a67b25c628ecdc92765 2026-11-23 17:18:31
+
+=== 17:18:32 hook tests (host py -3.12, FOLLOWUP-212)
+.................................                                        [100%]
+465 passed in 157.52s (0:02:37)
+hooks exit=0
+
+=== 17:21:17 compose config
+config exit=0
+
+=== 17:21:30 compose config egress+tls
+config-egress-tls exit=0
+
+=== 17:21:42 compose config vllm
+config-vllm exit=0
+
+=== 17:21:54 compose config e2e
+config-e2e exit=0
+
+=== 17:22:09 up -d --build --pull never --wait (+ tools image: FOLLOWUP tools profile was never rebuilt by the gate)
+ Container ffmain-tools-1  Starting
+ Container ffmain-tools-1  Started
+ Container ffmain-tools-1  Waiting
+container ffmain-tools-1 exited (0)
+tools-build exit=1
+ Container ffmain-postgres-1  Running
+ Container ffmain-ticket-desk-1  Recreate
+ Container ffmain-redis-1  Running
+ Container ffmain-langfuse-redis-1  Running
+ Container ffmain-litellm-1  Running
+ Container ffmain-fake-llm-1  Recreate
+ Container ffmain-langfuse-worker-1  Running
+ Container ffmain-migrate-1  Recreate
+ Container ffmain-langfuse-web-1  Running
+Error response from daemon: No such container: 630947ea2fd428289c2af92cb171eaa9169667518bc98bed94652256cc9c7253
+up exit=1
+=== migrate logs
+migrate-1  | INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+migrate-1  | INFO  [alembic.runtime.migration] Will assume transactional DDL.
+migrate-1  | model catalog: 2 entries, 0 removed
+migrate-1  | checkpointer tables ready in schema checkpoints
+a22ad4dd1a08_ffmain-ticket-desk-1 Created
+630947ea2fd4_ffmain-migrate-1 Created
+ffmain-qdrant-1 Created
+4c1128df4ee8_ffmain-fake-llm-1 Created
+ffmain-backend-1 Up 9 seconds (health: starting)
+ffmain-migrate-1 Exited (0) 9 seconds ago
+ffmain-tools-1 Exited (0) 2 minutes ago
+ffmain-mcp-sql-1 Up About a minute (healthy)
+ffmain-agent-worker-bg-1 Up About a minute
+ffmain-worker-1 Restarting (1) 30 seconds ago
+ffmain-agent-worker-1 Up About a minute
+ffmain-mcp-search-1 Up About a minute (healthy)
+ffmain-frontend-1 Up About a minute
+ffmain-sync-worker-1 Up 2 minutes
+ffmain-litellm-1 Up 2 minutes (healthy)
+ffmain-langfuse-web-1 Up 2 minutes (healthy)
+ffmain-langfuse-worker-1 Up 2 minutes
+ffmain-ticket-desk-1 Up 3 minutes (healthy)
+ffmain-postgres-1 Up 3 minutes (healthy)
+ffmain-redis-1 Up 3 minutes (healthy)
+ffmain-langfuse-postgres-1 Up 3 minutes (healthy)
+ffmain-fake-llm-1 Exited (137) 3 seconds ago
+ffmain-langfuse-redis-1 Up 3 minutes (healthy)
+ffmain-langfuse-clickhouse-1 Up 3 minutes (healthy)
+ffmain-langfuse-minio-1 Up 3 minutes (healthy)
+ffmain-e2e-1 Created
+=== ABORT: up failed, stack left up for inspection
