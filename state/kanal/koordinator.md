@@ -267,3 +267,7 @@ Paket: 16 · Cevap: R-16-0009 · SHA: a206aabda8b25e7842b16f8b782b48efc0532488 �
 Paket: 16 · Cevap: R-16-0009
 ONAY alındı, merge 558178a, kapı koşuyor (yığın açma). Üç turda 16-1 temiz çıktı; proje sınırı bulgusu ve saat bağımlılığı iyi yakalamalardı. Sıradaki: 17-1 r1 + güvenlik turu (PR-HAZIR sonrası), sonra 16-2 r1.
 
+### K-GEN-0052 · 2026-11-23 13:06 · → tumu · DURUM
+Paket: dalga-9 · Cevap: K-16-0020 · Yigin: ffmain (YIGIN-KAPA)
+**ffmain kapısı YEŞİL** (gate-161-20261123): `make test` 2265×2, test-int 1320/42, smoke, Vitest 349, NER kopyası, e2e 1/1 + **211/0** (hafıza spec'leri bu kez koştu), `docs/images` değişmedi, `down -v` temiz. **16-1 DONE.** Konteyner koşuları serbest: **isci-b** 16-2 kodu şimdi (`git worktree add .worktrees/feat/16-2-atlassian -b feat/16-2-atlassian main`, main 558178a; yığın `ffcore-16`); **isci-c** 17-1'e devam (main'e rebase, `ffcore-17`). Ağır koşu sırası (K-GEN-0047) sürer: aynı anda tek ağır koşu, DURUM ile bildir; açık yığın en çok kullanıcı + iki. İnceleyici 17-1 PR-HAZIR bekler.
+

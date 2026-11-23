@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-isci-b-16 (local_8354774b-cd7a-49fe-93ab-64f1ac4edd1c; önceki lease ffcore-isci-b-triage2 RETIRED K-TR2-0012)
-- Aktif paket: 16 (feat/16-kaynaklar)
+- Aktif paket: 16 (16-1 MERGED 558178a; 16-2 feat/16-2-atlassian kapı yeşilinden sonra)
 - Durum: ACTIVE
-- Son okunan: koordinator K-16-0016
+- Son okunan: koordinator K-16-0020
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/isci-b-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 309 mesaj); ID ile atıf orada bulunur.
@@ -119,3 +119,7 @@ Paket: 16 · Cevap: B-16-0022 · Yigin: ffcore-16
 ### B-16-0024 · 2026-11-23 11:37 · → koordinator · PR-HAZIR
 Paket: 16 · Cevap: K-16-0016 · SHA: a206aabda8b25e7842b16f8b782b48efc0532488
 **PR 16-1 r3** (yalnız test). Delta `d914b47..a206aab` (1 commit). `test_16_1_tick_fails_abandoned_runs` artık kaynağı `manual` kaydeder ve `tick`'e sabit saat verir (bugünün UTC tarihi 01:30 / 08:14 / 23:50, parametrik); terk + günlük dilim devri `test_16_1_tick_abandon_then_the_daily_slot_takes_over` ile sabit (409 `sync_running`). Duvar saati taraması: tik'e giden tek kullanım buydu. Kanıt `16-1-r3-scheduler.log`: eski sürüm 08:3x UTC'de FAILED (409 == 202); yeni dosya 08:31 ve 08:33 UTC'de 6/6 × 2; ruff 0. PR notu `state/pr/16.md` 'PR 16-1 r3'. Tam test-int gerekmez (K-16-0016).
+
+### B-16-0025 · 2026-11-23 11:52 · → koordinator · DURUM
+Paket: 16 · Cevap: K-16-0020 · Durum: PLANNED
+16-1 MERGED (558178a) bilgisi alındı. 16-2: dal `feat/16-2-atlassian` main 558178a'dan **kapı yeşil duyurusundan sonra** açılacak; o zamana kadar konteyner yok. Hazır taslaklar (scratchpad, not dosyası `side-session-notes/.../isci-b-16-2-hazirlik.md`): `storage_format.py` (Markdown'a; plandaki to_html'den sapma, 04'te HTML Docling'e gittiği için), `atlassian.py`, `confluence.py`, `jira.py`, `tests/fakes/fake_atlassian.py`, birim testleri, `data/samples/openapi/jira.yaml`. Dal açılınca sıra: kırmızı testler → kod → test-int (compose `fake-atlassian`) → docs → tam test-int SORU (S4 paylaşılan modül).

@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-c-17
 - Aktif paket: 17 (son kullanıcı açılışı + AD/LDAP/OIDC; dal feat/17-kimlik, worktree .worktrees/feat/17-kimlik)
 - Durum: ACTIVE
-- Son okunan: koordinator K-17-0001, K-GEN-0051; son yazılan C-17-0003 (YIGIN-AC)
+- Son okunan: koordinator K-17-0001, K-GEN-0051; son yazılan C-17-0005 (YIGIN-KAPA)
 - Önceki lease: ffcore-isci-c-14 RETIRED (14 DONE; K-14-0033); ondan önce ffcore-isci-c-11 RETIRED (11 DONE; K-11-0033); ondan önce ffcore-isci-c-10c3 RETIRED (10c-3 MERGED 0a92084; son C-10C3-0009 RETIRED); ondan önce ffcore-isci-c-10c2 RETIRED (10c-2 MERGED b93cd96; son C-10C2-0016 RETIRED); ondan önce ffcore-isci-c-sse RETIRED (fix/10b-sse-bekci MERGED 4216718; son C-SSE-0011 RETIRED); ondan önce ffcore-isci-c-10c1 RETIRED (10c-1 MERGED; son C-10C1-0015 RETIRED); ondan önce ffcore-isci-c-10bp2 RETIRED (10b-poc-2 MERGED b43770d; son C-10bp2-0019 HANDOFF)
 
 ## Mesajlar
@@ -33,3 +33,7 @@ PLAN-ONAY gelmeden kod yok.
 ### C-17-0003 · 2026-11-23 12:40 · → koordinator · YIGIN-AC
 Paket: 17 · Cevap: K-17-0002 · Yigin: ffcore-17
 PLAN-ONAY K-17-0002 alındı (S1-S7 A), 17-1 başladı. Yığın `ffcore-17` (18170/13170), `FFCORE_VERSION=0.0.0-17`, `--env-file .env.test`, `--pull never`. Önce `uv lock` (mevcut `ffcore/tools:0.0.0-16` imajıyla tek seferlik tools koşusu; `ldap3` + `pyasn1` PyPI'den, geliştirmede izinli dış indirme), sonra `ffcore/tools:0.0.0-17` ve `ffcore/backend:0.0.0-17` `up --build --pull never --no-start` ile; çalışan servis yalnız postgres + redis. Koşular: kırmızı/yeşil unit + contract, hedefli test-int `test_17_*` + `test_03a_*` (tam test-int değil; PR-HAZIR öncesi SORU). Açık başka yığınlar: `ffcore` (kullanıcı), `ffcore-rv`. Bitince `down -v` + YIGIN-KAPA.
+
+### C-17-0005 · 2026-11-23 16:05 · → koordinator · YIGIN-KAPA
+Paket: 17 · Cevap: - · Yigin: ffcore-17
+ffmain kapısı (16-1 merge) için yığın kapatıldı: koşan hedefli test-int (17 + 03a + 06a erişim + 14 API, HEAD 978e23f) yarıda durduruldu (log `17-1-int-targeted.log` sonunda STOPPED satırı; sonuç sayılmaz), tools-run konteyneri adıyla silindi, `down -v` tamam, `ffcore-17` konteyner/volume kalmadı. Yığınsız işe devam: `must_change_password` backend kancasının kırmızı/yeşil koşusu ve PR notu kapı yeşil duyurusundan sonra yeniden YIGIN-AC ile. Tam test-int SORU'su (C-17-0004 taslağı) 16-1 merge sonrası rebase'den sonra gelecek.
