@@ -25,7 +25,15 @@ if anything.
   password is deleted). New refusals: 503 `identity_provider_unavailable` (no local fallback),
   403 `user_inactive` (a disabled account used to get 401), 403 `local_login_disabled`,
   409 `identity_conflict`, 400 `external_identity`, 422 `superadmin_must_be_local`, 403
-  `password_change_required` (an imported account before its first password change).
+  `password_change_required` (an imported account before its first password change), 400
+  `password_unchanged`, 422 `identity_provider_not_configured`. `PATCH /users/{id}` also takes
+  `auth_source: local` to take a link back before the first directory sign-in (answer field
+  `temporary_password`, once).
+- **Deactivation guard (r2):** `identity_sync` deactivates nothing when the directory cannot
+  be asked or more than `IDENTITY_SYNC_MAX_DEACTIVATE_RATIO` (0.2) of the accounts are
+  missing (alert kind `identity_sync_refused`, new; `ffcore.cli identity-sync --force`). Its own
+  deactivations reopen when the directory accepts the account again (`users.deactivated_by`).
+  Several mappings: the highest role brings its own access. LDAP referrals are not followed.
 - **Behaviour:** changing a member on the members screen marks the membership manual (group sync
   no longer moves it). Dependencies: `ldap3` 2.9.1, `pyasn1` 0.6.1 (in `uv.lock`, so in the
   offline wheel set).

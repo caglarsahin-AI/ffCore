@@ -120,10 +120,10 @@ other field `null` is a 422 `validation_error`.
 
 | Endpoint | Notes |
 |---|---|
-| `POST /auth/login` | email + password (argon2id). Sets `ffcore_session`: HttpOnly, SameSite=Strict, Secure, Path=/. Wrong email and wrong password give the same 401 `invalid_credentials` |
+| `POST /auth/login` | email (or, with a directory, account name / UPN) + password. Sets `ffcore_session`: HttpOnly, SameSite=Strict, Secure, Path=/. Wrong email and wrong password give the same 401 `invalid_credentials` (same timing); a disabled account 403 `user_inactive` and `LOCAL_LOGIN` 403 `local_login_disabled`, both only after a correct password; a directory that cannot be asked 503 `identity_provider_unavailable`, never a local fallback (17, `docs/kimlik.md`) |
 | `POST /auth/logout` | clears the cookie and revokes every session token of the user |
 | `GET /auth/me` | `{user, role, access, memberships[]}` |
-| `POST /auth/password` | own password; allowed in read-only access mode; revokes other sessions |
+| `POST /auth/password` | own password; allowed in read-only access mode; revokes other sessions; 400 `password_unchanged` for the same password, 400 `external_identity` for a directory account (17) |
 
 The cookie holds an HS256 token signed with `SECRET_KEY` (not `OBO_JWT_SECRET`), lifetime
 `SESSION_TTL_S` (default 8 h). It carries the user's `token_version`; logout, password change,

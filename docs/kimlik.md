@@ -41,7 +41,9 @@ live in the database and are edited on screen.
 | `AUTO_PROVISION_FROM_CHANNELS` | `false` (default): a channel user without an account is refused politely (15) |
 | `OIDC_INACTIVE_AFTER_DAYS` | OIDC accounts unused this long are deactivated (90) |
 
-The directory host must be reachable under the egress rules like any other destination: in
+Referrals are never followed (a referred host would receive the credentials outside the
+egress rules and the `ldaps` requirement). The directory host must be reachable under the
+egress rules like any other destination: in
 `airgap` and for an internal directory add it to `ALLOWED_INTERNAL_HOSTS`; in `llmaas` an
 external host must be in `EGRESS_ALLOWLIST`. A refused host makes sign-in answer 503.
 
@@ -78,9 +80,10 @@ source after another:
 | Situation | Answer |
 |---|---|
 | wrong password, unknown login, empty password, several accounts match | 401 `invalid_credentials`, the same body every time; the reason is only in the audit row (`auth.login` `denied`, `after.reason`) |
-| directory unreachable, timeout, service account refused, host refused by egress | 503 `identity_provider_unavailable`. **No fallback to a local password.** A local account (the superadmin) still signs in |
+| directory unreachable, timeout, service account refused, `LDAP_USER_BASE` missing, host refused by egress | 503 `identity_provider_unavailable`. **No fallback to a local password.** A local account (the superadmin) still signs in |
 | directory account while `LDAP_URL` is empty | 503 `identity_provider_unavailable` (`reason: ldap_disabled`) |
-| account disabled in the directory (`userAccountControl`) or in FFCore | 403 `user_inactive` |
+| account refused by the directory for itself (locked, expired, disabled: LDAP codes 19, 50, 53 …) | 401 `invalid_credentials`, the code in the audit reason (`bind_rejected_<code>`) |
+| account disabled in the directory (`userAccountControl`) or in FFCore | 403 `user_inactive` (only after a correct password) |
 | directory account without an email | 403 `identity_email_missing` |
 | the email belongs to another account (for example a local pilot account) | 409 `identity_conflict` until a superadmin links it (below) |
 | `LOCAL_LOGIN` forbids local passwords for this account | 403 `local_login_disabled` (only after a correct password) |
@@ -105,7 +108,13 @@ ldap      CN=FFCore-Analysts,OU=Groups,DC=example,DC=com   support   analyst  ed
 - LDAP group DNs compare case-insensitively (stored lower-case).
 - Applied at **every** sign-in: a new mapping reaches members at their next sign-in, a removed
   one (or a member who left the group) loses that membership at the next sign-in.
-- Several groups for one project: the highest role wins; `edit` beats `read`.
+- Several groups for one project: the mapping with the **highest role wins with its own
+  access**; `edit` beats `read` only between mappings of the same role. `(admin, read)` +
+  `(user, edit)` gives `(admin, read)`, never an access no single mapping gave;
+  `(analyst, read)` + `(analyst, edit)` gives `(analyst, edit)`.
+- Memberships are computed at sign-in. A member who leaves a group keeps the project until
+  the session ends (`SESSION_TTL_S`, 8 hours by default) or the next sign-in; deactivating
+  the account (directory or `identity_sync`) ends every session at once.
 - A member in no mapped group signs in but belongs to no project (unless
   `DEFAULT_PROJECT_FOR_NEW_USERS` names one, which gives `user`/`read`).
 - **Manual memberships win.** A membership an admin added or changed by hand
@@ -133,17 +142,55 @@ PATCH /api/v1/users/{user_id}   {"auth_source": "ldap"}
 The local password is **deleted** and every session ends; the next directory sign-in with the same
 email binds the account (memberships, conversations and memory stay). Audit:
 `user_identity_linked` (`password_deleted: true`), then `user_identity_bound` at the sign-in.
-Only a local, non-superadmin account can be linked; nothing is linked back.
+Only a local, non-superadmin account can be linked, and only to a provider configured on this
+installation (otherwise 422 `identity_provider_not_configured`: a link nobody can complete
+would leave the account without any sign-in).
+
+**Taking a link back.** Until the account's first directory sign-in (it has no
+`external_id` yet) a superadmin can undo the link with `{"auth_source": "local"}`: the account
+gets a temporary password, returned **once** in that answer (`temporary_password`), and must
+change it at the next sign-in (audit `user_identity_unlinked`, without the password). After
+the first directory sign-in the directory owns the identity: there is no way back (422
+`auth_source_change_invalid`).
+
+**The email is the bridge.** A linked account waiting for its first directory sign-in binds
+to the first directory entry that carries its email. In a directory where users can edit
+their own `mail` attribute, link shortly before the person signs in, or ask the directory
+team to lock that attribute.
 
 ## Deactivation (`identity_sync`)
 
 A daily job on the background worker (04:15, arq cron) asks the directory about every active
 directory account: one the directory no longer has or has disabled is deactivated
-(`is_active=false`), its open sessions end at once, and `user_deactivated` is audited with the
-reason (`directory_missing`, `directory_disabled`). OIDC accounts unused for
-`OIDC_INACTIVE_AFTER_DAYS` are deactivated the same way (`oidc_inactive`). If the directory cannot
-be reached the run changes **nothing** (no half run) and records `identity.sync` with
-`outcome=error`; the provider status shows the last run.
+(`is_active=false`, `deactivated_by=identity_sync`), its open sessions end at once, and
+`user_deactivated` is audited with the reason (`directory_missing`, `directory_disabled`).
+OIDC accounts unused for `OIDC_INACTIVE_AFTER_DAYS` are deactivated the same way
+(`oidc_inactive`).
+
+**Protection against a wrong answer.** All answers are gathered first; the run changes
+**nothing** and records `identity.sync` with `outcome=error` when:
+
+- the directory cannot be asked: unreachable, the service account refused, `LDAP_USER_BASE`
+  missing (`directory_base_missing`), one id on two entries (`directory_ambiguous`);
+- more than `IDENTITY_SYNC_MAX_DEACTIVATE_RATIO` (default 0.2) of the checked accounts are
+  missing, or all of them are (`identity_sync_refused`). A moved base or a service account
+  that lost its read right looks exactly like everyone leaving. The alert
+  `identity_sync_refused` (critical) fires for rules of that kind.
+
+After checking the directory, an operator who really means it runs the pass once without
+the ratio:
+
+```bash
+docker compose run --rm backend python -m ffcore.cli identity-sync --force
+```
+
+(`forced: true` in the audit row; directory errors are never forced.)
+
+**Coming back.** An account `identity_sync` deactivated reopens by itself when the directory
+accepts it again: at its next successful directory sign-in, or at the next sync that finds it
+active (`user_reactivated`, reason `directory_sign_in` or `identity_sync`). An account a
+superadmin deactivated (`deactivated_by=admin`) never reopens by itself; the superadmin turns
+it back on (`PATCH /users/{id} {"is_active": true}`).
 
 ## Importing local accounts (CSV)
 
@@ -161,7 +208,8 @@ and code (`invalid_email`, `duplicate_email`, `invalid_full_name`, `invalid_role
 the file. `dry_run=false` applies the good lines: a new account gets a temporary password that
 appears **once**, in that answer, and is never stored in clear or audited; at the first sign-in
 `must_change_password` sends the user to the password screen; until the password is changed
-every other call answers 403 `password_change_required`. Existing local accounts get the
+every other call answers 403 `password_change_required`, and the same password again is 400
+`password_unchanged`. Existing local accounts get the
 name and the listed memberships (as manual). Directory accounts are refused: the directory
 manages them. The audit row `user_imported` keeps the counts only.
 
