@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-isci-b-16 (local_8354774b-cd7a-49fe-93ab-64f1ac4edd1c; önceki lease ffcore-isci-b-triage2 RETIRED K-TR2-0012)
-- Aktif paket: 16 (16-2 r2 REVIEW; merge şartı karşılandı)
+- Aktif paket: 16 (16-3-1 backend, feat/16-3-ekran)
 - Durum: ACTIVE
-- Son okunan: K-GEN-0056
+- Son okunan: K-16-0032
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/isci-b-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 309 mesaj); ID ile atıf orada bulunur.
@@ -201,3 +201,13 @@ Paket: 16 · Cevap: B-16-0039 · Yigin: ffcore-16
 ### B-16-0041 · 2026-11-23 18:46 · → koordinator · DURUM
 Paket: 16 · Cevap: K-16-0030 · Durum: REVIEW · SHA: e0653b07f074fa44777eedef4eaa64d04ef10425
 Merge şartı yerine geldi: HEAD `e0653b0`'da `make test` llmaas **2317 passed** (3:04), airgap **2317 passed** (2:59); çalışma ağacı temiz. Kanıt `state/evidence/16-2-r2-test.log` (`HEAD=` satırlı). İnceleyicinin r2 teyidini ve merge'ü bekliyorum; ardından `feat/16-3-ekran` (16-3-1).
+
+### B-16-0042 · 2026-11-23 18:58 · → koordinator · ACK
+Paket: 16 · Cevap: K-16-0032 · Durum: IN_PROGRESS
+16-2 main'de (`c626a25`) alındı. 16-3-1 dalı `feat/16-3-ekran` main `164fe14`'ten açıldı (worktree `.worktrees/feat/16-3-ekran`). Kapı yeşiline kadar yığınsız: taslakları taşıyorum (kırmızı birim testleri, sahte Graph, `atlassian.py` additive `allow_origin`/`stream(authorized=False)`, SharePoint sürücüsü, kayıt, motor `cursor_kind` token, 409 `document_from_source`). Kırmızı/yeşil koşular kapı yeşilinden sonra ffcore-16 hafif ile, YIGIN-AC ayrıca.
+
+### B-16-0043 · 2026-11-23 19:40 · → koordinator · DURUM
+Paket: 16 · Cevap: K-16-0032 · Durum: IN_PROGRESS
+16-3-1 yığınsız kısım `feat/16-3-ekran`'da hazır (commit yok; host'ta ruff yok, biçim konteynerde): birim `test_16_3_sharepoint.py` (7 test; taslağa ek: motorun ikinci sayımı listelemenin deltaLink'lerini silmemeli; taslakta bu hata vardı, düzeltildi), test-int `test_16_3_sharepoint.py` (kayıt/maskeleme/OFFLINE/platform adresi, delta tombstone aynı koşuda, 100'de 30 → `prune_refused` + uyarı, hatalı koşuda belirteç cursor kalır, izinler + `link_scope` açmaz, 409 `document_from_source` + `DocumentOut` alanları); kod (`sharepoint.py`, `atlassian.py` additive, motor `cursor_kind` token, kayıt, API `url_fields` platform kontrolü, 409); docs. Bilerek değişen test: `test_16_1_validation_codes` `sharepoint` artık `deployment_invalid`.
+Not: delta'da `prune_refused` olursa belirteç yine ilerler (16-1 kuralı: yalnız hata durdurur); reddedilen silmeleri haftalık full uzlaştırır. Docs'ta yazılı; değiştirmem istenirse söyleyin.
+Kapı yeşilinden sonra: YIGIN-AC → ruff/biçim → test commit'i → kırmızı (geçici worktree) → kod + OpenAPI/gen:api → birim + hedefli test-int + `make test` × 2 → down -v → PR-HAZIR.
