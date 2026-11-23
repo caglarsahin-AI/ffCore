@@ -108,7 +108,10 @@ def test_03a_users_projects_members_flow(root, make_user, client_factory):
     assert created.status_code == 201, created.text
     user_id = created.json()["id"]
     # 17: `must_change_password` is a flag, not a password; no other password field appears.
-    assert {k for k in created.json() if "password" in k} == {"must_change_password"}
+    # 17 r2: `temporary_password` is only filled in the answer that takes a link back.
+    body = created.json()
+    assert {k for k in body if "password" in k} == {"must_change_password", "temporary_password"}
+    assert body["temporary_password"] is None
     assert "password_hash" not in created.text
     dup = root.post(
         f"{API}/users",

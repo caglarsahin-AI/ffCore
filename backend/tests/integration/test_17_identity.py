@@ -359,7 +359,7 @@ def test_17_s1_database_refuses_external_superadmin(pg):
 # --- identity_sync (acceptance 2: deactivation) ---
 
 
-def _sync(settings, fake, now=None):
+def _sync(settings, fake, now=None, force=False):
     from ffcore.core import db
     from ffcore.core.identity import run_identity_sync
 
@@ -370,6 +370,7 @@ def _sync(settings, fake, now=None):
                 settings,
                 fake.directory(settings) if settings.ldap_enabled else None,
                 now=now,
+                force=force,
             )
 
     return asyncio.run(go())
@@ -383,7 +384,9 @@ def test_17_2_identity_sync_deactivates_and_drops_session(configure, fake, clien
     assert client.get(f"{API}/auth/me").status_code == 200
     fake.remove("user-a")
     fake.disable("user-b")
-    report = _sync(settings, fake)
+    # r2: earlier tests' accounts are missing from this fake directory, so the ratio guard
+    # would refuse (test_17_r2 covers the guard); forced, this test checks the deactivation.
+    report = _sync(settings, fake, force=True)
     assert report.error is None
     for name in ("user-a", "user-b"):
         row = user_row(pg, fake.email(name))

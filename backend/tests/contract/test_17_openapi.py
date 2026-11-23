@@ -39,7 +39,13 @@ def test_17_03a_draft_gains_identity_fields_only_additively():
         assert "auth_source" in props and "must_change_password" in props
         assert "auth_source" not in schemas[name].get("required", [])
     assert "last_login_at" in schemas["UserOut"]["properties"]
-    assert set(schemas["UserUpdate"]["properties"]["auth_source"]["enum"]) == {"ldap", "oidc"}
+    # r2: `local` takes a link back before the first directory sign-in
+    assert set(schemas["UserUpdate"]["properties"]["auth_source"]["enum"]) == {
+        "ldap",
+        "oidc",
+        "local",
+    }
+    assert "temporary_password" in schemas["UserOut"]["properties"]
     assert "/api/v1/auth/providers" not in yaml.safe_load(render("03a"))["paths"]
 
 

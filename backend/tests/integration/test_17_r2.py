@@ -1,3 +1,4 @@
+# ruff: noqa: F811 (the fixtures imported from test_17_identity are used as parameters)
 """17-1 r2 (K-17-0008, KARARLAR '17-1 r1 kararları'): identity_sync refuses mass deactivation,
 sync-deactivated accounts reopen, the unknown-email timing, linking without a provider and the
 unlink path, an unchanged password, the concurrent first sign-in."""
@@ -39,9 +40,7 @@ def _sync(settings, fake, *, force=False):
 
     async def go():
         async with db.session_scope() as session:
-            return await run_identity_sync(
-                session, settings, fake.directory(settings), force=force
-            )
+            return await run_identity_sync(session, settings, fake.directory(settings), force=force)
 
     return asyncio.run(go())
 
@@ -79,9 +78,7 @@ def _active(pg, fake, name):
 # --- MAJOR-1: mass deactivation is refused ---
 
 
-def test_17_r2_moved_base_refuses_and_changes_nothing(
-    configure, fake, root, client_factory, pg
-):
+def test_17_r2_moved_base_refuses_and_changes_nothing(configure, fake, root, client_factory, pg):
     """The reviewer's S4: the directory answers, but under a wrong base nobody is found."""
     settings = configure()
     names = ["user-a", "user-b", *_extra_users(fake, 3)]
@@ -107,9 +104,7 @@ def test_17_r2_moved_base_refuses_and_changes_nothing(
         assert alert is not None and alert[0]["missing"] == len(names)
 
 
-def test_17_r2_ratio_over_limit_refused_under_limit_applies(
-    configure, fake, client_factory, pg
-):
+def test_17_r2_ratio_over_limit_refused_under_limit_applies(configure, fake, client_factory, pg):
     settings = configure()
     names = ["user-a", "user-b", *_extra_users(fake, 3)]  # five accounts
     _sign_in_all(fake, client_factory, names)
@@ -141,15 +136,12 @@ def test_17_r2_force_overrides_the_ratio(configure, fake, client_factory, pg):
     forced = _sync(settings, fake, force=True)
     assert forced.error is None and not _active(pg, fake, "user-a")
     after = pg.execute(
-        "SELECT after FROM audit_events WHERE action = 'identity.sync'"
-        " ORDER BY ts DESC LIMIT 1"
+        "SELECT after FROM audit_events WHERE action = 'identity.sync' ORDER BY ts DESC LIMIT 1"
     ).fetchone()[0]
     assert after["forced"] is True
 
 
-def test_17_r2_sync_deactivated_account_reopens_at_sign_in(
-    configure, fake, client_factory, pg
-):
+def test_17_r2_sync_deactivated_account_reopens_at_sign_in(configure, fake, client_factory, pg):
     settings = configure()
     names = ["user-a", "user-b", *_extra_users(fake, 3)]
     _sign_in_all(fake, client_factory, names)
