@@ -12,11 +12,15 @@ with its own ORDER BY is refused at registration (`jql_order_by`), the order is 
 - **render:** `# KEY: summary`, a metadata block (project, type, status, priority, resolution,
   labels, created, updated), `## Description`, `## Resolution`, each comment `## Comment <n>
   (<date>)` so chunks break at comment boundaries. **No person names** (assignee, reporter,
-  comment authors: K-16-0009 S1, the personal-data boundary). Jira wiki `{code}`/`{noformat}`
+  comment authors, `[~user]` mentions: K-16-0009 S1, the personal-data boundary). A comment
+  the source restricts (`visibility`: a role or a group) or a service desk internal note
+  (`jsdPublic: false`) is not in the document (R-16-0013 MAJOR-1): the issue's permission is
+  wider than the comment's. Raw keeps the API answer as is. Jira wiki `{code}`/`{noformat}`
   blocks become fenced blocks and `h1.`-`h6.` headings Markdown headings; log, stack trace and
   JSON dumps are left to Kapı 2 (`data_dump`).
-- **permissions:** `project:<KEY>`; an issue with a security level is `security:<level>` only
-  (the level narrows who sees it; beside `project:` the project row would open it).
+- **permissions:** `project:<KEY>`; an issue with a security level is
+  `security:<KEY>/<level>` only (the level narrows who sees it; beside `project:` the project
+  row would open it; named per project because level names repeat across schemes, NOTE-3).
 - **attachments:** `fields.attachment[]` (name, size, created, MIME, content URL on the Jira
   origin only).
 - A delta never deletes (no tombstones): deleted or archived issues leave in a full run (D4).
@@ -35,6 +39,7 @@ from ffcore.sources.atlassian import (
     AtlassianHttp,
     AtlassianSecret,
     BaseUrl,
+    PageGuard,
     auth_header,
     check_secret,
 )
@@ -58,6 +63,7 @@ FIELDS = (
 _ORDER_BY = re.compile(r"\border\s+by\b", re.I)
 _CODE = re.compile(r"\{(code|noformat)(?::([^}]*))?\}(.*?)\{\1\}", re.S)
 _HEADING = re.compile(r"^h([1-6])\.\s+", re.M)
+_MENTION = re.compile(r" ?\[~[^\]\n]*\]")
 
 
 class JiraConfig(BaseUrl):
@@ -131,6 +137,7 @@ class JiraDriver:
     async def _search(self, jql: str, *, fields: str) -> AsyncIterator[dict]:
         if self._cloud:
             token = None
+            guard = PageGuard()
             while True:
                 params = {"jql": jql, "maxResults": str(PAGE_SIZE), "fields": fields}
                 if token:
@@ -141,6 +148,7 @@ class JiraDriver:
                 token = body.get("nextPageToken")
                 if not token:
                     return
+                guard.next(token)
         start = 0
         while True:
             params = {
@@ -198,13 +206,18 @@ class JiraDriver:
     async def fetch_attachment(self, item: ItemRef, attachment: AttachmentRef):
         if not attachment.ref:
             raise SourceError("attachment_gone", "the issue gave no download link")
-        async with self._http.stream(attachment.ref) as chunks:
+        # Cloud answers an attachment URL with a redirect to its media host; `redirect=false`
+        # asks for the bytes (R-16-0013 MINOR-2). Server/Data Center ignores the parameter.
+        joiner = "&" if "?" in attachment.ref else "?"
+        async with self._http.stream(f"{attachment.ref}{joiner}redirect=false") as chunks:
             yield chunks
 
     async def acl(self, item: ItemRef, raw: RawPayload) -> SourceAcl:
         fields = json.loads(raw.content).get("fields") or {}
         level = (fields.get("security") or {}).get("name")
-        return SourceAcl(groups=(f"security:{level}",) if level else (f"project:{item.space}",))
+        if level:
+            return SourceAcl(groups=(f"security:{item.space}/{level}",))
+        return SourceAcl(groups=(f"project:{item.space}",))
 
     def render(self, item: ItemRef, raw: RawPayload) -> Rendered:
         issue = json.loads(raw.content)
@@ -226,11 +239,15 @@ class JiraDriver:
         resolution = (fields.get("resolution") or {}).get("description")
         if resolution:
             lines += ["", "## Resolution", "", wiki_to_markdown(resolution)]
-        comments = (fields.get("comment") or {}).get("comments") or []
+        comments = [
+            c
+            for c in (fields.get("comment") or {}).get("comments") or []
+            if not c.get("visibility")
+            and c.get("jsdPublic") is not False
+            and (c.get("body") or "").strip()
+        ]
         for n, comment in enumerate(comments, 1):
-            body = comment.get("body") or ""
-            if not body.strip():
-                continue
+            body = comment["body"]
             when = _date(comment.get("created"))
             heading = f"## Comment {n}" + (f" ({when})" if when else "")
             lines += ["", heading, "", wiki_to_markdown(body)]
@@ -250,7 +267,8 @@ def wiki_to_markdown(text: str) -> str:
         language = (match.group(2) or "").split("|")[0].strip() if match.group(1) == "code" else ""
         return f"\n```{language}\n{match.group(3).strip(chr(10))}\n```\n"
 
-    text = _CODE.sub(fence, text.replace("\r\n", "\n"))
+    text = _MENTION.sub("", text.replace("\r\n", "\n"))
+    text = _CODE.sub(fence, text)
     return _HEADING.sub(lambda m: "#" * (int(m.group(1)) + 2) + " ", text).strip()
 
 

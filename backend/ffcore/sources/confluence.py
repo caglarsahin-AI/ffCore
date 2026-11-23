@@ -37,6 +37,7 @@ from ffcore.sources.atlassian import (
     AtlassianHttp,
     AtlassianSecret,
     BaseUrl,
+    PageGuard,
     auth_header,
     check_secret,
 )
@@ -108,7 +109,9 @@ class ConfluenceDriver:
     def _cql(self, since: datetime | None = None) -> str:
         parts = ["type=page"]
         if self._config.space_keys:
-            parts.append(f"space in ({','.join(self._config.space_keys)})")
+            # Quoted: a personal space key starts with `~` (NOTE-7).
+            keys = ",".join(f'"{key}"' for key in self._config.space_keys)
+            parts.append(f"space in ({keys})")
         if since is not None:
             parts.append(f'lastmodified >= now("-{window_minutes(since)}m")')
         return " AND ".join(parts)
@@ -126,7 +129,9 @@ class ConfluenceDriver:
         return total if isinstance(total, int) else None
 
     async def _follow(self, link: str, params: dict | None) -> AsyncIterator[dict]:
+        guard = PageGuard()
         while link:
+            guard.next(link)
             body = await self._http.get_json(link, params)
             yield body
             link = (body.get("_links") or {}).get("next")

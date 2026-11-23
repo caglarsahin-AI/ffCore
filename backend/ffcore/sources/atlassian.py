@@ -17,6 +17,7 @@ coded error (`rate_limited`, `source_unavailable`). Bodies of error answers are 
 import asyncio
 import base64
 import json
+import math
 import time
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
@@ -36,6 +37,9 @@ CONCURRENCY = 2
 TIMEOUT = EgressTimeout(connect=10, read=60, total=300)
 DOWNLOAD_TIMEOUT = EgressTimeout(connect=10, read=120, total=3600)
 RETRYABLE = (429, 502, 503, 504)
+# NOTE-1 (R-16-0013): a listing longer than this, or a next link / page token seen
+# before, is `pagination_loop`, not a run that follows itself until the job limit.
+MAX_PAGES = 100_000
 
 
 class AtlassianSecret(BaseModel):
@@ -182,7 +186,13 @@ class AtlassianHttp:
                         else:
                             if response.status_code == 404:
                                 raise SourceError("attachment_gone", "the source has no such file")
-                            _raise_for(response.status_code)
+                            if not 200 <= response.status_code < 300:
+                                # R-16-0013 MINOR-2: a 3xx without Location (or any other
+                                # answer) is never streamed as the file.
+                                raise SourceError(
+                                    "attachment_download_failed",
+                                    f"the source answered {response.status_code} to a download",
+                                )
                             yield response.aiter_bytes()
                             return
                 except EgressError as exc:
@@ -204,13 +214,31 @@ def _origin(url: str) -> tuple[str, str, int | None]:
 
 
 def _retry_after(response, attempt: int) -> float:
+    """The server's wait in seconds, capped; a value that is not a finite number of seconds
+    (an HTTP date, `nan`, `inf`, negative) falls back to the exponential default (NOTE-6)."""
+    default = min(2.0 ** (attempt - 1), BACKOFF_CAP_S)
     value = response.headers.get("Retry-After")
-    if value is not None:
-        try:
-            return min(max(float(value), 0.0), BACKOFF_CAP_S)
-        except ValueError:
-            pass
-    return min(2.0 ** (attempt - 1), BACKOFF_CAP_S)
+    if value is None:
+        return default
+    try:
+        seconds = float(value)
+    except ValueError:
+        return default
+    if not math.isfinite(seconds) or seconds < 0:
+        return default
+    return min(seconds, BACKOFF_CAP_S)
+
+
+class PageGuard:
+    """NOTE-1: refuses a next link or page token seen before, and a listing over MAX_PAGES."""
+
+    def __init__(self) -> None:
+        self._seen: set[str] = set()
+
+    def next(self, marker: str) -> None:
+        if marker in self._seen or len(self._seen) >= MAX_PAGES:
+            raise SourceError("pagination_loop", "the source kept returning pages already read")
+        self._seen.add(marker)
 
 
 def _raise_for(status: int) -> None:

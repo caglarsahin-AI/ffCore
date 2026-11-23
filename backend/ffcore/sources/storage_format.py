@@ -138,9 +138,12 @@ def _inline(node, result: Converted) -> str:
     name = _name(node)
     if name in ("ac:structured-macro", "ac:macro"):
         return _macro(node, result)
-    if name in ("ac:image", "ac:emoticon", "ri:attachment"):
+    if name in ("ac:image", "ac:emoticon", "ri:attachment", "script", "style"):
         return ""
     if name == "ac:link":
+        if node.find("ri:user") is not None:
+            # A mention: the person's name is not indexed (K-16-0009 S1, R-16-0013 MINOR-3).
+            return ""
         body = node.find("ac:link-body") or node.find("ac:plain-text-link-body")
         if body is not None:
             return body.get_text(" ", strip=True)
