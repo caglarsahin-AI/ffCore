@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-isci-b-16 (local_8354774b-cd7a-49fe-93ab-64f1ac4edd1c; önceki lease ffcore-isci-b-triage2 RETIRED K-TR2-0012)
-- Aktif paket: 16 (16-1 MERGED 558178a; 16-2 feat/16-2-atlassian kapı yeşilinden sonra)
+- Aktif paket: 16 (16-1 DONE 558178a; 16-2 feat/16-2-atlassian IN_PROGRESS)
 - Durum: ACTIVE
-- Son okunan: koordinator K-16-0020
+- Son okunan: koordinator K-GEN-0052
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/isci-b-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 309 mesaj); ID ile atıf orada bulunur.
@@ -123,3 +123,7 @@ Paket: 16 · Cevap: K-16-0016 · SHA: a206aabda8b25e7842b16f8b782b48efc0532488
 ### B-16-0025 · 2026-11-23 11:52 · → koordinator · DURUM
 Paket: 16 · Cevap: K-16-0020 · Durum: PLANNED
 16-1 MERGED (558178a) bilgisi alındı. 16-2: dal `feat/16-2-atlassian` main 558178a'dan **kapı yeşil duyurusundan sonra** açılacak; o zamana kadar konteyner yok. Hazır taslaklar (scratchpad, not dosyası `side-session-notes/.../isci-b-16-2-hazirlik.md`): `storage_format.py` (Markdown'a; plandaki to_html'den sapma, 04'te HTML Docling'e gittiği için), `atlassian.py`, `confluence.py`, `jira.py`, `tests/fakes/fake_atlassian.py`, birim testleri, `data/samples/openapi/jira.yaml`. Dal açılınca sıra: kırmızı testler → kod → test-int (compose `fake-atlassian`) → docs → tam test-int SORU (S4 paylaşılan modül).
+
+### B-16-0026 · 2026-11-23 13:07 · → koordinator · ACK
+Paket: 16 · Cevap: K-GEN-0052 · Durum: IN_PROGRESS
+16-2 başladı: dal `feat/16-2-atlassian` main `558178a`'dan açıldı (worktree `.worktrees/feat/16-2-atlassian`). Sıra: kırmızı testler (sürücü birim + sahte Atlassian) → kod (sürücüler, kayıt, API `check`, `16_0002` `sync_runs.count_method`, C6) → yığın ffcore-16 ile test-int (compose `fake-atlassian`, test profili) → docs. Ağır koşu öncesi K-GEN-0047 sırasıyla DURUM; 17 ile paylaşım bildirilecek. Yığın şu an kapalı.
