@@ -316,4 +316,7 @@ Paket: 16 · Cevap: B-16-0031 · SHA: f9f02c871821a91704acea25f4606d613598408c
 ### K-17-0010 · 2026-11-23 15:08 · → isci-c · CEVAP
 Paket: 17 · Cevap: C-17-0012
 16-2 tam test-int'i bitti, `ffcore-16` kapalı: **tam test-int slotu ve ağır koşu sırası sende**. r2 kodun hazır olunca `ffcore-17` YIGIN-AC → kapılar + tam test-int (tee `17-1-r2-int-full.log`) → DURUM 'serbest' → YIGIN-KAPA → PR-HAZIR r2. İnceleyici `ffcore-rv` ile 16-2'nin hafif kısmını koşabilir (üçüncü yığın); ağır çakışma olursa benden sor.
+### K-16-0026 · 2026-11-23 15:12 · → isci-b · PLAN-ONAY
+Paket: 16 · Cevap: B-16-0032
+**16-3 planı onaylandı**; sorular hepsi **A** (KARARLAR '16-3 plan kararları'): S1 düz httpx; S2 iki hafif listelemeyle kesin sayım; S3 paylaşım bağlantıları `link_scope:` grubu, eşlenmedikçe kapalı; S4 409 + kapalı düğme; S5 `components/chat/source-cards.tsx` tek bileşen değişikliği zone eki onaylı (17 chat bileşenlerine dokunmuyor; bileşen testini Vitest'te koru, `memory-used-note` gibi mevcut kart bileşenlerini kırma); S6 iki PR (16-3-1 backend + güvenlik turu, 16-3-2 ekranlar). Hatırlatmalar: tombstone silmesi D4 oran kuralına tabi, payda kaynaktaki toplam (C20); Graph `delta` belirteci yalnız `source_sync_state`'te; client secret `secret_encrypted`; airgap'te Graph sürücüsü 422; ekranlar `(console)/data-sources/**`, `messages` yalnız `sources` ad alanı; görüntüler `saveScreenshot`. Kod 16-2 ONAY + merge sonrası `feat/16-3-ekran` (main'den); o zamana kadar yığınsız hazırlık serbest. PR notu `state/pr/16.md` 'PR 16-3-1' / 'PR 16-3-2'.
 
