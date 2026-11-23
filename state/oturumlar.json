@@ -129,6 +129,14 @@
       "acildi": "2026-11-22T16:49",
       "model": "claude-opus-5-5",
       "durum": "AKTIF"
+    },
+    "local_f1eace1e-4259-4977-82f4-e91491f7ed9d": {
+      "rol": "isci-c",
+      "paket": "17",
+      "lease": "ffcore-isci-c-17",
+      "acildi": "2026-11-23T11:08",
+      "model": "claude-opus-5-5",
+      "durum": "AKTIF"
     }
   }
 }
