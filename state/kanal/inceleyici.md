@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-inceleyici-d9 (önceki: ffcore-inceleyici-04b; Fable 5.2, dalga 9'dan itibaren)
-Aktif paket: bekleme (16-1 r2)
+Aktif paket: bekleme (16-1 r3)
 - Durum: ACTIVE
-Son okunan: koordinator K-14-0029
+Son okunan: koordinator K-16-0015
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/inceleyici-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 335 mesaj); ID ile atıf orada bulunur.
@@ -75,3 +75,19 @@ Paket: 16 · Cevap: K-16-0008 · SHA: 044c148ee278494a6140a3e7e36ab916a0131c0e �
 ### R-16-0004 · 2026-11-22 21:11 · → tumu · YIGIN-KAPA
 Paket: 16 · Cevap: R-16-0002 · Yigin: ffcore-rv
 `ffcore-rv` `down -v` temiz: konteyner 0, volume 0, ağ 0 (`state/evidence/16-1-r1-rv-down.log`). Açık FF yığını yalnız `ffcore` (kullanıcı). Kalan imaj etiketleri `ffcore/{backend,frontend,tools,e2e}:0.0.0-rv`. Sıradaki: K-14-0029 (14-2 r2 teyidi, yığınsız).
+
+### R-16-0005 · 2026-11-23 11:12 · → tumu · YIGIN-AC
+Paket: 16 · Cevap: K-16-0015 · Yigin: ffcore-rv
+16-1 r2 teyidi alındı (ACK; SHA `d914b4728ef920cdbf936e726c4b48c13fb60f75`, beş madde). Hafif inceleme yığını: `ffcore-rv` (18540/13540), `git archive d914b47` kopyasından, `--env-file .env.test`, `--pull never`. Servisler: `postgres`, `redis` + `tools` koşuları (imaj `0.0.0-rv`, kaynak kopyadan bağlı, kurulum yok): dalda olmayan probe, 16 hedefli testler iki profil. `sync-worker` bellek sınırı `compose config` çıktısından. Tam test-int yok. Açık yığınlar: `ffcore` (kullanıcı) + `ffcore-rv`. Rebase yığınsız doğrulandı (range-diff: r1 commit'leri aynı, docs commit'inde yalnız `degisiklikler.md` bağlamı). Bitince `down -v` + YIGIN-KAPA.
+
+### R-16-0006 · 2026-11-23 11:26 · → koordinator · REVIEW-SONUC
+Paket: 16 · Cevap: K-16-0015 · SHA: d914b4728ef920cdbf936e726c4b48c13fb60f75 · Sonuc: DEGISIKLIK · Bulgu: B0 M1 m0 N1
+16-1 r2 teyidi tamam; rapor `state/reviews/16-1-r2.md`, kanıt `state/evidence/16-1-r2-rv-*.log`.
+- **r1'in beş maddesi kapandı** (kendi probe'umla): (1) proje developer/admin ve başka projenin developer/admin'i `POST kind=fs` → 403 `fs_source_superadmin_only`, kök/süzgeç/`config {}` PATCH'i de; süperadmin 201; proje rolleri senkron, eşleme, izleme yapıyor; B projesi A'nın metnini bulamıyor. (2) etkin kaynaklı KB `DELETE` → 409 `knowledge_base_has_sources`; duraklatınca 204; sonraki raw/silver/gold `failed kb_deleted`, yazım 0. (3) `mem_limit` yapılandırma çıktısında 2g, değişkenle 3g. (4) docs kodla aynı. (5) range-diff: r1 commit'leri aynı.
+- **MAJOR-1 `saate-bagli-test`:** `test_16_1_scheduler::test_16_1_tick_fails_abandoned_runs` günün saatine bağlı düşüyor. Kaynak varsayılan `daily 02:00` UTC ile kayıtlı; `tick` terk edilen koşuyu düşürürken aynı çağrıda zamanlanmış koşuyu açıyor, testin son `sync`'i 409 alıyor. **02:00-15:01 UTC (05:00-18:01 TSİ) arasında her koşuda düşer**; bugün 08:14 ve 08:24 UTC'de iki kez düştü (hedefli 101 passed / 1 failed; tek başına 1 failed). Ürün davranışı doğru; düzeltme testte (kaynağı `manual` zamanlamayla kaydet ya da sabit `now`). r1'den beri dalda; akşam koşuları yeşil olduğu için görünmedi. Gündüz koşan main kapısını düşürür.
+- Koşular: hedefli llmaas 101/1, airgap (r2 + api) 25, ruff 0. Tam test-int, `make test`, `check:api`, smoke koşulmadı.
+- NOTE-1: duraklatılmış kaynak KB silmeyi engellemiyor (istenen), koşusu `kb_deleted` ile düşer. Probe'umun sonundaki audit sorgusu yanlış tablo adıyla düştü (benim hatam); audit satırı doğrulanmadı.
+
+### R-16-0007 · 2026-11-23 11:26 · → tumu · YIGIN-KAPA
+Paket: 16 · Cevap: R-16-0005 · Yigin: ffcore-rv
+`ffcore-rv` `down -v` temiz: konteyner 0, volume 0, ağ 0 (`state/evidence/16-1-r2-rv-scheduler.log` sonu; yığın düşen testi tek başına koşmak için bir kez yeniden açılıp kapandı). Açık FF yığını yalnız `ffcore` (kullanıcı). Açık inceleme isteği yok; 16-1 r3 teyidi bekleniyor.

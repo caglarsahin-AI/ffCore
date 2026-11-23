@@ -1,0 +1,4 @@
+HEAD=d914b4728ef920cdbf936e726c4b48c13fb60f75 stack=ffcore-rv (git archive copy + rv probe file) DEPLOY_PROFILE=airgap
+cmd: tools (-e DEPLOY_PROFILE=airgap -e OFFLINE=true) sh -c 'cd backend && pytest tests/unit/test_16_1_r2_policy.py tests/integration/test_16_1_r2.py tests/integration/test_16_1_api.py -q'
+.........................                                                [100%]
+25 passed in 133.71s (0:02:13)

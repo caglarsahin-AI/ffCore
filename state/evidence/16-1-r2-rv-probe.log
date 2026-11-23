@@ -1,0 +1,72 @@
+HEAD=d914b4728ef920cdbf936e726c4b48c13fb60f75 stack=ffcore-rv (git archive copy + rv probe file)
+cmd: tools sh -c 'cd backend && pytest tests/integration/test_rv_16_r2_probe.py -q -s -p no:cacheprovider'
+RV16R2 R1 project developer POST fs -> 403 fs_source_superadmin_only
+RV16R2 R1 project admin POST fs -> 403 fs_source_superadmin_only
+RV16R2 R1 project analyst POST fs -> 403 insufficient_role
+2026-11-23 08:14:04,713 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 08:14:04,996 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 08:14:05,399 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+RV16R2 R1 other project's developer POST fs root='.' -> 403 fs_source_superadmin_only
+RV16R2 R1 other project's developer POST fs root='paylasim' -> 403 fs_source_superadmin_only
+2026-11-23 08:14:05,770 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+RV16R2 R1 other project's developer POST fs root='paylasim/ik' -> 403 fs_source_superadmin_only
+RV16R2 R1 other project's admin POST fs root='.' -> 403 fs_source_superadmin_only
+RV16R2 R1 other project's admin POST fs root='paylasim' -> 403 fs_source_superadmin_only
+RV16R2 R1 other project's admin POST fs root='paylasim/ik' -> 403 fs_source_superadmin_only
+RV16R2 R1 data_sources rows after the refusals: 0
+RV16R2 R1 read-only superadmin POST fs -> 403 read_only_access
+RV16R2 R1 superadmin POST fs -> 201 project=True
+2026-11-23 08:14:07,499 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+RV16R2 R1 admin PATCH config.root -> 403 fs_source_superadmin_only
+2026-11-23 08:14:07,695 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+RV16R2 R1 admin PATCH config (same root) -> 403 fs_source_superadmin_only
+RV16R2 R1 admin PATCH include_globs -> 403 fs_source_superadmin_only
+RV16R2 R1 developer PATCH config {} -> 403 fs_source_superadmin_only
+RV16R2 R1 admin PATCH secret -> 403 fs_source_superadmin_only
+2026-11-23 08:14:08,625 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+RV16R2 R1 developer PATCH name -> 200 None
+RV16R2 R1 developer PATCH schedule -> 200 None
+2026-11-23 08:14:08,879 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+RV16R2 R1 developer PATCH status paused -> 200 None
+RV16R2 R1 developer PATCH status active -> 200 None
+RV16R2 R1 super PATCH include_globs -> 200 None
+2026-11-23 08:14:09,420 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+RV16R2 R1 stored config after the tries: {'root': 'paylasim', 'exclude_globs': [], 'include_globs': ['*.md']}
+2026-11-23 08:14:09,565 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+RV16R2 R1 developer sync -> 202
+2026-11-23 08:14:10,031 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+RV16R2 R1 admin PUT acl-mappings -> 200; developer items -> 200; developer test -> 200
+RV16R2 R1 other project's admin: search found=False, sources=0, GET A's source via B -> 404
+F2026-11-23 08:14:16,670 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 08:14:16,832 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 08:14:18,678 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+RV16R2 R2 delete KB with an active source -> 409 knowledge_base_has_sources
+RV16R2 R2 KB still there -> 200; live docs=1
+RV16R2 R2 pause -> 200, delete KB -> 204 None
+RV16R2 R2 unpause -> 200, sync -> 202 None
+RV16R2 R2 runs after the KB is gone: [{'status': 'failed', 'error': 'kb_deleted', 'added': None}]
+RV16R2 R2 silver after the KB is gone -> 202 [{'status': 'failed', 'error': 'kb_deleted'}]
+RV16R2 R2 gold after the KB is gone -> 202 [{'status': 'failed', 'error': 'kb_deleted'}]
+RV16R2 R2 storage files 2 -> 2, documents rows 2 -> 2
+RV16R2 R2 source after: status=active last_error=kb_deleted
+            assert r.status_code == 403
+                assert r.status_code == 403 and code(r) == "fs_source_superadmin_only"
+                    raise TypeError(
+E           psycopg.errors.UndefinedTable: relation "audit_log" does not exist
+E           LINE 1: SELECT action, outcome, count(*) FROM audit_log WHERE action...
+E                                                         ^
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+1 failed, 1 passed in 56.79s

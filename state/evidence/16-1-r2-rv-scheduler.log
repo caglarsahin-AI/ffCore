@@ -1,0 +1,16 @@
+HEAD=d914b4728ef920cdbf936e726c4b48c13fb60f75 stack=ffcore-rv (yeniden acildi: dusen test icin; ayni YIGIN-AC R-16-0005)
+utc now 08:24
+cmd: docker compose -p ffcore-rv --env-file .env.test up -d --wait --pull never postgres redis ; tools pytest tests/integration/test_16_1_scheduler.py -q
+2
+        assert result["abandoned"] == 1
+        assert (status, error) == ("failed", "run_abandoned")
+>       assert w["admin"].post(sources_url(w, f"/{source['id']}/sync"), json={}).status_code == 202
+E       AssertionError: assert 409 == 202
+E        +  where 409 = <Response [409 Conflict]>.status_code
+E        +    where <Response [409 Conflict]> = post('/api/v1/projects/b62b45fa-3ef2-43fc-ad27-6eba4faab653/data-sources/7d6c81c5-7bf5-47ba-9cfd-75bb6a00931d/sync', json={})
+E        +      where post = <starlette.testclient.TestClient object at 0x7f49400f3440>.post
+E        +      and   '/api/v1/projects/b62b45fa-3ef2-43fc-ad27-6eba4faab653/data-sources/7d6c81c5-7bf5-47ba-9cfd-75bb6a00931d/sync' = sources_url({'settings': Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('****...ed0/sources'), 'root': PosixPath
+1 failed, 2 passed in 24.14s
+cmd: down -v
+ Network ffcore-rv_default  Removed
+containers=0 volumes=0 networks=0

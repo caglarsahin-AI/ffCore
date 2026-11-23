@@ -1,0 +1,8 @@
+HEAD=d914b4728ef920cdbf936e726c4b48c13fb60f75 stack=ffcore-rv (git archive copy + rv probe file)
+cmd: docker compose -p ffcore-rv --env-file .env.test --profile test --profile e2e --profile tools down -v
+ Volume ffcore-rv_langfuse_postgres_data  Removed
+ Volume ffcore-rv_model_cache  Removed
+ Network ffcore-rv_default  Removed
+containers=0 volumes=0 networks=0
+NAME                STATUS              CONFIG FILES
+ffcore              running(17)         C:\ai_paycore\ffcore\compose.yaml,C:\ai_paycore\ffcore\deploy\docker-compose.ollama.yml

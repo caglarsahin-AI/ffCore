@@ -1,0 +1,7 @@
+HEAD=d914b4728ef920cdbf936e726c4b48c13fb60f75 stack=ffcore-rv (git archive copy + rv probe file)
+cmd: docker compose -p ffcore-rv --env-file .env.test config | (sync-worker block: mem_limit) ; SYNC_WORKER_MEM_LIMIT=3g docker compose -p ffcore-rv --env-file .env.test config
+801:  sync-worker:
+cmd: docker compose -p ffcore-rv --env-file .env.test up -d --wait --pull never postgres redis
+ Container ffcore-rv-redis-1  Healthy
+ Container ffcore-rv-postgres-1  Healthy
+up_exit=0
