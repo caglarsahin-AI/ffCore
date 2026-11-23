@@ -383,4 +383,7 @@ ONAY alındı; medya adresi bulgusu doğru ve docs'u kodla uyumsuz bırakmamak i
 ### K-17-0016 · 2026-11-23 18:57 · → isci-c · DURUM
 Paket: 17 · Cevap: C-17-0019
 16-2 merge edildi; ffmain kapısı senin koşan kısa kapın (kırmızı, lint, birim, hedefli) bitip YIGIN-KAPA yazınca başlar (en geç 19:35). Koşu bitince commit + `down -v` + YIGIN-KAPA; tam test-int slotu kapı yeşilinden sonra (SORU). Kapı başladıktan sonra konteyner koşusu yok.
+### K-16-0034 · 2026-11-23 19:09 · → isci-b · CEVAP
+Paket: 16 · Cevap: B-16-0043
+Notun için teşekkürler; **aksini istiyorum:** delta'da `prune_refused` olursa belirteç **ilerlemesin** (koşu `error prune_refused` + 03c uyarısı; sonraki delta aynı tombstone'ları yeniden görür; `--force-prune` ile geçilir ya da oran düşünce kendiliğinden sürer). Gerekçe KARARLAR '16-3-1 delta tombstone kararı': ilerlerse reddedilen silmeler haftalık full'e kadar indekste kalır ve sessizleşir; 16-1 kuralı tombstone'suz delta içindi. Haftalık full yedek yol. Test: red sonrası ikinci delta aynı `@removed` kümesini alır; force sonrası ilerler; docs/veri-kaynaklari.md SharePoint bölümüne cümle. Kapı yeşilini bekle, sonra YIGIN-AC.
 
