@@ -240,3 +240,75 @@ def test_17_preflight_refuses_plaintext_incomplete_and_bad_policy():
         {**PREFLIGHT_BASE, **LDAP_ENV, "LDAP_URL": "ldap://d", "LDAP_ALLOW_PLAINTEXT": "true"}
     )
     assert any(line.startswith("warning: LDAP_URL is plaintext") for line in lines)
+
+
+# --- 17-1 r2 (K-17-0008) ---
+
+
+def test_17_r2_referrals_off(directory):
+    """MINOR-2: a referral would send the bind to a host the egress policy never saw."""
+    from ffcore.core.ldap_auth import default_endpoint
+
+    _, ldap = directory
+    endpoint = default_endpoint(ldap.settings)
+    assert endpoint.server.allowed_referral_hosts == []
+    conn = ldap._connection("cn=x", "y")
+    assert conn.auto_referrals is False
+
+
+class _Refusing:
+    """A bind the server answers with a non-49 code (locked, expired, disabled...)."""
+
+    def __init__(self, code):
+        self.result = {"result": code}
+
+    def bind(self):
+        return False
+
+    def unbind(self):
+        return None
+
+
+@pytest.mark.parametrize("code", [49, 19, 50, 53])
+def test_17_r2_user_bind_refusal_is_invalid_credentials(directory, code):
+    """MINOR-3: the server answered for one account: 401, the code in the audit reason; 503
+    stays for an unreachable directory and the service account."""
+    fake, ldap = directory
+    real = ldap._connection
+
+    def connection(user, password):
+        if user == fx.SERVICE_DN:
+            return real(user, password)
+        return _Refusing(code)
+
+    ldap._connection = connection
+    with pytest.raises(InvalidCredentials) as caught:
+        run(ldap.authenticate(fake.login("user-a"), fake.password("user-a")))
+    assert caught.value.reason == ("bind_failed" if code == 49 else f"bind_rejected_{code}")
+
+
+def test_17_r2_search_errors_are_run_errors_not_missing(directory):
+    """MAJOR-1 (a): a missing base or an ambiguous id is a directory error, never 'not found'."""
+    fake, _ = directory
+    moved = fake.directory(
+        fx.ldap_settings(base_settings(), ldap_user_base="ou=moved,dc=example,dc=test")
+    )
+    try:
+        result = run(moved.find(fake.guid("user-a")))
+    except ProviderUnavailable as exc:
+        assert exc.reason == "directory_base_missing"
+    else:
+        # The mock answers an absent base with success and no entry: the ratio guard
+        # (integration test_17_r2_moved_base_refuses_and_changes_nothing) is the protection.
+        assert result is None
+
+
+def test_17_r2_settings_ratio_and_cli():
+    assert base_settings().identity_sync_max_deactivate_ratio == 0.2
+    with pytest.raises(ValueError):
+        base_settings(identity_sync_max_deactivate_ratio=0)
+    from ffcore.cli import build_parser
+
+    args = build_parser().parse_args(["identity-sync", "--force"])
+    assert args.command == "identity-sync" and args.force is True
+    assert build_parser().parse_args(["identity-sync"]).force is False

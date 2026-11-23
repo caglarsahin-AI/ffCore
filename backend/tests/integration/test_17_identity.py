@@ -139,22 +139,33 @@ def test_17_1_default_project_gives_user_read(configure, fake, make_project, cli
     assert memberships(pg, row[0]) == {project: ("user", "read", "idp")}
 
 
-def test_17_1_default_project_missing_fails_loud(configure, fake, client_factory):
+def test_17_1_default_project_missing_fails_loud(configure, fake, client_factory, pg):
     configure(default_project_for_new_users="no-such-project")
     response = login(client_factory(), fake.login("user-b"), fake.password("user-b"))
     assert response.status_code == 503
     assert response.json()["error"]["code"] == "default_project_missing"
+    # r1 NOTE-7: the refusal is in the sign-in audit too
+    row = audit_rows(pg, "auth.login", "error")[-1][2]
+    assert row["code"] == "default_project_missing" and row["source"] == "ldap"
 
 
-def test_17_1_several_groups_highest_role_and_edit(
+def test_17_1_several_groups_highest_role_and_its_access(
     configure, fake, root, make_project, client_factory, pg
 ):
-    project = make_project()
-    map_group(root, project, fake.group("chat"), "user", "edit")
-    map_group(root, project, fake.group("analysts"), "analyst", "read")
+    """r1 MINOR-5 (KARARLAR '17-1 r1 kararları'): the highest role brings its own access; edit
+    beats read only between mappings of the same role. (admin, read) + (user, edit) is
+    (admin, read), never an access no mapping gave."""
+    mixed, same = make_project(), make_project()
+    map_group(root, mixed, fake.group("chat"), "user", "edit")
+    map_group(root, mixed, fake.group("analysts"), "analyst", "read")
+    map_group(root, same, fake.group("chat"), "analyst", "read")
+    map_group(root, same, fake.group("editors"), "analyst", "edit")
     login(client_factory(), fake.login("user-b"), fake.password("user-b"))
     row = user_row(pg, fake.email("user-b"))
-    assert memberships(pg, row[0]) == {project: ("analyst", "edit", "idp")}
+    assert memberships(pg, row[0]) == {
+        mixed: ("analyst", "read", "idp"),
+        same: ("analyst", "edit", "idp"),
+    }
 
 
 # --- group change, manual memberships (acceptance 2, S2) ---

@@ -37,6 +37,13 @@ def test_17_migration_schema_and_roundtrip(scratch_db):
         "ck_users_superadmin_is_local",
     } <= _checks(db, "users")
     assert "ck_project_members_membership_source" in _checks(db, "project_members")
+    # r2 (MAJOR-1): who deactivated an account, and the identity_sync_refused alert kind
+    assert "deactivated_by" in _columns(db, "users")
+    assert "ck_users_deactivated_by" in _checks(db, "users")
+    kinds = db.conn.execute(
+        "SELECT pg_get_constraintdef(oid) FROM pg_constraint WHERE conname = 'ck_alert_rules_kind'"
+    ).fetchone()[0]
+    assert "identity_sync_refused" in kinds
     nullable = db.conn.execute(
         "SELECT is_nullable FROM information_schema.columns"
         " WHERE table_name = 'users' AND column_name = 'password_hash'"
@@ -45,6 +52,10 @@ def test_17_migration_schema_and_roundtrip(scratch_db):
 
     db.run("downgrade", "16_0001")
     assert "identity_group_mappings" not in db.tables()
+    kinds = db.conn.execute(
+        "SELECT pg_get_constraintdef(oid) FROM pg_constraint WHERE conname = 'ck_alert_rules_kind'"
+    ).fetchone()[0]
+    assert "identity_sync_refused" not in kinds
     assert "auth_source" not in _columns(db, "users")
     db.run("upgrade", "head")
     assert "identity_group_mappings" in db.tables()
