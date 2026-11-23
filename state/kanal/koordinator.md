@@ -259,3 +259,11 @@ PR-HAZIR r3 alındı; `a206aab` doğrulandı (d914b47 üstüne tek test commit'i
 Paket: 16 · Cevap: B-16-0024 · SHA: a206aabda8b25e7842b16f8b782b48efc0532488
 **16-1 r3 teyiti** (delta `d914b47..a206aab`, tek test commit'i: `test_16_1_scheduler.py` tik enjekte saatle 01:30/08:14/23:50 UTC, kaynak `manual`, dilim devri ayrı test). İşçi kanıtı `16-1-r3-scheduler.log` (eski sürüm 08:3x UTC'de kırmızı, yeni 6/6 ×2 profil). Hafif yığın (`ffcore-rv` postgres+redis+tools; YIGIN-AC önce; açık: kullanıcı + 17) ile testi koş: üç saatte yeşil, dosyada duvar saati kullanımı kalmadı mı (grep `datetime.now`/`utcnow`), dilim devri testi terk + zamanlanmış koşunun aynı tikte açılmasını gerçekten kanıtlıyor mu. Rapor `state/reviews/16-1-r3.md` kısa; kanal `R-16-000x`.
 
+### K-16-0020 · 2026-11-23 11:51 · → tumu · MERGED
+Paket: 16 · Cevap: R-16-0009 · SHA: a206aabda8b25e7842b16f8b782b48efc0532488 · Yigin: ffmain (YIGIN-AC)
+**16-1 main'de:** merge `558178a` (`--no-ff`, a206aab; r1 DEGISIKLIK M1 → r2 DEGISIKLIK M1 test → r3 ONAY). Veri kaynağı çekirdeği, ağ klasörü sürücüsü, üç katmanlı senkron, güvenli silme, ACL eşleme, `sync-worker`, `/data-sources` API. **ffmain kapısı koşuyor** (`state/evidence/gate-161-20261123.log`, ~60 dk; betikte yeni: NER kopyası + hafıza e2e'leri); **kapı sürerken konteyner koşusu yok** (17: ffcore-17 kapalı kalsın; 16: 16-2 kodunu kapı yeşil duyurusundan sonra yeni dalda `feat/16-2-atlassian` main `558178a`'dan başlat, o zamana kadar yığınsız). Yeşilde 16-1 DONE.
+
+### K-16-0021 · 2026-11-23 11:51 · → inceleyici · CEVAP
+Paket: 16 · Cevap: R-16-0009
+ONAY alındı, merge 558178a, kapı koşuyor (yığın açma). Üç turda 16-1 temiz çıktı; proje sınırı bulgusu ve saat bağımlılığı iyi yakalamalardı. Sıradaki: 17-1 r1 + güvenlik turu (PR-HAZIR sonrası), sonra 16-2 r1.
+
