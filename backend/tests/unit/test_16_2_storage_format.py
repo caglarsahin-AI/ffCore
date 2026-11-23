@@ -19,7 +19,7 @@ PAGE = """
 <ac:image><ri:attachment ri:filename="ekran.png"/></ac:image>
 <ul><li>Birinci adım<ul><li>Alt adım</li></ul></li><li>İkinci <ac:link><ri:page ri:content-title="Ek sayfa"/><ac:plain-text-link-body><![CDATA[bağlantı]]></ac:plain-text-link-body></ac:link></li></ul>
 <table><tbody><tr><th>Alan</th><th>Değer</th></tr><tr><td>Limit</td><td><p>10 | 20</p></td></tr></tbody></table>
-"""
+"""  # noqa: E501 (storage format as Confluence stores it)
 
 
 def test_16_2_macro_rules():

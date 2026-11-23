@@ -8,7 +8,7 @@ changed page).
 
 Confluence (DC paths; Cloud adds the `/wiki` prefix):
   GET /rest/api/content/search?cql=&expand=&limit=&start=    pages with body.storage (DC)
-  GET /rest/api/search?cql=&limit=&start=                    totalSize, results (count; Cloud listing)
+  GET /rest/api/search?cql=&limit=&start=                    totalSize, results (count, Cloud)
   GET /api/v2/pages/{id}?body-format=storage                 Cloud page with body (under /wiki)
   GET /api/v2/pages/{id}/attachments?cursor=                 Cloud attachments (under /wiki)
   GET /rest/api/content/{id}/child/attachment                DC attachments (all versions)
@@ -80,7 +80,9 @@ def _check_cql(cql: str) -> None:
 def _check_jql(jql: str) -> None:
     rest = re.sub(r"order\s+by\s+updated\s+asc\s*$", "", jql.strip(), flags=re.I)
     rest = re.sub(r'updated\s*>=\s*"-\d+m"', "", rest, flags=re.I)
-    rest = re.sub(r"project\s+in\s*\([^)]*\)|project\s*=\s*\"?[A-Za-z0-9_-]+\"?", "", rest, flags=re.I)
+    rest = re.sub(
+        r"project\s+in\s*\([^)]*\)|project\s*=\s*\"?[A-Za-z0-9_-]+\"?", "", rest, flags=re.I
+    )
     if re.sub(r"\b(and)\b|[\s()]", "", rest, flags=re.I):
         raise QueryError(f"unsupported JQL: {jql}")
 
@@ -142,7 +144,10 @@ def _attachment_json(page: dict, att: dict, prefix: str) -> dict:
     return {
         "id": f"att-{page['id']}-{name}",
         "title": name,
-        "extensions": {"fileSize": att.get("size", len(_content(att))), "mediaType": att.get("mediaType")},
+        "extensions": {
+            "fileSize": att.get("size", len(_content(att))),
+            "mediaType": att.get("mediaType"),
+        },
         "version": {"number": att.get("version", 1), "when": att.get("when", page["when"])},
         "_links": {"download": f"/download/attachments/{page['id']}/{quote(name)}"},
     }
@@ -165,7 +170,9 @@ class Handler(BaseHTTPRequestHandler):
     def _send(self, status: int, payload=None, *, raw: bytes | None = None, headers=None) -> None:
         body = raw if raw is not None else json.dumps(payload, ensure_ascii=False).encode()
         self.send_response(status)
-        self.send_header("Content-Type", "application/octet-stream" if raw is not None else "application/json")
+        self.send_header(
+            "Content-Type", "application/octet-stream" if raw is not None else "application/json"
+        )
         self.send_header("Content-Length", str(len(body)))
         for key, value in (headers or {}).items():
             self.send_header(key, value)
@@ -190,7 +197,11 @@ class Handler(BaseHTTPRequestHandler):
             if remaining:
                 FAULT["rate_limit"] = remaining - 1
         if remaining:
-            self._send(429, {"message": "rate limited"}, headers={"Retry-After": str(FAULT.get("retry_after", 1))})
+            self._send(
+                429,
+                {"message": "rate limited"},
+                headers={"Retry-After": str(FAULT.get("retry_after", 1))},
+            )
             return True
         return False
 
@@ -253,7 +264,7 @@ class Handler(BaseHTTPRequestHandler):
             return
         path, prefix = url.path, ""
         if path.startswith("/wiki/"):
-            path, prefix = path[len("/wiki"):], "/wiki"
+            path, prefix = path[len("/wiki") :], "/wiki"
         query = {k: v[-1] for k, v in parse_qs(url.query).items()}
         try:
             self._dispatch(path, prefix, query)
@@ -278,9 +289,18 @@ class Handler(BaseHTTPRequestHandler):
                 return
             chunk = pages[start : start + limit]
             body = "body.storage" in q.get("expand", "")
-            payload = {"results": [_page_json(p, base, body=body) for p in chunk], "start": start, "limit": limit, "size": len(chunk), "_links": {}}
+            payload = {
+                "results": [_page_json(p, base, body=body) for p in chunk],
+                "start": start,
+                "limit": limit,
+                "size": len(chunk),
+                "_links": {},
+            }
             if start + limit < len(pages):
-                payload["_links"]["next"] = f"/rest/api/content/search?cql={quote(q.get('cql', ''))}&expand={quote(q.get('expand', ''))}&limit={limit}&start={start + limit}"
+                payload["_links"]["next"] = (
+                    f"/rest/api/content/search?cql={quote(q.get('cql', ''))}"
+                    f"&expand={quote(q.get('expand', ''))}&limit={limit}&start={start + limit}"
+                )
             self._send(200, payload)
         elif path == "/rest/api/search":
             pages = _pages(q.get("cql", ""))
@@ -297,7 +317,10 @@ class Handler(BaseHTTPRequestHandler):
                 "_links": {},
             }
             if start + limit < len(pages):
-                payload["_links"]["next"] = f"/rest/api/search?cql={quote(q.get('cql', ''))}&limit={limit}&start={start + limit}"
+                payload["_links"]["next"] = (
+                    f"/rest/api/search?cql={quote(q.get('cql', ''))}"
+                    f"&limit={limit}&start={start + limit}"
+                )
             self._send(200, payload)
         elif m := re.fullmatch(r"/api/v2/pages/([^/]+)", path):
             page = self._page(m.group(1))
@@ -315,7 +338,16 @@ class Handler(BaseHTTPRequestHandler):
             results = []
             for att in page.get("attachments", []):
                 item = _attachment_json(page, att, prefix)
-                results.append({"id": item["id"], "title": item["title"], "fileSize": item["extensions"]["fileSize"], "mediaType": att.get("mediaType"), "version": item["version"], "downloadLink": item["_links"]["download"]})
+                results.append(
+                    {
+                        "id": item["id"],
+                        "title": item["title"],
+                        "fileSize": item["extensions"]["fileSize"],
+                        "mediaType": att.get("mediaType"),
+                        "version": item["version"],
+                        "downloadLink": item["_links"]["download"],
+                    }
+                )
             self._send(200, {"results": results, "_links": {}})
         elif m := re.fullmatch(r"/rest/api/content/([^/]+)/child/attachment", path):
             page = self._page(m.group(1))
@@ -328,13 +360,25 @@ class Handler(BaseHTTPRequestHandler):
             if page is None:
                 return
             restriction = page.get("restrictions", {})
-            self._send(200, {
-                "operation": "read",
-                "restrictions": {
-                    "group": {"results": [{"type": "group", "name": g} for g in restriction.get("groups", [])]},
-                    "user": {"results": [{"type": "known", "username": u, "accountId": u} for u in restriction.get("users", [])]},
+            self._send(
+                200,
+                {
+                    "operation": "read",
+                    "restrictions": {
+                        "group": {
+                            "results": [
+                                {"type": "group", "name": g} for g in restriction.get("groups", [])
+                            ]
+                        },
+                        "user": {
+                            "results": [
+                                {"type": "known", "username": u, "accountId": u}
+                                for u in restriction.get("users", [])
+                            ]
+                        },
+                    },
                 },
-            })
+            )
         elif m := re.fullmatch(r"/download/attachments/([^/]+)/(.+)", path):
             page = self._page(m.group(1))
             if page is None:
@@ -348,7 +392,9 @@ class Handler(BaseHTTPRequestHandler):
         elif path in ("/rest/api/2/search", "/rest/api/2/search/jql"):
             self._jira_search(path, q)
         elif m := re.fullmatch(r"/rest/api/2/issue/([A-Z][A-Z0-9]*-\d+)", path):
-            issue = next((i for i in STATE.get("jira", {}).get("issues", []) if i["key"] == m.group(1)), None)
+            issue = next(
+                (i for i in STATE.get("jira", {}).get("issues", []) if i["key"] == m.group(1)), None
+            )
             if issue is None:
                 self._send(404, {"errorMessages": ["Issue does not exist"]})
             else:
@@ -405,7 +451,12 @@ class Handler(BaseHTTPRequestHandler):
             if start + limit < len(issues):
                 payload["nextPageToken"] = str(start + limit)
         else:
-            payload = {"startAt": start, "maxResults": limit, "total": len(issues), "issues": [view(i) for i in chunk]}
+            payload = {
+                "startAt": start,
+                "maxResults": limit,
+                "total": len(issues),
+                "issues": [view(i) for i in chunk],
+            }
         self._send(200, payload)
 
 

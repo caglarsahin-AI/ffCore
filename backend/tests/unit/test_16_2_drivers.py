@@ -49,16 +49,28 @@ def local(settings):
 
 
 def confluence(base, settings, deployment="server", **config):
-    secret = {"token": PAT} if deployment == "server" else {"email": "svc@example.test", "api_token": PAT}
-    spec = SourceSpec(id="c", kind="confluence", deployment=deployment, config={"base_url": base, **config})
+    secret = (
+        {"token": PAT}
+        if deployment == "server"
+        else {"email": "svc@example.test", "api_token": PAT}
+    )
+    spec = SourceSpec(
+        id="c", kind="confluence", deployment=deployment, config={"base_url": base, **config}
+    )
     driver = ConfluenceDriver(spec, secret, None, settings)
     driver._http._gaps = {"read": 0, "download": 0}  # no pacing in tests
     return driver
 
 
 def jira(base, settings, deployment="server", **config):
-    secret = {"token": PAT} if deployment == "server" else {"email": "svc@example.test", "api_token": PAT}
-    spec = SourceSpec(id="j", kind="jira", deployment=deployment, config={"base_url": base, **config})
+    secret = (
+        {"token": PAT}
+        if deployment == "server"
+        else {"email": "svc@example.test", "api_token": PAT}
+    )
+    spec = SourceSpec(
+        id="j", kind="jira", deployment=deployment, config={"base_url": base, **config}
+    )
     driver = JiraDriver(spec, secret, None, settings)
     driver._http._gaps = {"read": 0, "download": 0}
     return driver
@@ -66,19 +78,36 @@ def jira(base, settings, deployment="server", **config):
 
 def pages_state(n_old=60, auth=None):
     pages = [
-        {"id": str(1000 + n), "space": "OPS", "title": f"Sayfa {n}", "body": f"<p>Metin {n}</p>",
-         "when": OLD, "ancestors": [{"id": "999", "title": "Ana sayfa"}]}
+        {
+            "id": str(1000 + n),
+            "space": "OPS",
+            "title": f"Sayfa {n}",
+            "body": f"<p>Metin {n}</p>",
+            "when": OLD,
+            "ancestors": [{"id": "999", "title": "Ana sayfa"}],
+        }
         for n in range(n_old)
     ]
     # The ancestor is a page of its own (its read restriction is inherited by every child).
-    pages.append({"id": "999", "space": "OPS", "title": "Ana sayfa", "body": "<p>Kök</p>", "when": OLD})
-    pages.append({
-        "id": "2000", "space": "OPS", "title": "Yeni sayfa", "body": "<h2>Başlık</h2><p>Güncel</p>",
-        "when": NEW, "ancestors": [{"id": "999", "title": "Ana sayfa"}],
-        "restrictions": {"groups": ["Yonetim"], "users": ["kullanici1"]},
-        "attachments": [{"title": "rapor.txt", "content": "ek metni", "when": NEW, "size": 8}],
-    })
-    return {"auth": auth or [f"Bearer {PAT}"], "confluence": {"spaces": {"OPS": {}}, "pages": pages}}
+    pages.append(
+        {"id": "999", "space": "OPS", "title": "Ana sayfa", "body": "<p>Kök</p>", "when": OLD}
+    )
+    pages.append(
+        {
+            "id": "2000",
+            "space": "OPS",
+            "title": "Yeni sayfa",
+            "body": "<h2>Başlık</h2><p>Güncel</p>",
+            "when": NEW,
+            "ancestors": [{"id": "999", "title": "Ana sayfa"}],
+            "restrictions": {"groups": ["Yonetim"], "users": ["kullanici1"]},
+            "attachments": [{"title": "rapor.txt", "content": "ek metni", "when": NEW, "size": 8}],
+        }
+    )
+    return {
+        "auth": auth or [f"Bearer {PAT}"],
+        "confluence": {"spaces": {"OPS": {}}, "pages": pages},
+    }
 
 
 async def collect(gen):
@@ -103,7 +132,7 @@ def test_16_2_confluence_full_listing_count_and_pagination(fake, local):
     assert not any(p.startswith("/rest/api/content/1") for p in paths)  # no per-page fetch
     page = next(i for i in items if i.external_id == "2000")
     assert page.breadcrumb_parts == ("OPS", "Ana sayfa", "Yeni sayfa") and page.space == "OPS"
-    rendered = driver.render(page, raws[-1])
+    rendered = driver.render(page, raws[items.index(page)])
     assert rendered.filename == "2000.md"
     assert rendered.content.decode().startswith("# Yeni sayfa\n\n## Başlık\n\nGüncel")
 
@@ -124,7 +153,9 @@ def test_16_2_confluence_delta_asks_only_for_the_changed_page(fake, local):
     items, attachments, acl = asyncio.run(go())
     assert [i.external_id for i in items] == ["2000"]
     seen = control(fake, "/_requests")["requests"]
-    assert seen[0]["query"]["cql"] == [f'type=page AND lastmodified >= now("-{window_minutes(since)}m")']
+    assert seen[0]["query"]["cql"] == [
+        f'type=page AND lastmodified >= now("-{window_minutes(since)}m")'
+    ]
     assert [r["path"] for r in seen] == [
         "/rest/api/content/search",
         "/rest/api/content/2000/child/attachment",
@@ -142,18 +173,40 @@ def test_16_2_confluence_delta_asks_only_for_the_changed_page(fake, local):
     [
         ({}, {}, ("space:OPS",)),
         ({"groups": ["A", "B"]}, {}, ("group:A", "group:B")),
-        ({"groups": ["A", "B"], "users": ["u1"]}, {"groups": ["B", "C"], "users": ["u1"]}, ("group:B", "user:u1")),
+        (
+            {"groups": ["A", "B"], "users": ["u1"]},
+            {"groups": ["B", "C"], "users": ["u1"]},
+            ("group:B", "user:u1"),
+        ),
         ({"groups": ["A"]}, {"groups": ["C"]}, ()),
     ],
     ids=["open", "inherited", "intersection", "disjoint-admin-only"],
 )
 def test_16_2_confluence_restrictions_are_inherited(fake, local, parent, child, groups):
     pages = [
-        {"id": "10", "space": "OPS", "title": "Üst", "body": "<p>a</p>", "when": OLD, "restrictions": parent},
-        {"id": "11", "space": "OPS", "title": "Alt", "body": "<p>b</p>", "when": OLD,
-         "ancestors": [{"id": "10", "title": "Üst"}], "restrictions": child},
+        {
+            "id": "10",
+            "space": "OPS",
+            "title": "Üst",
+            "body": "<p>a</p>",
+            "when": OLD,
+            "restrictions": parent,
+        },
+        {
+            "id": "11",
+            "space": "OPS",
+            "title": "Alt",
+            "body": "<p>b</p>",
+            "when": OLD,
+            "ancestors": [{"id": "10", "title": "Üst"}],
+            "restrictions": child,
+        },
     ]
-    control(fake, "/_state", {"auth": [f"Bearer {PAT}"], "confluence": {"spaces": {"OPS": {}}, "pages": pages}})
+    control(
+        fake,
+        "/_state",
+        {"auth": [f"Bearer {PAT}"], "confluence": {"spaces": {"OPS": {}}, "pages": pages}},
+    )
     driver = confluence(fake, local)
 
     async def go():
@@ -208,7 +261,7 @@ def test_16_2_rate_limit_is_waited_out(fake, local):
         waits.append(seconds)
 
     driver._http._sleep = fake_sleep
-    assert asyncio.run(driver.count()) == 2
+    assert asyncio.run(driver.count()) == 3
     assert [w for w in waits if w >= 1] == [7.0, 7.0]  # Retry-After honoured, then success
     control(fake, "/_fault", {"rate_limit": 10, "retry_after": 1})
     with pytest.raises(SourceError) as error:
@@ -219,19 +272,41 @@ def test_16_2_rate_limit_is_waited_out(fake, local):
 
 def issues_state():
     issues = [
-        {"key": f"OPS-{n}", "fields": {
-            "summary": f"Konu {n}", "updated": OLD, "created": OLD,
-            "project": {"key": "OPS"}, "status": {"name": "Done"},
-            "assignee": {"displayName": "Ayşe Kaya"}, "reporter": {"displayName": "Mehmet Demir"},
-            "description": "h2. Kök neden\n{code:java}\nthrow new TimeoutException();\n{code}",
-            "resolution": {"name": "Fixed", "description": "Zaman aşımı 30 sn yapıldı."},
-            "comment": {"comments": [
-                {"author": {"displayName": "Ayşe Kaya"}, "body": "Yeniden denendi.", "created": OLD},
-            ]},
-            "security": {"name": "Yonetim"} if n == 0 else None,
-            "attachment": [{"filename": "log.txt", "size": 3, "created": OLD, "mimeType": "text/plain",
-                            "content": "BASE/secure/attachment/1/log.txt"}] if n == 1 else [],
-        }}
+        {
+            "key": f"OPS-{n}",
+            "fields": {
+                "summary": f"Konu {n}",
+                "updated": OLD,
+                "created": OLD,
+                "project": {"key": "OPS"},
+                "status": {"name": "Done"},
+                "assignee": {"displayName": "Ayşe Kaya"},
+                "reporter": {"displayName": "Mehmet Demir"},
+                "description": "h2. Kök neden\n{code:java}\nthrow new TimeoutException();\n{code}",
+                "resolution": {"name": "Fixed", "description": "Zaman aşımı 30 sn yapıldı."},
+                "comment": {
+                    "comments": [
+                        {
+                            "author": {"displayName": "Ayşe Kaya"},
+                            "body": "Yeniden denendi.",
+                            "created": OLD,
+                        },
+                    ]
+                },
+                "security": {"name": "Yonetim"} if n == 0 else None,
+                "attachment": [
+                    {
+                        "filename": "log.txt",
+                        "size": 3,
+                        "created": OLD,
+                        "mimeType": "text/plain",
+                        "content": "BASE/secure/attachment/1/log.txt",
+                    }
+                ]
+                if n == 1
+                else [],
+            },
+        }
         for n in range(150)
     ]
     issues[-1]["fields"]["updated"] = NEW
@@ -252,11 +327,11 @@ def test_16_2_jira_dc_listing_count_render_without_names(fake, local):
         raw = await driver.fetch_raw(items[0])
         second = await driver.fetch_raw(items[1])
         attachments = await collect(driver.list_attachments(items[1], second))
-        acl = await driver.acl(items[0], raw)
+        acl = (await driver.acl(items[0], raw), await driver.acl(items[1], second))
         await driver.aclose()
         return count, items, raw, attachments, acl
 
-    count, items, raw, attachments, acl = asyncio.run(go())
+    count, items, raw, attachments, (acl, acl_open) = asyncio.run(go())
     assert count == 150 and len(items) == 150
     seen = control(fake, "/_requests")["requests"]
     assert seen[0]["query"]["maxResults"] == ["0"]
@@ -268,7 +343,7 @@ def test_16_2_jira_dc_listing_count_render_without_names(fake, local):
     assert "## Comment 1 (" in text and "Yeniden denendi." in text
     assert "Ayşe" not in text and "Mehmet" not in text  # K-16-0009 S1
     assert acl.groups == ("security:Yonetim",)  # the level narrows the project, not adds to it
-    assert asyncio.run(driver.acl(items[1], second)).groups == ("project:OPS",)
+    assert acl_open.groups == ("project:OPS",)
     assert [a.name for a in attachments] == ["log.txt"]
 
 

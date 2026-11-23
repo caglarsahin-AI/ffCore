@@ -20,8 +20,14 @@ STATE = {
         "spaces": {"OPS": {}, "GIZ": {"permitted": False}},
         "pages": [
             {"id": "11", "space": "OPS", "title": "Eski", "body": "<p>a</p>", "when": OLD},
-            {"id": "12", "space": "OPS", "title": "Yeni", "body": "<p>b</p>", "when": NEW,
-             "attachments": [{"title": "rapor.txt", "content": "metin", "when": NEW}]},
+            {
+                "id": "12",
+                "space": "OPS",
+                "title": "Yeni",
+                "body": "<p>b</p>",
+                "when": NEW,
+                "attachments": [{"title": "rapor.txt", "content": "metin", "when": NEW}],
+            },
             {"id": "13", "space": "GIZ", "title": "Gizli", "body": "<p>c</p>", "when": NEW},
         ],
     },
@@ -58,7 +64,7 @@ def call(base, path, body=None, token="dummy-not-secret-pat"):
 
 
 def test_16_2_fake_confluence_listing_count_delta_and_permissions(fake):
-    cql = quote('type=page AND space in (OPS,GIZ)')
+    cql = quote("type=page AND space in (OPS,GIZ)")
     status, body = call(fake, f"/rest/api/search?cql={cql}&limit=1")
     assert status == 200 and body["totalSize"] == 2  # GIZ is not permitted
     delta = quote('type=page AND lastmodified >= now("-10m")')
@@ -69,7 +75,7 @@ def test_16_2_fake_confluence_listing_count_delta_and_permissions(fake):
     assert cloud["body"]["storage"]["value"] == "<p>b</p>"
     _, att = call(fake, "/rest/api/content/12/child/attachment")
     status, raw = call(fake, att["results"][0]["_links"]["download"])
-    assert status == 200 and raw == "metin".encode()
+    assert status == 200 and raw == b"metin"
     assert call(fake, "/rest/api/content/13/child/attachment")[0] == 404
 
 

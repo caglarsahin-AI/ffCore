@@ -16,7 +16,15 @@ import pytest
 from ffcore.core.config import get_settings
 from tests.fakes import fake_atlassian
 from tests.integration import sources_support
-from tests.integration.sources_support import documents, drain, found, runs, search, sources_url, sync
+from tests.integration.sources_support import (
+    documents,
+    drain,
+    found,
+    runs,
+    search,
+    sources_url,
+    sync,
+)
 
 src_world = sources_support.src_world
 PAT = "dummy-not-secret-pat-16-2-int"
@@ -56,11 +64,22 @@ def asked(w):
 
 def page(n, *, marker=None, when=OLD, **extra):
     text = f"<h2>Bölüm {n}</h2><p>{PROSE * 4}{marker or f'sayfaimi{n}'}</p>"
-    return {"id": str(100 + n), "space": "OPS", "title": f"Sayfa {n}", "body": text, "when": when, **extra}
+    return {
+        "id": str(100 + n),
+        "space": "OPS",
+        "title": f"Sayfa {n}",
+        "body": text,
+        "when": when,
+        **extra,
+    }
 
 
 def state(pages, **extra):
-    return {"auth": [f"Bearer {PAT}"], "confluence": {"spaces": {"OPS": {}}, "pages": pages}, **extra}
+    return {
+        "auth": [f"Bearer {PAT}"],
+        "confluence": {"spaces": {"OPS": {}}, "pages": pages},
+        **extra,
+    }
 
 
 def create_source(w, kind="confluence", key="wiki", config=None, client="admin", **extra):
@@ -105,8 +124,13 @@ def test_16_2_project_admin_registers_and_credentials_stay_masked(atl, pg):
     refused = w["admin"].post(
         sources_url(w),
         json={
-            "key": "bulut", "name": "b", "kb_id": w["kb"], "kind": "jira", "deployment": "cloud",
-            "config": {"base_url": "https://ornek.atlassian.net"}, "secret": {"token": PAT},
+            "key": "bulut",
+            "name": "b",
+            "kb_id": w["kb"],
+            "kind": "jira",
+            "deployment": "cloud",
+            "config": {"base_url": "https://ornek.atlassian.net"},
+            "secret": {"token": PAT},
         },
     )
     assert refused.status_code == 422 and refused.json()["error"]["code"] == "secret_invalid"
@@ -126,7 +150,7 @@ def test_16_2_confluence_full_then_delta_asks_only_for_the_changed_page(atl, pg)
     assert raw["status"] == "completed" and raw["added"] == 5 and silver["status"] == "completed"
     assert len(documents(pg, w["kb"])) == 5 and found(w, "analyst", "sayfaimi3")
     hit = next(h for h in search(w, "analyst", "sayfaimi3") if "sayfaimi3" in h["text"])
-    assert hit["breadcrumb"].startswith("OPS › Sayfa 3")
+    assert "OPS › Sayfa 3" in hit["breadcrumb"]  # under the knowledge base name
     assert hit["source_url"] == f"{w['fake']}/spaces/OPS/pages/103"  # S4: the card's link
     # One page changes; the delta asks for that page's attachments and permissions only.
     pages = [page(n) for n in range(5)]
@@ -151,7 +175,7 @@ def test_16_2_confluence_full_prunes_three_deleted_pages(atl, pg):
     open_to_analysts(w, source["id"])
     full(w, source["id"])
     control(w, "/_state", state([page(n) for n in range(30) if n not in (4, 9, 14)]))
-    raw, _ = full(w, source["id"])
+    raw, *_ = full(w, source["id"])
     assert raw["prune_decision"] == "done" and raw["deleted"] == 3
     assert len(documents(pg, w["kb"])) == 27
     assert not found(w, "analyst", "sayfaimi9") and found(w, "analyst", "sayfaimi10")
@@ -160,27 +184,27 @@ def test_16_2_confluence_full_prunes_three_deleted_pages(atl, pg):
 def test_16_2_lost_space_and_cut_listing_delete_nothing(atl, pg):
     w = atl
     two_spaces = [page(n) for n in range(10)] + [
-        {**page(n), "id": str(500 + n), "space": "IK"} for n in range(20)
+        {**page(n), "id": str(500 + n), "space": "IK"} for n in range(45)
     ]
     data = state(two_spaces)
     data["confluence"]["spaces"]["IK"] = {}
     control(w, "/_state", data)
     source = create_source(w)
     full(w, source["id"])
-    assert len(documents(pg, w["kb"])) == 30
-    # The service account loses the IK space: 20 of 30 would go, over the ratio → refused.
+    assert len(documents(pg, w["kb"])) == 55
+    # The service account loses the IK space: 45 of 55 would go, over the ratio → refused.
     data["confluence"]["spaces"]["IK"] = {"permitted": False}
     control(w, "/_state", data)
     raw, *_ = full(w, source["id"])
     assert raw["prune_decision"] == "prune_refused" and raw["deleted"] == 0
-    assert len(documents(pg, w["kb"])) == 30
+    assert len(documents(pg, w["kb"])) == 55
     # The connection drops in the middle of the listing: nothing is deleted.
     data["confluence"]["spaces"]["IK"] = {}
     control(w, "/_state", data)
-    control(w, "/_fault", {"cut_listing_after": 1})
+    control(w, "/_fault", {"cut_listing_after": 50})  # the second listing page drops
     raw, *_ = full(w, source["id"])
     assert raw["status"] == "failed" and raw["prune_decision"] == "listing_failed"
-    assert raw["deleted"] == 0 and len(documents(pg, w["kb"])) == 30
+    assert raw["deleted"] == 0 and len(documents(pg, w["kb"])) == 55
 
 
 def test_16_2_silver_and_gold_never_ask_atlassian(atl, pg):
@@ -210,10 +234,12 @@ def test_16_2_restricted_page_is_not_opened_by_the_space_mapping(atl, pg):
     # Mapping the restriction's group opens it, to that role.
     response = w["admin"].put(
         sources_url(w, f"/{source['id']}/acl-mappings"),
-        json={"mappings": [
-            {"external_group": "space:OPS", "role": "analyst"},
-            {"external_group": "group:Yonetim", "role": "analyst"},
-        ]},
+        json={
+            "mappings": [
+                {"external_group": "space:OPS", "role": "analyst"},
+                {"external_group": "group:Yonetim", "role": "analyst"},
+            ]
+        },
     )
     assert response.status_code == 200, response.text
     sync(w, source["id"], mode="delta")
@@ -224,7 +250,7 @@ def test_16_2_restricted_page_is_not_opened_by_the_space_mapping(atl, pg):
 def test_16_2_shared_attachment_is_downloaded_once_and_big_files_never(atl, pg):
     w = atl
     shared = {"title": "kilavuz.txt", "content": PROSE * 20}
-    huge = {"title": "arsiv.zip", "content": "x", "size": 600 * 1024 * 1024}
+    huge = {"title": "buyuk.pdf", "content": "x", "size": 600 * 1024 * 1024}
     pages = [page(0, attachments=[shared, huge]), page(1, attachments=[shared])]
     control(w, "/_state", state(pages))
     source = create_source(w)
@@ -240,7 +266,7 @@ def test_16_2_shared_attachment_is_downloaded_once_and_big_files_never(atl, pg):
         (source["id"],),
     ).fetchall()
     assert rows == [
-        ("arsiv.zip", "skipped", "too_large", False),
+        ("buyuk.pdf", "skipped", "too_large", False),
         ("kilavuz.txt", "ok", None, False),
         ("kilavuz.txt", "ok", "shared_from", True),
     ]
@@ -248,13 +274,20 @@ def test_16_2_shared_attachment_is_downloaded_once_and_big_files_never(atl, pg):
 
 def issue(n, **fields):
     base = {
-        "summary": f"Konu {n}", "updated": OLD, "created": OLD, "project": {"key": "OPS"},
-        "status": {"name": "Done"}, "issuetype": {"name": "Bug"},
-        "assignee": {"displayName": "Ayşe Kaya"}, "reporter": {"displayName": "Mehmet Demir"},
+        "summary": f"Konu {n}",
+        "updated": OLD,
+        "created": OLD,
+        "project": {"key": "OPS"},
+        "status": {"name": "Done"},
+        "issuetype": {"name": "Bug"},
+        "assignee": {"displayName": "Ayşe Kaya"},
+        "reporter": {"displayName": "Mehmet Demir"},
         "description": f"{PROSE * 3} sorunkodu{n}",
-        "comment": {"comments": [
-            {"author": {"displayName": "Ayşe Kaya"}, "body": PROSE * 2, "created": OLD},
-        ]},
+        "comment": {
+            "comments": [
+                {"author": {"displayName": "Ayşe Kaya"}, "body": PROSE * 2, "created": OLD},
+            ]
+        },
     }
     return {"key": f"OPS-{n}", "fields": {**base, **fields}}
 
@@ -263,14 +296,25 @@ def test_16_2_jira_issues_become_documents_without_person_names(atl, pg):
     w = atl
     fix = issue(
         7,
-        description=f"h2. Kök neden\n{PROSE * 3}\n{{code:java}}\nthrow new TimeoutException();\n{{code}}",
-        resolution={"name": "Fixed", "description": f"{PROSE} Zaman aşımı otuz saniyeye çıkarıldı."},
+        description=f"h2. Kök neden\n{PROSE * 3}\n"
+        "{code:java}\nthrow new TimeoutException();\n{code}",
+        resolution={
+            "name": "Fixed",
+            "description": f"{PROSE} Zaman aşımı otuz saniyeye çıkarıldı.",
+        },
     )
     secret = issue(8, security={"name": "Yonetim"}, description=f"{PROSE * 3} gizlisorun")
-    control(w, "/_state", {
-        "auth": [f"Bearer {PAT}"],
-        "jira": {"projects": {"OPS": {}}, "issues": [issue(n) for n in range(5)] + [fix, secret]},
-    })
+    control(
+        w,
+        "/_state",
+        {
+            "auth": [f"Bearer {PAT}"],
+            "jira": {
+                "projects": {"OPS": {}},
+                "issues": [issue(n) for n in range(5)] + [fix, secret],
+            },
+        },
+    )
     source = create_source(w, kind="jira", key="jira", config={"jql": "project = OPS"})
     open_to_analysts(w, source["id"], group="project:OPS")
     raw, _ = full(w, source["id"])
