@@ -98,15 +98,21 @@ class Membership(BaseModel):
 AuthSource = Literal["local", "ldap", "oidc"]
 
 
+def _additive(schema: dict[str, Any]) -> None:
+    """17: a field added to an existing answer has no `default` in the schema, so generated
+    clients see it as optional and older code (and mocks) that never set it keep compiling."""
+    schema.pop("default", None)
+
+
 class CurrentUser(BaseModel):
     id: UUID
     email: str
     full_name: str
     is_superadmin: bool
     # 17 (additive): where the identity lives; a directory account has no password here.
-    auth_source: AuthSource = "local"
+    auth_source: AuthSource = Field(default="local", json_schema_extra=_additive)
     # 17: set by the CSV import; the console sends the user to the password screen first.
-    must_change_password: bool = False
+    must_change_password: bool = Field(default=False, json_schema_extra=_additive)
 
 
 class MeResponse(BaseModel):
@@ -132,9 +138,9 @@ class UserOut(BaseModel):
     created_at: datetime
     updated_at: datetime
     # 17 (additive)
-    auth_source: AuthSource = "local"
-    last_login_at: datetime | None = None
-    must_change_password: bool = False
+    auth_source: AuthSource = Field(default="local", json_schema_extra=_additive)
+    last_login_at: datetime | None = Field(default=None, json_schema_extra=_additive)
+    must_change_password: bool = Field(default=False, json_schema_extra=_additive)
 
 
 class UserCreate(Strict):

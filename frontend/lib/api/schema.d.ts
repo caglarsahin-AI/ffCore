@@ -550,15 +550,11 @@ export interface components {
             is_superadmin: boolean;
             /**
              * Auth Source
-             * @default local
              * @enum {string}
              */
-            auth_source: "local" | "ldap" | "oidc";
-            /**
-             * Must Change Password
-             * @default false
-             */
-            must_change_password: boolean;
+            auth_source?: "local" | "ldap" | "oidc";
+            /** Must Change Password */
+            must_change_password?: boolean;
         };
         /** DriverField */
         DriverField: {
@@ -1184,17 +1180,13 @@ export interface components {
             updated_at: string;
             /**
              * Auth Source
-             * @default local
              * @enum {string}
              */
-            auth_source: "local" | "ldap" | "oidc";
+            auth_source?: "local" | "ldap" | "oidc";
             /** Last Login At */
             last_login_at?: string | null;
-            /**
-             * Must Change Password
-             * @default false
-             */
-            must_change_password: boolean;
+            /** Must Change Password */
+            must_change_password?: boolean;
         };
         /** UserUpdate */
         UserUpdate: {

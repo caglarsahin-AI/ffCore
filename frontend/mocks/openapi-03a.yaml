@@ -2398,11 +2398,9 @@ components:
           - ldap
           - oidc
           title: Auth Source
-          default: local
         must_change_password:
           type: boolean
           title: Must Change Password
-          default: false
       type: object
       required:
       - id
@@ -3486,7 +3484,6 @@ components:
           - ldap
           - oidc
           title: Auth Source
-          default: local
         last_login_at:
           anyOf:
           - type: string
@@ -3496,7 +3493,6 @@ components:
         must_change_password:
           type: boolean
           title: Must Change Password
-          default: false
       type: object
       required:
       - id
