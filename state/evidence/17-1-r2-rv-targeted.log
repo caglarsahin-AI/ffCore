@@ -1,0 +1,17 @@
+HEAD=561f255e0664f162fd7805e5a45671b7019486a7 stack=ffcore-rv (git archive copy)
+utc now 2026-11-23 13:25
+cmd: tools pytest tests/unit/test_17_ldap.py tests/contract/test_17_openapi.py tests/integration/test_17_identity.py tests/integration/test_17_r2.py tests/integration/test_17_migration.py tests/integration/test_03a_access.py tests/integration/test_03a_auth.py tests/contract/test_03a_openapi.py tests/contract/test_03c_openapi.py -q (llmaas); alembic heads; ruff
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/integration/test_03a_auth.py::test_03a_4_wrong_password_401_uniform
+1 failed, 110 passed, 2 warnings in 440.75s (0:07:20)
+17_0001 (07, 03b, 11, 04b, 03c, 05a, 09,
+All checks passed!
+3 files already formatted
+utc now 13:33
+cmd: tools (-e DEPLOY_PROFILE=airgap -e OFFLINE=true) pytest tests/unit/test_17_ldap.py tests/contract/test_17_openapi.py tests/integration/test_17_identity.py tests/integration/test_17_r2.py tests/integration/test_17_migration.py -q
+    warnings.warn(f"{attr} is deprecated. Please use {newAttr} instead.", DeprecationWarning)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+78 passed, 2 warnings in 277.82s (0:04:37)
+utc now 13:37

@@ -1,0 +1,66 @@
+HEAD=561f255e0664f162fd7805e5a45671b7019486a7 stack=ffcore-rv (git archive copy + reviewer probe file)
+utc now 2026-11-23 13:39
+cmd: docker compose -p ffcore-rv --env-file .env.test up -d --wait --pull never postgres redis
+2
+cmd: tools pytest tests/integration/test_rv_17_r2_probe.py -k bind_codes -q -s
+RV2 4 user bind result 49    -> 401 invalid_credentials    audit denied bind_failed
+RV2 4 user bind result 53    -> 401 invalid_credentials    audit denied bind_rejected_53
+RV2 4 user bind result 19    -> 401 invalid_credentials    audit denied bind_rejected_19
+RV2 4 user bind result 50    -> 401 invalid_credentials    audit denied bind_rejected_50
+RV2 4 user bind result 51    -> 401 invalid_credentials    audit denied bind_rejected_51
+RV2 4 user bind result 52    -> 401 invalid_credentials    audit denied bind_rejected_52
+RV2 4 user bind result 80    -> 401 invalid_credentials    audit denied bind_rejected_80
+RV2 4 user bind result None  -> 401 invalid_credentials    audit denied bind_rejected_None
+RV2 4 password TAB -> 503 identity_provider_unavailable
+2026-11-23 13:40:10,412 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+RV2 4 service bind refused -> 503 identity_provider_unavailable
+2026-11-23 13:40:10,565 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 13:40:10,566 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+RV2 4 unreachable -> 503 identity_provider_unavailable
+.2026-11-23 13:40:10,922 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 13:40:11,187 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 13:40:11,888 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 13:40:12,072 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 13:40:12,117 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 13:40:12,354 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 13:40:12,496 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 13:40:12,859 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 13:40:14,360 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 13:40:14,362 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 13:40:14,714 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 13:40:14,775 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 13:40:14,776 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 13:40:14,777 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 13:40:14,778 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 13:40:14,780 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 13:40:14,781 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 13:40:14,781 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 13:40:14,782 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 13:40:14,782 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 13:40:14,782 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 13:40:14,947 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 13:40:15,898 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 13:40:16,285 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 13:40:16,629 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 13:40:21,947 ERROR ffcore.litellm_reconcile litellm_reconcile_failed attempts=3 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 13:40:22,326 ERROR ffcore.litellm_reconcile litellm_reconcile_failed attempts=3 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 13:40:22,682 ERROR ffcore.litellm_reconcile litellm_reconcile_failed attempts=3 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 13:40:24,426 ERROR ffcore.litellm_reconcile litellm_reconcile_failed attempts=3 error=EgressRequestFailed: egress_dns_failed
+1 passed, 9 deselected, 2 warnings in 27.16s
+cmd: tools pytest tests/integration/test_03a_auth.py -q (alone, fresh database)
+..............                                                           [100%]
+14 passed in 67.53s (0:01:07)
+cmd: tools pytest tests/integration/test_17_r2.py tests/integration/test_03a_auth.py -q (17 first, the order of my earlier run)
+E       AssertionError: assert 20 == 2
+E        +  where 20 = len([('anonymous', 'denied', {'code': 'user_inactive', 'reason': 'user_inactive', 'source': 'ldap'}), ('anonymous', 'denie...local'}), ('anonymous', 'denied', {'code': 'invalid_
+2026-11-23 13:43:16,255 ERROR ffcore.readiness warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+FAILED tests/integration/test_03a_auth.py::test_03a_4_wrong_password_401_uniform
+1 failed, 27 passed, 2 warnings in 148.22s (0:02:28)
+cmd: docker compose -p ffcore-rv --env-file .env.test --profile test --profile e2e --profile tools down -v
+ Network ffcore-rv_default  Removed
+containers=0 volumes=0 networks=0
+NAME                STATUS              CONFIG FILES
+ffcore              running(17)         C:\ai_paycore\ffcore\compose.yaml,C:\ai_paycore\ffcore\deploy\docker-compose.ollama.yml
+ffcore-16           running(3)          C:\ai_paycore\ffcore\.worktrees\feat\16-2-atlassian\compose.yaml
+utc now 13:44

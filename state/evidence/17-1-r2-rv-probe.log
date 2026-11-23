@@ -1,0 +1,113 @@
+HEAD=561f255e0664f162fd7805e5a45671b7019486a7 stack=ffcore-rv (git archive copy) (+ reviewer probe file tests/integration/test_rv_17_r2_probe.py, not in the branch)
+utc now 2026-11-23 13:23
+cmd: docker compose -p ffcore-rv --env-file .env.test up -d --wait --pull never postgres redis
+2
+NAME                STATUS              CONFIG FILES
+ffcore              running(17)         C:\ai_paycore\ffcore\compose.yaml,C:\ai_paycore\ffcore\deploy\docker-compose.ollama.yml
+ffcore-16           running(3)          C:\ai_paycore\ffcore\.worktrees\feat\16-2-r2-red\compose.yaml,C:\ai_paycore\ffcore\.worktrees\feat\16-2-atlassian\compose.yaml
+ffcore-rv           running(2)          C:\Users\caglar.sahin\AppData\Local\Temp\claude\9398d5fca5badfb5\d866dade-595b-43f0-b74a-a212bc018d6b\scratchpad\p171r2\compose.yaml
+cmd: tools pytest tests/integration/test_rv_17_r2_probe.py -q -s (llmaas)
+RV2 1 alert rule 201 | accounts (active, inactive, by sync): (8, 0, 0)
+RV2 1 base that does not exist     error=directory_base_missing checked=0 missing=0 deactivated=0 | state (8, 0, 0) | audit error
+RV2 1 base that exists, no users   error=identity_sync_refused checked=8 missing=8 deactivated=0 | state (8, 0, 0) | audit error
+RV2 1 wrong id attribute           error=identity_sync_refused checked=8 missing=8 deactivated=0 | state (8, 0, 0) | audit error
+RV2 1 service account refused      error=service_bind_failed checked=0 missing=0 deactivated=0 | state (8, 0, 0) | audit error
+RV2 1 unreachable                  error=directory_unreachable deactivated=0
+RV2 1 alerts identity_sync_refused before/after: 0 (1, 'critical')
+RV2 1 an open session still works: 200
+RV2 1 one of eight removed: error=None missing=1 deactivated=1 | row active=False by=identity_sync | its session 401
+RV2 1 two of seven removed: error=identity_sync_refused missing=2 deactivated=0 | state (7, 1, 1)
+RV2 1 the same with force: error=None deactivated=2 | audit {'forced': True, 'checked': 7, 'missing': 2, 'max_ratio': 0.2, 'deactivated': 2, 'reactivated': 0}
+RV2 1 three of five disabled in the directory: error=None missing=0 deactivated=3 | state (2, 6, 6)
+.2026-11-23 13:24:01,038 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 13:24:01,439 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 13:24:01,499 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 13:24:01,762 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 13:24:02,384 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 13:24:03,471 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 13:24:03,471 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 13:24:03,472 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 13:24:03,473 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 13:24:03,473 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 13:24:03,473 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 13:24:03,474 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 13:24:03,474 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 13:24:10,557 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 13:24:11,552 ERROR ffcore.readiness warmup failed: ModelMissing
+RV2 1 the only directory account left the directory: error=identity_sync_refused checked=1 missing=1 deactivated=0
+2026-11-23 13:24:11,752 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 13:24:11,926 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 13:24:12,083 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 13:24:12,227 ERROR ffcore.readiness warmup failed: ModelMissing
+RV2 1 one of four left (25 % > 0.2): error=identity_sync_refused deactivated=0 
+.2026-11-23 13:24:15,165 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 13:24:15,443 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 13:24:15,679 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 13:24:15,855 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 13:24:16,026 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 13:24:16,312 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 13:24:16,484 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 13:24:16,676 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 13:24:17,277 ERROR ffcore.readiness warmup failed: ModelMissing
+RV2 1 after the sync: (False, 'identity_sync')
+2026-11-23 13:24:17,551 ERROR ffcore.readiness warmup failed: ModelMissing
+RV2 1 sign-in while still missing in the directory: 401 invalid_credentials | row (False, 'identity_sync')
+2026-11-23 13:24:17,716 ERROR ffcore.readiness warmup failed: ModelMissing
+RV2 1 back in the directory, wrong password: 401 invalid_credentials | row (False, 'identity_sync')
+2026-11-23 13:24:17,882 ERROR ffcore.readiness warmup failed: ModelMissing
+RV2 1 back in the directory, right password: 200 None | row (True, None)
+RV2 1 user_reactivated audit: [{'reason': 'directory_sign_in'}]
+2026-11-23 13:24:18,088 ERROR ffcore.readiness warmup failed: ModelMissing
+RV2 1 admin deactivation: 200 | sign-in 403 user_inactive | after sync row (False, 'admin') reactivated 0
+2026-11-23 13:24:18,209 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+RV2 1 parked by the sync, seen again by the next sync: reactivated 1 | row (True, None)
+RV2 1 routes with 'sync' or 'force': []
+.2026-11-23 13:24:18,411 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 13:24:18,563 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 13:24:19,062 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 13:24:19,233 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 13:24:19,449 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+RV2 3 default_endpoint allowed_referral_hosts = []
+RV2 3 connection auto_referrals = False
+.2026-11-23 13:24:22,440 ERROR ffcore.readiness warmup failed: ModelMissing
+F2026-11-23 13:24:30,716 ERROR ffcore.readiness warmup failed: ModelMissing
+RV2 5 LDAP off: ->ldap 422 identity_provider_not_configured | ->oidc 422 identity_provider_not_configured
+RV2 5 a local account ->local 200 None | row ('local', None, True)
+RV2 5 LDAP on: ->oidc 422 identity_provider_not_configured
+RV2 5 link ->ldap 200 | temporary_password in answer: None
+RV2 5 unlink before binding 200 | temporary password given: True | row ('local', None, True, True, None, True)
+RV2 5 temporary password in a later GET: False | in the list: False
+RV2 5 temporary password in audit: False | user_identity_unlinked: [{'from': 'ldap'}]
+RV2 5 update_user audit after (password keys): {'temporary_password': '***', 'must_change_password': '***'}
+2026-11-23 13:24:31,448 ERROR ffcore.readiness warmup failed: ModelMissing
+RV2 5 signed in with the temporary password; another call: 403 password_change_required
+2026-11-23 13:24:31,837 ERROR ffcore.readiness warmup failed: ModelMissing
+RV2 5 link again 200 | directory sign-in 200 None | unlink after binding 422 auth_source_change_invalid | row ('ldap', 'd8efc8ad-69e7-423f-89b8-37a20b94aee8', False)
+RV2 5 bound account -> local + superadmin in one call 422 auth_source_change_invalid
+.2026-11-23 13:24:40,043 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 13:24:41,066 ERROR ffcore.readiness warmup failed: ModelMissing
+RV2 6 (admin,read)+(user,edit)                   -> ('admin', 'read', 'idp')
+RV2 6 (user,edit)+(admin,read)                   -> ('admin', 'read', 'idp')
+RV2 6 (analyst,read)+(analyst,edit)              -> ('analyst', 'edit', 'idp')
+RV2 6 (user,edit)+(analyst,read)+(admin,read)    -> ('admin', 'read', 'idp')
+RV2 6 (admin,read)+(admin,edit)+(user,read)      -> ('admin', 'edit', 'idp')
+.2026-11-23 13:24:49,242 ERROR ffcore.readiness warmup failed: ModelMissing
+RV2 7 password changed to itself -> 400 password_unchanged
+2026-11-23 13:24:49,608 ERROR ffcore.readiness warmup failed: ModelMissing
+RV2 7 default project missing -> 503 default_project_missing | audit ('error', {'code': 'default_project_missing', 'reason': 'default_project_missing', 'source': 'ldap'}) | account row: None
+.2026-11-23 13:24:57,893 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 13:24:57,998 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 13:24:58,169 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 13:24:58,275 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 13:24:58,399 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 13:24:58,508 ERROR ffcore.readiness warmup failed: ModelMissing
+RV2 7 six parallel first sign-ins -> ['200 None', '200 None', '200 None', '200 None', '200 None', '200 None'] | account rows: 1
+RV2 7 user_provisioned rows for it: 1
+.2026-11-23 13:25:02,611 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 13:25:11,807 ERROR ffcore.readiness warmup failed: ModelMissing
+RV2 2 median ms: known=92.3 unknown=86.1 known again=90.6 ratio=1.07
+E                           TypeError: cannot pickle '_thread.lock' object
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+FAILED tests/integration/test_rv_17_r2_probe.py::test_rv2_4_bind_codes - Type...
+1 failed, 9 passed, 2 warnings in 96.88s (0:01:36)
+utc now 13:25
