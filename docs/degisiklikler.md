@@ -24,7 +24,8 @@ if anything.
   `last_login_at`); `PATCH /users/{id}` accepts `auth_source` to link a local account (its
   password is deleted). New refusals: 503 `identity_provider_unavailable` (no local fallback),
   403 `user_inactive` (a disabled account used to get 401), 403 `local_login_disabled`,
-  409 `identity_conflict`, 400 `external_identity`, 422 `superadmin_must_be_local`.
+  409 `identity_conflict`, 400 `external_identity`, 422 `superadmin_must_be_local`, 403
+  `password_change_required` (an imported account before its first password change).
 - **Behaviour:** changing a member on the members screen marks the membership manual (group sync
   no longer moves it). Dependencies: `ldap3` 2.9.1, `pyasn1` 0.6.1 (in `uv.lock`, so in the
   offline wheel set).

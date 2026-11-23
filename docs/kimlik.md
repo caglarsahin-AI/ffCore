@@ -160,7 +160,8 @@ and code (`invalid_email`, `duplicate_email`, `invalid_full_name`, `invalid_role
 `invalid_access`, `unknown_project`, `external_identity`, `row_columns`). A bad line never stops
 the file. `dry_run=false` applies the good lines: a new account gets a temporary password that
 appears **once**, in that answer, and is never stored in clear or audited; at the first sign-in
-`must_change_password` sends the user to the password screen. Existing local accounts get the
+`must_change_password` sends the user to the password screen; until the password is changed
+every other call answers 403 `password_change_required`. Existing local accounts get the
 name and the listed memberships (as manual). Directory accounts are refused: the directory
 manages them. The audit row `user_imported` keeps the counts only.
 
