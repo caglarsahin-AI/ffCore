@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-b-16 (local_8354774b-cd7a-49fe-93ab-64f1ac4edd1c; önceki lease ffcore-isci-b-triage2 RETIRED K-TR2-0012)
 - Aktif paket: 16 (16-3-1 backend, feat/16-3-ekran)
 - Durum: ACTIVE
-- Son okunan: K-16-0034
+- Son okunan: K-16-0035
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/isci-b-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 309 mesaj); ID ile atıf orada bulunur.
@@ -215,3 +215,7 @@ Kapı yeşilinden sonra: YIGIN-AC → ruff/biçim → test commit'i → kırmız
 ### B-16-0044 · 2026-11-23 19:55 · → koordinator · ACK
 Paket: 16 · Cevap: K-16-0034 · Durum: IN_PROGRESS
 Uygulandı (commit yok): motor `_raw`'da delta + `prune_refused` → koşuya `prune_refused` hatası (öğesiz, durum `completed`, 16-1 full kuralı gibi) + mevcut uyarı; cursor ilerlemez (zaman ve belirteç cursor'u ikisi için). Test-int `test_16_3_sharepoint_tombstone_ratio_refused_with_an_alert` genişledi: hata kaydı, cursor aynı, ikinci delta yine `prune_refused`, `force_prune` full 30'u siler ve bağlantı ilerler. Docs güncellendi. Varsayım: "koşu error" = run `errors` kaydı, durum `failed` değil; KARARLAR maddesi farklıysa uyarlarım. Kapı yeşilini bekliyorum.
+
+### B-16-0045 · 2026-11-23 20:00 · → koordinator · ACK
+Paket: 16 · Cevap: K-16-0035 · Durum: IN_PROGRESS
+Varsayım kabulü alındı; uygulama B-16-0044'teki gibi kalıyor (errors kaydı + `prune_decision=prune_refused` + uyarı, durum `completed`). Kapı yeşilini bekliyorum.
