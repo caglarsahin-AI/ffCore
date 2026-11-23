@@ -4,6 +4,21 @@ Behaviour and configuration changes that a deployment or an API client notices, 
 (handbook/RELEASE_AND_ROLLBACK.md, CHANGE_CONTROL.md). Each entry names the package and what to do,
 if anything.
 
+## 2026-11-23 · 16-2 · Data sources: Confluence and Jira
+
+- **What:** `kind: confluence` and `kind: jira` sources, Server/Data Center (`deployment:
+  server`, personal access token) and Cloud (`deployment: cloud`, e-mail + API token; refused
+  with `OFFLINE=true`). Registered by the project admin with an address, a credential and an
+  optional scope (space keys, JQL); docs/veri-kaynaklari.md.
+- **Search and chat (additive):** a search hit and a chat source carry `source_url` (the page
+  or issue in its system; `null` for uploads). Existing clients ignore the new field.
+- **Egress overlay:** `sync-worker` gets `EGRESS_PROXY_URL`; add Atlassian Cloud sites to
+  `EGRESS_ALLOWLIST`, internal Confluence/Jira hosts to `ALLOWED_INTERNAL_HOSTS`.
+- **Permissions:** a restricted Confluence page or a Jira issue with a security level is
+  readable only through a mapping of its restriction (`group:`, `user:`, `security:`); the space
+  or project mapping does not open it.
+- **Nothing to migrate.**
+
 ## 2026-11-22 · 16-1 · Data sources: core and network folder
 
 - **What:** a knowledge base can be fed from a live source on a schedule instead of uploads

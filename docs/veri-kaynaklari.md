@@ -3,8 +3,8 @@
 A data source feeds one knowledge base from a live system on a schedule, instead of manual
 uploads: what is added or changed at the source is indexed, what is really deleted there leaves
 the index, and the source's permissions are carried to the documents. 16-1 ships the core and
-the **network folder** source; Confluence and Jira (Server/Data Center and Cloud) follow in
-16-2, SharePoint/OneDrive and the console screen in 16-3. The word "connector" is not used
+the **network folder** source, 16-2 **Confluence** and **Jira** (Server/Data Center and Cloud);
+SharePoint/OneDrive and the console screen follow in 16-3. The word "connector" is not used
 (TERMINOLOGY): a source is a *data source*, its code a *driver*.
 
 | Source | Profiles | Package |
@@ -105,6 +105,9 @@ change reaches all documents at the next run, without asking the source).
 
 - A group without a mapping gives **admin only**; an item none of whose groups is mapped is
   readable by admins only. Open a source on purpose with a `*` row (every item).
+- Confluence and Jira groups are a **union** (each group the source lists may read the
+  item), so a restriction is reported **instead of** the broad group, never beside it: see
+  the Confluence and Jira sections.
 - Network folders report their folder chain (`folder:/`, `folder:/a`, `folder:/a/b`); the
   **deepest mapped folder wins**, so `folder:/contracts/board` → `admin` closes that subtree even
   when `folder:/` → `analyst`.
@@ -142,6 +145,73 @@ A file that keeps an old modification time (moved, renamed, copied with its orig
 **full** sync after such a change (it also finds deleted files). A folder named like a personnel-data source
 (`prsim…`) is refused (`prsim_requires_ner`) until names are masked (08).
 
+## Confluence
+
+Set up with three things (K-16-0003): the address, a service account credential and an
+optional scope.
+
+| Field | Server/Data Center (`deployment: server`) | Cloud (`deployment: cloud`) |
+|---|---|---|
+| `config.base_url` | `https://wiki.example.org[/context]` | `https://<site>.atlassian.net` |
+| `secret` | `{"token": "<personal access token>"}` | `{"email": "...", "api_token": "..."}` |
+| `config.space_keys` | empty = every space the account sees | same |
+| `config.attachments_enabled` | `true` | same |
+
+A credential that does not fit the deployment is refused (`422 secret_invalid`); a base URL
+that points at the platform itself is `400 endpoint_is_platform`. Cloud needs outbound HTTP:
+refused with `OFFLINE=true` (`source_kind_unavailable`); with the egress overlay the sync
+worker goes through the forward proxy (add the site to `EGRESS_ALLOWLIST`). A Server/Data
+Center host inside the network goes into `ALLOWED_INTERNAL_HOSTS`.
+
+- **What is read:** pages (`type=page`) with their storage-format body; Server/Data Center
+  lists bodies with the listing (one request per 50 pages), Cloud lists with the v1 CQL search
+  and reads each changed page's body from the v2 API. The count is the search's `totalSize`.
+- **Delta:** only pages modified since the last run, `lastmodified >= now("-Nm")` with N =
+  minutes since the cursor + 10 (no time zone in the query; the 10 minutes cover clock skew).
+  A delta never deletes; a page deleted, archived or out of scope leaves in a **full** run under
+  the safe delete rule. Scheduled runs are deltas.
+- **Document:** the body is turned into Markdown (headings, lists, tables, code blocks kept;
+  `toc`, `children`, `pagetree`, attachment galleries removed; `include`d pages are not expanded
+  because they are indexed themselves; an unknown macro keeps its rich body or is dropped and
+  counted). The breadcrumb is `space › parent pages › page`; the search hit's `source_url` is
+  the page in Confluence.
+- **Attachments:** listing metadata first (newest version per title), Kapı 0 before any
+  download; the same name and size on two pages is downloaded and indexed once.
+- **Permissions:** a page with no read restriction (on itself or any parent page) reports
+  `space:<KEY>`; map it to open the space. A restricted page reports only the restriction's
+  `group:<name>` and `user:<name>`; restrictions on several levels report who is named on every
+  level, and none in common means admins only.
+
+## Jira
+
+| Field | Value |
+|---|---|
+| `config.base_url`, `secret` | as Confluence |
+| `config.jql` | empty = every issue the account sees; otherwise a filter such as `project = OPS`. Leave `ORDER BY` out (`422 config_invalid` `jql_order_by`): the sync orders by `updated` |
+| `config.attachments_enabled` | `true` |
+
+- **Document:** one per issue, `# KEY: summary`, a metadata block (project, type, status,
+  priority, resolution, labels, created, updated), `## Description`, `## Resolution` and one
+  `## Comment <n> (<date>)` per comment, so chunks break at comment boundaries. Jira wiki code
+  blocks and headings become Markdown. **Person names are not indexed** (assignee, reporter,
+  comment authors): the issue's knowledge is the problem and its solution, not who said it.
+  `source_url` is `<base_url>/browse/<KEY>`.
+- **Count:** Server/Data Center asks the search for `total`; Jira Cloud has only an approximate
+  count, so the driver counts by a key-only listing (two light scans per full run) to keep the
+  safe delete rule exact.
+- **Delta:** `updated >= "-Nm"` (as Confluence). Deleted issues leave in a full run.
+- **Permissions:** `project:<KEY>`; an issue with a security level reports only
+  `security:<level>` (map it to the role that may see that level).
+
+Requests are paced (0.5 s between reads, 0.1 s between downloads, two at a time per source);
+`429` and `503` wait for `Retry-After` (at most 30 s) or back off exponentially, four tries,
+then a coded error (`rate_limited`, `source_unavailable`). A link the source returns that
+points to another host is not followed (`foreign_url`). Wrong credentials are
+`source_auth_failed` on the connection test and in the run.
+
+The Jira sample `data/samples/openapi/jira.yaml` (search, get, create, comment) can be published
+as agent tools through the OpenAPI → MCP road (05b); publish create and comment with approval.
+
 ## API
 
 `/api/v1/projects/{project_id}/data-sources` (OpenAPI `backend/openapi/16.yaml`). Developers and
@@ -174,6 +244,9 @@ Error codes: `path_outside_base` (400), `fs_source_superadmin_only` (403),
 `data_source_paused`, `data_source_has_items`, `sync_running`, `sync_run_finished`,
 `knowledge_base_has_sources` (409), `queue_unavailable` (503). Run errors (in the run row):
 `kb_deleted`, `count_failed`, `listing_failed`, `prune_failed`, `raw_failed`, `run_abandoned`.
+Confluence/Jira (16-2): `source_auth_failed`, `source_not_found`, `source_query_refused`,
+`source_unavailable`, `source_bad_response`, `rate_limited`, `foreign_url`, `attachment_gone`,
+`endpoint_is_platform` (400 at registration).
 
 ## Settings
 
@@ -189,5 +262,6 @@ Error codes: `path_outside_base` (400), `fs_source_superadmin_only` (403),
 ## Services
 
 `sync-worker` (`arq ffcore.sources.worker.SyncWorkerSettings`, backend image) runs raw runs and
-the minute tick; it loads no model and converts nothing. Silver and gold run on the ingest
+the minute tick; it loads no model and converts nothing. With the egress overlay it gets
+`EGRESS_PROXY_URL` like the other application services (Cloud sources). Silver and gold run on the ingest
 `worker` (`source_layer_job`). Neither publishes a port.
