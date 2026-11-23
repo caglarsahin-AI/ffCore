@@ -194,9 +194,12 @@ def test_03a_13_each_mutation_one_audit_event(root, make_user, pg):
         response = getattr(root, method)(url, **kwargs)
         assert response.status_code in (200, 201, 204), (url, response.text)
         assert count() == before + 1, url
+    # 17-1 r2 gate: the query had no order and no resource filter, so another test's delete_user
+    # row could come last (the shared database); now it names this user's row.
     rows = pg.execute(
         "SELECT resource_id, before FROM audit_events WHERE action = 'delete_user'"
-        " AND outcome = 'success'"
+        " AND outcome = 'success' AND resource_id = %s ORDER BY ts",
+        (uid,),
     ).fetchall()
     assert rows and rows[-1][0] == uid  # deletions name the resource too
     assert "password_hash" not in str(rows[-1][1])
