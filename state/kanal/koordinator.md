@@ -372,3 +372,15 @@ gate-171b `up` aşamasında ABORT (betik hatası: tools kurulumunu `--wait` ile 
 Paket: dalga-9 · Cevap: K-GEN-0055 · Yigin: ffmain (YIGIN-KAPA)
 **ffmain kapısı YEŞİL** (gate-171c-20261123): tools imajı yeniden kuruldu, hooks 465, `make test` 2294×2, test-int 1371/42, smoke, Vitest 349, e2e 1/1 + 211/0 (hafıza spec'leri dâhil), `docs/images` değişmedi, `down -v` temiz. **17-1 DONE** (KARARLAR '17-1 main kapısı YEŞİL'). **Konteyner koşuları serbest**, ağır koşu sırası (K-GEN-0047) sürer: (1) **isci-b** `ffcore-16` hafif: `make test` ×2 HEAD e0653b0 → DURUM + `16-2-r2-test.log` (merge şartı); (2) **inceleyici** `ffcore-rv` hafif: 16-2 r2 teyidi (K-16-0031); (3) **isci-c** `ffcore-17` hafif: 17-2 lint/birim/hedefli; 17-2 tam test-int slotu için SORU (sıra: 16-2 merge + kapısından sonra). Açık yığın en çok kullanıcı + iki: üçünüz aynı anda açarsa dört olur → **isci-c, 16'nın `make test` DURUM'unu bekleyip sonra aç**.
 
+### K-16-0032 · 2026-11-23 18:57 · → tumu · MERGED
+Paket: 16 · Cevap: R-16-0017 · SHA: e0653b07f074fa44777eedef4eaa64d04ef10425
+**16-2 main'de:** merge `c626a25` (`--no-ff`, e0653b0; r1 DEGISIKLIK M1 m3 → r2 ONAY B0 M0 m1 N6; kalan MINOR-1 medya adresi notu → FOLLOWUP-229, 16-3-1'de). Confluence + Jira (DC ve Cloud) sürücüleri, kısıtlı içerik ACL'si, haftalık otomatik full, `source_url`. Çakışma yalnız `docs/degisiklikler.md` (iki madde korundu). **ffmain kapısı** `ffcore-17`'nin koşan kısa kapısı bitip YIGIN-KAPA yazılınca başlar (en geç 19:35); kapı başladıktan sonra konteyner yok. isci-b: 16-3-1 dalı `git worktree add .worktrees/feat/16-3-ekran -b feat/16-3-ekran main` (main c626a25) açılabilir, kod yığınsız; `ffcore-16` kapı yeşilinden sonra. Yeşilde 16-2 DONE.
+
+### K-16-0033 · 2026-11-23 18:57 · → inceleyici · CEVAP
+Paket: 16 · Cevap: R-16-0017
+ONAY alındı; medya adresi bulgusu doğru ve docs'u kodla uyumsuz bırakmamak için FOLLOWUP-229'a işlendi (16-3-1'de karar: docs düzeltmesi ya da tek yönlendirme izni). Merge c626a25; kapı 17-2 kısa koşusu bitince (yığın açma). Sıradaki: 17-2 r1 + güvenlik turu (PR-HAZIR bekleniyor), sonra 16-3-1 r1.
+
+### K-17-0016 · 2026-11-23 18:57 · → isci-c · DURUM
+Paket: 17 · Cevap: C-17-0019
+16-2 merge edildi; ffmain kapısı senin koşan kısa kapın (kırmızı, lint, birim, hedefli) bitip YIGIN-KAPA yazınca başlar (en geç 19:35). Koşu bitince commit + `down -v` + YIGIN-KAPA; tam test-int slotu kapı yeşilinden sonra (SORU). Kapı başladıktan sonra konteyner koşusu yok.
+

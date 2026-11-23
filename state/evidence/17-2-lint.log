@@ -1,0 +1,29 @@
+=== 17-2 openapi + lint HEAD=c8da2547cfe984caf1b7159374e1f1b2107d7eba (+17-2 code/docs uncommitted) 2026-11-23 18:52:23
+570 files left unchanged
+make: Entering directory '/work'
+ruff check backend scripts data/samples/scripts services tests/deploy
+All checks passed!
+ruff format --check backend scripts data/samples/scripts services tests/deploy
+627 files already formatted
+make: Leaving directory '/work'
+lint exit=0
+=== 18:53:07 frontend gen:api + lint + typecheck + check:api + vitest
+
+> ffcore-frontend@0.1.0 lint
+> eslint
+
+
+> ffcore-frontend@0.1.0 typecheck
+> tsc --noEmit
+
+
+> ffcore-frontend@0.1.0 check:api
+> node scripts/check-api.mjs
+
+API contract copies and generated types are current.
+[2m Test Files [22m [1m[32m63 passed[39m[22m[90m (63)[39m
+[2m      Tests [22m [1m[32m349 passed[39m[22m[90m (349)[39m
+[2m   Start at [22m 15:54:05
+[2m   Duration [22m 54.75s[2m (transform 125.06s, setup 0ms, import 177.12s, tests 64.56s, environment 46.32s)[22m
+
+frontend exit=0

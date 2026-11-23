@@ -724,3 +724,72 @@ smoke: passed
 smoke exit=0
 
 === 17:17:09 frontend typecheck/check:api/vitest (node, --network none, repo root)
+typecheck_exit=0
+> ffcore-frontend@0.1.0 typecheck
+> tsc --noEmit
+
+checkapi_exit=0
+> node scripts/check-api.mjs
+
+API contract copies and generated types are current.
+vitest_exit=0
+
+[2m Test Files [22m [1m[32m63 passed[39m[22m[90m (63)[39m
+[2m      Tests [22m [1m[32m349 passed[39m[22m[90m (349)[39m
+[2m   Start at [22m 14:19:13
+[2m   Duration [22m 82.02s[2m (transform 199.89s, setup 0ms, import 283.09s, tests 92.35s, environment 69.80s)[22m
+
+
+=== 17:20:36 NER weights for the memory e2e specs (14-2 S8): copy from ffcore_model_cache, no network)
+ Volume "ffmain_knowledge_storage"  Creating
+ Volume "ffmain_knowledge_storage"  Created
+99995f7d2be4b3a28c74f0d36ee97f8c04ee0571
+models--akdeniz27--bert-base-turkish-cased-ner
+ner-copy exit=0
+
+=== 17:20:53 e2e image (up --build --pull never --no-start --no-deps e2e)
+#9 [e2e] exporting to image
+#9 exporting layers done
+#9 writing image sha256:7dd6d942820ce8007bdef30d45e7d7873b54c640fe015157f34df009c08965fa done
+#9 naming to docker.io/ffcore/e2e:0.0.0-main done
+ Volume "ffmain_e2e_node_modules"  Creating
+ Volume "ffmain_e2e_node_modules"  Created
+ Container ffmain-e2e-1  Creating
+ Container ffmain-e2e-1  Created
+e2e-image exit=0
+
+=== 17:21:32 e2e A. stack FAKE_EMBED=0 (model-missing stage)
+ Container ffmain-backend-1  Healthy
+ Container ffmain-mcp-sql-1  Healthy
+ Container ffmain-mcp-search-1  Healthy
+upA exit=0
+
+=== 17:23:06 e2e A. seed (prompts + superadmin)
+2026-11-23 14:23:36,740 WARNING langfuse Prompt 'platform_rules-label:production' not found during refresh, evicting from cache.
+prompts created: ['eval_judge_rubric_v2', 'memory_extract', 'platform_rules']
+prompts already present: -
+superadmin created: b1af2092-9e79-4fd0-97e2-297fe8e2872d
+
+=== 17:24:04 e2e A. @model-missing
+e2e-mm exit=137
+
+=== 17:28:10 e2e B. whole stack FAKE_EMBED=1 + NER (memory specs)
+ Container ffmain-backend-1  Recreate
+ Container ffmain-sync-worker-1  Created
+Error response from daemon: removal of container bf2921889879fca1a9a43fac71b63d347639bdaf30c4280fee0e57190f9285d9 is already in progress
+upB exit=1
+service "agent-worker" is not running
+
+=== 17:28:32 e2e B. main run (grep-invert @model-missing, fake upstream)
+dependency failed to start: container ffmain-litellm-1 is unhealthy
+e2e-main exit=1
+
+=== 17:29:19 docs/images after e2e (FOLLOWUP-221: expect no new change)
+114
+
+=== 17:29:23 down -v
+ Volume ffmain_model_cache  Removed
+ Volume ffmain_langfuse_minio_data  Removed
+
+=== 17:29:42 done
+gate script exit 0

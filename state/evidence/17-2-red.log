@@ -1,0 +1,99 @@
+=== 18:49:03 up postgres redis
+ Network ffcore-17_default  Creating
+ Network ffcore-17_default  Created
+ Volume "ffcore-17_knowledge_storage"  Creating
+ Volume "ffcore-17_knowledge_storage"  Created
+ Volume "ffcore-17_redis_data"  Creating
+ Volume "ffcore-17_redis_data"  Created
+ Volume "ffcore-17_langfuse_postgres_data"  Creating
+ Volume "ffcore-17_langfuse_postgres_data"  Created
+ Volume "ffcore-17_postgres_data"  Creating
+ Volume "ffcore-17_postgres_data"  Created
+ Volume "ffcore-17_langfuse_clickhouse_data"  Creating
+ Volume "ffcore-17_langfuse_clickhouse_data"  Created
+ Volume "ffcore-17_langfuse_clickhouse_logs"  Creating
+ Volume "ffcore-17_langfuse_clickhouse_logs"  Created
+ Volume "ffcore-17_langfuse_minio_data"  Creating
+ Volume "ffcore-17_langfuse_minio_data"  Created
+ Volume "ffcore-17_model_cache"  Creating
+ Volume "ffcore-17_model_cache"  Created
+ Container ffcore-17-redis-1  Creating
+ Container ffcore-17-postgres-1  Creating
+ Container ffcore-17-postgres-1  Created
+ Container ffcore-17-redis-1  Created
+ Container ffcore-17-postgres-1  Starting
+ Container ffcore-17-redis-1  Starting
+ Container ffcore-17-redis-1  Started
+ Container ffcore-17-postgres-1  Started
+ Container ffcore-17-postgres-1  Waiting
+ Container ffcore-17-redis-1  Waiting
+ Container ffcore-17-redis-1  Healthy
+ Container ffcore-17-postgres-1  Healthy
+up exit=0
+=== 17-2 red HEAD=c8da2547cfe984caf1b7159374e1f1b2107d7eba (tests only, no 17-2 code) 2026-11-23 18:49:21
+Traceback (most recent call last):
+  File "/opt/venv/bin/pytest", line 10, in <module>
+    sys.exit(_console_main())
+             ^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/_pytest/config/__init__.py", line 286, in _console_main
+    code = _main(prog=_get_prog_name(sys.argv))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/_pytest/config/__init__.py", line 253, in _main
+    config = _prepareconfig(new_args, plugins, prog=prog)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/_pytest/config/__init__.py", line 434, in _prepareconfig
+    initial_config = get_config(args, plugins, prog=prog)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/_pytest/config/__init__.py", line 395, in get_config
+    dir=pathlib.Path.cwd(),
+        ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/pathlib.py", line 1195, in cwd
+    return cls().absolute()
+           ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/pathlib.py", line 1216, in absolute
+    cwd = os.getcwd()
+          ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+red exit=0
+=== 18:49:31 done
+=== retry (first attempt: getcwd error in the fresh worktree mount) 17-2 red HEAD=c8da2547cfe984caf1b7159374e1f1b2107d7eba (tests only, no 17-2 code) 2026-11-23 18:50:20
+FAILED tests/unit/test_17_2_oidc.py::test_17_2_settings_refuse[changes1-oidc_incomplete]
+FAILED tests/unit/test_17_2_oidc.py::test_17_2_settings_refuse[changes2-oidc_redirect_origin]
+FAILED tests/unit/test_17_2_oidc.py::test_17_2_settings_refuse[changes3-oidc_issuer_http]
+FAILED tests/unit/test_17_2_oidc.py::test_17_2_settings_refuse[changes4-oidc_scopes_invalid]
+FAILED tests/unit/test_17_2_oidc.py::test_17_2_settings_http_only_internal_and_explicit
+FAILED tests/unit/test_17_2_oidc.py::test_17_2_preflight_oidc - assert False
+FAILED tests/contract/test_17_openapi.py::test_17_openapi_paths - AssertionEr...
+ERROR tests/unit/test_17_2_oidc.py::test_17_2_verify_good_token - ImportError...
+ERROR tests/unit/test_17_2_oidc.py::test_17_2_token_rejections[wrong_aud-oidc_audience_invalid]
+ERROR tests/unit/test_17_2_oidc.py::test_17_2_token_rejections[expired-oidc_token_expired]
+ERROR tests/unit/test_17_2_oidc.py::test_17_2_token_rejections[future_iat-oidc_token_invalid]
+ERROR tests/unit/test_17_2_oidc.py::test_17_2_token_rejections[alg_none-oidc_token_invalid]
+ERROR tests/unit/test_17_2_oidc.py::test_17_2_token_rejections[hs256-oidc_token_invalid]
+ERROR tests/unit/test_17_2_oidc.py::test_17_2_token_rejections[wrong_iss-oidc_token_invalid]
+ERROR tests/unit/test_17_2_oidc.py::test_17_2_token_rejections[wrong_nonce-oidc_nonce_mismatch]
+ERROR tests/unit/test_17_2_oidc.py::test_17_2_azp_checked_with_several_audiences
+ERROR tests/unit/test_17_2_oidc.py::test_17_2_unknown_kid_refreshes_jwks_once
+ERROR tests/unit/test_17_2_oidc.py::test_17_2_discovery_cached_then_expired_refresh_failure_is_503
+ERROR tests/unit/test_17_2_oidc.py::test_17_2_claims_to_user - ImportError: c...
+ERROR tests/unit/test_17_2_oidc.py::test_17_2_groups_overflow_and_absent - Im...
+ERROR tests/unit/test_17_2_oidc.py::test_17_2_email_verified_rule - ImportErr...
+ERROR tests/integration/test_17_2_oidc_flow.py::test_17_2_oidc_full_flow_provisions_user
+ERROR tests/integration/test_17_2_oidc_flow.py::test_17_2_oidc_state_is_one_time_and_bound_to_the_browser
+ERROR tests/integration/test_17_2_oidc_flow.py::test_17_2_oidc_token_rejections[wrong_aud-oidc_audience_invalid]
+ERROR tests/integration/test_17_2_oidc_flow.py::test_17_2_oidc_token_rejections[expired-oidc_token_expired]
+ERROR tests/integration/test_17_2_oidc_flow.py::test_17_2_oidc_token_rejections[alg_none-oidc_token_invalid]
+ERROR tests/integration/test_17_2_oidc_flow.py::test_17_2_oidc_token_rejections[hs256-oidc_token_invalid]
+ERROR tests/integration/test_17_2_oidc_flow.py::test_17_2_oidc_token_rejections[wrong_nonce-oidc_nonce_mismatch]
+ERROR tests/integration/test_17_2_oidc_flow.py::test_17_2_oidc_token_rejections[groups_overflow-groups_claim_overflow]
+ERROR tests/integration/test_17_2_oidc_flow.py::test_17_2_oidc_email_unverified_refused
+ERROR tests/integration/test_17_2_oidc_flow.py::test_17_2_oidc_groups_absent_enters_without_project
+ERROR tests/integration/test_17_2_oidc_flow.py::test_17_2_oidc_provider_down_503
+ERROR tests/integration/test_17_2_oidc_flow.py::test_17_2_oidc_airgap_external_issuer
+ERROR tests/integration/test_17_2_oidc_flow.py::test_17_2_oidc_llmaas_not_allowlisted
+ERROR tests/integration/test_17_2_oidc_flow.py::test_17_2_oidc_no_tokens_stored_or_logged
+ERROR tests/integration/test_17_2_oidc_flow.py::test_17_2_oidc_provider_test_endpoint
+ERROR tests/integration/test_17_2_oidc_flow.py::test_17_2_oidc_link_and_bind
+ERROR tests/integration/test_17_2_oidc_flow.py::test_17_2_oidc_sync_deactivated_reopens_at_sign_in
+ERROR tests/integration/test_17_2_oidc_flow.py::test_17_2_resolver_and_widget_verifier
+9 failed, 3 passed, 32 errors in 15.16s
