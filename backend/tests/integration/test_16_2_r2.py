@@ -15,6 +15,7 @@ from tests.integration.sources_support import (
     create_fs_source,
     drain,
     found,
+    sources_url,
     sync,
     write_tree,
 )
@@ -40,10 +41,14 @@ def test_16_2_r2_restricted_comments_never_reach_the_index(atl, pg):
         {"body": f"{PROSE} ekipyorum", "visibility": {"type": "group", "value": "jira-ops"}},
         {"body": f"{PROSE} icnotum", "jsdPublic": False},
     ]
-    control(w, "/_state", {
-        "auth": [f"Bearer {PAT}"],
-        "jira": {"projects": {"OPS": {}}, "issues": [issue(1, comment={"comments": comments})]},
-    })
+    control(
+        w,
+        "/_state",
+        {
+            "auth": [f"Bearer {PAT}"],
+            "jira": {"projects": {"OPS": {}}, "issues": [issue(1, comment={"comments": comments})]},
+        },
+    )
     source = create_source(w, kind="jira", key="jira", config={"jql": "project = OPS"})
     open_to_analysts(w, source["id"], group="project:OPS")
     raw, *_ = full(w, source["id"])
@@ -98,3 +103,6 @@ def test_16_2_r2_scheduled_run_is_full_once_a_week(src_world, pg):
     w["settings"] = w["settings"].model_copy(update={"full_sync_every_days": 0})
     last_full_ended(30)
     assert scheduled_mode() == "delta"
+    # The database is shared: the source must not be due in the other scheduler tests' ticks.
+    paused = w["admin"].patch(sources_url(w, f"/{source['id']}"), json={"status": "paused"})
+    assert paused.status_code == 200, paused.text

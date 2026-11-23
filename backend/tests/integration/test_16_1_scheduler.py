@@ -109,7 +109,8 @@ def test_16_1_tick_abandon_then_the_daily_slot_takes_over(src_world, pg):
     _abandon(pg, run["id"], now)
     result, queue = tick(w, now)
     mine = [r for r in runs(w, source["id"]) if r["trigger"] == "schedule"]
-    assert len(mine) == 1 and mine[0]["status"] == "queued" and mine[0]["mode"] == "delta"
+    # r2 MINOR-1: its only full run was abandoned (no completed full), so the slot's run is full.
+    assert len(mine) == 1 and mine[0]["status"] == "queued" and mine[0]["mode"] == "full"
     assert (engine.SYNC_RAW_JOB, mine[0]["id"]) in queue.jobs
     second = w["admin"].post(sources_url(w, f"/{source['id']}/sync"), json={})
     assert second.status_code == 409 and second.json()["error"]["code"] == "sync_running"

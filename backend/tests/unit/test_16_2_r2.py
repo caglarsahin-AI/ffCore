@@ -26,21 +26,28 @@ PAT = "dummy-not-secret-pat-16-2-r2"
 
 
 def jira(settings, deployment="server", base="https://jira.example.test"):
-    secret = {"token": PAT} if deployment == "server" else {"email": "s@example.test", "api_token": PAT}
+    secret = (
+        {"token": PAT} if deployment == "server" else {"email": "s@example.test", "api_token": PAT}
+    )
     spec = SourceSpec(id="j", kind="jira", deployment=deployment, config={"base_url": base})
     return JiraDriver(spec, secret, None, settings)
 
 
 def confluence(settings, **config):
     spec = SourceSpec(
-        id="c", kind="confluence", deployment="server",
+        id="c",
+        kind="confluence",
+        deployment="server",
         config={"base_url": "https://wiki.example.test", **config},
     )
     return ConfluenceDriver(spec, {"token": PAT}, None, settings)
 
 
 def issue_raw(**fields):
-    issue = {"key": "OPS-1", "fields": {"summary": "Zaman aşımı", "project": {"key": "OPS"}, **fields}}
+    issue = {
+        "key": "OPS-1",
+        "fields": {"summary": "Zaman aşımı", "project": {"key": "OPS"}, **fields},
+    }
     return RawPayload(content=json.dumps(issue).encode(), ext="json")
 
 
@@ -51,19 +58,33 @@ ITEM = ItemRef(external_id="OPS-1", title="OPS-1", space="OPS")
 
 
 def test_16_2_r2_restricted_and_internal_comments_stay_out(settings):
-    raw = issue_raw(comment={"comments": [
-        {"body": "Herkese açık çözüm notu.", "created": "2026-03-01T10:00:00.000+0300"},
-        {"body": "Yalnız yöneticiler: müşteri adı X.", "visibility": {"type": "role", "value": "Administrators"}},
-        {"body": "Yalnız ekip: iç maliyet.", "visibility": {"type": "group", "value": "jira-ops"}},
-        {"body": "Servis masası iç notu.", "jsdPublic": False},
-        {"body": "Servis masası açık yanıtı.", "jsdPublic": True},
-    ]})
+    raw = issue_raw(
+        comment={
+            "comments": [
+                {"body": "Herkese açık çözüm notu.", "created": "2026-03-01T10:00:00.000+0300"},
+                {
+                    "body": "Yalnız yöneticiler: müşteri adı X.",
+                    "visibility": {"type": "role", "value": "Administrators"},
+                },
+                {
+                    "body": "Yalnız ekip: iç maliyet.",
+                    "visibility": {"type": "group", "value": "jira-ops"},
+                },
+                {"body": "Servis masası iç notu.", "jsdPublic": False},
+                {"body": "Servis masası açık yanıtı.", "jsdPublic": True},
+            ]
+        }
+    )
     text = jira(settings).render(ITEM, raw).content.decode()
     assert "Herkese açık çözüm notu." in text and "Servis masası açık yanıtı." in text
     for hidden in ("müşteri adı X", "iç maliyet", "Servis masası iç notu"):
         assert hidden not in text
     # Numbering counts the comments in the document only (no gap that tells one was left out).
-    assert "## Comment 1 (2026-03-01)" in text and "## Comment 2" in text and "## Comment 3" not in text
+    assert (
+        "## Comment 1 (2026-03-01)" in text
+        and "## Comment 2" in text
+        and "## Comment 3" not in text
+    )
 
 
 # -- MINOR-3 -----------------------------------------------------------------------------
@@ -76,7 +97,8 @@ def test_16_2_r2_mentions_are_dropped():
     storage = (
         '<p>Sorumlu <ac:link><ri:user ri:userkey="8a7f"/></ac:link> ve '
         '<ac:link><ri:user ri:account-id="557058"/><ac:link-body>Ayse Kaya</ac:link-body></ac:link>'
-        ' ile görüşüldü; <ac:link><ri:page ri:content-title="Kurallar"/></ac:link> sayfasına bakın.</p>'
+        ' ile görüşüldü; <ac:link><ri:page ri:content-title="Kurallar"/></ac:link>'
+        " sayfasına bakın.</p>"
     )
     md = to_markdown(storage).markdown
     assert "Ayse" not in md and "8a7f" not in md and "557058" not in md
@@ -87,7 +109,9 @@ def test_16_2_r2_mentions_are_dropped():
 
 
 def test_16_2_r2_script_and_style_bodies_are_dropped():
-    md = to_markdown("<p>Metin</p><script>alert(1)</script><style>p{color:red}</style><p>Son</p>").markdown
+    md = to_markdown(
+        "<p>Metin</p><script>alert(1)</script><style>p{color:red}</style><p>Son</p>"
+    ).markdown
     assert "alert" not in md and "color" not in md and "Metin" in md and "Son" in md
 
 
