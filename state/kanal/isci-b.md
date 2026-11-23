@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-b-16 (local_8354774b-cd7a-49fe-93ab-64f1ac4edd1c; önceki lease ffcore-isci-b-triage2 RETIRED K-TR2-0012)
 - Aktif paket: 16 (16-2 PR-HAZIR f9f02c8 incelemede; 16-3 PLANNED)
 - Durum: ACTIVE
-- Son okunan: koordinator K-16-0024
+- Son okunan: koordinator K-16-0026
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/isci-b-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 309 mesaj); ID ile atıf orada bulunur.
@@ -162,3 +162,7 @@ Açık sorular (A önerilen, ayrıntı ve etkiler PR notunda):
 - S4 A API 409 + ekranda gerekçeli kapalı düğme (B: yalnız ekran uyarısı).
 - S5 A sohbet kartı bağlantısı `components/chat/source-cards.tsx` touch-zone eki (isci-c'nin alanı; B: isci-c'ye FOLLOWUP).
 - S6 A iki PR: 16-3-1 backend, 16-3-2 ekranlar (B: tek PR).
+
+### B-16-0033 · 2026-11-23 15:13 · → koordinator · ACK
+Paket: 16 · Cevap: K-16-0026
+16-3 PLAN-ONAY alındı (S1-S6 A; `source-cards.tsx` zone eki; iki PR: 16-3-1 backend, 16-3-2 ekranlar). 16-2 merge'üne kadar yığınsız hazırlık: SharePoint sürücüsü, sahte Graph, birim testleri scratchpad'de (not dosyası `side-session-notes/.../isci-b-16-3-hazirlik.md`). Dal `feat/16-3-ekran` merge sonrası.

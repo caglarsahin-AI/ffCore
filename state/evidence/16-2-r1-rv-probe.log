@@ -1,0 +1,100 @@
+HEAD=f9f02c871821a91704acea25f4606d613598408c stack=ffcore-rv (git archive copy) (+ reviewer probe file tests/unit/test_rv_16_2_probe.py, not in the branch)
+utc now 2026-11-23 12:13
+cmd: docker compose -p ffcore-rv --env-file .env.test up -d --wait --pull never postgres redis
+2
+NAME                STATUS              CONFIG FILES
+ffcore              running(17)         C:\ai_paycore\ffcore\compose.yaml,C:\ai_paycore\ffcore\deploy\docker-compose.ollama.yml
+ffcore-17           running(2)          C:\ai_paycore\ffcore\.worktrees\feat\17-kimlik\compose.yaml
+ffcore-rv           running(2)          C:\Users\caglar.sahin\AppData\Local\Temp\claude\9398d5fca5badfb5\d866dade-595b-43f0-b74a-a212bc018d6b\scratchpad\p162\compose.yaml
+cmd: tools pytest tests/unit/test_rv_16_2_probe.py -q -s (llmaas)
+RV G1 /x                                                             -> ok 'http://127.0.0.1:38891/x'                                ok {'ok': True} | reached ports [38891] (own 38891)
+RV G1 x                                                              -> ok 'http://127.0.0.1:38891/x'                                ok {'ok': True} | reached ports [38891] (own 38891)
+RV G1 //evil.example.test/x                                          -> ok 'http://127.0.0.1:38891//evil.example.test/x'             SourceError source_not_found | reached ports [38891] (own 38891)
+RV G1 https://evil.example.test/x                                    -> SourceError foreign_url                                      
+RV G1 http://127.0.0.1:41809/x                                       -> SourceError foreign_url                                      
+RV G1 http://127.0.0.1:38891@evil.example.test/x                     -> SourceError foreign_url                                      
+RV G1 http://evil.example.test\@127.0.0.1:38891/x                    -> ok 'http://evil.example.test\\@127.0.0.1:38891/x'            ok {'ok': True} | reached ports [38891] (own 38891)
+RV G1 http://evil.example.test#@127.0.0.1:38891/x                    -> SourceError foreign_url                                      
+RV G1 https://127.0.0.1:38891/x                                      -> SourceError foreign_url                                      
+RV G1 http://localhost:38891/x                                       -> SourceError foreign_url                                      
+RV G1 HTTP://127.0.0.1:38891/x                                       -> ok 'HTTP://127.0.0.1:38891/x'                                ok {'ok': True} | reached ports [38891] (own 38891)
+RV G1 http://127.0.0.1:38891.evil.example.test/x                     -> ValueError Port could not be cast to integer value as '38891 
+RV G1 http://[::ffff:127.0.0.1]:38891/x                              -> SourceError foreign_url                                      
+RV G1 /../../x                                                       -> ok 'http://127.0.0.1:38891/../../x'                          ok {'ok': True} | reached ports [38891] (own 38891)
+RV G1 http://127.0.0.1:38891/x?next=http://evil.example.test         -> ok 'http://127.0.0.1:38891/x?next=http://evil.example.test'  ok {'ok': True} | reached ports [38891] (own 38891)
+RV G1 javascript://127.0.0.1/x                                       -> SourceError foreign_url                                      
+RV G1 file:///etc/passwd                                             -> SourceError foreign_url                                      
+RV G1 requests on the other server: []
+.RV G2 json 302 to another origin -> SourceError egress_too_many_redirects
+RV G2 json 302 same origin       -> SourceError egress_too_many_redirects
+RV G2 download 302 other origin  -> SourceError egress_too_many_redirects
+RV G2 download 303 same origin   -> SourceError egress_too_many_redirects
+RV G2 download 302 no Location   -> ok b'<html>redirect without location</html>'
+RV G2 _links.next to another origin -> SourceError foreign_url
+RV G2 requests on the other server: []
+RV G2 next link that points at itself -> still following after 500 pages (no guard)
+.RV G3 as configured server http://127.0.0.1:9               -> reachable=False code=egress_not_allowlisted
+RV G3 as configured cloud  http://127.0.0.1:9               -> reachable=False code=egress_not_allowlisted
+RV G3 as configured server http://localhost:9               -> reachable=False code=egress_not_allowlisted
+RV G3 as configured cloud  http://localhost:9               -> reachable=False code=egress_not_allowlisted
+RV G3 as configured server http://169.254.169.254           -> reachable=False code=egress_not_allowlisted
+RV G3 as configured cloud  http://169.254.169.254           -> reachable=False code=egress_not_allowlisted
+RV G3 as configured server http://10.0.0.5                  -> reachable=False code=egress_not_allowlisted
+RV G3 as configured cloud  http://10.0.0.5                  -> reachable=False code=egress_not_allowlisted
+RV G3 as configured server http://[::1]:9                   -> reachable=False code=egress_not_allowlisted
+RV G3 as configured cloud  http://[::1]:9                   -> reachable=False code=egress_not_allowlisted
+RV G3 as configured server http://backend:8000              -> reachable=False code=egress_not_allowlisted
+RV G3 as configured cloud  http://backend:8000              -> reachable=False code=egress_not_allowlisted
+RV G3 as configured server http://postgres:5432             -> reachable=False code=egress_not_allowlisted
+RV G3 as configured cloud  http://postgres:5432             -> reachable=False code=egress_not_allowlisted
+RV G3 as configured server https://example.atlassian.net    -> reachable=False code=egress_not_allowlisted
+RV G3 as configured cloud  https://example.atlassian.net    -> reachable=False code=egress_not_allowlisted
+RV G3 offline       server http://127.0.0.1:9               -> reachable=False code=egress_offline
+RV G3 offline       cloud  http://127.0.0.1:9               -> reachable=False code=egress_offline
+RV G3 offline       server http://localhost:9               -> reachable=False code=egress_offline
+RV G3 offline       cloud  http://localhost:9               -> reachable=False code=egress_offline
+RV G3 offline       server http://169.254.169.254           -> reachable=False code=egress_offline
+RV G3 offline       cloud  http://169.254.169.254           -> reachable=False code=egress_offline
+RV G3 offline       server http://10.0.0.5                  -> reachable=False code=egress_offline
+RV G3 offline       cloud  http://10.0.0.5                  -> reachable=False code=egress_offline
+RV G3 offline       server http://[::1]:9                   -> reachable=False code=egress_offline
+RV G3 offline       cloud  http://[::1]:9                   -> reachable=False code=egress_offline
+RV G3 offline       server http://backend:8000              -> reachable=False code=egress_offline
+RV G3 offline       cloud  http://backend:8000              -> reachable=False code=egress_offline
+RV G3 offline       server http://postgres:5432             -> reachable=False code=egress_offline
+RV G3 offline       cloud  http://postgres:5432             -> reachable=False code=egress_offline
+RV G3 offline       server https://example.atlassian.net    -> reachable=False code=egress_offline
+RV G3 offline       cloud  https://example.atlassian.net    -> reachable=False code=egress_offline
+.RV G4 wrong credentials -> False source_auth_failed | the source refused the credentials (401)
+RV G4 token in log: False | 'Bearer' in log: False
+RV G4 repr(driver._http._headers) hidden? True
+RV G4 Retry-After None                               attempts 1..3 -> [1.0, 2.0, 4.0]
+RV G4 Retry-After '7'                                attempts 1..3 -> [7.0, 7.0, 7.0]
+RV G4 Retry-After '9999'                             attempts 1..3 -> [30.0, 30.0, 30.0]
+RV G4 Retry-After '-5'                               attempts 1..3 -> [0.0, 0.0, 0.0]
+RV G4 Retry-After 'Wed, 21 Oct 2026 07:28:00 GMT'    attempts 1..3 -> [1.0, 2.0, 4.0]
+RV G4 Retry-After '0'                                attempts 1..3 -> [0.0, 0.0, 0.0]
+RV G4 Retry-After 'nan'                              attempts 1..3 -> [nan, nan, nan]
+RV G4 Retry-After 'inf'                              attempts 1..3 -> [30.0, 30.0, 30.0]
+.RV A1 first full run: {'10': ('space:OPS',), '11': ('space:OPS',)}
+RV A1 delta after the parent was restricted lists: {}
+RV A1 full after the restriction: {'10': ('group:Yonetim',), '11': ('group:Yonetim',)}
+.RV A2 acl ('project:OPS',)
+RV A2 restricted comment (visibility role) in the document: True
+RV A2 internal comment (jsdPublic false) in the document: True
+RV A2 raw keeps visibility: True
+RV A2 'Ayse Kaya' in document: True | '[~akaya]' in document: True | 'Mehmet' in document: False
+RV A2 title/url/extra: OPS-1: Konu http://127.0.0.1:36707/browse/OPS-1 {}
+.RV D1 user mention   -> '# T /  / Sorumlu  ve Ayse Kaya / ' | ['macros', 'unknown']
+RV D1 profile macro  -> '# T /  / son / ' | ['macros', 'unknown']
+RV D1 contributors   -> '# T /  / son / ' | ['macros', 'unknown']
+RV D1 script         -> '# T /  / a /  / alert(1)p{} /  / b / ' | ['macros', 'unknown']
+RV D1 code cdata     -> '# T /  / ```py / print("x") / # not a heading / ``` / ' | ['macros', 'unknown']
+RV D1 table          -> '# T /  / | A | B | / |---|---| / | 1 \\| 2 | x y | / ' | ['macros', 'unknown']
+RV D1 broken         -> '# T /  / acik **etiket /  / x** / ' | ['macros', 'unknown']
+RV D1 entities       -> '# T /  / ü&<tag> &unknown / ' | ['macros', 'unknown']
+RV D1 jira macro     -> '# T /  / JIRA: OPS-1 /  / son / ' | ['macros', 'unknown']
+RV D1 include        -> '# T /  / [Included page: Diger] / ' | ['macros', 'unknown']
+RV D1 huge nesting   -> RecursionError: maximum recursion depth exceeded
+7 passed in 7.61s
+utc now 12:14

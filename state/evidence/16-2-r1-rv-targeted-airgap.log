@@ -1,0 +1,7 @@
+HEAD=f9f02c871821a91704acea25f4606d613598408c stack=ffcore-rv (git archive copy)
+utc now 2026-11-23 12:22
+cmd: tools (-e DEPLOY_PROFILE=airgap -e OFFLINE=true) pytest tests/unit/test_16_2_drivers.py tests/unit/test_16_2_fake_atlassian.py tests/unit/test_16_2_jira_openapi.py tests/unit/test_16_2_registry.py tests/unit/test_16_2_storage_format.py tests/unit/test_hke_208_compose.py tests/integration/test_16_2_atlassian.py tests/integration/test_16_1_api.py tests/integration/test_16_1_attachments.py -q
+..............................................................           [100%]
+62 passed in 382.64s (0:06:22)
+cmd: compose config with the egress overlay: sync-worker proxy and dependency
+utc now 12:29

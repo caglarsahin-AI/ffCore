@@ -1,0 +1,17 @@
+HEAD=f9f02c871821a91704acea25f4606d613598408c stack=ffcore-rv (git archive copy)
+utc now 2026-11-23 12:14
+cmd: tools pytest tests/unit/test_16_2_drivers.py tests/unit/test_16_2_fake_atlassian.py tests/unit/test_16_2_jira_openapi.py tests/unit/test_16_2_registry.py tests/unit/test_16_2_storage_format.py tests/unit/test_hke_208_compose.py -q (llmaas)
+.................................                                        [100%]
+33 passed in 9.87s
+cmd: tools pytest tests/integration/test_16_2_atlassian.py tests/integration/test_16_1_api.py tests/integration/test_16_1_attachments.py tests/contract/test_04a_openapi.py tests/contract/test_06b_openapi.py -q (llmaas)
+test_04a_makefile_test_int.py
+test_04a_openapi.py
+test_06a_openapi.py
+test_06b2_reserved_hosts.py
+test_06b_litellm_not_published.py
+test_06b_openapi.py
+......................................                                   [100%]
+38 passed in 427.00s (0:07:07)
+All checks passed!
+18 files already formatted
+utc now 12:22

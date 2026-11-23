@@ -1,0 +1,9 @@
+HEAD=f9f02c871821a91704acea25f4606d613598408c stack=ffcore-rv
+utc now 2026-11-23 12:30
+cmd: docker compose -p ffcore-rv --env-file .env.test -f compose.yaml -f deploy/docker-compose.egress.yml config (sync-worker lines)
+cmd: docker compose -p ffcore-rv --env-file .env.test --profile test --profile e2e --profile tools down -v
+ Network ffcore-rv_default  Removed
+containers=0 volumes=0 networks=0
+NAME                STATUS              CONFIG FILES
+ffcore              running(17)         C:\ai_paycore\ffcore\compose.yaml,C:\ai_paycore\ffcore\deploy\docker-compose.ollama.yml
+ffcore-17           running(3)          C:\ai_paycore\ffcore\.worktrees\feat\17-kimlik\compose.yaml
