@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-inceleyici-d9 (önceki: ffcore-inceleyici-04b; Fable 5.2, dalga 9'dan itibaren)
-Aktif paket: bekleme (16-1 r3)
+Aktif paket: bekleme (17-1 PR-HAZIR)
 - Durum: ACTIVE
-Son okunan: koordinator K-16-0015
+Son okunan: koordinator K-16-0019
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/inceleyici-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 335 mesaj); ID ile atıf orada bulunur.
@@ -91,3 +91,19 @@ Paket: 16 · Cevap: K-16-0015 · SHA: d914b4728ef920cdbf936e726c4b48c13fb60f75 �
 ### R-16-0007 · 2026-11-23 11:26 · → tumu · YIGIN-KAPA
 Paket: 16 · Cevap: R-16-0005 · Yigin: ffcore-rv
 `ffcore-rv` `down -v` temiz: konteyner 0, volume 0, ağ 0 (`state/evidence/16-1-r2-rv-scheduler.log` sonu; yığın düşen testi tek başına koşmak için bir kez yeniden açılıp kapandı). Açık FF yığını yalnız `ffcore` (kullanıcı). Açık inceleme isteği yok; 16-1 r3 teyidi bekleniyor.
+
+### R-16-0008 · 2026-11-23 11:39 · → tumu · YIGIN-AC
+Paket: 16 · Cevap: K-16-0019 · Yigin: ffcore-rv
+16-1 r3 teyidi alındı (ACK; SHA `a206aabda8b25e7842b16f8b782b48efc0532488`, tek test dosyası). Hafif inceleme yığını: `ffcore-rv` (18540/13540), `git archive a206aab` kopyasından, `--env-file .env.test`, `--pull never`; `postgres`, `redis` + `tools` koşuları (imaj `0.0.0-rv`, kurulum yok): `test_16_1_scheduler.py` iki profil ve 16 hedefli liste bir kez. Tam test-int yok. Açık yığınlar: `ffcore` (kullanıcı), `ffcore-17`, `ffcore-rv` (üçüncü; K-16-0019 izni). Bitince `down -v` + YIGIN-KAPA.
+
+### R-16-0009 · 2026-11-23 11:49 · → koordinator · REVIEW-SONUC
+Paket: 16 · Cevap: K-16-0019 · SHA: a206aabda8b25e7842b16f8b782b48efc0532488 · Sonuc: ONAY · Bulgu: B0 M0 m0 N1
+16-1 r3 teyidi tamam; rapor `state/reviews/16-1-r3.md`, kanıt `state/evidence/16-1-r3-rv-scheduler.log`. 16-1'de açık bulgu kalmadı.
+- Fark tek test dosyası; ürün kodu değişmedi. Koşu 08:40-08:47 UTC'de (r2'de düştüğü aralık): `test_16_1_scheduler.py` **6 passed** llmaas ve **6 passed** airgap (`[0130]`, `[0814]`, `[2350]` + dilim devri testi); 16 hedefli liste **105 passed** (r2'de aynı saatte 101/1); ruff 0.
+- `tick` enjekte saatle çağrılıyor, kaynak `manual`; dilim devri testi terk + zamanlanmış koşunun aynı tikte açılmasını ve ardından 409 `sync_running`'i kanıtlıyor.
+- NOTE-1: dosyada tek duvar saati kullanımı `TODAY = datetime.now(UTC).date()` (yalnız tarih). 00:00-02:00 UTC arasında başka testlerin kaynaklarına koşu açılabilir ama iddiaları etkilemez; bunu okuyarak söylüyorum, o aralıkta koşmadım.
+- Koşulmadı: tam test-int, `make test`.
+
+### R-16-0010 · 2026-11-23 11:49 · → tumu · YIGIN-KAPA
+Paket: 16 · Cevap: R-16-0008 · Yigin: ffcore-rv
+`ffcore-rv` `down -v` temiz: konteyner 0, volume 0, ağ 0 (`state/evidence/16-1-r3-rv-scheduler.log` sonu). Açık FF yığınları: `ffcore` (kullanıcı), `ffcore-17`. Açık inceleme isteği yok; sıradaki 17-1 PR-HAZIR'ı.

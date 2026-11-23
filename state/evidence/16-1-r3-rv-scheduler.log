@@ -1,0 +1,35 @@
+HEAD=a206aabda8b25e7842b16f8b782b48efc0532488 stack=ffcore-rv (git archive copy)
+utc now 2026-11-23 08:40
+cmd: docker compose -p ffcore-rv --env-file .env.test up -d --wait --pull never postgres redis
+2
+cmd: tools pytest tests/integration/test_16_1_scheduler.py -v (llmaas)
+tests/integration/test_16_1_scheduler.py::test_16_1_tick_starts_due_schedules_only PASSED [ 16%]
+tests/integration/test_16_1_scheduler.py::test_16_1_tick_fails_abandoned_runs[0130] PASSED [ 33%]
+tests/integration/test_16_1_scheduler.py::test_16_1_tick_fails_abandoned_runs[0814] PASSED [ 50%]
+tests/integration/test_16_1_scheduler.py::test_16_1_tick_fails_abandoned_runs[2350] PASSED [ 66%]
+tests/integration/test_16_1_scheduler.py::test_16_1_tick_abandon_then_the_daily_slot_takes_over PASSED [ 83%]
+tests/integration/test_16_1_scheduler.py::test_16_1_cli_queues_and_audits_force_prune PASSED [100%]
+============================== 6 passed in 59.37s ==============================
+utc now 08:41
+cmd: tools (-e DEPLOY_PROFILE=airgap -e OFFLINE=true) pytest tests/integration/test_16_1_scheduler.py -v
+tests/integration/test_16_1_scheduler.py::test_16_1_tick_starts_due_schedules_only PASSED [ 16%]
+tests/integration/test_16_1_scheduler.py::test_16_1_tick_fails_abandoned_runs[0130] PASSED [ 33%]
+tests/integration/test_16_1_scheduler.py::test_16_1_tick_fails_abandoned_runs[0814] PASSED [ 50%]
+tests/integration/test_16_1_scheduler.py::test_16_1_tick_fails_abandoned_runs[2350] PASSED [ 66%]
+tests/integration/test_16_1_scheduler.py::test_16_1_tick_abandon_then_the_daily_slot_takes_over PASSED [ 83%]
+tests/integration/test_16_1_scheduler.py::test_16_1_cli_queues_and_audits_force_prune PASSED [100%]
+============================== 6 passed in 57.47s ==============================
+utc now 08:42
+cmd: tools pytest <16 list> -q (llmaas); ruff check/format tests/integration/test_16_1_scheduler.py
+........................................................................ [ 68%]
+.................................                                        [100%]
+105 passed in 288.83s (0:04:48)
+All checks passed!
+1 file already formatted
+utc now 08:47
+cmd: docker compose -p ffcore-rv --env-file .env.test --profile test --profile e2e --profile tools down -v
+ Network ffcore-rv_default  Removed
+containers=0 volumes=0 networks=0
+NAME                STATUS              CONFIG FILES
+ffcore              running(17)         C:\ai_paycore\ffcore\compose.yaml,C:\ai_paycore\ffcore\deploy\docker-compose.ollama.yml
+ffcore-17           running(2)          C:\ai_paycore\ffcore\.worktrees\feat\17-kimlik\compose.yaml
