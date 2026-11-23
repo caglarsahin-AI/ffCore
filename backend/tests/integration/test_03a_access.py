@@ -63,7 +63,8 @@ def test_03a_1_non_member_gets_404_not_data(make_user, make_project, client_fact
     assert response.status_code == 404  # FOLLOWUP-103: same answer as a missing project
 
 
-@pytest.mark.parametrize("role", ["developer", "user"])
+# 17: `user` is assignable now (test_17_user_role_matrix); `developer` stays reserved.
+@pytest.mark.parametrize("role", ["developer"])
 def test_03a_14_reserved_roles_rejected(role, root, make_user, make_project):
     project = make_project()
     user_id, _ = make_user()
@@ -106,7 +107,9 @@ def test_03a_users_projects_members_flow(root, make_user, client_factory):
     )
     assert created.status_code == 201, created.text
     user_id = created.json()["id"]
-    assert "password" not in created.text and "password_hash" not in created.text
+    # 17: `must_change_password` is a flag, not a password; no other password field appears.
+    assert {k for k in created.json() if "password" in k} == {"must_change_password"}
+    assert "password_hash" not in created.text
     dup = root.post(
         f"{API}/users",
         json={"email": "FLOW@example.test", "full_name": "F", "password": "dummy-not-secret-pw-02"},

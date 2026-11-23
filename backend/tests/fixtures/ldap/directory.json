@@ -1,0 +1,55 @@
+{
+  "_comment": "17: synthetic directory for the ldap3 MOCK_SYNC server (no person names, example.test only). Passwords are obvious test values.",
+  "base": "dc=example,dc=test",
+  "service": {"dn": "cn=svc-ffcore,ou=service,dc=example,dc=test", "password": "dummy-not-secret-bind-pw"},
+  "groups": {
+    "chat": "CN=FFCore-Chat,OU=Groups,DC=example,DC=test",
+    "editors": "CN=FFCore-Editors,OU=Groups,DC=example,DC=test",
+    "analysts": "CN=FFCore-Analysts,OU=Groups,DC=example,DC=test",
+    "other": "CN=Unmapped,OU=Groups,DC=example,DC=test"
+  },
+  "users": [
+    {
+      "dn": "cn=user-a,ou=people,dc=example,dc=test",
+      "password": "dummy-not-secret-user-a",
+      "sAMAccountName": "user-a",
+      "mail": "user-a@example.test",
+      "userPrincipalName": "user-a@example.test",
+      "displayName": "Directory User A",
+      "objectGUID": "6f1e8d2a-0000-4000-8000-00000000000a",
+      "memberOf": ["chat"],
+      "userAccountControl": 512
+    },
+    {
+      "dn": "cn=user-b,ou=people,dc=example,dc=test",
+      "password": "dummy-not-secret-user-b",
+      "sAMAccountName": "user-b",
+      "mail": "user-b@example.test",
+      "userPrincipalName": "user-b@example.test",
+      "displayName": "Directory User B",
+      "objectGUID": "6f1e8d2a-0000-4000-8000-00000000000b",
+      "memberOf": ["chat", "editors", "analysts"],
+      "userAccountControl": 512
+    },
+    {
+      "dn": "cn=user-disabled,ou=people,dc=example,dc=test",
+      "password": "dummy-not-secret-user-d",
+      "sAMAccountName": "user-disabled",
+      "mail": "user-disabled@example.test",
+      "userPrincipalName": "user-disabled@example.test",
+      "displayName": "Directory User Disabled",
+      "objectGUID": "6f1e8d2a-0000-4000-8000-00000000000d",
+      "memberOf": ["chat"],
+      "userAccountControl": 514
+    },
+    {
+      "dn": "cn=user-nomail,ou=people,dc=example,dc=test",
+      "password": "dummy-not-secret-user-n",
+      "sAMAccountName": "user-nomail",
+      "displayName": "Directory User Without Mail",
+      "objectGUID": "6f1e8d2a-0000-4000-8000-00000000000e",
+      "memberOf": ["other"],
+      "userAccountControl": 512
+    }
+  ]
+}
