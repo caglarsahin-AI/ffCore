@@ -1,0 +1,239 @@
+openapi: "3.0.3"
+info:
+  title: "Jira API (FFCore örnek alt kümesi)"
+  version: "1.0.0-sample"
+  description: >-
+    Agent aracı olarak yayınlamak için seçilmiş 4 Jira Server/Data Center işlemi (REST v2).
+    Sentetik örnek (paket 16): issue ara ve getir okuma; issue oluştur ve yorum ekle yazma
+    işlemidir, 05'te yayınlanırken onaylı (requires_approval) seçilir. Gerçek bir Jira adresi
+    içermez; testler yerel sahte sunucuya bağlanır.
+servers:
+  - url: "http://jira.ornek.local"
+security:
+  - bearerAuth: []
+paths:
+  /rest/api/2/search:
+    get:
+      operationId: searchIssues
+      summary: "Issue ara"
+      description: "JQL ile issue arar; yalnız özet alanlar döner."
+      parameters:
+        - name: jql
+          in: query
+          required: true
+          description: "JQL sorgusu, ör. project = OPS AND text ~ \"zaman aşımı\" ORDER BY updated DESC"
+          schema:
+            type: string
+        - name: maxResults
+          in: query
+          required: false
+          description: "En fazla dönecek issue sayısı (varsayılan 20, üst sınır 50)."
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
+        - name: fields
+          in: query
+          required: false
+          description: "Virgülle ayrılmış alan listesi."
+          schema:
+            type: string
+            default: "summary,status,resolution,updated"
+      responses:
+        "200":
+          description: "Issue listesi"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/SearchResult"
+  /rest/api/2/issue/{issueKey}:
+    get:
+      operationId: getIssue
+      summary: "Issue getir"
+      description: "Tek issue'yu açıklama, çözüm ve yorumlarıyla getirir."
+      parameters:
+        - name: issueKey
+          in: path
+          required: true
+          description: "Issue anahtarı, ör. OPS-142"
+          schema:
+            type: string
+            pattern: "^[A-Z][A-Z0-9]+-[0-9]+$"
+      responses:
+        "200":
+          description: "Issue"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Issue"
+        "404":
+          description: "Issue yok ya da görme yetkisi yok"
+  /rest/api/2/issue:
+    post:
+      operationId: createIssue
+      summary: "Issue oluştur (onaylı)"
+      description: "Yeni issue açar. Yazma işlemi: yayınlarken onay zorunlu seçilir."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/IssueCreate"
+      responses:
+        "201":
+          description: "Oluşan issue"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/IssueRef"
+  /rest/api/2/issue/{issueKey}/comment:
+    post:
+      operationId: addComment
+      summary: "Yorum ekle (onaylı)"
+      description: "Issue'ya yorum ekler. Yazma işlemi: yayınlarken onay zorunlu seçilir."
+      parameters:
+        - name: issueKey
+          in: path
+          required: true
+          description: "Issue anahtarı"
+          schema:
+            type: string
+            pattern: "^[A-Z][A-Z0-9]+-[0-9]+$"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/CommentCreate"
+      responses:
+        "201":
+          description: "Eklenen yorum"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/CommentRef"
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: "Jira Server/Data Center kişisel erişim belirteci (PAT); 05'te şifreli saklanır."
+  schemas:
+    SearchResult:
+      type: object
+      properties:
+        total:
+          type: integer
+        issues:
+          type: array
+          items:
+            "$ref": "#/components/schemas/IssueSummary"
+    IssueSummary:
+      type: object
+      properties:
+        key:
+          type: string
+        fields:
+          type: object
+          properties:
+            summary:
+              type: string
+            status:
+              type: object
+              properties:
+                name:
+                  type: string
+            resolution:
+              type: object
+              nullable: true
+              properties:
+                name:
+                  type: string
+            updated:
+              type: string
+              format: date-time
+    Issue:
+      type: object
+      properties:
+        key:
+          type: string
+        fields:
+          type: object
+          properties:
+            summary:
+              type: string
+            description:
+              type: string
+              nullable: true
+            status:
+              type: object
+              properties:
+                name:
+                  type: string
+            resolution:
+              type: object
+              nullable: true
+              properties:
+                name:
+                  type: string
+            comment:
+              type: object
+              properties:
+                comments:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      body:
+                        type: string
+                      created:
+                        type: string
+                        format: date-time
+    IssueCreate:
+      type: object
+      required: [fields]
+      properties:
+        fields:
+          type: object
+          required: [project, summary, issuetype]
+          properties:
+            project:
+              type: object
+              required: [key]
+              properties:
+                key:
+                  type: string
+            summary:
+              type: string
+              maxLength: 255
+            description:
+              type: string
+            issuetype:
+              type: object
+              required: [name]
+              properties:
+                name:
+                  type: string
+    IssueRef:
+      type: object
+      properties:
+        id:
+          type: string
+        key:
+          type: string
+    CommentCreate:
+      type: object
+      required: [body]
+      properties:
+        body:
+          type: string
+          maxLength: 32000
+    CommentRef:
+      type: object
+      properties:
+        id:
+          type: string
+        created:
+          type: string
+          format: date-time

@@ -870,6 +870,11 @@ export interface components {
             embed_score: number | null;
             /** Rerank Score */
             rerank_score: number | null;
+            /**
+             * Source Url
+             * @description The item in its source system (Confluence page, Jira issue) for documents a data source brought (16); null for uploads.
+             */
+            source_url?: string | null;
         };
         /** SearchRequest */
         SearchRequest: {

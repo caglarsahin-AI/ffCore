@@ -62,6 +62,15 @@ services:
       egress-proxy:
         condition: service_healthy
 
+  # 16-2: Confluence/Jira Cloud data sources (Server/Data Center inside the network are
+  # ALLOWED_INTERNAL_HOSTS and stay direct).
+  sync-worker:
+    environment:
+      EGRESS_PROXY_URL: http://egress-proxy:3128
+    depends_on:
+      egress-proxy:
+        condition: service_healthy
+
   litellm:
     environment:
       HTTP_PROXY: http://egress-proxy:3128

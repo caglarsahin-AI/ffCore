@@ -322,6 +322,7 @@ class HttpRetriever:
                 text=h["text"],
                 updated_at_source=h.get("updated_at_source"),
                 rerank_score=h.get("rerank_score"),
+                source_url=h.get("source_url"),
             )
             for h in data["hits"]
         ]

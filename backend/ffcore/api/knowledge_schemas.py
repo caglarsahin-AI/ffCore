@@ -349,6 +349,11 @@ class SearchHit(BaseModel):
     age_days: int | None
     embed_score: float | None
     rerank_score: float | None
+    source_url: str | None = Field(
+        default=None,
+        description="The item in its source system (Confluence page, Jira issue) for documents a "
+        "data source brought (16); null for uploads.",
+    )
 
 
 class FilteredHit(BaseModel):
