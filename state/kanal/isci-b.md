@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-b-16 (local_8354774b-cd7a-49fe-93ab-64f1ac4edd1c; önceki lease ffcore-isci-b-triage2 RETIRED K-TR2-0012)
 - Aktif paket: 16 (feat/16-kaynaklar)
 - Durum: ACTIVE
-- Son okunan: koordinator K-16-0013
+- Son okunan: koordinator K-16-0016
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/isci-b-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 309 mesaj); ID ile atıf orada bulunur.
@@ -103,3 +103,11 @@ Paket: 16 · Cevap: K-16-0011, K-16-0013 · SHA: d914b4728ef920cdbf936e726c4b48c
 **PR 16-1 r2.** Main `7db7483`'e rebase (14-2 sonrası; tek çakışma `docs/degisiklikler.md`, iki girdi korundu; range-diff diğer commit'lerde birebir). Tam delta `7db7483..d914b47` (9 commit), r2 delta `bb24990..d914b47` (4 commit: test kırmızı → test biçim → kod → docs); eşleme PR notunda. PR notu `state/pr/16.md` 'PR 16-1 r2'.
 MAJOR-1 A: `sources/policy.py` (fs → süperadmin, diğer türler → proje admin'i), kayıt ve `config/secret` değişikliği 403 `fs_source_superadmin_only` (audit `denied`); S3 testi: B'nin developer'ı ve admin'i üç kökte de 403, B aramasında A'nın metni yok. MINOR-1: KB DELETE 409 `knowledge_base_has_sources`; raw/silver/gold başında `kb_deleted`, yazım yok (S8 testi). MINOR-2: `SYNC_WORKER_MEM_LIMIT` 2g. Docs NOTE-2/4/5 + süperadmin gerekçesi.
 Kapı (`state/evidence/16-1-r2-*.log`, `HEAD=` satırlı): kırmızı birim + test-int (3 failed, S3/S8 kodsuz üretildi); rebase'li HEAD'de `make lint` 0, tek head, `make test` 2265 × iki profil, hedefli test-int 272/272 (16 tamamı + 03a + 04a/04b silme + 57 + trj), gen:api/check:api 0, compose config 0 (mem 2 GiB). Bilerek değişen: mevcut 16-1 testlerinde fs kaydı süperadmin'le; `test_16_1_sync_worker_service` mem_limit.
+
+### B-16-0021 · 2026-11-23 11:30 · → koordinator · ACK
+Paket: 16 · Cevap: K-16-0016
+DUZELT r3 alındı: yalnız test; `tick`'e sabit saat (bugünün UTC tarihi, 01:30 / 08:14 / 23:50) + kaynak `manual`; terk + aynı tikte günlük dilim davranışı ayrı testle sabitlenir. 16 testlerinde duvar saati taraması: tik'e giden tek kullanım bu testteydi (diğerleri dosya mtime'ı için).
+
+### B-16-0022 · 2026-11-23 11:30 · → koordinator · YIGIN-AC
+Paket: 16 · Cevap: K-16-0016 · Yigin: ffcore-16
+Küçük yığın: yalnız `postgres` + `redis` (+ `tools` run), `--no-build --pull never`; zamanlayıcı testi + 16 birim/ruff. Log `16-1-r3-scheduler.log`. Bitince down -v + YIGIN-KAPA.
