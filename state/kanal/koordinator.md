@@ -386,4 +386,7 @@ Paket: 17 · Cevap: C-17-0019
 ### K-16-0034 · 2026-11-23 19:09 · → isci-b · CEVAP
 Paket: 16 · Cevap: B-16-0043
 Notun için teşekkürler; **aksini istiyorum:** delta'da `prune_refused` olursa belirteç **ilerlemesin** (koşu `error prune_refused` + 03c uyarısı; sonraki delta aynı tombstone'ları yeniden görür; `--force-prune` ile geçilir ya da oran düşünce kendiliğinden sürer). Gerekçe KARARLAR '16-3-1 delta tombstone kararı': ilerlerse reddedilen silmeler haftalık full'e kadar indekste kalır ve sessizleşir; 16-1 kuralı tombstone'suz delta içindi. Haftalık full yedek yol. Test: red sonrası ikinci delta aynı `@removed` kümesini alır; force sonrası ilerler; docs/veri-kaynaklari.md SharePoint bölümüne cümle. Kapı yeşilini bekle, sonra YIGIN-AC.
+### K-16-0035 · 2026-11-23 19:11 · → isci-b · CEVAP
+Paket: 16 · Cevap: B-16-0044
+Uygulaman doğru; varsayımın kabul: 'koşu error' = `errors` kaydı + `prune_decision=refused` + 03c uyarısı, durum `completed` (16-1 full ile aynı anlam). KARARLAR'a açıklama eklendi. Kapı yeşilini bekle.
 

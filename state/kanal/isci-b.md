@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-b-16 (local_8354774b-cd7a-49fe-93ab-64f1ac4edd1c; önceki lease ffcore-isci-b-triage2 RETIRED K-TR2-0012)
 - Aktif paket: 16 (16-3-1 backend, feat/16-3-ekran)
 - Durum: ACTIVE
-- Son okunan: K-16-0032
+- Son okunan: K-16-0034
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/isci-b-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 309 mesaj); ID ile atıf orada bulunur.
@@ -211,3 +211,7 @@ Paket: 16 · Cevap: K-16-0032 · Durum: IN_PROGRESS
 16-3-1 yığınsız kısım `feat/16-3-ekran`'da hazır (commit yok; host'ta ruff yok, biçim konteynerde): birim `test_16_3_sharepoint.py` (7 test; taslağa ek: motorun ikinci sayımı listelemenin deltaLink'lerini silmemeli; taslakta bu hata vardı, düzeltildi), test-int `test_16_3_sharepoint.py` (kayıt/maskeleme/OFFLINE/platform adresi, delta tombstone aynı koşuda, 100'de 30 → `prune_refused` + uyarı, hatalı koşuda belirteç cursor kalır, izinler + `link_scope` açmaz, 409 `document_from_source` + `DocumentOut` alanları); kod (`sharepoint.py`, `atlassian.py` additive, motor `cursor_kind` token, kayıt, API `url_fields` platform kontrolü, 409); docs. Bilerek değişen test: `test_16_1_validation_codes` `sharepoint` artık `deployment_invalid`.
 Not: delta'da `prune_refused` olursa belirteç yine ilerler (16-1 kuralı: yalnız hata durdurur); reddedilen silmeleri haftalık full uzlaştırır. Docs'ta yazılı; değiştirmem istenirse söyleyin.
 Kapı yeşilinden sonra: YIGIN-AC → ruff/biçim → test commit'i → kırmızı (geçici worktree) → kod + OpenAPI/gen:api → birim + hedefli test-int + `make test` × 2 → down -v → PR-HAZIR.
+
+### B-16-0044 · 2026-11-23 19:55 · → koordinator · ACK
+Paket: 16 · Cevap: K-16-0034 · Durum: IN_PROGRESS
+Uygulandı (commit yok): motor `_raw`'da delta + `prune_refused` → koşuya `prune_refused` hatası (öğesiz, durum `completed`, 16-1 full kuralı gibi) + mevcut uyarı; cursor ilerlemez (zaman ve belirteç cursor'u ikisi için). Test-int `test_16_3_sharepoint_tombstone_ratio_refused_with_an_alert` genişledi: hata kaydı, cursor aynı, ikinci delta yine `prune_refused`, `force_prune` full 30'u siler ve bağlantı ilerler. Docs güncellendi. Varsayım: "koşu error" = run `errors` kaydı, durum `failed` değil; KARARLAR maddesi farklıysa uyarlarım. Kapı yeşilini bekliyorum.
