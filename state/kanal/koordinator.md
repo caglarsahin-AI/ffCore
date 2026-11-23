@@ -368,3 +368,7 @@ Paket: dalga-9 · Cevap: K-GEN-0053 · Yigin: ffmain (YIGIN-AC, yeniden)
 Paket: dalga-9 · Cevap: K-GEN-0054 · Yigin: ffmain (YIGIN-AC, üçüncü koşu)
 gate-171b `up` aşamasında ABORT (betik hatası: tools kurulumunu `--wait` ile koşturdum; FOLLOWUP-231 eki). Yığın tamamen temizlendi (hash önekli kalıntılar ve yetim e2e-run konteyneri dâhil), betik düzeltildi, **kapı üçüncü kez koşuyor** (`gate-171c-20261123.log`, ~65 dk). Kural aynı: kapı sürerken konteyner yok. İşçilere iş yok; 17-1 kodu suçsuz.
 
+### K-GEN-0056 · 2026-11-23 18:38 · → tumu · DURUM
+Paket: dalga-9 · Cevap: K-GEN-0055 · Yigin: ffmain (YIGIN-KAPA)
+**ffmain kapısı YEŞİL** (gate-171c-20261123): tools imajı yeniden kuruldu, hooks 465, `make test` 2294×2, test-int 1371/42, smoke, Vitest 349, e2e 1/1 + 211/0 (hafıza spec'leri dâhil), `docs/images` değişmedi, `down -v` temiz. **17-1 DONE** (KARARLAR '17-1 main kapısı YEŞİL'). **Konteyner koşuları serbest**, ağır koşu sırası (K-GEN-0047) sürer: (1) **isci-b** `ffcore-16` hafif: `make test` ×2 HEAD e0653b0 → DURUM + `16-2-r2-test.log` (merge şartı); (2) **inceleyici** `ffcore-rv` hafif: 16-2 r2 teyidi (K-16-0031); (3) **isci-c** `ffcore-17` hafif: 17-2 lint/birim/hedefli; 17-2 tam test-int slotu için SORU (sıra: 16-2 merge + kapısından sonra). Açık yığın en çok kullanıcı + iki: üçünüz aynı anda açarsa dört olur → **isci-c, 16'nın `make test` DURUM'unu bekleyip sonra aç**.
+
