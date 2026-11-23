@@ -543,11 +543,17 @@ def test_17_import_dry_run_then_apply(
     me = login(client_factory(), f"new-{tag}@example.test", temp).json()
     assert me["user"]["must_change_password"] is True
     client = client_factory(f"new-{tag}@example.test", temp)
+    # the temporary password opens only the password screen
+    blocked = client.get(f"{API}/projects/{project}/chat/agents")
+    assert blocked.status_code == 403
+    assert blocked.json()["error"]["code"] == "password_change_required"
+    assert client.get(f"{API}/auth/me").status_code == 200
     changed = client.post(
         f"{API}/auth/password", json={"current_password": temp, "new_password": "y" * 16}
     )
     assert changed.status_code == 204
     assert user_row(pg, f"new-{tag}@example.test")[6] is False
+    assert client.get(f"{API}/projects/{project}/chat/agents").status_code == 200
 
 
 def test_17_import_header_and_permissions(configure, root, make_user, client_factory):
