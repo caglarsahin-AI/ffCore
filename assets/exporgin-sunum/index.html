@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FFCore · Exporgin sunumu</title>
+<style>
+  :root{
+    --bg:#0f1720; --panel:#16212c; --ink:#e8eef4; --muted:#9fb0c0; --line:#263442;
+    --accent:#4cc3a8; --accent-2:#f4b942; --warn:#ff8a65; --ok:#4cc3a8; --soon:#f4b942; --later:#8aa0b4;
+  }
+  @media (prefers-color-scheme: light){
+    :root{ --bg:#f6f8fa; --panel:#ffffff; --ink:#15202b; --muted:#56687a; --line:#dbe3ea; --accent:#0f8f75; --accent-2:#b57f00; --warn:#c2410c; --later:#6b7f93; }
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font:16px/1.5 "Segoe UI",system-ui,-apple-system,Roboto,sans-serif}
+  .deck{height:100%;display:flex;flex-direction:column}
+  .slide{display:none;flex:1;padding:48px 72px 40px;max-width:1280px;margin:0 auto;width:100%}
+  .slide.active{display:flex;flex-direction:column}
+  .kicker{color:var(--accent);font-weight:600;letter-spacing:.08em;text-transform:uppercase;font-size:.8rem;margin:0 0 6px}
+  h1{font-size:2.4rem;line-height:1.15;margin:0 0 14px}
+  h2{font-size:1.9rem;line-height:1.2;margin:0 0 18px}
+  h3{font-size:1.1rem;margin:0 0 8px;color:var(--accent-2)}
+  p{margin:0 0 10px}
+  .lead{font-size:1.2rem;color:var(--muted)}
+  ul{margin:0;padding-left:1.2em}
+  li{margin:0 0 8px}
+  .grid{display:grid;gap:18px}
+  .g2{grid-template-columns:repeat(2,1fr)}
+  .g3{grid-template-columns:repeat(3,1fr)}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+  .card h3{margin-top:0}
+  .tag{display:inline-block;font-size:.72rem;font-weight:600;padding:2px 8px;border-radius:999px;border:1px solid var(--line);margin-left:6px;vertical-align:middle}
+  .tag.ok{color:var(--ok);border-color:var(--ok)} .tag.soon{color:var(--soon);border-color:var(--soon)} .tag.later{color:var(--later);border-color:var(--later)}
+  table{border-collapse:collapse;width:100%;font-size:.92rem}
+  th,td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{color:var(--muted);font-weight:600}
+  .foot{display:flex;justify-content:space-between;align-items:center;padding:10px 72px 16px;color:var(--muted);font-size:.85rem;max-width:1280px;margin:0 auto;width:100%}
+  .foot .nav button{background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 12px;margin-left:6px;cursor:pointer}
+  .notes{display:none;margin-top:auto;border-top:1px dashed var(--line);padding-top:12px;color:var(--muted);font-size:.9rem}
+  .show-notes .notes{display:block}
+  .big{font-size:3rem;font-weight:700;color:var(--accent);line-height:1}
+  .stat{display:flex;flex-direction:column;gap:4px}
+  .stat small{color:var(--muted)}
+  .flow{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap}
+  .flow .step{flex:1;min-width:150px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px;position:relative}
+  .flow .step + .step::before{content:"\2192";position:absolute;left:-14px;top:50%;transform:translateY(-50%);color:var(--muted)}
+  .legend{margin-top:auto;font-size:.85rem;color:var(--muted)}
+  svg text{font-family:inherit}
+  @media print{
+    .slide{display:flex!important;page-break-after:always;padding:36px 48px}
+    .foot{display:none} .notes{display:block}
+  }
+  @media (max-width:800px){
+    .slide{padding:24px 16px} .g2,.g3{grid-template-columns:1fr} h1{font-size:1.7rem} h2{font-size:1.4rem} .foot{padding:8px 16px}
+  }
+</style>
+</head>
+<body>
+<div class="deck" id="deck">
+
+<!-- 1 -->
+<section class="slide active">
+  <p class="kicker">FFCore · Exporgin için</p>
+  <h1>Exporgin için dijital ekip:<br>40 ülkeyi 7/24 izleyen, konuşan ve işleyen asistanlar</h1>
+  <p class="lead">Kurumunuzun bilgisini, araçlarını ve kurallarını bilen; kaynak gösteren; izin olmadan iş yapmayan dijital çalışanlar. Hizmet olarak, size ayrılmış kurulumda.</p>
+  <div class="grid g3" style="margin-top:28px">
+    <div class="card stat"><span class="big">7/24</span><small>5 dilde müşteri desteği, gece saatleri dâhil</small></div>
+    <div class="card stat"><span class="big">40+</span><small>ülkeyi aynı anda izleyen operasyon asistanları</small></div>
+    <div class="card stat"><span class="big">%0</span><small>kaynaksız cevap; her para hareketi insan onayından geçer</small></div>
+  </div>
+  <div class="notes"><b>Not:</b> Açılış 30 saniye. Vaat üç sayıda: gece desteği, 40 ülke izleme, güvenli otomasyon. "Sohbet botu" kelimesini kullanmayın; "dijital ekip" ve "asistan" deyin. Tarih ve sunan kişiyi altbilgiye ekleyin.</div>
+</section>
+
+<!-- 2 -->
+<section class="slide">
+  <p class="kicker">Sizi nasıl görüyoruz</p>
+  <h2>Ödevimizi yaptık; yanlışsa ilk üç dakikada düzeltin</h2>
+  <div class="grid g2">
+    <div class="card">
+      <h3>Sitenizden okuduklarımız</h3>
+      <ul>
+        <li>Türkiye'nin ürünlerini (gıda, bakır, mücevher, kozmetik, ev) 40'tan fazla ülkeye satan e-ticaret; Fransa merkezli şirket</li>
+        <li>5 dil (EN, DE, IT, ES, FR), 5.000+ ürün, 10.000+ müşteri, 4,8/5 puan</li>
+        <li>Shopify mağazası, yerel ödeme yöntemleri (Klarna, BLIK, MB WAY, Satispay), FedEx/UPS/DHL ile kargo</li>
+        <li>Toptan sipariş alınıyor; tedarikçilere perakende ve toptan kanal sunuluyor</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Gözümüze çarpanlar</h3>
+      <ul>
+        <li>Destek yalnız e-posta ve form; çalışma saatleri sayfalar arasında farklı (09-18, 09-24, "7/24")</li>
+        <li>Gümrük ve iade kuralları SSS'de dağınık; gıdada iade yok, 14 gün kuralı diğerlerinde</li>
+        <li>Sipariş takibi ayrı uygulamada; müşteri hesabı şifresiz giriş</li>
+        <li>Tedarikçi portalı, API veya iç araç görünmüyor</li>
+      </ul>
+    </div>
+  </div>
+  <div class="notes"><b>Not:</b> Bu slayt onların konuşması için. "Destek ekibiniz kaç kişi, hangi dillerde ve saatlerde boşluk var?" sorusunu burada sorun. Kaynak: exporgin.com ana sayfa, Hakkımızda, SSS, İletişim (23 Kasım 2026).</div>
+</section>
+
+<!-- 3 -->
+<section class="slide">
+  <p class="kicker">Üç acı</p>
+  <h2>E-ticarette en hızlı hissedilen üç maliyet</h2>
+  <div class="grid g3">
+    <div class="card"><h3>1 · Gece ve çok dilli destek</h3><p>Avustralya, ABD ve Körfez soruları sizin gece saatlerinize düşer. 5 dilde, politikaya uygun, kaynaklı cevap insan gücüyle pahalı.</p><p class="lead" style="font-size:1rem">Bugün nasıl yapılıyor? ______</p></div>
+    <div class="card"><h3>2 · İade ve gümrük kaynaklı kayıp</h3><p>Gümrük gecikmesi, ek vergi şaşkınlığı, hasarlı paket, yanlış beyan; her biri müşteri kaybı ve operasyon saati.</p><p class="lead" style="font-size:1rem">Aylık kayıp? ______</p></div>
+    <div class="card"><h3>3 · 40 ülkeyi aynı anda izleyememek</h3><p>Bir ülkede ödeme yöntemi bozulur, bir kargo firması gecikir, bir dilde dönüşüm düşer; kimse 40 kesiti elle izleyemez.</p><p class="lead" style="font-size:1rem">Son fark edilmeyen sorun? ______</p></div>
+  </div>
+  <div class="notes"><b>Not:</b> Boşlukları toplantıda onlar doldurur; cevaplar pilotun hangi iki senaryoyla başlayacağını belirler. Rakamları biz vermiyoruz, onlardan alıyoruz.</div>
+</section>
+
+<!-- 4 -->
+<section class="slide">
+  <p class="kicker">FFCore nedir</p>
+  <h2>Kurumun bilgisini, araçlarını ve kurallarını bilen dijital çalışanlar platformu</h2>
+  <div class="grid g2" style="align-items:start">
+    <div>
+      <ul>
+        <li><b>Kullanıcı yüzeyleri:</b> sohbet ekranı, yönetim konsolu, OpenAI uyumlu API; web widget ve WhatsApp/Slack kanalları yol haritasında</li>
+        <li><b>Asistanlar (agent'lar):</b> her biri kendi talimatı, araç seti ve yetkisiyle; onay kuralları ve zaman sınırları</li>
+        <li><b>Bilgi tabanı:</b> belgeleriniz, SSS, politikalar, sözleşmeler; belge düzeyinde erişim; Confluence/Jira/SharePoint/ağ klasöründen düzenli senkron</li>
+        <li><b>Araçlar:</b> Shopify, kargo, muhasebe gibi sistemler OpenAPI tanımıyla bağlanır; metinle veri sorgusu salt okunur</li>
+        <li><b>Kurallar:</b> kişi verisi maskesi, çıkış izin listesi, onay kuyruğu, denetim izi</li>
+        <li><b>Modeller:</b> sağlayıcı bağımsız (Azure OpenAI AB bölgesi, Anthropic, açık modeller); tek geçitten, kota ve harcama tavanıyla</li>
+      </ul>
+    </div>
+    <div class="card" style="padding:10px">
+      <svg viewBox="0 0 520 330" width="100%" role="img" aria-label="FFCore katmanları">
+        <defs><marker id="a" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#9fb0c0"/></marker></defs>
+        <g font-size="13" fill="currentColor">
+          <rect x="20" y="16" width="480" height="48" rx="8" fill="none" stroke="#4cc3a8"/><text x="260" y="38" text-anchor="middle">Kullanıcı yüzeyleri</text><text x="260" y="55" text-anchor="middle" font-size="11" fill="#9fb0c0">sohbet · konsol · API · (widget, WhatsApp, Slack)</text>
+          <rect x="20" y="88" width="480" height="56" rx="8" fill="none" stroke="#f4b942"/><text x="260" y="112" text-anchor="middle">Asistanlar</text><text x="260" y="130" text-anchor="middle" font-size="11" fill="#9fb0c0">destek · operasyon · katalog · icra kurulu asistanları</text>
+          <rect x="20" y="168" width="150" height="64" rx="8" fill="none" stroke="#9fb0c0"/><text x="95" y="194" text-anchor="middle">Bilgi tabanı</text><text x="95" y="212" text-anchor="middle" font-size="11" fill="#9fb0c0">belge · SSS · ACL</text>
+          <rect x="185" y="168" width="150" height="64" rx="8" fill="none" stroke="#9fb0c0"/><text x="260" y="194" text-anchor="middle">Araçlar</text><text x="260" y="212" text-anchor="middle" font-size="11" fill="#9fb0c0">Shopify · kargo · SQL</text>
+          <rect x="350" y="168" width="150" height="64" rx="8" fill="none" stroke="#9fb0c0"/><text x="425" y="194" text-anchor="middle">Kurallar</text><text x="425" y="212" text-anchor="middle" font-size="11" fill="#9fb0c0">onay · maske · izin listesi</text>
+          <rect x="20" y="256" width="480" height="48" rx="8" fill="none" stroke="#4cc3a8"/><text x="260" y="278" text-anchor="middle">Model geçidi</text><text x="260" y="295" text-anchor="middle" font-size="11" fill="#9fb0c0">sağlayıcı bağımsız · kota · izleme ve değerlendirme</text>
+          <line x1="260" y1="64" x2="260" y2="86" stroke="#9fb0c0" marker-end="url(#a)"/><line x1="260" y1="144" x2="260" y2="166" stroke="#9fb0c0" marker-end="url(#a)"/><line x1="260" y1="232" x2="260" y2="254" stroke="#9fb0c0" marker-end="url(#a)"/>
+        </g>
+      </svg>
+    </div>
+  </div>
+  <div class="notes"><b>Not:</b> Tek cümle: "Model dışındaki her şey sizin alanınızda: bilgi, araçlar, kurallar, izleme." Model seçimi onların; bugün Azure OpenAI AB bölgesi, yarın başka. Widget ve kanalların yol haritasında olduğunu burada söyleyin, sonra değil.</div>
+</section>
+
+<!-- 5 -->
+<section class="slide">
+  <p class="kicker">Neden "sohbet botu" değil</p>
+  <h2>Dört ayrım</h2>
+  <div class="grid g2">
+    <div class="card"><h3>Kaynaksız cevap yok</h3><p>Her cevap belgeyi, sayfayı ve güncelleme tarihini gösterir; bilgi yoksa "bilmiyorum" der. Uydurma yerine kayıtlı ret.</p></div>
+    <div class="card"><h3>Para ve veri hareketi onaydan geçer</h3><p>İade, kısmi iade, fiyat değişikliği, tedarikçi siparişi: asistan hazırlar, yetkili kişi onaylar; onaylayan ve zaman denetim izinde.</p></div>
+    <div class="card"><h3>Her cevap izlenir ve ölçülür</h3><p>İzleme, değerlendirme setleri ve kullanıcı geri bildirimi; kalite düşerse görünür, prompt değişiklikleri sınavla kanıtlanır.</p></div>
+    <div class="card"><h3>Kişi verisi maskelenir</h3><p>Ad, adres, kimlik ve kart bilgisi modele ve loglara girmez; GDPR silme hakkı üründe; dış çıkışlar izin listesiyle.</p></div>
+  </div>
+  <div class="notes"><b>Not:</b> Güven slaytı. Fransız şirket için GDPR cümlesini vurgulayın. Rakip ürünlerin adını anmayın; farkı davranışla anlatın.</div>
+</section>
+
+<!-- 6 -->
+<section class="slide">
+  <p class="kicker">Senaryo 1 <span class="tag ok">bugün var</span></p>
+  <h2>7/24 çok dilli destek asistanı + iade/gümrük işleyici</h2>
+  <div class="flow">
+    <div class="step"><b>Soru gelir</b><br><small>5 dil; web sohbeti, e-posta, ileride WhatsApp</small></div>
+    <div class="step"><b>Bilgi tabanı</b><br><small>SSS, kargo, iade, gümrük, ödeme politikaları</small></div>
+    <div class="step"><b>Shopify sorgusu</b><br><small>sipariş durumu, kargo takibi (OpenAPI aracı)</small></div>
+    <div class="step"><b>Kaynaklı cevap</b><br><small>politika maddesi ve sipariş verisiyle</small></div>
+    <div class="step"><b>İade talebi</b><br><small>fotoğraf ve politika → karar taslağı → <b>onay kuyruğu</b> → işlem</small></div>
+  </div>
+  <div class="grid g2" style="margin-top:18px">
+    <div class="card"><h3>Ölçüt</h3><ul><li>İlk cevap süresi (gece dâhil)</li><li>İnsan dokunuşu oranı</li><li>İade kararında politika uyumu</li></ul></div>
+    <div class="card"><h3>Sizden gerekenler</h3><ul><li>SSS ve politika metinleri (5 dil)</li><li>Shopify API erişimi (salt okunur + iade yetkisi onaylı)</li><li>Haftada 2 saat destek sorumlusu</li></ul></div>
+  </div>
+  <div class="notes"><b>Not:</b> Canlı demo burada: sohbet ekranında kaynak kartlı cevap, "siparişim nerede" aracı, iade talebinin onay kuyruğuna düşmesi. Dürüstlük: web widget dalga 10'da; pilotta sohbet bizim ekranımızda ya da Shopify sayfasına gömülü iframe ile.</div>
+</section>
+
+<!-- 7 -->
+<section class="slide">
+  <p class="kicker">Senaryo 2 <span class="tag soon">pilotta kurulur</span></p>
+  <h2>Operasyon anomali izleyici ve talep tahmini</h2>
+  <p class="lead">LLM hesap yapmaz; hesabı istatistik araçları yapar, asistan anlamlandırır, kök nedeni kazar, aksiyonu onaya sunar.</p>
+  <div class="grid g3">
+    <div class="card"><h3>İzlenen seriler</h3><ul><li>Ödeme yöntemi × ülke hata oranı (Klarna, BLIK, MB WAY…)</li><li>Kargo firması × ülke gecikme ve kayıp</li><li>SKU iade oranı, dil bazlı dönüşüm, sepet terk</li></ul></div>
+    <div class="card"><h3>Asistan ne yapar</h3><ul><li>Sabah özeti: "DE'de dönüşüm %30 düştü; Klarna hata oranı 3 kat, aynı saatte fiyat gösterimi değişmiş"</li><li>Metinle sorgu ve kampanya takvimiyle kök neden hipotezi</li><li>İlgiliye kanaldan yazar; aksiyon onaylı</li></ul></div>
+    <div class="card"><h3>Talep tahmini</h3><ul><li>SKU × ülke × hafta; mevsimsellik ve kampanya etkisi</li><li>Gıda raf ömrü ve Türkiye'den sevk süresiyle sipariş noktası</li><li>Tedarikçi sipariş taslağı → onay</li></ul></div>
+  </div>
+  <p class="legend">Ölçüt: fark etme süresi, yanlış alarm oranı, kurtarılan sipariş; tahminde haftalık hata (MAPE) ve stok yetmezliği sayısı. Veri: 18-24 ay sipariş geçmişi, kişi verisi olmadan, salt okunur raporlama veritabanına günlük aktarım.</p>
+  <div class="notes"><b>Not:</b> Tahmin ve anomali motoru bugün üründe yok; pilotta hafif istatistik araçları olarak birlikte kurulur, platformun araç uzantı noktasına takılır. Değer asistanın açıklama ve aksiyon katmanında. Bunu söylemek güven kazandırır.</div>
+</section>
+
+<!-- 8 -->
+<section class="slide">
+  <p class="kicker">Senaryo 3 <span class="tag ok">bugün var</span></p>
+  <h2>Katalog içerik üreticisi ve gıda uyum denetçisi</h2>
+  <div class="grid g2">
+    <div class="card"><h3>Akış</h3><ul><li>Tedarikçi Türkçe metni ve belgeleri (Excel, PDF, sertifika) bilgi tabanına</li><li>5 dilde ürün açıklaması, SEO başlığı, alerjen ve içerik tablosu</li><li>Ülke kurallarına göre zorunlu ibareler; eksikte yayın durur</li><li>Değerlendirme seti marka sesi ve zorunlu bilgiyi puanlar; insan son onay</li></ul></div>
+    <div class="card"><h3>Değer ve ölçüt</h3><ul><li>Ürün başına yayın süresi (5 dil)</li><li>Alerjen/içerik hatası sayısı (gıdada düzenleyici risk)</li><li>Tedarikçi sorusu: "bu tedarikçinin helal sertifikası hangi tarihe kadar geçerli?"</li></ul></div>
+  </div>
+  <div class="notes"><b>Not:</b> 5.000 ürün × 5 dil = 25.000 metin; bugün nasıl yapıldığını sorun. Belge dönüşümü (PDF, eski Office, MHTML) üründe var; Confluence/Jira ve ağ klasörü senkronu bu hafta tamamlanıyor.</div>
+</section>
+
+<!-- 9 -->
+<section class="slide">
+  <p class="kicker">İcra kurulu asistanları <span class="tag ok">bugün var</span> <span class="tag later">asistanlar arası devir: yol haritası</span></p>
+  <h2>Her yöneticiye bir asistan; görür, yapar, onaylar yetkisi kadar</h2>
+  <table>
+    <thead><tr><th>Asistan</th><th>Görür</th><th>Uzman alt ajanlar</th><th>Yapar / onaylar</th></tr></thead>
+    <tbody>
+      <tr><td><b>CEO</b></td><td>Bütün projelerin özet katmanı; kişi verisi yok</td><td>Haftalık yönetim özeti, "neden" analisti, karar takibi</td><td>Hiçbir işlemi başlatmaz; özet ve kanıt</td></tr>
+      <tr><td><b>CFO</b></td><td>Finans projesi, ödeme verileri (maskeli)</td><td>Mutabakat, ödeme hata analisti, OSS/KDV özeti, nakit tahmini</td><td>Ödeme ve limit üstü iade yalnız onayla</td></tr>
+      <tr><td><b>COO</b></td><td>Sipariş, kargo, depo, tedarikçi</td><td>Teslimat anomali, kargo seçici, gümrük belgesi, talep tahmini</td><td>Kargo değişikliği ve tedarikçi siparişi onayla</td></tr>
+      <tr><td><b>CMO</b></td><td>Reklam, kampanya, içerik</td><td>Kampanya planlayıcı ve karnesi, reklam analisti, katalog içerik, yorum asistanı</td><td>Kampanya ve fiyat onayla; gönderim insan düğmesiyle</td></tr>
+      <tr><td><b>Satış (B2B)</b></td><td>Toptan talepler, fiyat listeleri, CRM</td><td>Talep triyajı ve teklif, distribütör araştırması</td><td>Teklif gönderimi onayla; indirim sınırı kurallı</td></tr>
+      <tr><td><b>Destek müdürü</b></td><td>Konuşmalar, SSS, politikalar</td><td>7/24 asistan, iade işleyici, kalite denetçisi, GDPR talep işleyici</td><td>İade limitli; GDPR silme onaylı ve kanıtlı</td></tr>
+    </tbody>
+  </table>
+  <p class="legend">Aynı soru ("Almanya'da ne oldu?") CEO'ya özet ve kanıt, CFO'ya ödeme ve marj, COO'ya kargo ve iade, CMO'ya kampanya etkisi getirir; her biri yalnız kendi görebildiğiyle, aynı platformda, aynı denetim iziyle. Her yöneticinin asistanı tercihlerini hatırlar; kullanıcı hafızasını görür ve siler.</p>
+  <div class="notes"><b>Not:</b> Yetki sınırını canlı gösterin: CMO asistanına "iade yap" dendiğinde reddedip doğru kuyruğa yönlendirmesi. Dürüstlük: bugün uzmanlık ayrı asistan ya da araç olarak bağlanır; bir asistanın başka asistanı kendi içinden çağırıp sonucu birleştirmesi yol haritasında.</div>
+</section>
+
+<!-- 10 -->
+<section class="slide">
+  <p class="kicker">Yol haritası</p>
+  <h2>Platform bir kez kurulur, asistanlar eklenir</h2>
+  <div class="grid g3">
+    <div class="card"><h3>Pilot (6 hafta) <span class="tag ok">bugün var</span></h3><ul><li>7/24 destek + iade/gümrük işleyici</li><li>Katalog içerik ve uyum</li><li>Anomali izleyici (ilk seriler) <span class="tag soon">pilotta</span></li><li>CEO ve COO asistanı (özet, neden)</li></ul></div>
+    <div class="card"><h3>3 ay içinde <span class="tag soon">kurulur</span></h3><ul><li>Talep tahmini ve tedarikçi sipariş taslağı</li><li>Toptan talep triyajı ve teklif</li><li>Mutabakat ve ödeme hata analisti</li><li>GDPR talep işleyici, sertifika takibi</li><li>Web widget, WhatsApp kanalı</li></ul></div>
+    <div class="card"><h3>Sonrası <span class="tag later">yol haritası</span></h3><ul><li>Kampanya planlayıcı ve karnesi, reklam analisti</li><li>Kargo seçici, gümrük belgesi hazırlayıcı</li><li>Sahtecilik ve iade suistimali puanı</li><li>Distribütör araştırması, rakip izleme</li><li>Asistanlar arası devir, sesli kanal</li></ul></div>
+  </div>
+  <div class="notes"><b>Not:</b> Bu slayt menü; onlar seçer. Her kalem için "veri nereden" sorusuna hazır olun: Shopify, GA4, reklam panelleri, kargo takip, muhasebe.</div>
+</section>
+
+<!-- 11 -->
+<section class="slide">
+  <p class="kicker">Güvenlik ve uyum</p>
+  <h2>Avrupa'da barındırma, GDPR üründe</h2>
+  <div class="grid g2">
+    <div class="card"><h3>Veri</h3><ul><li>AB bölgesinde barındırma; veri ve bilgi tabanı sizin ayrılmış kurulumunuzda</li><li>Kişi verisi maskesi: ad, adres, kimlik, kart modele ve loglara girmez</li><li>Silme hakkı: kullanıcı kendi hafızasını siler; GDPR talepleri kanıtlı işlenir</li><li>Dış çıkışlar izin listesiyle; model sağlayıcısına yalnız gereken gider</li></ul></div>
+    <div class="card"><h3>Erişim ve denetim</h3><ul><li>Proje izolasyonu; rol ve erişim modu (düzenleme / salt okunur)</li><li>Belge düzeyinde erişim; kaynak sistemdeki yetki indekse taşınır</li><li>Onay kuyruğu: kim, ne zaman, neyi onayladı</li><li>Tam denetim izi; guardrail retleri kayıtlı; kurumsal giriş (AD/LDAP, OIDC) bu hafta</li></ul></div>
+  </div>
+  <div class="notes"><b>Not:</b> Fransız şirket için satın alma kararı slaytı. "Verileriniz model eğitiminde kullanılmaz" cümlesini sağlayıcı sözleşmesiyle destekleyin. Kurumsal giriş paketi geliştirmede; pilotta yerel kullanıcılar yeter.</div>
+</section>
+
+<!-- 12 -->
+<section class="slide">
+  <p class="kicker">Hizmet modeli</p>
+  <h2>Size ayrılmış kurulum, biz işletiriz; istediğinizde kendi sunucunuza taşınır</h2>
+  <div class="grid g3">
+    <div class="card"><h3>Aylık platform aboneliği</h3><p>Kurulum, işletme, güncelleme, izleme; asistan sayısına göre kademeli.</p></div>
+    <div class="card"><h3>Model kullanımı</h3><p>Geçiş fiyatıyla; kota ve harcama tavanı sizin konsolunuzda, aşımda uyarı.</p></div>
+    <div class="card"><h3>Bir kerelik kurulum</h3><p>Bilgi tabanı hazırlığı, Shopify araç tanımı, ilk asistanların ayarı ve değerlendirme setleri.</p></div>
+  </div>
+  <p class="legend" style="margin-top:18px">Aynı ürün iki profilde çalışır: hizmet (bizim AB barındırmamız) ya da kendi sunucunuz (kapalı ağ dâhil). Kilitlenme yok: veri, bilgi tabanı ve asistan tanımları taşınabilir; model sağlayıcısı değiştirilebilir.</p>
+  <div class="notes"><b>Not:</b> Rakam vermeyin; ölçek örneğini ek slayta bırakın (aylık 20 bin destek mesajı için tahmini model gideri). Çok kiracılı paylaşımlı altyapı yok; "size ayrılmış" demek hem güvenlik hem fiyat argümanı.</div>
+</section>
+
+<!-- 13 -->
+<section class="slide">
+  <p class="kicker">Pilot teklifi</p>
+  <h2>6 hafta, iki senaryo, ölçülebilir çıkış kriteri</h2>
+  <div class="grid g2">
+    <div class="card"><h3>Kapsam</h3><ul><li>Senaryo 1: 7/24 destek + iade/gümrük işleyici</li><li>Senaryo 2 ya da 3: anomali izleyici (ilk üç seri) ya da katalog içerik</li><li>CEO/COO asistanı: haftalık özet ve "neden"</li><li>Haftalık karne, 6. haftada karar toplantısı</li></ul></div>
+    <div class="card"><h3>Başarı ölçütleri</h3><ul><li>İlk cevap süresi: gece saatleri dâhil dakikalar içinde</li><li>İnsan dokunuşu oranı: hedef destek konuşmalarının yarısından azı</li><li>Anomali: fark etme süresi ve yanlış alarm oranı</li><li>Katalog: ürün başına yayın süresi</li></ul></div>
+    <div class="card"><h3>Sizden gerekenler</h3><ul><li>Shopify API erişimi (salt okunur; iade onaylı)</li><li>SSS, politika ve sözleşme metinleri (5 dil)</li><li>18-24 ay sipariş geçmişi, kişi verisi olmadan</li><li>Haftada 2 saat ürün sahibi</li></ul></div>
+    <div class="card"><h3>Bizden</h3><ul><li>AB bölgesinde ayrılmış kurulum ve işletme</li><li>Bilgi tabanı hazırlığı ve Shopify araç tanımı</li><li>Anomali/tahmin araçlarının ilk sürümü</li><li>Haftalık ölçüm ve karne</li></ul></div>
+  </div>
+  <div class="notes"><b>Not:</b> Çıkış kriterini onlarla birlikte yazın; pilotun sonunda "devam / genişlet / dur" kararı sayılara dayansın.</div>
+</section>
+
+<!-- 14 -->
+<section class="slide">
+  <p class="kicker">Sonraki adım</p>
+  <h2>Keşif görüşmesi: beş soru, bir tarih</h2>
+  <div class="grid g2">
+    <div class="card"><h3>Beş soru</h3><ol style="margin:0;padding-left:1.2em">
+      <li>Destek ekibi kaç kişi; hangi saatler ve dillerde boşluk var?</li>
+      <li>İade ve gümrük kaynaklı aylık kayıp ne?</li>
+      <li>5.000 ürünün çevirisi nasıl yapılıyor, ne kadar sürüyor?</li>
+      <li>Toptan talepler nereye düşüyor, kaçı cevapsız kalıyor?</li>
+      <li>Shopify dışında hangi sistemler var; raporu kim çekiyor?</li>
+    </ol></div>
+    <div class="card"><h3>Takvim</h3><ul>
+      <li>Keşif görüşmesi: 60 dk, operasyon ve destek sorumlularıyla</li>
+      <li>Teknik ön hazırlık: Shopify API, SSS metinleri, veri örneği</li>
+      <li>Pilot başlangıcı: keşiften 2 hafta sonra</li>
+      <li>İletişim: ______</li>
+    </ul></div>
+  </div>
+  <p class="legend">Dürüst notlar: web widget ve WhatsApp kanalı dalga 10'da; kurumsal giriş bu hafta; tahmin ve anomali motoru pilotta birlikte kurulur, asistan açıklama ve aksiyon katmanıdır.</p>
+  <div class="notes"><b>Not:</b> Kapanış: "Platform bir kez kurulur, dijital ekip büyür." Toplantıdan çıkarken keşif tarihini almış olun.</div>
+</section>
+
+</div>
+<div class="foot">
+  <span id="counter">1 / 14</span>
+  <span>FFCore · Exporgin · Kasım 2026 · <b>N</b> notlar · <b>←/→</b> gezinme · <b>P</b> yazdır</span>
+  <span class="nav"><button id="prev" aria-label="Önceki">←</button><button id="next" aria-label="Sonraki">→</button><button id="notes" aria-label="Notlar">N</button></span>
+</div>
+<script>
+(function(){
+  var slides=[].slice.call(document.querySelectorAll('.slide')),i=0,n=slides.length;
+  var hash=parseInt(location.hash.replace('#',''),10); if(hash>=1&&hash<=n) i=hash-1;
+  function show(k){ slides[i].classList.remove('active'); i=(k+n)%n; slides[i].classList.add('active'); document.getElementById('counter').textContent=(i+1)+' / '+n; location.hash=i+1; }
+  show(i);
+  document.getElementById('prev').onclick=function(){show(i-1)};
+  document.getElementById('next').onclick=function(){show(i+1)};
+  document.getElementById('notes').onclick=function(){document.body.classList.toggle('show-notes')};
+  document.addEventListener('keydown',function(e){
+    if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){show(i+1);e.preventDefault();}
+    else if(e.key==='ArrowLeft'||e.key==='PageUp'){show(i-1);e.preventDefault();}
+    else if(e.key==='n'||e.key==='N'){document.body.classList.toggle('show-notes');}
+    else if(e.key==='p'||e.key==='P'){window.print();}
+    else if(e.key==='Home'){show(0);} else if(e.key==='End'){show(n-1);}
+  });
+})();
+</script>
+</body>
+</html>
