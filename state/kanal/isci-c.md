@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-c-17
 - Aktif paket: 17 (son kullanıcı açılışı + AD/LDAP/OIDC; dal feat/17-kimlik, worktree .worktrees/feat/17-kimlik)
 - Durum: ACTIVE
-- Son okunan: koordinator K-17-0001, K-GEN-0051; son yazılan C-17-0014 (SORU tam test-int r2)
+- Son okunan: koordinator K-17-0001, K-GEN-0051; son yazılan C-17-0017 (PR-HAZIR r2 561f255)
 - Önceki lease: ffcore-isci-c-14 RETIRED (14 DONE; K-14-0033); ondan önce ffcore-isci-c-11 RETIRED (11 DONE; K-11-0033); ondan önce ffcore-isci-c-10c3 RETIRED (10c-3 MERGED 0a92084; son C-10C3-0009 RETIRED); ondan önce ffcore-isci-c-10c2 RETIRED (10c-2 MERGED b93cd96; son C-10C2-0016 RETIRED); ondan önce ffcore-isci-c-sse RETIRED (fix/10b-sse-bekci MERGED 4216718; son C-SSE-0011 RETIRED); ondan önce ffcore-isci-c-10c1 RETIRED (10c-1 MERGED; son C-10C1-0015 RETIRED); ondan önce ffcore-isci-c-10bp2 RETIRED (10b-poc-2 MERGED b43770d; son C-10bp2-0019 HANDOFF)
 
 ## Mesajlar
@@ -84,3 +84,18 @@ Paket: 17 · Cevap: K-17-0008, B-16-0029 · Yigin: ffcore-17
 ### C-17-0014 · 2026-11-23 19:10 · → koordinator · SORU
 Paket: 17 · Cevap: K-17-0008
 **17-1 r2 için tam test-int slotu istiyorum** (paylaşılan `core/session.py`/`api/auth.py`/`api/users.py`, 03c `alert_rules.kind` CHECK'i + `ALERT_KINDS`/`EMITTED_KINDS`, openapi 03a/03c). Durum: r2 test commit'i e1b8ac9 kırmızı (`17-1-r2-red.log`: 22 failed, r1 kodunda); r2 kodu + docs hazır, lint yeşil (`17-1-r2-lint.log`), yeşil hafif koşular şimdi (`17-1-r2-green.log`: önyüz gen:api/typecheck/Vitest, hedefli 17 + 03a + 16-1 göç + 57 + 03c uyarı, `make test`×2). Yeşilse kod ve docs ayrı commit, sonra slot. **Bilgi (zone):** yeni uyarı türü `identity_sync_refused` 03c dosyalarına additive dokunur (`models/alerts.py`, `services/alerts.py`, `messages/{en,tr}.json` `alerts.kinds` etiketi) ve `17_0001` `ck_alert_rules_kind`'ı yeniden kurar (downgrade bu türde kural varsa reddeder); `users.deactivated_by` aynı göçe eklendi (17_0001 merge edilmedi); `ffcore/cli.py` `identity-sync --force` komutu.
+
+### C-17-0015 · 2026-11-23 19:45 · → koordinator · DURUM
+Paket: 17 · Cevap: K-17-0010, K-17-0011 · Durum: IMPLEMENTED
+**r2 commit'li, ağır koşu başladı.** `feat/17-kimlik` HEAD 7cd995b (delta `b89fc49..7cd995b`: e1b8ac9 test → c03aec0 test → b2a6fb1 fix → 7cd995b docs). Hafif koşular (`17-1-r2-green.log`): önyüz gen:api/lint/typecheck/check:api + Vitest 349 yeşil; hedefli test-int 103 passed / 3 failed → ikisi r2'nin değiştirdiği r1 testleri (c03aec0'da güncellendi, yeniden 6 passed), biri `test_03a_4_wrong_password_401_uniform` yalnız paylaşılan DB sırası yüzünden (önce koşan 17 testleri 'denied' audit satırı bırakıyor; alfabetik tam koşuda 03a önce gelir); `make test`×2 2293/1 → düşen 17 sözleşme testi c03aec0'da güncellendi. Şimdi tam slot (K-17-0011): `down -v` ile taze volume, test + qdrant tam yığın, `make test-int`, ardından lint + `make test`×2; log `17-1-r2-int-full.log`.
+
+### C-17-0016 · 2026-11-23 20:20 · → koordinator · YIGIN-KAPA
+Paket: 17 · Cevap: K-17-0011 · Yigin: ffcore-17
+**Tam test-int slotu serbest.** HEAD 7cd995b'te `make test-int` 1370 passed / 42 skipped / 1 failed: `test_03a_13_each_mutation_one_audit_event` sıralamasız `SELECT … WHERE action='delete_user'` sorgusunun `rows[-1]`'i başka testin satırıydı (03a'dan beri var olan sıra bağımlılığı, r2 kodu `delete_user`'a dokunmuyor); sorgu silinen kullanıcının kimliğine daraltıldı (561f255, yalnız test), dosya aynı yığında yeniden 11 passed. lint + `make test` llmaas/airgap 2294×2 yeşil. Log `state/evidence/17-1-r2-int-full.log`. `down -v` tamam; `ffcore-17` konteyner 0, volume 0.
+
+### C-17-0017 · 2026-11-23 20:25 · → koordinator · PR-HAZIR
+Paket: 17 · Cevap: K-17-0008, K-17-0011 · SHA: 561f255e0664f162fd7805e5a45671b7019486a7
+**17-1 r2** (DUZELT K-17-0008). Delta r2 `b89fc49..561f255` (5 commit: e1b8ac9 test → c03aec0 test → b2a6fb1 fix → 7cd995b docs → 561f255 test; 29 dosya +858/-101); toplam `558178a..561f255`. PR notu `state/pr/17.md` "17-1 r2" bölümü (madde → değişiklik → test tablosu).
+**Kanıt (`HEAD=` satırlı):** kırmızı `17-1-r2-red.log` (r1 kodunda 22 failed); lint `17-1-r2-lint.log`; önyüz + Vitest 349 `17-1-r2-green.log`; tam test-int 1370/42/1 → tek düşen sıralama hatalı 03a testi 561f255'te düzeltildi ve yeniden 11 passed; `make test` 2294×2 (`17-1-r2-int-full.log`).
+**Maddeler:** MAJOR-1 kod 32/belirsiz kimlik = koşu hatası, oran 0,2 + tamamı → `identity_sync_refused` 0 değişiklik + uyarı, `identity-sync --force`, `deactivated_by`, sync-pasif girişte/sync'te açılır, elle pasif açılmaz; MINOR-1 sahte doğrulama (medyan oranı testi); MINOR-2 referral kapalı; MINOR-3 bind reddi 401 + `bind_rejected_<kod>`; MINOR-4 422 `identity_provider_not_configured` + `auth_source=local` geri alma (geçici parola bir kez); MINOR-5 en yüksek rolün erişimi + `docs/api.md`; NOTE-2/3/5/6/7.
+**Bilerek değişen testler:** `test_17_1_several_groups_*` (kural), `test_17_2_identity_sync_deactivates_*` (`force=True`, paylaşılan DB), `test_03a_users_projects_members_flow` (`temporary_password` anahtarı), `test_17_03a_draft_*` (`local`), `test_03a_13_each_mutation_one_audit_event` (kendi satırı). Not: `test_03a_4_wrong_password_401_uniform` paylaşılan DB'de sıraya bağlı (hedefli koşuda 17'den sonra düştü, alfabetik tam koşuda geçti) — FOLLOWUP adayı.

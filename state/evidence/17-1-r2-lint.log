@@ -1,0 +1,546 @@
+HEAD=e1b8ac9419c01a82fcafac2d568894a002967fd6 (+ r2 code/docs, uncommitted)
+17_0001 (03a, 03b, 09, 08, 05a, 07, 06a, 03c, 17, 06b, 11, 04b, 16, 05b, 14, 12, 04a) (head)
+ruff check backend scripts data/samples/scripts services tests/deploy
+F811 Redefinition of unused `fake` from line 17
+  --> backend/tests/integration/test_17_r2.py:24:18
+   |
+24 | def _isolate(pg, fake):
+   |                  ^^^^ `fake` redefined here
+25 |     """The integration database is shared: earlier tests leave directory accounts this fake
+26 |     directory does not know. They are soft-deleted here so the sync sees this test's accounts
+   |
+  ::: backend/tests/integration/test_17_r2.py:17:5
+   |
+15 |     API,
+16 |     configure,
+17 |     fake,
+   |     ---- previous definition of `fake` here
+18 |     login,
+19 |     root,
+   |
+help: Remove definition: `fake`
+
+F811 Redefinition of unused `fake` from line 17
+  --> backend/tests/integration/test_17_r2.py:36:21
+   |
+36 | def _sync(settings, fake, *, force=False):
+   |                     ^^^^ `fake` redefined here
+37 |     from ffcore.core import db
+38 |     from ffcore.core.identity import run_identity_sync
+   |
+  ::: backend/tests/integration/test_17_r2.py:17:5
+   |
+15 |     API,
+16 |     configure,
+17 |     fake,
+   |     ---- previous definition of `fake` here
+18 |     login,
+19 |     root,
+   |
+help: Remove definition: `fake`
+
+F811 Redefinition of unused `fake` from line 17
+  --> backend/tests/integration/test_17_r2.py:47:18
+   |
+47 | def _extra_users(fake, count):
+   |                  ^^^^ `fake` redefined here
+48 |     """More directory accounts, so one missing account stays under the 0.2 ratio."""
+49 |     names = []
+   |
+  ::: backend/tests/integration/test_17_r2.py:17:5
+   |
+15 |     API,
+16 |     configure,
+17 |     fake,
+   |     ---- previous definition of `fake` here
+18 |     login,
+19 |     root,
+   |
+help: Remove definition: `fake`
+
+F811 Redefinition of unused `fake` from line 17
+  --> backend/tests/integration/test_17_r2.py:67:18
+   |
+67 | def _sign_in_all(fake, client_factory, names):
+   |                  ^^^^ `fake` redefined here
+68 |     for name in names:
+69 |         response = login(client_factory(), fake.login(name), fake.password(name))
+   |
+  ::: backend/tests/integration/test_17_r2.py:17:5
+   |
+15 |     API,
+16 |     configure,
+17 |     fake,
+   |     ---- previous definition of `fake` here
+18 |     login,
+19 |     root,
+   |
+help: Remove definition: `fake`
+
+F811 Redefinition of unused `fake` from line 17
+  --> backend/tests/integration/test_17_r2.py:73:17
+   |
+73 | def _active(pg, fake, name):
+   |                 ^^^^ `fake` redefined here
+74 |     return user_row(pg, fake.email(name))[4]
+   |
+  ::: backend/tests/integration/test_17_r2.py:17:5
+   |
+15 |     API,
+16 |     configure,
+17 |     fake,
+   |     ---- previous definition of `fake` here
+18 |     login,
+19 |     root,
+   |
+help: Remove definition: `fake`
+
+F811 Redefinition of unused `configure` from line 16
+  --> backend/tests/integration/test_17_r2.py:80:55
+   |
+80 | def test_17_r2_moved_base_refuses_and_changes_nothing(configure, fake, root, client_factory, pg):
+   |                                                       ^^^^^^^^^ `configure` redefined here
+81 |     """The reviewer's S4: the directory answers, but under a wrong base nobody is found."""
+82 |     settings = configure()
+   |
+  ::: backend/tests/integration/test_17_r2.py:16:5
+   |
+14 | from tests.integration.test_17_identity import (  # noqa: F401 (fixtures)
+15 |     API,
+16 |     configure,
+   |     --------- previous definition of `configure` here
+17 |     fake,
+18 |     login,
+   |
+help: Remove definition: `configure`
+
+F811 Redefinition of unused `fake` from line 17
+  --> backend/tests/integration/test_17_r2.py:80:66
+   |
+80 | def test_17_r2_moved_base_refuses_and_changes_nothing(configure, fake, root, client_factory, pg):
+   |                                                                  ^^^^ `fake` redefined here
+81 |     """The reviewer's S4: the directory answers, but under a wrong base nobody is found."""
+82 |     settings = configure()
+   |
+  ::: backend/tests/integration/test_17_r2.py:17:5
+   |
+15 |     API,
+16 |     configure,
+17 |     fake,
+   |     ---- previous definition of `fake` here
+18 |     login,
+19 |     root,
+   |
+help: Remove definition: `fake`
+
+F811 Redefinition of unused `root` from line 19
+  --> backend/tests/integration/test_17_r2.py:80:72
+   |
+80 | def test_17_r2_moved_base_refuses_and_changes_nothing(configure, fake, root, client_factory, pg):
+   |                                                                        ^^^^ `root` redefined here
+81 |     """The reviewer's S4: the directory answers, but under a wrong base nobody is found."""
+82 |     settings = configure()
+   |
+  ::: backend/tests/integration/test_17_r2.py:19:5
+   |
+17 |     fake,
+18 |     login,
+19 |     root,
+   |     ---- previous definition of `root` here
+20 |     user_row,
+21 | )
+   |
+help: Remove definition: `root`
+
+F811 Redefinition of unused `configure` from line 16
+   --> backend/tests/integration/test_17_r2.py:106:61
+    |
+106 | def test_17_r2_ratio_over_limit_refused_under_limit_applies(configure, fake, client_factory, pg):
+    |                                                             ^^^^^^^^^ `configure` redefined here
+107 |     settings = configure()
+108 |     names = ["user-a", "user-b", *_extra_users(fake, 3)]  # five accounts
+    |
+   ::: backend/tests/integration/test_17_r2.py:16:5
+    |
+ 14 | from tests.integration.test_17_identity import (  # noqa: F401 (fixtures)
+ 15 |     API,
+ 16 |     configure,
+    |     --------- previous definition of `configure` here
+ 17 |     fake,
+ 18 |     login,
+    |
+help: Remove definition: `configure`
+
+F811 Redefinition of unused `fake` from line 17
+   --> backend/tests/integration/test_17_r2.py:106:72
+    |
+106 | def test_17_r2_ratio_over_limit_refused_under_limit_applies(configure, fake, client_factory, pg):
+    |                                                                        ^^^^ `fake` redefined here
+107 |     settings = configure()
+108 |     names = ["user-a", "user-b", *_extra_users(fake, 3)]  # five accounts
+    |
+   ::: backend/tests/integration/test_17_r2.py:17:5
+    |
+ 15 |     API,
+ 16 |     configure,
+ 17 |     fake,
+    |     ---- previous definition of `fake` here
+ 18 |     login,
+ 19 |     root,
+    |
+help: Remove definition: `fake`
+
+F811 Redefinition of unused `configure` from line 16
+   --> backend/tests/integration/test_17_r2.py:128:42
+    |
+128 | def test_17_r2_force_overrides_the_ratio(configure, fake, client_factory, pg):
+    |                                          ^^^^^^^^^ `configure` redefined here
+129 |     settings = configure()
+130 |     names = ["user-a", "user-b"]
+    |
+   ::: backend/tests/integration/test_17_r2.py:16:5
+    |
+ 14 | from tests.integration.test_17_identity import (  # noqa: F401 (fixtures)
+ 15 |     API,
+ 16 |     configure,
+    |     --------- previous definition of `configure` here
+ 17 |     fake,
+ 18 |     login,
+    |
+help: Remove definition: `configure`
+
+F811 Redefinition of unused `fake` from line 17
+   --> backend/tests/integration/test_17_r2.py:128:53
+    |
+128 | def test_17_r2_force_overrides_the_ratio(configure, fake, client_factory, pg):
+    |                                                     ^^^^ `fake` redefined here
+129 |     settings = configure()
+130 |     names = ["user-a", "user-b"]
+    |
+   ::: backend/tests/integration/test_17_r2.py:17:5
+    |
+ 15 |     API,
+ 16 |     configure,
+ 17 |     fake,
+    |     ---- previous definition of `fake` here
+ 18 |     login,
+ 19 |     root,
+    |
+help: Remove definition: `fake`
+
+F811 Redefinition of unused `configure` from line 16
+   --> backend/tests/integration/test_17_r2.py:143:60
+    |
+143 | def test_17_r2_sync_deactivated_account_reopens_at_sign_in(configure, fake, client_factory, pg):
+    |                                                            ^^^^^^^^^ `configure` redefined here
+144 |     settings = configure()
+145 |     names = ["user-a", "user-b", *_extra_users(fake, 3)]
+    |
+   ::: backend/tests/integration/test_17_r2.py:16:5
+    |
+ 14 | from tests.integration.test_17_identity import (  # noqa: F401 (fixtures)
+ 15 |     API,
+ 16 |     configure,
+    |     --------- previous definition of `configure` here
+ 17 |     fake,
+ 18 |     login,
+    |
+help: Remove definition: `configure`
+
+F811 Redefinition of unused `fake` from line 17
+   --> backend/tests/integration/test_17_r2.py:143:71
+    |
+143 | def test_17_r2_sync_deactivated_account_reopens_at_sign_in(configure, fake, client_factory, pg):
+    |                                                                       ^^^^ `fake` redefined here
+144 |     settings = configure()
+145 |     names = ["user-a", "user-b", *_extra_users(fake, 3)]
+    |
+   ::: backend/tests/integration/test_17_r2.py:17:5
+    |
+ 15 |     API,
+ 16 |     configure,
+ 17 |     fake,
+    |     ---- previous definition of `fake` here
+ 18 |     login,
+ 19 |     root,
+    |
+help: Remove definition: `fake`
+
+F811 Redefinition of unused `configure` from line 16
+   --> backend/tests/integration/test_17_r2.py:158:51
+    |
+158 | def test_17_r2_sync_reopens_an_account_seen_again(configure, fake, client_factory, pg):
+    |                                                   ^^^^^^^^^ `configure` redefined here
+159 |     settings = configure()
+160 |     names = ["user-a", "user-b", *_extra_users(fake, 3)]
+    |
+   ::: backend/tests/integration/test_17_r2.py:16:5
+    |
+ 14 | from tests.integration.test_17_identity import (  # noqa: F401 (fixtures)
+ 15 |     API,
+ 16 |     configure,
+    |     --------- previous definition of `configure` here
+ 17 |     fake,
+ 18 |     login,
+    |
+help: Remove definition: `configure`
+
+F811 Redefinition of unused `fake` from line 17
+   --> backend/tests/integration/test_17_r2.py:158:62
+    |
+158 | def test_17_r2_sync_reopens_an_account_seen_again(configure, fake, client_factory, pg):
+    |                                                              ^^^^ `fake` redefined here
+159 |     settings = configure()
+160 |     names = ["user-a", "user-b", *_extra_users(fake, 3)]
+    |
+   ::: backend/tests/integration/test_17_r2.py:17:5
+    |
+ 15 |     API,
+ 16 |     configure,
+ 17 |     fake,
+    |     ---- previous definition of `fake` here
+ 18 |     login,
+ 19 |     root,
+    |
+help: Remove definition: `fake`
+
+F811 Redefinition of unused `configure` from line 16
+   --> backend/tests/integration/test_17_r2.py:172:51
+    |
+172 | def test_17_r2_admin_deactivation_is_not_reopened(configure, fake, root, client_factory, pg):
+    |                                                   ^^^^^^^^^ `configure` redefined here
+173 |     configure()
+174 |     login(client_factory(), fake.login("user-a"), fake.password("user-a"))
+    |
+   ::: backend/tests/integration/test_17_r2.py:16:5
+    |
+ 14 | from tests.integration.test_17_identity import (  # noqa: F401 (fixtures)
+ 15 |     API,
+ 16 |     configure,
+    |     --------- previous definition of `configure` here
+ 17 |     fake,
+ 18 |     login,
+    |
+help: Remove definition: `configure`
+
+F811 Redefinition of unused `fake` from line 17
+   --> backend/tests/integration/test_17_r2.py:172:62
+    |
+172 | def test_17_r2_admin_deactivation_is_not_reopened(configure, fake, root, client_factory, pg):
+    |                                                              ^^^^ `fake` redefined here
+173 |     configure()
+174 |     login(client_factory(), fake.login("user-a"), fake.password("user-a"))
+    |
+   ::: backend/tests/integration/test_17_r2.py:17:5
+    |
+ 15 |     API,
+ 16 |     configure,
+ 17 |     fake,
+    |     ---- previous definition of `fake` here
+ 18 |     login,
+ 19 |     root,
+    |
+help: Remove definition: `fake`
+
+F811 Redefinition of unused `root` from line 19
+   --> backend/tests/integration/test_17_r2.py:172:68
+    |
+172 | def test_17_r2_admin_deactivation_is_not_reopened(configure, fake, root, client_factory, pg):
+    |                                                                    ^^^^ `root` redefined here
+173 |     configure()
+174 |     login(client_factory(), fake.login("user-a"), fake.password("user-a"))
+    |
+   ::: backend/tests/integration/test_17_r2.py:19:5
+    |
+ 17 |     fake,
+ 18 |     login,
+ 19 |     root,
+    |     ---- previous definition of `root` here
+ 20 |     user_row,
+ 21 | )
+    |
+help: Remove definition: `root`
+
+F811 Redefinition of unused `configure` from line 16
+   --> backend/tests/integration/test_17_r2.py:190:37
+    |
+190 | def test_17_r2_unknown_email_timing(configure, make_user, client_factory):
+    |                                     ^^^^^^^^^ `configure` redefined here
+191 |     configure(ldap=False)
+192 |     _, known = make_user()
+    |
+   ::: backend/tests/integration/test_17_r2.py:16:5
+    |
+ 14 | from tests.integration.test_17_identity import (  # noqa: F401 (fixtures)
+ 15 |     API,
+ 16 |     configure,
+    |     --------- previous definition of `configure` here
+ 17 |     fake,
+ 18 |     login,
+    |
+help: Remove definition: `configure`
+
+F811 Redefinition of unused `configure` from line 16
+   --> backend/tests/integration/test_17_r2.py:213:49
+    |
+213 | def test_17_r2_link_needs_a_configured_provider(configure, root, make_user, pg):
+    |                                                 ^^^^^^^^^ `configure` redefined here
+214 |     configure(ldap=False)
+215 |     user_id, _ = make_user()
+    |
+   ::: backend/tests/integration/test_17_r2.py:16:5
+    |
+ 14 | from tests.integration.test_17_identity import (  # noqa: F401 (fixtures)
+ 15 |     API,
+ 16 |     configure,
+    |     --------- previous definition of `configure` here
+ 17 |     fake,
+ 18 |     login,
+    |
+help: Remove definition: `configure`
+
+F811 Redefinition of unused `root` from line 19
+   --> backend/tests/integration/test_17_r2.py:213:60
+    |
+213 | def test_17_r2_link_needs_a_configured_provider(configure, root, make_user, pg):
+    |                                                            ^^^^ `root` redefined here
+214 |     configure(ldap=False)
+215 |     user_id, _ = make_user()
+    |
+   ::: backend/tests/integration/test_17_r2.py:19:5
+    |
+ 17 |     fake,
+ 18 |     login,
+ 19 |     root,
+    |     ---- previous definition of `root` here
+ 20 |     user_row,
+ 21 | )
+    |
+help: Remove definition: `root`
+
+F811 Redefinition of unused `configure` from line 16
+   --> backend/tests/integration/test_17_r2.py:226:5
+    |
+225 | def test_17_r2_unlink_before_binding_then_not_after(
+226 |     configure, fake, root, make_user, client_factory, pg
+    |     ^^^^^^^^^ `configure` redefined here
+227 | ):
+228 |     configure()
+    |
+   ::: backend/tests/integration/test_17_r2.py:16:5
+    |
+ 14 | from tests.integration.test_17_identity import (  # noqa: F401 (fixtures)
+ 15 |     API,
+ 16 |     configure,
+    |     --------- previous definition of `configure` here
+ 17 |     fake,
+ 18 |     login,
+    |
+help: Remove definition: `configure`
+
+F811 Redefinition of unused `fake` from line 17
+   --> backend/tests/integration/test_17_r2.py:226:16
+    |
+225 | def test_17_r2_unlink_before_binding_then_not_after(
+226 |     configure, fake, root, make_user, client_factory, pg
+    |                ^^^^ `fake` redefined here
+227 | ):
+228 |     configure()
+    |
+   ::: backend/tests/integration/test_17_r2.py:17:5
+    |
+ 15 |     API,
+ 16 |     configure,
+ 17 |     fake,
+    |     ---- previous definition of `fake` here
+ 18 |     login,
+ 19 |     root,
+    |
+help: Remove definition: `fake`
+
+F811 Redefinition of unused `root` from line 19
+   --> backend/tests/integration/test_17_r2.py:226:22
+    |
+225 | def test_17_r2_unlink_before_binding_then_not_after(
+226 |     configure, fake, root, make_user, client_factory, pg
+    |                      ^^^^ `root` redefined here
+227 | ):
+228 |     configure()
+    |
+   ::: backend/tests/integration/test_17_r2.py:19:5
+    |
+ 17 |     fake,
+ 18 |     login,
+ 19 |     root,
+    |     ---- previous definition of `root` here
+ 20 |     user_row,
+ 21 | )
+    |
+help: Remove definition: `root`
+
+F811 Redefinition of unused `configure` from line 16
+   --> backend/tests/integration/test_17_r2.py:252:43
+    |
+252 | def test_17_r2_unchanged_password_refused(configure, make_user, client_factory):
+    |                                           ^^^^^^^^^ `configure` redefined here
+253 |     configure(ldap=False)
+254 |     _, email = make_user()
+    |
+   ::: backend/tests/integration/test_17_r2.py:16:5
+    |
+ 14 | from tests.integration.test_17_identity import (  # noqa: F401 (fixtures)
+ 15 |     API,
+ 16 |     configure,
+    |     --------- previous definition of `configure` here
+ 17 |     fake,
+ 18 |     login,
+    |
+help: Remove definition: `configure`
+
+F811 Redefinition of unused `configure` from line 16
+   --> backend/tests/integration/test_17_r2.py:266:51
+    |
+266 | def test_17_r2_concurrent_first_provision_rereads(configure, fake):
+    |                                                   ^^^^^^^^^ `configure` redefined here
+267 |     from ffcore.core import db
+268 |     from ffcore.core.identity import provision
+    |
+   ::: backend/tests/integration/test_17_r2.py:16:5
+    |
+ 14 | from tests.integration.test_17_identity import (  # noqa: F401 (fixtures)
+ 15 |     API,
+ 16 |     configure,
+    |     --------- previous definition of `configure` here
+ 17 |     fake,
+ 18 |     login,
+    |
+help: Remove definition: `configure`
+
+F811 Redefinition of unused `fake` from line 17
+   --> backend/tests/integration/test_17_r2.py:266:62
+    |
+266 | def test_17_r2_concurrent_first_provision_rereads(configure, fake):
+    |                                                              ^^^^ `fake` redefined here
+267 |     from ffcore.core import db
+268 |     from ffcore.core.identity import provision
+    |
+   ::: backend/tests/integration/test_17_r2.py:17:5
+    |
+ 15 |     API,
+ 16 |     configure,
+ 17 |     fake,
+    |     ---- previous definition of `fake` here
+ 18 |     login,
+ 19 |     root,
+    |
+help: Remove definition: `fake`
+
+Found 28 errors.
+make: *** [Makefile:9: lint] Error 1
+exit=2
+HEAD=e1b8ac9419c01a82fcafac2d568894a002967fd6 (+ r2 code/docs, uncommitted; rerun)
+ruff check backend scripts data/samples/scripts services tests/deploy
+All checks passed!
+ruff format --check backend scripts data/samples/scripts services tests/deploy
+622 files already formatted
+exit=0

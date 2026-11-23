@@ -1,0 +1,1452 @@
+HEAD=e1b8ac9419c01a82fcafac2d568894a002967fd6 (r2 tests on the r1 code b89fc49)
+..................F.FFF.FFFFFFFFFFFFFFF....FF..........................F [ 97%]
+..                                                                       [100%]
+=================================== FAILURES ===================================
+___________________________ test_17_r2_referrals_off ___________________________
+
+directory = (<tests.ldap_fixture.FakeDirectory object at 0x7f05519a1490>, <ffcore.core.ldap_auth.LdapDirectory object at 0x7f05568bf4a0>)
+
+    def test_17_r2_referrals_off(directory):
+        """MINOR-2: a referral would send the bind to a host the egress policy never saw."""
+        from ffcore.core.ldap_auth import default_endpoint
+    
+        _, ldap = directory
+        endpoint = default_endpoint(ldap.settings)
+>       assert endpoint.server.allowed_referral_hosts == []
+E       AssertionError: assert [('*', True)] == []
+E         
+E         Left contains one more item: ('*', True)
+E         Use -v to get more diff
+
+tests/unit/test_17_ldap.py:254: AssertionError
+___________ test_17_r2_user_bind_refusal_is_invalid_credentials[19] ____________
+
+directory = (<tests.ldap_fixture.FakeDirectory object at 0x7f05519a3290>, <ffcore.core.ldap_auth.LdapDirectory object at 0x7f0556706690>)
+code = 19
+
+    @pytest.mark.parametrize("code", [49, 19, 50, 53])
+    def test_17_r2_user_bind_refusal_is_invalid_credentials(directory, code):
+        """MINOR-3: the server answered for one account: 401, the code in the audit reason; 503
+        stays for an unreachable directory and the service account."""
+        fake, ldap = directory
+        real = ldap._connection
+    
+        def connection(user, password):
+            if user == fx.SERVICE_DN:
+                return real(user, password)
+            return _Refusing(code)
+    
+        ldap._connection = connection
+        with pytest.raises(InvalidCredentials) as caught:
+>           run(ldap.authenticate(fake.login("user-a"), fake.password("user-a")))
+
+tests/unit/test_17_ldap.py:286: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/unit/test_17_ldap.py:40: in run
+    return asyncio.run(coro)
+           ^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+ffcore/core/ldap_auth.py:154: in authenticate
+    return await self._in_thread(self._authenticate, login, password)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ffcore/core/ldap_auth.py:186: in _in_thread
+    return await asyncio.wait_for(asyncio.to_thread(func, *args), timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/tasks.py:520: in wait_for
+    return await fut
+           ^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/threads.py:25: in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/concurrent/futures/thread.py:59: in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ffcore/core/ldap_auth.py:297: in _authenticate
+    self._bind(found[0]["dn"], password, service=False).unbind()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ffcore.core.ldap_auth.LdapDirectory object at 0x7f0556706690>
+user = 'cn=user-a-f1df8461,ou=people,dc=example,dc=test'
+password = 'dummy-not-secret-user-a', service = False
+
+    def _bind(self, user: str, password: str, *, service: bool):
+        from ldap3.core.exceptions import LDAPException
+    
+        conn = self._connection(user, password)
+        try:
+            bound = conn.bind()
+        except LDAPException:
+            raise ProviderUnavailable("directory_unreachable") from None
+        if bound:
+            return conn
+        code = (conn.result or {}).get("result")
+        conn.unbind()
+        if code == 49 and not service:
+            raise InvalidCredentials("bind_failed")
+        if service:
+            raise ProviderUnavailable("service_bind_failed")
+>       raise ProviderUnavailable("directory_error")
+E       ffcore.core.ldap_auth.ProviderUnavailable: directory_error
+
+ffcore/core/ldap_auth.py:221: ProviderUnavailable
+___________ test_17_r2_user_bind_refusal_is_invalid_credentials[50] ____________
+
+directory = (<tests.ldap_fixture.FakeDirectory object at 0x7f05519d8620>, <ffcore.core.ldap_auth.LdapDirectory object at 0x7f05517de270>)
+code = 50
+
+    @pytest.mark.parametrize("code", [49, 19, 50, 53])
+    def test_17_r2_user_bind_refusal_is_invalid_credentials(directory, code):
+        """MINOR-3: the server answered for one account: 401, the code in the audit reason; 503
+        stays for an unreachable directory and the service account."""
+        fake, ldap = directory
+        real = ldap._connection
+    
+        def connection(user, password):
+            if user == fx.SERVICE_DN:
+                return real(user, password)
+            return _Refusing(code)
+    
+        ldap._connection = connection
+        with pytest.raises(InvalidCredentials) as caught:
+>           run(ldap.authenticate(fake.login("user-a"), fake.password("user-a")))
+
+tests/unit/test_17_ldap.py:286: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/unit/test_17_ldap.py:40: in run
+    return asyncio.run(coro)
+           ^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+ffcore/core/ldap_auth.py:154: in authenticate
+    return await self._in_thread(self._authenticate, login, password)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ffcore/core/ldap_auth.py:186: in _in_thread
+    return await asyncio.wait_for(asyncio.to_thread(func, *args), timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/tasks.py:520: in wait_for
+    return await fut
+           ^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/threads.py:25: in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/concurrent/futures/thread.py:59: in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ffcore/core/ldap_auth.py:297: in _authenticate
+    self._bind(found[0]["dn"], password, service=False).unbind()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ffcore.core.ldap_auth.LdapDirectory object at 0x7f05517de270>
+user = 'cn=user-a-a5747461,ou=people,dc=example,dc=test'
+password = 'dummy-not-secret-user-a', service = False
+
+    def _bind(self, user: str, password: str, *, service: bool):
+        from ldap3.core.exceptions import LDAPException
+    
+        conn = self._connection(user, password)
+        try:
+            bound = conn.bind()
+        except LDAPException:
+            raise ProviderUnavailable("directory_unreachable") from None
+        if bound:
+            return conn
+        code = (conn.result or {}).get("result")
+        conn.unbind()
+        if code == 49 and not service:
+            raise InvalidCredentials("bind_failed")
+        if service:
+            raise ProviderUnavailable("service_bind_failed")
+>       raise ProviderUnavailable("directory_error")
+E       ffcore.core.ldap_auth.ProviderUnavailable: directory_error
+
+ffcore/core/ldap_auth.py:221: ProviderUnavailable
+___________ test_17_r2_user_bind_refusal_is_invalid_credentials[53] ____________
+
+directory = (<tests.ldap_fixture.FakeDirectory object at 0x7f05519a07d0>, <ffcore.core.ldap_auth.LdapDirectory object at 0x7f05519a0e90>)
+code = 53
+
+    @pytest.mark.parametrize("code", [49, 19, 50, 53])
+    def test_17_r2_user_bind_refusal_is_invalid_credentials(directory, code):
+        """MINOR-3: the server answered for one account: 401, the code in the audit reason; 503
+        stays for an unreachable directory and the service account."""
+        fake, ldap = directory
+        real = ldap._connection
+    
+        def connection(user, password):
+            if user == fx.SERVICE_DN:
+                return real(user, password)
+            return _Refusing(code)
+    
+        ldap._connection = connection
+        with pytest.raises(InvalidCredentials) as caught:
+>           run(ldap.authenticate(fake.login("user-a"), fake.password("user-a")))
+
+tests/unit/test_17_ldap.py:286: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/unit/test_17_ldap.py:40: in run
+    return asyncio.run(coro)
+           ^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+ffcore/core/ldap_auth.py:154: in authenticate
+    return await self._in_thread(self._authenticate, login, password)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ffcore/core/ldap_auth.py:186: in _in_thread
+    return await asyncio.wait_for(asyncio.to_thread(func, *args), timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/tasks.py:520: in wait_for
+    return await fut
+           ^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/threads.py:25: in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/concurrent/futures/thread.py:59: in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ffcore/core/ldap_auth.py:297: in _authenticate
+    self._bind(found[0]["dn"], password, service=False).unbind()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ffcore.core.ldap_auth.LdapDirectory object at 0x7f05519a0e90>
+user = 'cn=user-a-1eb6c3d3,ou=people,dc=example,dc=test'
+password = 'dummy-not-secret-user-a', service = False
+
+    def _bind(self, user: str, password: str, *, service: bool):
+        from ldap3.core.exceptions import LDAPException
+    
+        conn = self._connection(user, password)
+        try:
+            bound = conn.bind()
+        except LDAPException:
+            raise ProviderUnavailable("directory_unreachable") from None
+        if bound:
+            return conn
+        code = (conn.result or {}).get("result")
+        conn.unbind()
+        if code == 49 and not service:
+            raise InvalidCredentials("bind_failed")
+        if service:
+            raise ProviderUnavailable("service_bind_failed")
+>       raise ProviderUnavailable("directory_error")
+E       ffcore.core.ldap_auth.ProviderUnavailable: directory_error
+
+ffcore/core/ldap_auth.py:221: ProviderUnavailable
+______________________ test_17_r2_settings_ratio_and_cli _______________________
+
+    def test_17_r2_settings_ratio_and_cli():
+>       assert base_settings().identity_sync_max_deactivate_ratio == 0.2
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_17_ldap.py:307: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+item = 'identity_sync_max_deactivate_ratio'
+
+    def __getattr__(self, item: str) -> Any:
+        private_attributes = object.__getattribute__(self, '__private_attributes__')
+        if item in private_attributes:
+            attribute = private_attributes[item]
+            if hasattr(attribute, '__get__'):
+                return attribute.__get__(self, type(self))  # type: ignore
+    
+            try:
+                # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
+                return self.__pydantic_private__[item]  # type: ignore
+            except KeyError as exc:
+                raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}') from exc
+        else:
+            # `__pydantic_extra__` can fail to be set if the model is not yet fully initialized.
+            # See `BaseModel.__repr_args__` for more details
+            try:
+                pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
+            except AttributeError:
+                pydantic_extra = None
+    
+            if pydantic_extra and item in pydantic_extra:
+                return pydantic_extra[item]
+            else:
+                if hasattr(self.__class__, item):
+                    return super().__getattribute__(item)  # Raises AttributeError if appropriate
+                else:
+                    # this is the current error
+>                   raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+E                   AttributeError: 'Settings' object has no attribute 'identity_sync_max_deactivate_ratio'
+
+/opt/venv/lib/python3.12/site-packages/pydantic/main.py:1105: AttributeError
+______________ test_17_r2_moved_base_refuses_and_changes_nothing _______________
+
+configure = <function configure.<locals>.apply at 0x7f0543a114e0>
+fake = <tests.ldap_fixture.FakeDirectory object at 0x7f0543a0c4a0>
+root = <starlette.testclient.TestClient object at 0x7f0543b2c830>
+client_factory = <function client_factory.<locals>.make at 0x7f0543a118a0>
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_2636058fab84) at 0x7f0543a0dc40>
+
+    def test_17_r2_moved_base_refuses_and_changes_nothing(
+        configure, fake, root, client_factory, pg
+    ):
+        """The reviewer's S4: the directory answers, but under a wrong base nobody is found."""
+        settings = configure()
+        names = ["user-a", "user-b", *_extra_users(fake, 3)]
+        _sign_in_all(fake, client_factory, names)
+        _isolate(pg, fake)
+        rule = root.post(f"{API}/alert-rules", json={"kind": "identity_sync_refused", "channel": "ui"})
+>       assert rule.status_code == 201, rule.text
+E       AssertionError: {"error":{"message":"Invalid request: body.kind","type":"invalid_request_error","code":"validation_error"}}
+E       assert 422 == 201
+E        +  where 422 = <Response [422 Unprocessable Content]>.status_code
+
+tests/integration/test_17_r2.py:91: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-23 12:08:28,836 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=720
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=720
+----------------------------- Captured stderr call -----------------------------
+2026-11-23 12:08:29,058 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=127
+2026-11-23 12:08:29,229 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=81
+2026-11-23 12:08:29,413 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=100
+2026-11-23 12:08:29,618 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=76
+2026-11-23 12:08:29,839 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=132
+2026-11-23 12:08:30,361 INFO ffcore.access access method=POST path=/api/v1/alert-rules status=422 ms=511
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=127
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=81
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=100
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=76
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=132
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/alert-rules status=422 ms=511
+--------------------------- Captured stderr teardown ---------------------------
+2026-11-23 12:08:32,513 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 12:08:32,741 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 12:08:32,953 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 12:08:33,147 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 12:08:33,335 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 12:08:36,323 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 12:08:36,531 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 12:08:36,745 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 12:08:36,948 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 12:08:37,177 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 12:08:41,903 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 12:08:41,904 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 12:08:41,905 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 12:08:41,907 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 12:08:41,907 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 12:08:42,439 ERROR ffcore.litellm_reconcile litellm_reconcile_failed attempts=3 error=EgressRequestFailed: egress_dns_failed
+---------------------------- Captured log teardown -----------------------------
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:452 litellm_reconcile_failed attempts=3 error=EgressRequestFailed: egress_dns_failed
+___________ test_17_r2_ratio_over_limit_refused_under_limit_applies ____________
+
+configure = <function configure.<locals>.apply at 0x7f04c8637560>
+fake = <tests.ldap_fixture.FakeDirectory object at 0x7f04c8765ca0>
+client_factory = <function client_factory.<locals>.make at 0x7f04c8636de0>
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_2636058fab84) at 0x7f052be52420>
+
+    def test_17_r2_ratio_over_limit_refused_under_limit_applies(
+        configure, fake, client_factory, pg
+    ):
+        settings = configure()
+        names = ["user-a", "user-b", *_extra_users(fake, 3)]  # five accounts
+        _sign_in_all(fake, client_factory, names)
+        _isolate(pg, fake)
+        fake.remove("extra-0")
+        fake.remove("extra-1")  # 2/5 = 0.4 > 0.2
+>       refused = _sync(settings, fake)
+                  ^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_17_r2.py:119: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_17_r2.py:46: in _sync
+    return asyncio.run(go())
+           ^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    async def go():
+        async with db.session_scope() as session:
+>           return await run_identity_sync(
+                session, settings, fake.directory(settings), force=force
+            )
+E           TypeError: run_identity_sync() got an unexpected keyword argument 'force'
+
+tests/integration/test_17_r2.py:42: TypeError
+----------------------------- Captured stderr call -----------------------------
+2026-11-23 12:08:43,199 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 12:08:43,280 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=78
+2026-11-23 12:08:43,355 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 12:08:43,445 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=86
+2026-11-23 12:08:43,507 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 12:08:43,580 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=71
+2026-11-23 12:08:43,647 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 12:08:43,713 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=63
+2026-11-23 12:08:43,775 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 12:08:43,877 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=98
+------------------------------ Captured log call -------------------------------
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=78
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=86
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=71
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=63
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=98
+_____________________ test_17_r2_force_overrides_the_ratio _____________________
+
+configure = <function configure.<locals>.apply at 0x7f04f8387e20>
+fake = <tests.ldap_fixture.FakeDirectory object at 0x7f05281b74d0>
+client_factory = <function client_factory.<locals>.make at 0x7f0528222de0>
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_2636058fab84) at 0x7f042969f290>
+
+    def test_17_r2_force_overrides_the_ratio(configure, fake, client_factory, pg):
+        settings = configure()
+        names = ["user-a", "user-b"]
+        _sign_in_all(fake, client_factory, names)
+        _isolate(pg, fake)
+        fake.remove("user-a")
+>       assert _sync(settings, fake).error == "identity_sync_refused"  # 1/2
+               ^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_17_r2.py:140: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_17_r2.py:46: in _sync
+    return asyncio.run(go())
+           ^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    async def go():
+        async with db.session_scope() as session:
+>           return await run_identity_sync(
+                session, settings, fake.directory(settings), force=force
+            )
+E           TypeError: run_identity_sync() got an unexpected keyword argument 'force'
+
+tests/integration/test_17_r2.py:42: TypeError
+----------------------------- Captured stderr call -----------------------------
+2026-11-23 12:08:46,680 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 12:08:46,847 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=163
+2026-11-23 12:08:46,914 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 12:08:46,997 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=80
+------------------------------ Captured log call -------------------------------
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=163
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=80
+____________ test_17_r2_sync_deactivated_account_reopens_at_sign_in ____________
+
+configure = <function configure.<locals>.apply at 0x7f0429692980>
+fake = <tests.ldap_fixture.FakeDirectory object at 0x7f04f83f6ab0>
+client_factory = <function client_factory.<locals>.make at 0x7f0429693380>
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_2636058fab84) at 0x7f0439d4f7a0>
+
+    def test_17_r2_sync_deactivated_account_reopens_at_sign_in(
+        configure, fake, client_factory, pg
+    ):
+        settings = configure()
+        names = ["user-a", "user-b", *_extra_users(fake, 3)]
+        _sign_in_all(fake, client_factory, names)
+        _isolate(pg, fake)
+        fake.disable("user-a")  # disabled, not missing: no ratio involved
+>       assert _sync(settings, fake).error is None
+               ^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_17_r2.py:158: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_17_r2.py:46: in _sync
+    return asyncio.run(go())
+           ^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    async def go():
+        async with db.session_scope() as session:
+>           return await run_identity_sync(
+                session, settings, fake.directory(settings), force=force
+            )
+E           TypeError: run_identity_sync() got an unexpected keyword argument 'force'
+
+tests/integration/test_17_r2.py:42: TypeError
+----------------------------- Captured stderr call -----------------------------
+2026-11-23 12:08:50,911 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 12:08:51,132 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=216
+2026-11-23 12:08:51,337 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 12:08:51,465 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=117
+2026-11-23 12:08:51,582 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 12:08:51,689 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=99
+2026-11-23 12:08:51,776 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 12:08:51,866 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=87
+2026-11-23 12:08:51,948 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 12:08:52,046 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=95
+------------------------------ Captured log call -------------------------------
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=216
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=117
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=99
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=87
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=95
+________________ test_17_r2_sync_reopens_an_account_seen_again _________________
+
+configure = <function configure.<locals>.apply at 0x7f04fcbcbe20>
+fake = <tests.ldap_fixture.FakeDirectory object at 0x7f04fcc0f5c0>
+client_factory = <function client_factory.<locals>.make at 0x7f04fcbca200>
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_2636058fab84) at 0x7f04fcc0f7d0>
+
+    def test_17_r2_sync_reopens_an_account_seen_again(configure, fake, client_factory, pg):
+        settings = configure()
+        names = ["user-a", "user-b", *_extra_users(fake, 3)]
+        _sign_in_all(fake, client_factory, names)
+        _isolate(pg, fake)
+        fake.disable("user-b")
+>       _sync(settings, fake)
+
+tests/integration/test_17_r2.py:173: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_17_r2.py:46: in _sync
+    return asyncio.run(go())
+           ^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    async def go():
+        async with db.session_scope() as session:
+>           return await run_identity_sync(
+                session, settings, fake.directory(settings), force=force
+            )
+E           TypeError: run_identity_sync() got an unexpected keyword argument 'force'
+
+tests/integration/test_17_r2.py:42: TypeError
+----------------------------- Captured stderr call -----------------------------
+2026-11-23 12:08:54,828 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 12:08:54,957 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=126
+2026-11-23 12:08:55,049 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 12:08:55,159 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=106
+2026-11-23 12:08:55,261 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 12:08:55,355 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=89
+2026-11-23 12:08:55,434 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 12:08:55,535 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=96
+2026-11-23 12:08:55,630 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 12:08:55,720 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=86
+------------------------------ Captured log call -------------------------------
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=126
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=106
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=89
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=96
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=86
+________________ test_17_r2_admin_deactivation_is_not_reopened _________________
+
+configure = <function configure.<locals>.apply at 0x7f04fcaeaa20>
+fake = <tests.ldap_fixture.FakeDirectory object at 0x7f04fca64e90>
+root = <starlette.testclient.TestClient object at 0x7f04fca66450>
+client_factory = <function client_factory.<locals>.make at 0x7f04fcaeac00>
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_2636058fab84) at 0x7f04fca66840>
+
+    def test_17_r2_admin_deactivation_is_not_reopened(configure, fake, root, client_factory, pg):
+        configure()
+        login(client_factory(), fake.login("user-a"), fake.password("user-a"))
+        user_id = user_row(pg, fake.email("user-a"))[0]
+        assert root.patch(f"{API}/users/{user_id}", json={"is_active": False}).status_code == 200
+        refused = login(client_factory(), fake.login("user-a"), fake.password("user-a"))
+        assert refused.status_code == 403
+        assert refused.json()["error"]["code"] == "user_inactive"
+>       row = pg.execute("SELECT deactivated_by FROM users WHERE id = %s", (user_id,)).fetchone()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_17_r2.py:189: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_2636058fab84) at 0x7f04fca66840>
+query = 'SELECT deactivated_by FROM users WHERE id = %s'
+params = (UUID('82b5023a-8658-418a-8431-87ceefe10f16'),), prepare = None
+binary = False
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool = False,
+    ) -> Cursor[Row]:
+        """Execute a query and return a cursor to read its results."""
+        try:
+            cur = self.cursor()
+            if binary:
+                cur.format = BINARY
+    
+            if isinstance(query, Template):
+                if params is not None:
+                    raise TypeError(
+                        "'execute()' with string template query doesn't support parameters"
+                    )
+                return cur.execute(query, prepare=prepare)
+            else:
+                return cur.execute(query, params, prepare=prepare)
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.UndefinedColumn: column "deactivated_by" does not exist
+E           LINE 1: SELECT deactivated_by FROM users WHERE id = $1
+E                          ^
+
+/opt/venv/lib/python3.12/site-packages/psycopg/connection.py:304: UndefinedColumn
+---------------------------- Captured stderr setup -----------------------------
+2026-11-23 12:09:03,897 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 12:09:04,053 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=153
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=153
+----------------------------- Captured stderr call -----------------------------
+2026-11-23 12:09:04,132 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 12:09:04,211 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=76
+2026-11-23 12:09:04,263 INFO ffcore.access access method=PATCH path=/api/v1/users/82b5023a-8658-418a-8431-87ceefe10f16 status=200 ms=49
+2026-11-23 12:09:04,330 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 12:09:04,388 INFO ffcore.access access method=POST path=/api/v1/auth/login status=403 ms=55
+------------------------------ Captured log call -------------------------------
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=76
+INFO     ffcore.access:logging.py:263 access method=PATCH path=/api/v1/users/82b5023a-8658-418a-8431-87ceefe10f16 status=200 ms=49
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=403 ms=55
+_______________________ test_17_r2_unknown_email_timing ________________________
+
+configure = <function configure.<locals>.apply at 0x7f04fcb1e980>
+make_user = <function make_user.<locals>.make at 0x7f04fcb1f060>
+client_factory = <function client_factory.<locals>.make at 0x7f04fcb1ee80>
+
+    def test_17_r2_unknown_email_timing(configure, make_user, client_factory):
+        configure(ldap=False)
+        _, known = make_user()
+        client = client_factory()
+    
+        def median(email):
+            samples = []
+            for _ in range(8):
+                started = time.perf_counter()
+                response = login(client, email, "wrong-password-0000")
+                samples.append(time.perf_counter() - started)
+                assert response.status_code == 401
+            return statistics.median(samples)
+    
+        login(client, known, "warm-up-0000000")
+        unknown = median(f"nobody-{uuid.uuid4().hex[:8]}@example.test")
+        existing = median(known)
+>       assert max(unknown, existing) / min(unknown, existing) < 1.5, (unknown, existing)
+E       AssertionError: (0.0334566000092309, 0.1259344500140287)
+E       assert (0.1259344500140287 / 0.0334566000092309) < 1.5
+E        +  where 0.1259344500140287 = max(0.0334566000092309, 0.1259344500140287)
+E        +  and   0.0334566000092309 = min(0.0334566000092309, 0.1259344500140287)
+
+tests/integration/test_17_r2.py:216: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-23 12:09:12,544 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 12:09:12,692 INFO ffcore.access access method=POST path=/api/v1/auth/login status=401 ms=144
+2026-11-23 12:09:12,728 INFO ffcore.access access method=POST path=/api/v1/auth/login status=401 ms=33
+2026-11-23 12:09:12,760 INFO ffcore.access access method=POST path=/api/v1/auth/login status=401 ms=29
+2026-11-23 12:09:12,790 INFO ffcore.access access method=POST path=/api/v1/auth/login status=401 ms=28
+2026-11-23 12:09:12,825 INFO ffcore.access access method=POST path=/api/v1/auth/login status=401 ms=31
+2026-11-23 12:09:12,858 INFO ffcore.access access method=POST path=/api/v1/auth/login status=401 ms=30
+2026-11-23 12:09:12,896 INFO ffcore.access access method=POST path=/api/v1/auth/login status=401 ms=35
+2026-11-23 12:09:12,930 INFO ffcore.access access method=POST path=/api/v1/auth/login status=401 ms=30
+2026-11-23 12:09:12,960 INFO ffcore.access access method=POST path=/api/v1/auth/login status=401 ms=27
+2026-11-23 12:09:13,061 INFO ffcore.access access method=POST path=/api/v1/auth/login status=401 ms=98
+2026-11-23 12:09:13,157 INFO ffcore.access access method=POST path=/api/v1/auth/login status=401 ms=91
+2026-11-23 12:09:13,260 INFO ffcore.access access method=POST path=/api/v1/auth/login status=401 ms=100
+2026-11-23 12:09:13,399 INFO ffcore.access access method=POST path=/api/v1/auth/login status=401 ms=135
+2026-11-23 12:09:13,552 INFO ffcore.access access method=POST path=/api/v1/auth/login status=401 ms=149
+2026-11-23 12:09:13,728 INFO ffcore.access access method=POST path=/api/v1/auth/login status=401 ms=169
+2026-11-23 12:09:13,868 INFO ffcore.access access method=POST path=/api/v1/auth/login status=401 ms=133
+2026-11-23 12:09:13,982 INFO ffcore.access access method=POST path=/api/v1/auth/login status=401 ms=110
+------------------------------ Captured log call -------------------------------
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=401 ms=144
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=401 ms=33
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=401 ms=29
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=401 ms=28
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=401 ms=31
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=401 ms=30
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=401 ms=35
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=401 ms=30
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=401 ms=27
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=401 ms=98
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=401 ms=91
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=401 ms=100
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=401 ms=135
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=401 ms=149
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=401 ms=169
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=401 ms=133
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=401 ms=110
+_________________ test_17_r2_link_needs_a_configured_provider __________________
+
+configure = <function configure.<locals>.apply at 0x7f04fcaa8400>
+root = <starlette.testclient.TestClient object at 0x7f04fcbccbc0>
+make_user = <function make_user.<locals>.make at 0x7f04fcaaa660>
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_2636058fab84) at 0x7f04fcbce1b0>
+
+    def test_17_r2_link_needs_a_configured_provider(configure, root, make_user, pg):
+        configure(ldap=False)
+        user_id, _ = make_user()
+        for source in ("oidc", "ldap"):
+            refused = root.patch(f"{API}/users/{user_id}", json={"auth_source": source})
+>           assert refused.status_code == 422, source
+E           AssertionError: oidc
+E           assert 200 == 422
+E            +  where 200 = <Response [200 OK]>.status_code
+
+tests/integration/test_17_r2.py:227: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-23 12:09:20,822 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 12:09:20,961 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=136
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=136
+----------------------------- Captured stderr call -----------------------------
+2026-11-23 12:09:21,019 INFO ffcore.access access method=PATCH path=/api/v1/users/613716f1-ba2c-4725-b505-8775e734453b status=200 ms=51
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=PATCH path=/api/v1/users/613716f1-ba2c-4725-b505-8775e734453b status=200 ms=51
+_______________ test_17_r2_unlink_before_binding_then_not_after ________________
+
+configure = <function configure.<locals>.apply at 0x7f04fcaeb6a0>
+fake = <tests.ldap_fixture.FakeDirectory object at 0x7f04fcbec620>
+root = <starlette.testclient.TestClient object at 0x7f04fcadab10>
+make_user = <function make_user.<locals>.make at 0x7f04fcae9080>
+client_factory = <function client_factory.<locals>.make at 0x7f04fcb1cf40>
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_2636058fab84) at 0x7f04fcada480>
+
+    def test_17_r2_unlink_before_binding_then_not_after(
+        configure, fake, root, make_user, client_factory, pg
+    ):
+        configure()
+        user_id, email = make_user(fake.email("user-a"))
+        assert root.patch(f"{API}/users/{user_id}", json={"auth_source": "ldap"}).status_code == 200
+        back = root.patch(f"{API}/users/{user_id}", json={"auth_source": "local"})
+>       assert back.status_code == 200, back.text
+E       AssertionError: {"error":{"message":"Invalid request: body.auth_source","type":"invalid_request_error","code":"validation_error"}}
+E       assert 422 == 200
+E        +  where 422 = <Response [422 Unprocessable Content]>.status_code
+
+tests/integration/test_17_r2.py:241: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-23 12:09:29,044 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 12:09:29,198 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=151
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=151
+----------------------------- Captured stderr call -----------------------------
+2026-11-23 12:09:29,275 INFO ffcore.access access method=PATCH path=/api/v1/users/5ab51d29-19af-4978-9598-b1f2bcb1bf56 status=200 ms=59
+2026-11-23 12:09:29,309 INFO ffcore.access access method=PATCH path=/api/v1/users/5ab51d29-19af-4978-9598-b1f2bcb1bf56 status=422 ms=30
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=PATCH path=/api/v1/users/5ab51d29-19af-4978-9598-b1f2bcb1bf56 status=200 ms=59
+INFO     ffcore.access:logging.py:263 access method=PATCH path=/api/v1/users/5ab51d29-19af-4978-9598-b1f2bcb1bf56 status=422 ms=30
+____________________ test_17_r2_unchanged_password_refused _____________________
+
+configure = <function configure.<locals>.apply at 0x7f04fc8f9080>
+make_user = <function make_user.<locals>.make at 0x7f04fc8f8f40>
+client_factory = <function client_factory.<locals>.make at 0x7f04fcbc85e0>
+
+    def test_17_r2_unchanged_password_refused(configure, make_user, client_factory):
+        configure(ldap=False)
+        _, email = make_user()
+        client = client_factory(email)
+        response = client.post(
+            f"{API}/auth/password", json={"current_password": PASSWORD, "new_password": PASSWORD}
+        )
+>       assert response.status_code == 400
+E       assert 204 == 400
+E        +  where 204 = <Response [204 No Content]>.status_code
+
+tests/integration/test_17_r2.py:268: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-23 12:09:33,261 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 12:09:33,377 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=112
+2026-11-23 12:09:33,514 INFO ffcore.access access method=POST path=/api/v1/auth/password status=204 ms=134
+------------------------------ Captured log call -------------------------------
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=112
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/password status=204 ms=134
+________________ test_17_r2_concurrent_first_provision_rereads _________________
+
+self = <sqlalchemy.engine.base.Connection object at 0x7f04fc90ee70>
+dialect = <sqlalchemy.dialects.postgresql.psycopg.PGDialectAsync_psycopg object at 0x7f04fc8538f0>
+context = <sqlalchemy.dialects.postgresql.psycopg.PGExecutionContext_psycopg object at 0x7f04fc90ffb0>
+statement = <sqlalchemy.dialects.postgresql.psycopg.PGCompiler_psycopg object at 0x7f04fca66870>
+parameters = [{'id': UUID('a4e05724-d7db-4edf-955c-c333aecf4a1a'), 'email': 'race-e6405f@example.test', 'password_hash': None, 'full_name': 'Race', ...}]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Unpack[TupleAny]]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+    
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+    
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+    
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+    
+        effective_parameters: Optional[_AnyExecuteParams]
+    
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+    
+        evt_handled: bool = False
+        try:
+            if self._has_events or self.engine._has_events:
+                for fn in self.dispatch.before_cursor_execute:
+                    str_statement, effective_parameters = fn(
+                        self,
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                        context.executemany,
+                    )
+    
+            if self._echo:
+                self._log_info(str_statement)
+    
+                stats = context._get_cache_stats()
+    
+                if not self.engine.hide_parameters:
+                    self._log_info(
+                        "[%s] %r",
+                        stats,
+                        sql_util._repr_params(
+                            effective_parameters,
+                            batches=10,
+                            ismulti=context.executemany,
+                        ),
+                    )
+                else:
+                    self._log_info(
+                        "[%s] [SQL parameters hidden due to "
+                        "hide_parameters=True]",
+                        stats,
+                    )
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1958: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py:1192: in do_execute
+    cursor.execute(statement, parameters)
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py:258: in execute
+    self._adapt_connection._handle_exception(error)
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py:412: in _handle_exception
+    self._handle_exception_no_connection(self.dbapi, error)
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py:409: in _handle_exception_no_connection
+    raise error.with_traceback(exc_info[2])
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py:256: in execute
+    return await_(self._execute_async(operation, parameters))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/concurrency.py:167: in await_
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/concurrency.py:205: in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/dialects/postgresql/psycopg.py:630: in _execute_async
+    result = await self._cursor.execute(operation, parameters)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.AsyncCursor [closed] [BAD] at 0x7f042969b290>
+query = 'INSERT INTO users (id, email, password_hash, full_name, superadmin_access, deleted_at, auth_source, external_id, last...rs.is_active, users.is_superadmin, users.token_version, users.must_change_password, users.created_at, users.updated_at'
+params = {'id': UUID('a4e05724-d7db-4edf-955c-c333aecf4a1a'), 'email': 'race-e6405f@example.test', 'password_hash': None, 'full_name': 'Race', ...}
+prepare = None, binary = None
+
+    async def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            async with self._conn.lock:
+                await self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.UniqueViolation: duplicate key value violates unique constraint "uq_users_email_live"
+E           DETAIL:  Key (lower(email))=(race-e6405f@example.test) already exists.
+
+/opt/venv/lib/python3.12/site-packages/psycopg/cursor_async.py:117: UniqueViolation
+
+The above exception was the direct cause of the following exception:
+
+configure = <function configure.<locals>.apply at 0x7f04fc8fbec0>
+fake = <tests.ldap_fixture.FakeDirectory object at 0x7f04fc851cd0>
+
+    def test_17_r2_concurrent_first_provision_rereads(configure, fake):
+        from ffcore.core import db
+        from ffcore.core.identity import provision
+        from ffcore.core.ldap_auth import DirectoryUser
+    
+        settings = configure()
+        found = DirectoryUser(
+            provider="ldap",
+            external_id=str(uuid.uuid4()),
+            email=f"race-{uuid.uuid4().hex[:6]}@example.test",
+            full_name="Race",
+            groups=frozenset(),
+            active=True,
+        )
+    
+        async def go():
+            first = db.session_scope()
+            second = db.session_scope()
+            async with first as one, second as two:
+                winner = await provision(one, found, settings)
+                racing = asyncio.create_task(provision(two, found, settings))
+                await asyncio.sleep(0.5)  # the second insert waits on the first's row lock
+                await one.commit()
+                loser = await racing
+                await two.commit()
+                return winner.id, loser.id
+    
+>       winner, loser = asyncio.run(go())
+                        ^^^^^^^^^^^^^^^^^
+
+tests/integration/test_17_r2.py:302: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/asyncio/runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/integration/test_17_r2.py:298: in go
+    loser = await racing
+            ^^^^^^^^^^^^
+ffcore/core/identity.py:243: in provision
+    await session.flush()
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/ext/asyncio/session.py:1030: in flush
+    await greenlet_spawn(self.sync_session.flush, objects=objects)
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/concurrency.py:212: in greenlet_spawn
+    result = context.switch(value)
+             ^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:4543: in flush
+    self._flush(objects)
+<sqlalchemy generated warned() wrapper for sqlalchemy.orm.session.Session._flush>:2: in _flush
+    return target(fn, self, objects=objects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/deprecations.py:281: in warned
+    return fn(*args, **kwargs)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:4686: in _flush
+    with util.safe_reraise():
+         ^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:4647: in _flush
+    flush_context.execute()
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py:467: in execute
+    rec.execute(self)
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py:643: in execute
+    util.preloaded.orm_persistence._save_obj(
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py:92: in _save_obj
+    _emit_insert_statements(
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py:1237: in _emit_insert_statements
+    result = connection.execute(
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1463: in execute
+    return meth(
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py:533: in _execute_on_connection
+    return connection._execute_clauseelement(
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1683: in _execute_clauseelement
+    ret = self._execute_context(
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1837: in _execute_context
+    return self._exec_single_context(
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1977: in _exec_single_context
+    self._handle_dbapi_exception(
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:2347: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1958: in _exec_single_context
+    self.dialect.do_execute(
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py:1192: in do_execute
+    cursor.execute(statement, parameters)
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py:258: in execute
+    self._adapt_connection._handle_exception(error)
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py:412: in _handle_exception
+    self._handle_exception_no_connection(self.dbapi, error)
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py:409: in _handle_exception_no_connection
+    raise error.with_traceback(exc_info[2])
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py:256: in execute
+    return await_(self._execute_async(operation, parameters))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/concurrency.py:167: in await_
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/concurrency.py:205: in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/dialects/postgresql/psycopg.py:630: in _execute_async
+    result = await self._cursor.execute(operation, parameters)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.AsyncCursor [closed] [BAD] at 0x7f042969b290>
+query = 'INSERT INTO users (id, email, password_hash, full_name, superadmin_access, deleted_at, auth_source, external_id, last...rs.is_active, users.is_superadmin, users.token_version, users.must_change_password, users.created_at, users.updated_at'
+params = {'id': UUID('a4e05724-d7db-4edf-955c-c333aecf4a1a'), 'email': 'race-e6405f@example.test', 'password_hash': None, 'full_name': 'Race', ...}
+prepare = None, binary = None
+
+    async def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            async with self._conn.lock:
+                await self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           sqlalchemy.exc.IntegrityError: (psycopg.errors.UniqueViolation) duplicate key value violates unique constraint "uq_users_email_live"
+E           DETAIL:  Key (lower(email))=(race-e6405f@example.test) already exists.
+E           [SQL: INSERT INTO users (id, email, password_hash, full_name, superadmin_access, deleted_at, auth_source, external_id, last_login_at) VALUES (%(id)s::UUID, %(email)s::VARCHAR, %(password_hash)s::VARCHAR, %(full_name)s::VARCHAR, %(superadmin_access)s::VARCHAR, %(deleted_at)s::TIMESTAMP WITH TIME ZONE, %(auth_source)s::VARCHAR, %(external_id)s::VARCHAR, %(last_login_at)s::TIMESTAMP WITH TIME ZONE) RETURNING users.is_active, users.is_superadmin, users.token_version, users.must_change_password, users.created_at, users.updated_at]
+E           [parameters: {'id': UUID('a4e05724-d7db-4edf-955c-c333aecf4a1a'), 'email': 'race-e6405f@example.test', 'password_hash': None, 'full_name': 'Race', 'superadmin_access': None, 'deleted_at': None, 'auth_source': 'ldap', 'external_id': 'c0b1cfeb-95e8-4cbb-9cf4-60e9794c8a85', 'last_login_at': None}]
+E           (Background on this error at: https://sqlalche.me/e/21/gkpj)
+
+/opt/venv/lib/python3.12/site-packages/psycopg/cursor_async.py:117: IntegrityError
+_______________ test_17_r2_deactivated_by_values[identity_sync] ________________
+
+value = 'identity_sync'
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_2636058fab84) at 0x7f04fc90e720>
+
+    @pytest.mark.parametrize("value", ["identity_sync", "admin", None])
+    def test_17_r2_deactivated_by_values(value, pg):
+        user_id = uuid.uuid4()
+>       pg.execute(
+            "INSERT INTO users (id, email, password_hash, full_name, is_active, deactivated_by)"
+            " VALUES (%s, %s, 'x', 'D', false, %s)",
+            (user_id, f"d-{user_id.hex[:8]}@example.test", value),
+        )
+
+tests/integration/test_17_r2.py:309: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_2636058fab84) at 0x7f04fc90e720>
+query = "INSERT INTO users (id, email, password_hash, full_name, is_active, deactivated_by) VALUES (%s, %s, 'x', 'D', false, %s)"
+params = (UUID('6d69e531-114c-4713-88aa-ef3d2d08bdfb'), 'd-6d69e531@example.test', 'identity_sync')
+prepare = None, binary = False
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool = False,
+    ) -> Cursor[Row]:
+        """Execute a query and return a cursor to read its results."""
+        try:
+            cur = self.cursor()
+            if binary:
+                cur.format = BINARY
+    
+            if isinstance(query, Template):
+                if params is not None:
+                    raise TypeError(
+                        "'execute()' with string template query doesn't support parameters"
+                    )
+                return cur.execute(query, prepare=prepare)
+            else:
+                return cur.execute(query, params, prepare=prepare)
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.UndefinedColumn: column "deactivated_by" of relation "users" does not exist
+E           LINE 1: ... (id, email, password_hash, full_name, is_active, deactivate...
+E                                                                        ^
+
+/opt/venv/lib/python3.12/site-packages/psycopg/connection.py:304: UndefinedColumn
+___________________ test_17_r2_deactivated_by_values[admin] ____________________
+
+value = 'admin'
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_2636058fab84) at 0x7f04fc850ad0>
+
+    @pytest.mark.parametrize("value", ["identity_sync", "admin", None])
+    def test_17_r2_deactivated_by_values(value, pg):
+        user_id = uuid.uuid4()
+>       pg.execute(
+            "INSERT INTO users (id, email, password_hash, full_name, is_active, deactivated_by)"
+            " VALUES (%s, %s, 'x', 'D', false, %s)",
+            (user_id, f"d-{user_id.hex[:8]}@example.test", value),
+        )
+
+tests/integration/test_17_r2.py:309: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_2636058fab84) at 0x7f04fc850ad0>
+query = "INSERT INTO users (id, email, password_hash, full_name, is_active, deactivated_by) VALUES (%s, %s, 'x', 'D', false, %s)"
+params = (UUID('2abb3771-b93a-4aea-8f47-20b9fbf9a2c7'), 'd-2abb3771@example.test', 'admin')
+prepare = None, binary = False
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool = False,
+    ) -> Cursor[Row]:
+        """Execute a query and return a cursor to read its results."""
+        try:
+            cur = self.cursor()
+            if binary:
+                cur.format = BINARY
+    
+            if isinstance(query, Template):
+                if params is not None:
+                    raise TypeError(
+                        "'execute()' with string template query doesn't support parameters"
+                    )
+                return cur.execute(query, prepare=prepare)
+            else:
+                return cur.execute(query, params, prepare=prepare)
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.UndefinedColumn: column "deactivated_by" of relation "users" does not exist
+E           LINE 1: ... (id, email, password_hash, full_name, is_active, deactivate...
+E                                                                        ^
+
+/opt/venv/lib/python3.12/site-packages/psycopg/connection.py:304: UndefinedColumn
+____________________ test_17_r2_deactivated_by_values[None] ____________________
+
+value = None
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_2636058fab84) at 0x7f04fcad8fe0>
+
+    @pytest.mark.parametrize("value", ["identity_sync", "admin", None])
+    def test_17_r2_deactivated_by_values(value, pg):
+        user_id = uuid.uuid4()
+>       pg.execute(
+            "INSERT INTO users (id, email, password_hash, full_name, is_active, deactivated_by)"
+            " VALUES (%s, %s, 'x', 'D', false, %s)",
+            (user_id, f"d-{user_id.hex[:8]}@example.test", value),
+        )
+
+tests/integration/test_17_r2.py:309: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_2636058fab84) at 0x7f04fcad8fe0>
+query = "INSERT INTO users (id, email, password_hash, full_name, is_active, deactivated_by) VALUES (%s, %s, 'x', 'D', false, %s)"
+params = (UUID('f558b4d1-3c49-4453-a995-d31df41f2ba1'), 'd-f558b4d1@example.test', None)
+prepare = None, binary = False
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool = False,
+    ) -> Cursor[Row]:
+        """Execute a query and return a cursor to read its results."""
+        try:
+            cur = self.cursor()
+            if binary:
+                cur.format = BINARY
+    
+            if isinstance(query, Template):
+                if params is not None:
+                    raise TypeError(
+                        "'execute()' with string template query doesn't support parameters"
+                    )
+                return cur.execute(query, prepare=prepare)
+            else:
+                return cur.execute(query, params, prepare=prepare)
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.UndefinedColumn: column "deactivated_by" of relation "users" does not exist
+E           LINE 1: ... (id, email, password_hash, full_name, is_active, deactivate...
+E                                                                        ^
+
+/opt/venv/lib/python3.12/site-packages/psycopg/connection.py:304: UndefinedColumn
+_________________ test_17_1_default_project_missing_fails_loud _________________
+
+configure = <function configure.<locals>.apply at 0x7f04fc8b9080>
+fake = <tests.ldap_fixture.FakeDirectory object at 0x7f04fcae2ea0>
+client_factory = <function client_factory.<locals>.make at 0x7f04fc8b9f80>
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_2636058fab84) at 0x7f04242acd10>
+
+    def test_17_1_default_project_missing_fails_loud(configure, fake, client_factory, pg):
+        configure(default_project_for_new_users="no-such-project")
+        response = login(client_factory(), fake.login("user-b"), fake.password("user-b"))
+        assert response.status_code == 503
+        assert response.json()["error"]["code"] == "default_project_missing"
+        # r1 NOTE-7: the refusal is in the sign-in audit too
+>       row = audit_rows(pg, "auth.login", "error")[-1][2]
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       IndexError: list index out of range
+
+tests/integration/test_17_identity.py:148: IndexError
+----------------------------- Captured stderr call -----------------------------
+2026-11-23 12:10:06,810 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 12:10:06,882 INFO ffcore.access access method=POST path=/api/v1/auth/login status=503 ms=70
+------------------------------ Captured log call -------------------------------
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=503 ms=70
+_____________ test_17_1_several_groups_highest_role_and_its_access _____________
+
+configure = <function configure.<locals>.apply at 0x7f04fc752ac0>
+fake = <tests.ldap_fixture.FakeDirectory object at 0x7f04242ae600>
+root = <starlette.testclient.TestClient object at 0x7f04242b2ed0>
+make_project = <function make_project.<locals>.make at 0x7f042427ab60>
+client_factory = <function client_factory.<locals>.make at 0x7f04fc7516c0>
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_2636058fab84) at 0x7f04242b2ba0>
+
+    def test_17_1_several_groups_highest_role_and_its_access(
+        configure, fake, root, make_project, client_factory, pg
+    ):
+        """r1 MINOR-5 (KARARLAR '17-1 r1 kararları'): the highest role brings its own access; edit
+        beats read only between mappings of the same role. (admin, read) + (user, edit) is
+        (admin, read), never an access no mapping gave."""
+        mixed, same = make_project(), make_project()
+        map_group(root, mixed, fake.group("chat"), "user", "edit")
+        map_group(root, mixed, fake.group("analysts"), "analyst", "read")
+        map_group(root, same, fake.group("chat"), "analyst", "read")
+        map_group(root, same, fake.group("editors"), "analyst", "edit")
+        login(client_factory(), fake.login("user-b"), fake.password("user-b"))
+        row = user_row(pg, fake.email("user-b"))
+>       assert memberships(pg, row[0]) == {
+            mixed: ("analyst", "read", "idp"),
+            same: ("analyst", "edit", "idp"),
+        }
+E       AssertionError: assert {UUID('528cb8...edit', 'idp')} == {UUID('528cb8...edit', 'idp')}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing items:
+E         {UUID('528cb878-d326-45d8-809d-0c9584295fc9'): ('analyst', 'edit', 'idp')} != {UUID('528cb878-d326-45d8-809d-0c9584295fc9'): ('analyst', 'read', 'idp')}
+E         Use -v to get more diff
+
+tests/integration/test_17_identity.py:165: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-23 12:10:09,733 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 12:10:09,941 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=204
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=204
+----------------------------- Captured stderr call -----------------------------
+2026-11-23 12:10:10,034 INFO ffcore.access access method=POST path=/api/v1/projects/528cb878-d326-45d8-809d-0c9584295fc9/identity-mappings status=201 ms=74
+2026-11-23 12:10:10,089 INFO ffcore.access access method=POST path=/api/v1/projects/528cb878-d326-45d8-809d-0c9584295fc9/identity-mappings status=201 ms=52
+2026-11-23 12:10:10,142 INFO ffcore.access access method=POST path=/api/v1/projects/b3a77c3f-054f-4a12-8050-869bd86e8fca/identity-mappings status=201 ms=50
+2026-11-23 12:10:10,193 INFO ffcore.access access method=POST path=/api/v1/projects/b3a77c3f-054f-4a12-8050-869bd86e8fca/identity-mappings status=201 ms=48
+2026-11-23 12:10:10,280 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 12:10:10,397 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=114
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/528cb878-d326-45d8-809d-0c9584295fc9/identity-mappings status=201 ms=74
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/528cb878-d326-45d8-809d-0c9584295fc9/identity-mappings status=201 ms=52
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/b3a77c3f-054f-4a12-8050-869bd86e8fca/identity-mappings status=201 ms=50
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/b3a77c3f-054f-4a12-8050-869bd86e8fca/identity-mappings status=201 ms=48
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=114
+____________________ test_17_migration_schema_and_roundtrip ____________________
+
+scratch_db = <tests.integration.conftest.ScratchDatabase object at 0x7f04fc51d6a0>
+
+    def test_17_migration_schema_and_roundtrip(scratch_db):
+        db = scratch_db
+        heads = [line for line in db.run("heads").splitlines() if line.strip()]
+        assert len(heads) == 1
+        assert {"auth_source", "external_id", "last_login_at", "must_change_password"} <= _columns(
+            db, "users"
+        )
+        assert "membership_source" in _columns(db, "project_members")
+        assert "identity_group_mappings" in db.tables()
+        assert {
+            "ck_users_auth_source",
+            "ck_users_password_only_local",
+            "ck_users_superadmin_is_local",
+        } <= _checks(db, "users")
+        assert "ck_project_members_membership_source" in _checks(db, "project_members")
+        # r2 (MAJOR-1): who deactivated an account, and the identity_sync_refused alert kind
+>       assert "deactivated_by" in _columns(db, "users")
+E       AssertionError: assert 'deactivated_by' in {'auth_source', 'created_at', 'deleted_at', 'email', 'external_id', 'full_name', ...}
+E        +  where {'auth_source', 'created_at', 'deleted_at', 'email', 'external_id', 'full_name', ...} = _columns(<tests.integration.conftest.ScratchDatabase object at 0x7f04fc51d6a0>, 'users')
+
+tests/integration/test_17_migration.py:41: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/test_17_ldap.py::test_17_r2_referrals_off - AssertionError:...
+FAILED tests/unit/test_17_ldap.py::test_17_r2_user_bind_refusal_is_invalid_credentials[19]
+FAILED tests/unit/test_17_ldap.py::test_17_r2_user_bind_refusal_is_invalid_credentials[50]
+FAILED tests/unit/test_17_ldap.py::test_17_r2_user_bind_refusal_is_invalid_credentials[53]
+FAILED tests/unit/test_17_ldap.py::test_17_r2_settings_ratio_and_cli - Attrib...
+FAILED tests/integration/test_17_r2.py::test_17_r2_moved_base_refuses_and_changes_nothing
+FAILED tests/integration/test_17_r2.py::test_17_r2_ratio_over_limit_refused_under_limit_applies
+FAILED tests/integration/test_17_r2.py::test_17_r2_force_overrides_the_ratio
+FAILED tests/integration/test_17_r2.py::test_17_r2_sync_deactivated_account_reopens_at_sign_in
+FAILED tests/integration/test_17_r2.py::test_17_r2_sync_reopens_an_account_seen_again
+FAILED tests/integration/test_17_r2.py::test_17_r2_admin_deactivation_is_not_reopened
+FAILED tests/integration/test_17_r2.py::test_17_r2_unknown_email_timing - Ass...
+FAILED tests/integration/test_17_r2.py::test_17_r2_link_needs_a_configured_provider
+FAILED tests/integration/test_17_r2.py::test_17_r2_unlink_before_binding_then_not_after
+FAILED tests/integration/test_17_r2.py::test_17_r2_unchanged_password_refused
+FAILED tests/integration/test_17_r2.py::test_17_r2_concurrent_first_provision_rereads
+FAILED tests/integration/test_17_r2.py::test_17_r2_deactivated_by_values[identity_sync]
+FAILED tests/integration/test_17_r2.py::test_17_r2_deactivated_by_values[admin]
+FAILED tests/integration/test_17_r2.py::test_17_r2_deactivated_by_values[None]
+FAILED tests/integration/test_17_identity.py::test_17_1_default_project_missing_fails_loud
+FAILED tests/integration/test_17_identity.py::test_17_1_several_groups_highest_role_and_its_access
+FAILED tests/integration/test_17_migration.py::test_17_migration_schema_and_roundtrip
+22 failed, 52 passed in 256.92s (0:04:16)
