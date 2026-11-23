@@ -1,0 +1,4 @@
+HEAD=e0653b07f074fa44777eedef4eaa64d04ef10425 2026-11-23 16:53:58 down -v
+ Volume ffcore-16_redis_data  Removed
+ Network ffcore-16_default  Removed
+containers=0 volumes=0

@@ -3,7 +3,7 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-isci-b-16 (local_8354774b-cd7a-49fe-93ab-64f1ac4edd1c; önceki lease ffcore-isci-b-triage2 RETIRED K-TR2-0012)
-- Aktif paket: 16 (16-2 r2 IN_PROGRESS feat/16-2-atlassian; 16-3 PLAN-ONAY, hazırlık scratchpad)
+- Aktif paket: 16 (16-2 r2 PR-HAZIR e0653b0; 16-3 PLAN-ONAY, hazırlık scratchpad)
 - Durum: ACTIVE
 - Son okunan: koordinator (16-2 r2 durum sorusu)
 
@@ -178,3 +178,14 @@ Hafif yığın: `postgres` + `redis` (+ `tools` run), `--no-build --pull never`.
 ### B-16-0036 · 2026-11-23 16:36 · → koordinator · DURUM
 Paket: 16 · Cevap: K-16-0027 · Durum: IN_PROGRESS · Yigin: ffcore-16
 r2 kodu ve testleri yazıldı (kırmızı test commit'i `5b10a61`; kod ve docs commit'lenmedi). Kırmızı koşu 15:44'te askıda kaldı: eski kod, NOTE-1 testindeki kendine işaret eden `next` bağlantısını sonsuza dek izledi (bulgunun kendisi). Konteyner adıyla kaldırıldı. Şimdi kırmızı koşu süre sınırıyla yeniden: döngü testleri `timeout 60` altında ayrı (`16-2-r2-red.log`), sonra birim/ruff (`16-2-r2-unit.log`), hedefli 16 test-int (`16-2-r2-int.log`), egress `compose config` (`16-2-r2-egress-config.log`). Tahmini 25 dk; sonra commit, `make test` × 2, YIGIN-KAPA, PR-HAZIR r2.
+
+### B-16-0037 · 2026-11-23 16:54 · → koordinator · YIGIN-KAPA
+Paket: 16 · Cevap: B-16-0035 · Yigin: ffcore-16
+`down -v` tamam: konteyner 0, volume 0 (`16-2-r2-down.log`). ffmain kapısı için yığınım yok.
+
+### B-16-0038 · 2026-11-23 16:54 · → koordinator · PR-HAZIR
+Paket: 16 · Cevap: K-16-0027 · SHA: e0653b07f074fa44777eedef4eaa64d04ef10425
+**PR 16-2 r2.** Delta `f9f02c8..e0653b0` (4 commit: test kırmızı `5b10a61` → test düzeltme `c147085` → kod `2ad7841` → docs `e0653b0`). PR notu `state/pr/16.md` 'PR 16-2 r2'.
+MAJOR-1: `visibility`'li ve `jsdPublic: false` Jira yorumları belgeye girmez (birim + A2 test-int; raw'da kalır). MINOR-1: `FULL_SYNC_EVERY_DAYS` (7, 0 kapalı) ile zamanlanmış koşu haftada bir full. MINOR-2: indirmede 2xx dışı → `attachment_download_failed`, Jira `redirect=false`, docs/`.env.example` `api.media.atlassian.com`. MINOR-3: `[~…]` ve `ri:user` anmaları düşer, docs sözü daraltıldı. NOTE-1 `pagination_loop`, NOTE-3 `security:<KEY>/<seviye>`, NOTE-4, NOTE-6, NOTE-7; NOTE-9 `16-2-r2-egress-config.log`.
+Kanıt (`state/evidence/16-2-r2-*.log`, `HEAD=` satırlı): kırmızı birim 21 failed + döngü testleri eski kodda `timeout 60` → 124 (ilk kırmızı koşu bu yüzden askıda kalmıştı, B-16-0036), kırmızı test-int 2 failed; kodla birim 117 passed, `make lint` 0, hedefli test-int 35 + 33 passed (iki 16-1 zamanlayıcı düşüşü `c147085` ile). Bilerek değişen: `test_16_2_drivers` `security:OPS/Yonetim`; `test_16_1_tick_abandon_…` mod `full` (tamamlanmış full yok → haftalık kural).
+**Koşulmadı:** HEAD'de `make test` × 2 (ffmain kapısı 17:10, konteyner yok); kapı yeşilinden sonra koşup `16-2-r2-test.log` ile bildireceğim.

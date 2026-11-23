@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-isci-c-17
-- Aktif paket: 17 (son kullanıcı açılışı + AD/LDAP/OIDC; dal feat/17-kimlik, worktree .worktrees/feat/17-kimlik)
+- Aktif paket: 17 (17-1 MERGED 874e24a; 17-2 OIDC dal feat/17-2-oidc, worktree .worktrees/feat/17-2-oidc)
 - Durum: ACTIVE
-- Son okunan: koordinator K-17-0001, K-GEN-0051; son yazılan C-17-0017 (PR-HAZIR r2 561f255)
+- Son okunan: koordinator K-17-0001, K-GEN-0051; son yazılan C-17-0018 (DURUM 17-2 dal)
 - Önceki lease: ffcore-isci-c-14 RETIRED (14 DONE; K-14-0033); ondan önce ffcore-isci-c-11 RETIRED (11 DONE; K-11-0033); ondan önce ffcore-isci-c-10c3 RETIRED (10c-3 MERGED 0a92084; son C-10C3-0009 RETIRED); ondan önce ffcore-isci-c-10c2 RETIRED (10c-2 MERGED b93cd96; son C-10C2-0016 RETIRED); ondan önce ffcore-isci-c-sse RETIRED (fix/10b-sse-bekci MERGED 4216718; son C-SSE-0011 RETIRED); ondan önce ffcore-isci-c-10c1 RETIRED (10c-1 MERGED; son C-10C1-0015 RETIRED); ondan önce ffcore-isci-c-10bp2 RETIRED (10b-poc-2 MERGED b43770d; son C-10bp2-0019 HANDOFF)
 
 ## Mesajlar
@@ -99,3 +99,7 @@ Paket: 17 · Cevap: K-17-0008, K-17-0011 · SHA: 561f255e0664f162fd7805e5a45671b
 **Kanıt (`HEAD=` satırlı):** kırmızı `17-1-r2-red.log` (r1 kodunda 22 failed); lint `17-1-r2-lint.log`; önyüz + Vitest 349 `17-1-r2-green.log`; tam test-int 1370/42/1 → tek düşen sıralama hatalı 03a testi 561f255'te düzeltildi ve yeniden 11 passed; `make test` 2294×2 (`17-1-r2-int-full.log`).
 **Maddeler:** MAJOR-1 kod 32/belirsiz kimlik = koşu hatası, oran 0,2 + tamamı → `identity_sync_refused` 0 değişiklik + uyarı, `identity-sync --force`, `deactivated_by`, sync-pasif girişte/sync'te açılır, elle pasif açılmaz; MINOR-1 sahte doğrulama (medyan oranı testi); MINOR-2 referral kapalı; MINOR-3 bind reddi 401 + `bind_rejected_<kod>`; MINOR-4 422 `identity_provider_not_configured` + `auth_source=local` geri alma (geçici parola bir kez); MINOR-5 en yüksek rolün erişimi + `docs/api.md`; NOTE-2/3/5/6/7.
 **Bilerek değişen testler:** `test_17_1_several_groups_*` (kural), `test_17_2_identity_sync_deactivates_*` (`force=True`, paylaşılan DB), `test_03a_users_projects_members_flow` (`temporary_password` anahtarı), `test_17_03a_draft_*` (`local`), `test_03a_13_each_mutation_one_audit_event` (kendi satırı). Not: `test_03a_4_wrong_password_401_uniform` paylaşılan DB'de sıraya bağlı (hedefli koşuda 17'den sonra düştü, alfabetik tam koşuda geçti) — FOLLOWUP adayı.
+
+### C-17-0018 · 2026-11-23 20:50 · → koordinator · DURUM
+Paket: 17 · Cevap: K-17-0014 · Durum: IN_PROGRESS
+17-1 MERGED 874e24a alındı. 17-2 dalı açıldı: `git worktree add .worktrees/feat/17-2-oidc -b feat/17-2-oidc main` (baz 842cbb2, 874e24a içinde). Plan `state/pr/17.md` "17-2 · PLANNED" + PLAN-ONAY K-17-0006 (S1-S5 A). Yığınsız iş: sahte sağlayıcı (`backend/tests/fakes/fake_oidc.py`), kırmızı testler, `core/oidc_auth.py`, uçlar, ayarlar, preflight, compose `fake-oidc` + docs. `ffcore-17` yığını yalnız ffmain kapısı yeşil duyurusundan sonra (YIGIN-AC ile).

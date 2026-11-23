@@ -1,0 +1,26 @@
+HEAD=5b10a613a1386c9bbbded5fe4594542ca260e75d + uncommitted r2 code/test fixes 2026-11-23 16:50:46 ruff format + check, scheduler/r2 test-int
+3 files reformatted, 18 files left unchanged
+E501 Line too long (150 > 100)
+ --> ffcore/sources/scheduler.py:7:101
+  |
+5 | …run when the source's last completed
+6 | … permission narrowed at the source
+7 | …t anyone starting one; D4 applies). A source with an active run keeps it (the partial unique
+  |                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+8 | …
+9 | …
+  |
+
+E501 Line too long (104 > 100)
+   --> tests/unit/test_16_2_r2.py:100:101
+    |
+ 98 |         '<p>Sorumlu <ac:link><ri:user ri:userkey="8a7f"/></ac:link> ve '
+ 99 |         '<ac:link><ri:user ri:account-id="557058"/><ac:link-body>Ayse Kaya</ac:link-body></ac:link>'
+100 |         ' ile görüşüldü; <ac:link><ri:page ri:content-title="Kurallar"/></ac:link> sayfasına bakın.</p>'
+    |                                                                                                     ^^^^
+101 |     )
+102 |     md = to_markdown(storage).markdown
+    |
+
+Found 2 errors.
+33 passed in 72.72s (0:01:12)

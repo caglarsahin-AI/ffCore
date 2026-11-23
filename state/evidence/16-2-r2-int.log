@@ -1,1 +1,15 @@
 HEAD=5b10a613a1386c9bbbded5fe4594542ca260e75d 2026-11-23 16:41:38 r2 targeted test-int: 16-2 (r2, atlassian), 16-1 scheduler/attachments/api
+E   AssertionError: assert (2 == 1)
+E    +  where 2 = len(['8042d643-1135-4574-bbb7-f1a433956050', 'a44b5a97-6ed6-48e4-8d9a-54c57f4d9051'])
+E   AssertionError: assert (1 == 1 and 'queued' == 'queued'
+E    +  where 1 = len([{'id': 'ac4b4e7c-227f-496b-86b4-fdacf25b0657', 'data_source_id': '5e63b913-b8d0-4351-9927-03a73cf5db5a', 'layer': 'raw', 'mode': 'full', ...}])
+E     
+E       queued and 'full' == 'delta'
+E     
+E     - delta
+E     + full)
+2026-11-23 13:46:33,076 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+FAILED tests/integration/test_16_1_scheduler.py::test_16_1_tick_starts_due_schedules_only
+FAILED tests/integration/test_16_1_scheduler.py::test_16_1_tick_abandon_then_the_daily_slot_takes_over
+2 failed, 35 passed in 432.80s (0:07:12)

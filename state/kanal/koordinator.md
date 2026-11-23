@@ -350,4 +350,15 @@ ONAY alındı; S4'ün dört senaryosu ve oran/force kanıtları tam. MINOR-1 (wh
 ### K-16-0029 · 2026-11-23 16:48 · → isci-b · DURUM
 Paket: 16 · Cevap: B-16-0036
 17-1 merge edildi; ffmain kapısı senin koşan hafif kapın bitip YIGIN-KAPA yazınca başlar (kapıyı 16-2 r2'nin zaman aşımlı yeniden koşusunu kesmemek için bekletiyorum; en geç 17:10). Koşu bitince: commit, `down -v` + YIGIN-KAPA, PR-HAZIR r2 (`make test` ×2 kapı yeşil duyurusundan sonra da olabilir; PR-HAZIR'da hangisinin koştuğunu yaz). Kapı başladıktan sonra konteyner koşusu yok.
+### K-GEN-0053 · 2026-11-23 16:56 · → tumu · DURUM
+Paket: dalga-9 · Cevap: K-17-0014 · Yigin: ffmain (YIGIN-AC)
+**ffmain kapısı koşuyor** (17-1 merge 874e24a; `state/evidence/gate-171-20261123.log`, ~60 dk, NER kopyası dâhil). **Kapı sürerken konteyner koşusu yok**: isci-b `make test` ×2'yi kapı yeşilinden sonra; isci-c 17-2 yığınsız; inceleyici 16-2 r2 teyidinin yığınsız kısmını (diff, birim testleri host'ta değil → yalnız okuma) yapabilir, hafif yığın kapı sonrası.
+
+### K-16-0030 · 2026-11-23 16:56 · → isci-b · CEVAP
+Paket: 16 · Cevap: B-16-0038 · SHA: e0653b07f074fa44777eedef4eaa64d04ef10425
+PR-HAZIR r2 alındı; `e0653b0` doğrulandı (4 commit f9f02c8 üstünde test→test→fix→docs, 14 dosya +548/-41, state yok, merge-tree temiz; zone dışı yalnız `config.py` `FULL_SYNC_EVERY_DAYS`, compose/`.env.example` satırı: kabul). **VERIFIED, koşullu:** `make test` ×2 kapı yeşilinden sonra koşulur ve DURUM ile bildirilir (merge öncesi şart). r2 teyiti inceleyicide (K-16-0031). Dal donuk; 16-3-1 kodu 16-2 merge sonrası.
+
+### K-16-0031 · 2026-11-23 16:56 · → inceleyici · REVIEW-ISTEK
+Paket: 16 · Cevap: B-16-0038 · SHA: e0653b07f074fa44777eedef4eaa64d04ef10425
+**16-2 r2 teyiti** (delta `f9f02c8..e0653b0`, 4 commit, 14 dosya; hafif tur: yığınsız kısım şimdi, hafif yığın kapı yeşilinden sonra). İşçi kanıtı `16-2-r2-*.log`: kırmızı birim 21 + döngü testleri `timeout 60` → 124 (NOTE-1 bulgusunun kendisi), test-int 2; kodla birim 117, lint 0, hedefli 35 + 33, egress `compose config` `16-2-r2-egress-config.log`; `make test` ×2 kapı sonrası (merge öncesi şart). **Teyit:** (1) MAJOR-1 A2 tekrar: `visibility` ve `jsdPublic:false` yorum belgede yok, raw'da var; (2) MINOR-1 `FULL_SYNC_EVERY_DAYS` zamanlayıcı birim (enjekte saat; 0 kapalı); (3) MINOR-2 G2 tekrar: `Location`'sız 3xx → `attachment_download_failed`; Jira `redirect=false`; docs medya adresi; (4) MINOR-3 D1 tekrar: `[~akaya]` ve `ri:user` gövdesi yok; docs sözü; (5) NOTE-1 `pagination_loop` (kendine işaret eden `next`), NOTE-3 `security:<KEY>/<seviye>`, NOTE-4/6/7; (6) NOTE-9 egress config kanıtı. Rapor `state/reviews/16-2-r2.md` kısa; kanal `R-16-00xx`.
 
