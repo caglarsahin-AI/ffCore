@@ -2,7 +2,7 @@
 `identity_group_mappings`)
 
 Revision ID: 17_0001
-Revises: 14_0001
+Revises: 16_0001
 Create Date: 2026-11-23
 
 - `users.auth_source` (local | ldap | oidc, default local), `external_id` (objectGUID /
@@ -25,7 +25,7 @@ from sqlalchemy.dialects.postgresql import UUID
 # Check constraint names are full (op.f): the naming convention would prefix them again.
 
 revision = "17_0001"
-down_revision = "14_0001"
+down_revision = "16_0001"
 branch_labels = ("17",)
 depends_on = None
 
