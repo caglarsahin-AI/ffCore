@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-c-17
 - Aktif paket: 17 (son kullanıcı açılışı + AD/LDAP/OIDC; dal feat/17-kimlik, worktree .worktrees/feat/17-kimlik)
 - Durum: ACTIVE
-- Son okunan: koordinator K-17-0001, K-GEN-0051; son yazılan C-17-0013 (YIGIN-AC r2)
+- Son okunan: koordinator K-17-0001, K-GEN-0051; son yazılan C-17-0014 (SORU tam test-int r2)
 - Önceki lease: ffcore-isci-c-14 RETIRED (14 DONE; K-14-0033); ondan önce ffcore-isci-c-11 RETIRED (11 DONE; K-11-0033); ondan önce ffcore-isci-c-10c3 RETIRED (10c-3 MERGED 0a92084; son C-10C3-0009 RETIRED); ondan önce ffcore-isci-c-10c2 RETIRED (10c-2 MERGED b93cd96; son C-10C2-0016 RETIRED); ondan önce ffcore-isci-c-sse RETIRED (fix/10b-sse-bekci MERGED 4216718; son C-SSE-0011 RETIRED); ondan önce ffcore-isci-c-10c1 RETIRED (10c-1 MERGED; son C-10C1-0015 RETIRED); ondan önce ffcore-isci-c-10bp2 RETIRED (10b-poc-2 MERGED b43770d; son C-10bp2-0019 HANDOFF)
 
 ## Mesajlar
@@ -80,3 +80,7 @@ DUZELT r2 alındı; rapor `state/reviews/17-1-r1.md` ve KARARLAR '17-1 r1 kararl
 ### C-17-0013 · 2026-11-23 18:50 · → koordinator · YIGIN-AC
 Paket: 17 · Cevap: K-17-0008, B-16-0029 · Yigin: ffcore-17
 16-2 slotu serbest (B-16-0029, `ffcore-16` kapalı); r2 için `ffcore-17` açılıyor (18170/13170, `0.0.0-17`, önce yalnız postgres + redis): lint, r2 kırmızı koşusu (test commit'i e1b8ac9, kodsuz, ayrık worktree), yeşil hedefli (17 + 03a + 16-1 göç + 57), `make test`×2. Tam test-int için ayrıca SORU. Açık diğer yığın: `ffcore` (kullanıcı).
+
+### C-17-0014 · 2026-11-23 19:10 · → koordinator · SORU
+Paket: 17 · Cevap: K-17-0008
+**17-1 r2 için tam test-int slotu istiyorum** (paylaşılan `core/session.py`/`api/auth.py`/`api/users.py`, 03c `alert_rules.kind` CHECK'i + `ALERT_KINDS`/`EMITTED_KINDS`, openapi 03a/03c). Durum: r2 test commit'i e1b8ac9 kırmızı (`17-1-r2-red.log`: 22 failed, r1 kodunda); r2 kodu + docs hazır, lint yeşil (`17-1-r2-lint.log`), yeşil hafif koşular şimdi (`17-1-r2-green.log`: önyüz gen:api/typecheck/Vitest, hedefli 17 + 03a + 16-1 göç + 57 + 03c uyarı, `make test`×2). Yeşilse kod ve docs ayrı commit, sonra slot. **Bilgi (zone):** yeni uyarı türü `identity_sync_refused` 03c dosyalarına additive dokunur (`models/alerts.py`, `services/alerts.py`, `messages/{en,tr}.json` `alerts.kinds` etiketi) ve `17_0001` `ck_alert_rules_kind`'ı yeniden kurar (downgrade bu türde kural varsa reddeder); `users.deactivated_by` aynı göçe eklendi (17_0001 merge edilmedi); `ffcore/cli.py` `identity-sync --force` komutu.
