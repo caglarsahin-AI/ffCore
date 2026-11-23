@@ -1,0 +1,726 @@
+=== gate-171 main 842cbb2 HEAD=842cbb2123dee94481cc6ebe6ef642d0527b7f56 2026-11-23 16:55:35
+
+=== 16:55:35 hook tests (host py -3.12, FOLLOWUP-212)
+.................................                                        [100%]
+465 passed in 116.21s (0:01:56)
+hooks exit=0
+
+=== 16:57:36 compose config
+config exit=0
+
+=== 16:57:46 compose config egress+tls
+config-egress-tls exit=0
+
+=== 16:57:56 compose config vllm
+config-vllm exit=0
+
+=== 16:58:04 compose config e2e
+config-e2e exit=0
+
+=== 16:58:13 up -d --build --pull never --wait
+ Container ffmain-redis-1  Healthy
+ Container ffmain-langfuse-postgres-1  Healthy
+ Container ffmain-postgres-1  Healthy
+ Container ffmain-migrate-1  Exited
+ Container ffmain-langfuse-redis-1  Healthy
+ Container ffmain-qdrant-1  Healthy
+ Container ffmain-agent-worker-bg-1  Healthy
+ Container ffmain-worker-1  Healthy
+ Container ffmain-mcp-search-1  Healthy
+ Container ffmain-mcp-sql-1  Healthy
+up exit=0
+ffcore/frontend:0.0.0-main 2026-11-23 16:59:52 +0300 +03
+ffcore/backend:0.0.0-main 2026-11-23 16:58:26 +0300 +03
+ffcore/e2e:0.0.0-main 2026-11-23 12:36:17 +0300 +03
+ffcore/tools:0.0.0-main 2026-11-05 21:09:24 +0300 +03
+
+=== 17:00:58 lint
+ruff check backend scripts data/samples/scripts services tests/deploy
+All checks passed!
+ruff format --check backend scripts data/samples/scripts services tests/deploy
+622 files already formatted
+lint exit=0
+
+=== 17:01:13 alembic heads
+17_0001 (16, 03a, 12, 08, 05a, 17, 04b, 11, 03c, 03b, 09, 06a, 14, 07, 04a, 06b, 05b) (head)
+heads exit=0
+
+=== 17:01:26 make test llmaas
+........................................................................ [  3%]
+........................................................................ [  6%]
+........................................................................ [  9%]
+........................................................................ [ 12%]
+........................................................................ [ 15%]
+..................................Call stack:
+  File "/usr/local/lib/python3.12/threading.py", line 1032, in _bootstrap
+    self._bootstrap_inner()
+...................................... [ 18%]
+--- Logging error ---
+.Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/logging/__init__.py", line 1163, in emit
+    stream.write(msg + self.terminator)
+ValueError: I/O operation on closed file.
+.Call stack:
+..  File "/usr/local/lib/python3.12/threading.py", line 1032, in _bootstrap
+    self._bootstrap_inner()
+  File "/usr/local/lib/python3.12/threading.py", line 1075, in _bootstrap_inner
+    self.run()
+.  File "/usr/local/lib/python3.12/threading.py", line 1012, in run
+    self._target(*self._args, **self._kwargs)
+  File "/opt/venv/lib/python3.12/site-packages/uvicorn/server.py", line 86, in run
+    return asyncio_run(self.serve(sockets=sockets), loop_factory=self.config.get_loop_factory())
+  File "/usr/local/lib/python3.12/asyncio/runners.py", line 195, in run
+    return runner.run(main)
+  File "/usr/local/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+  File "/opt/venv/lib/python3.12/site-packages/uvicorn/lifespan/on.py", line 86, in main
+    await app(scope, self.receive, self.send)
+  File "/opt/venv/lib/python3.12/site-packages/uvicorn/middleware/proxy_headers.py", line 30, in __call__
+    return await self.app(scope, receive, send)
+  File "/work/backend/tests/mcp_fixture.py", line 68, in app
+    await inner(scope, receive, send)
+  File "/opt/venv/lib/python3.12/site-packages/starlette/applications.py", line 96, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/opt/venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 151, in __call__
+    await self.app(scope, receive, send)
+................................................................... [ 21%]
+........................................................................ [ 25%]
+........................................................................ [ 28%]
+........................................................................ [ 31%]
+........................................................................ [ 34%]
+........................................................................ [ 37%]
+........................................................................ [ 40%]
+........................................................................ [ 43%]
+........................................................................ [ 47%]
+........................................................................ [ 50%]
+........................................................................ [ 53%]
+........................................................................ [ 56%]
+........................................................................ [ 59%]
+........................................................................ [ 62%]
+........................................................................ [ 65%]
+........................................................................ [ 69%]
+........................................................................ [ 72%]
+........................................................................ [ 75%]
+........................................................................ [ 78%]
+........................................................................ [ 81%]
+........................................................................ [ 84%]
+.EEEEEFEE..........EEEEEE............................................... [ 87%]
+........................................................................ [ 91%]
+........................................................................ [ 94%]
+........................................................................ [ 97%]
+..............................................................           [100%]
+==================================== ERRORS ====================================
+__ ERROR at setup of test_17_ldap_authenticate_by_account_name_email_and_upn ___
+
+    @pytest.fixture
+    def directory():
+>       fake = fx.FakeDirectory()
+               ^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_17_ldap.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.ldap_fixture.FakeDirectory object at 0x7fe97e0b5f40>
+
+    def __init__(self) -> None:
+>       from ldap3 import MOCK_SYNC, Connection, Server
+E       ModuleNotFoundError: No module named 'ldap3'
+
+tests/ldap_fixture.py:45: ModuleNotFoundError
+_ ERROR at setup of test_17_ldap_wrong_password_unknown_and_empty_are_invalid_credentials _
+
+    @pytest.fixture
+    def directory():
+>       fake = fx.FakeDirectory()
+               ^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_17_ldap.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.ldap_fixture.FakeDirectory object at 0x7fea8109e090>
+
+    def __init__(self) -> None:
+>       from ldap3 import MOCK_SYNC, Connection, Server
+E       ModuleNotFoundError: No module named 'ldap3'
+
+tests/ldap_fixture.py:45: ModuleNotFoundError
+__________ ERROR at setup of test_17_ldap_filter_injection_is_escaped __________
+
+    @pytest.fixture
+    def directory():
+>       fake = fx.FakeDirectory()
+               ^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_17_ldap.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.ldap_fixture.FakeDirectory object at 0x7fe97e0b7680>
+
+    def __init__(self) -> None:
+>       from ldap3 import MOCK_SYNC, Connection, Server
+E       ModuleNotFoundError: No module named 'ldap3'
+
+tests/ldap_fixture.py:45: ModuleNotFoundError
+______ ERROR at setup of test_17_ldap_disabled_account_reported_inactive _______
+
+    @pytest.fixture
+    def directory():
+>       fake = fx.FakeDirectory()
+               ^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_17_ldap.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.ldap_fixture.FakeDirectory object at 0x7fe97e0b6bd0>
+
+    def __init__(self) -> None:
+>       from ldap3 import MOCK_SYNC, Connection, Server
+E       ModuleNotFoundError: No module named 'ldap3'
+
+tests/ldap_fixture.py:45: ModuleNotFoundError
+_ ERROR at setup of test_17_ldap_unreachable_and_service_refused_are_unavailable _
+
+    @pytest.fixture
+    def directory():
+>       fake = fx.FakeDirectory()
+               ^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_17_ldap.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.ldap_fixture.FakeDirectory object at 0x7fea8109e420>
+
+    def __init__(self) -> None:
+>       from ldap3 import MOCK_SYNC, Connection, Server
+E       ModuleNotFoundError: No module named 'ldap3'
+
+tests/ldap_fixture.py:45: ModuleNotFoundError
+_____________ ERROR at setup of test_17_ldap_find_by_id_and_email ______________
+
+    @pytest.fixture
+    def directory():
+>       fake = fx.FakeDirectory()
+               ^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_17_ldap.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.ldap_fixture.FakeDirectory object at 0x7fe97e0b7c20>
+
+    def __init__(self) -> None:
+>       from ldap3 import MOCK_SYNC, Connection, Server
+E       ModuleNotFoundError: No module named 'ldap3'
+
+tests/ldap_fixture.py:45: ModuleNotFoundError
+_____________________ ERROR at setup of test_17_ldap_probe _____________________
+
+    @pytest.fixture
+    def directory():
+>       fake = fx.FakeDirectory()
+               ^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_17_ldap.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.ldap_fixture.FakeDirectory object at 0x7fe97e0b7f80>
+
+    def __init__(self) -> None:
+>       from ldap3 import MOCK_SYNC, Connection, Server
+E       ModuleNotFoundError: No module named 'ldap3'
+
+tests/ldap_fixture.py:45: ModuleNotFoundError
+__________________ ERROR at setup of test_17_r2_referrals_off __________________
+
+    @pytest.fixture
+    def directory():
+>       fake = fx.FakeDirectory()
+               ^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_17_ldap.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.ldap_fixture.FakeDirectory object at 0x7fe97e0b2300>
+
+    def __init__(self) -> None:
+>       from ldap3 import MOCK_SYNC, Connection, Server
+E       ModuleNotFoundError: No module named 'ldap3'
+
+tests/ldap_fixture.py:45: ModuleNotFoundError
+__ ERROR at setup of test_17_r2_user_bind_refusal_is_invalid_credentials[49] ___
+
+    @pytest.fixture
+    def directory():
+>       fake = fx.FakeDirectory()
+               ^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_17_ldap.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.ldap_fixture.FakeDirectory object at 0x7fe97e0b1fd0>
+
+    def __init__(self) -> None:
+>       from ldap3 import MOCK_SYNC, Connection, Server
+E       ModuleNotFoundError: No module named 'ldap3'
+
+tests/ldap_fixture.py:45: ModuleNotFoundError
+__ ERROR at setup of test_17_r2_user_bind_refusal_is_invalid_credentials[19] ___
+
+    @pytest.fixture
+    def directory():
+>       fake = fx.FakeDirectory()
+               ^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_17_ldap.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.ldap_fixture.FakeDirectory object at 0x7fea8108d7f0>
+
+    def __init__(self) -> None:
+>       from ldap3 import MOCK_SYNC, Connection, Server
+E       ModuleNotFoundError: No module named 'ldap3'
+
+tests/ldap_fixture.py:45: ModuleNotFoundError
+__ ERROR at setup of test_17_r2_user_bind_refusal_is_invalid_credentials[50] ___
+
+    @pytest.fixture
+    def directory():
+>       fake = fx.FakeDirectory()
+               ^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_17_ldap.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.ldap_fixture.FakeDirectory object at 0x7fe97e0b6180>
+
+    def __init__(self) -> None:
+>       from ldap3 import MOCK_SYNC, Connection, Server
+E       ModuleNotFoundError: No module named 'ldap3'
+
+tests/ldap_fixture.py:45: ModuleNotFoundError
+__ ERROR at setup of test_17_r2_user_bind_refusal_is_invalid_credentials[53] ___
+
+    @pytest.fixture
+    def directory():
+>       fake = fx.FakeDirectory()
+               ^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_17_ldap.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.ldap_fixture.FakeDirectory object at 0x7fe97e0b4380>
+
+    def __init__(self) -> None:
+>       from ldap3 import MOCK_SYNC, Connection, Server
+E       ModuleNotFoundError: No module named 'ldap3'
+
+tests/ldap_fixture.py:45: ModuleNotFoundError
+____ ERROR at setup of test_17_r2_search_errors_are_run_errors_not_missing _____
+
+    @pytest.fixture
+    def directory():
+>       fake = fx.FakeDirectory()
+               ^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_17_ldap.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.ldap_fixture.FakeDirectory object at 0x7fe97e0b34d0>
+
+    def __init__(self) -> None:
+>       from ldap3 import MOCK_SYNC, Connection, Server
+E       ModuleNotFoundError: No module named 'ldap3'
+
+tests/ldap_fixture.py:45: ModuleNotFoundError
+=================================== FAILURES ===================================
+_________________ test_17_ldap_host_goes_through_egress_policy _________________
+
+    def test_17_ldap_host_goes_through_egress_policy():
+>       fake = fx.FakeDirectory()
+               ^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_17_ldap.py:98: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.ldap_fixture.FakeDirectory object at 0x7fe97e0b7830>
+
+    def __init__(self) -> None:
+>       from ldap3 import MOCK_SYNC, Connection, Server
+E       ModuleNotFoundError: No module named 'ldap3'
+
+tests/ldap_fixture.py:45: ModuleNotFoundError
+=========================== short test summary info ============================
+FAILED tests/unit/test_17_ldap.py::test_17_ldap_host_goes_through_egress_policy
+ERROR tests/unit/test_17_ldap.py::test_17_ldap_authenticate_by_account_name_email_and_upn
+ERROR tests/unit/test_17_ldap.py::test_17_ldap_wrong_password_unknown_and_empty_are_invalid_credentials
+ERROR tests/unit/test_17_ldap.py::test_17_ldap_filter_injection_is_escaped - ...
+ERROR tests/unit/test_17_ldap.py::test_17_ldap_disabled_account_reported_inactive
+ERROR tests/unit/test_17_ldap.py::test_17_ldap_unreachable_and_service_refused_are_unavailable
+ERROR tests/unit/test_17_ldap.py::test_17_ldap_find_by_id_and_email - ModuleN...
+ERROR tests/unit/test_17_ldap.py::test_17_ldap_probe - ModuleNotFoundError: N...
+ERROR tests/unit/test_17_ldap.py::test_17_r2_referrals_off - ModuleNotFoundEr...
+ERROR tests/unit/test_17_ldap.py::test_17_r2_user_bind_refusal_is_invalid_credentials[49]
+ERROR tests/unit/test_17_ldap.py::test_17_r2_user_bind_refusal_is_invalid_credentials[19]
+ERROR tests/unit/test_17_ldap.py::test_17_r2_user_bind_refusal_is_invalid_credentials[50]
+ERROR tests/unit/test_17_ldap.py::test_17_r2_user_bind_refusal_is_invalid_credentials[53]
+ERROR tests/unit/test_17_ldap.py::test_17_r2_search_errors_are_run_errors_not_missing
+1 failed, 2280 passed, 13 errors in 258.05s (0:04:18)
+test exit=1
+
+=== 17:06:02 make test airgap
+........................................................................ [  3%]
+........................................................................ [  6%]
+........................................................................ [  9%]
+..................................Exception occurred during processing of request from ('127.0.0.1', 44962)
+...................................... [ 12%]
+........................................................................ [ 15%]
+........................................................................ [ 18%]
+.............................................--- Logging error ---
+.Call stack:
+  File "/usr/local/lib/python3.12/threading.py", line 1012, in run
+    self._target(*self._args, **self._kwargs)
+  File "/opt/venv/lib/python3.12/site-packages/uvicorn/server.py", line 86, in run
+    return asyncio_run(self.serve(sockets=sockets), loop_factory=self.config.get_loop_factory())
+  File "/usr/local/lib/python3.12/asyncio/runners.py", line 195, in run
+    return runner.run(main)
+  File "/usr/local/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+  File "/opt/venv/lib/python3.12/site-packages/uvicorn/lifespan/on.py", line 86, in main
+    await app(scope, self.receive, self.send)
+  File "/opt/venv/lib/python3.12/site-packages/uvicorn/middleware/proxy_headers.py", line 30, in __call__
+    return await self.app(scope, receive, send)
+  File "/work/backend/tests/mcp_fixture.py", line 68, in app
+    await inner(scope, receive, send)
+  File "/opt/venv/lib/python3.12/site-packages/starlette/applications.py", line 96, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/opt/venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 151, in __call__
+    await self.app(scope, receive, send)
+.  File "/opt/venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 49, in __call__
+    await self.app(scope, receive, send)
+  File "/opt/venv/lib/python3.12/site-packages/starlette/routing.py", line 683, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/opt/venv/lib/python3.12/site-packages/starlette/routing.py", line 692, in app
+    await self.lifespan(scope, receive, send)
+  File "/opt/venv/lib/python3.12/site-packages/starlette/routing.py", line 661, in lifespan
+    async with self.lifespan_context(app) as maybe_state:
+  File "/usr/local/lib/python3.12/contextlib.py", line 217, in __aexit__
+    await anext(self.gen)
+  File "/opt/venv/lib/python3.12/site-packages/mcp/server/streamable_http_manager.py", line 166, in run
+    logger.info("StreamableHTTP session manager shutting down")
+Message: 'StreamableHTTP session manager shutting down'
+Arguments: ()
+......................... [ 21%]
+........................................................................ [ 25%]
+........................................................................ [ 28%]
+.....................................----------------------------------------................................... [ 31%]
+........................................................................ [ 34%]
+........................................................................ [ 37%]
+........................................................................ [ 40%]
+........................................................................ [ 43%]
+........................................................................ [ 47%]
+........................................................................ [ 50%]
+........................................................................ [ 53%]
+........................................................................ [ 56%]
+........................................................................ [ 59%]
+........................................................................ [ 62%]
+........................................................................ [ 65%]
+........................................................................ [ 69%]
+........................................................................ [ 72%]
+........................................................................ [ 75%]
+........................................................................ [ 78%]
+........................................................................ [ 81%]
+........................................................................ [ 84%]
+.EEEEEFEE..........EEEEEE............................................... [ 87%]
+........................................................................ [ 91%]
+........................................................................ [ 94%]
+........................................................................ [ 97%]
+..............................................................           [100%]
+==================================== ERRORS ====================================
+__ ERROR at setup of test_17_ldap_authenticate_by_account_name_email_and_upn ___
+
+    @pytest.fixture
+    def directory():
+>       fake = fx.FakeDirectory()
+               ^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_17_ldap.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.ldap_fixture.FakeDirectory object at 0x7f88a486a720>
+
+    def __init__(self) -> None:
+>       from ldap3 import MOCK_SYNC, Connection, Server
+E       ModuleNotFoundError: No module named 'ldap3'
+
+tests/ldap_fixture.py:45: ModuleNotFoundError
+_ ERROR at setup of test_17_ldap_wrong_password_unknown_and_empty_are_invalid_credentials _
+
+    @pytest.fixture
+    def directory():
+>       fake = fx.FakeDirectory()
+               ^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_17_ldap.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.ldap_fixture.FakeDirectory object at 0x7f88a4868950>
+
+    def __init__(self) -> None:
+>       from ldap3 import MOCK_SYNC, Connection, Server
+E       ModuleNotFoundError: No module named 'ldap3'
+
+tests/ldap_fixture.py:45: ModuleNotFoundError
+__________ ERROR at setup of test_17_ldap_filter_injection_is_escaped __________
+
+    @pytest.fixture
+    def directory():
+>       fake = fx.FakeDirectory()
+               ^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_17_ldap.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.ldap_fixture.FakeDirectory object at 0x7f88a486a600>
+
+    def __init__(self) -> None:
+>       from ldap3 import MOCK_SYNC, Connection, Server
+E       ModuleNotFoundError: No module named 'ldap3'
+
+tests/ldap_fixture.py:45: ModuleNotFoundError
+______ ERROR at setup of test_17_ldap_disabled_account_reported_inactive _______
+
+    @pytest.fixture
+    def directory():
+>       fake = fx.FakeDirectory()
+               ^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_17_ldap.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.ldap_fixture.FakeDirectory object at 0x7f88a486bb60>
+
+    def __init__(self) -> None:
+>       from ldap3 import MOCK_SYNC, Connection, Server
+E       ModuleNotFoundError: No module named 'ldap3'
+
+tests/ldap_fixture.py:45: ModuleNotFoundError
+_ ERROR at setup of test_17_ldap_unreachable_and_service_refused_are_unavailable _
+
+    @pytest.fixture
+    def directory():
+>       fake = fx.FakeDirectory()
+               ^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_17_ldap.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.ldap_fixture.FakeDirectory object at 0x7f88a4868890>
+
+    def __init__(self) -> None:
+>       from ldap3 import MOCK_SYNC, Connection, Server
+E       ModuleNotFoundError: No module named 'ldap3'
+
+tests/ldap_fixture.py:45: ModuleNotFoundError
+_____________ ERROR at setup of test_17_ldap_find_by_id_and_email ______________
+
+    @pytest.fixture
+    def directory():
+>       fake = fx.FakeDirectory()
+               ^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_17_ldap.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.ldap_fixture.FakeDirectory object at 0x7f88a486aa80>
+
+    def __init__(self) -> None:
+>       from ldap3 import MOCK_SYNC, Connection, Server
+E       ModuleNotFoundError: No module named 'ldap3'
+
+tests/ldap_fixture.py:45: ModuleNotFoundError
+_____________________ ERROR at setup of test_17_ldap_probe _____________________
+
+    @pytest.fixture
+    def directory():
+>       fake = fx.FakeDirectory()
+               ^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_17_ldap.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.ldap_fixture.FakeDirectory object at 0x7f88a489fd40>
+
+    def __init__(self) -> None:
+>       from ldap3 import MOCK_SYNC, Connection, Server
+E       ModuleNotFoundError: No module named 'ldap3'
+
+tests/ldap_fixture.py:45: ModuleNotFoundError
+__________________ ERROR at setup of test_17_r2_referrals_off __________________
+
+    @pytest.fixture
+    def directory():
+>       fake = fx.FakeDirectory()
+               ^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_17_ldap.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.ldap_fixture.FakeDirectory object at 0x7f88a4892210>
+
+    def __init__(self) -> None:
+>       from ldap3 import MOCK_SYNC, Connection, Server
+E       ModuleNotFoundError: No module named 'ldap3'
+
+tests/ldap_fixture.py:45: ModuleNotFoundError
+__ ERROR at setup of test_17_r2_user_bind_refusal_is_invalid_credentials[49] ___
+
+    @pytest.fixture
+    def directory():
+>       fake = fx.FakeDirectory()
+               ^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_17_ldap.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.ldap_fixture.FakeDirectory object at 0x7f88a48927e0>
+
+    def __init__(self) -> None:
+>       from ldap3 import MOCK_SYNC, Connection, Server
+E       ModuleNotFoundError: No module named 'ldap3'
+
+tests/ldap_fixture.py:45: ModuleNotFoundError
+__ ERROR at setup of test_17_r2_user_bind_refusal_is_invalid_credentials[19] ___
+
+    @pytest.fixture
+    def directory():
+>       fake = fx.FakeDirectory()
+               ^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_17_ldap.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.ldap_fixture.FakeDirectory object at 0x7f88a489f740>
+
+    def __init__(self) -> None:
+>       from ldap3 import MOCK_SYNC, Connection, Server
+E       ModuleNotFoundError: No module named 'ldap3'
+
+tests/ldap_fixture.py:45: ModuleNotFoundError
+__ ERROR at setup of test_17_r2_user_bind_refusal_is_invalid_credentials[50] ___
+
+    @pytest.fixture
+    def directory():
+>       fake = fx.FakeDirectory()
+               ^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_17_ldap.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.ldap_fixture.FakeDirectory object at 0x7f88a486b680>
+
+    def __init__(self) -> None:
+>       from ldap3 import MOCK_SYNC, Connection, Server
+E       ModuleNotFoundError: No module named 'ldap3'
+
+tests/ldap_fixture.py:45: ModuleNotFoundError
+__ ERROR at setup of test_17_r2_user_bind_refusal_is_invalid_credentials[53] ___
+
+    @pytest.fixture
+    def directory():
+>       fake = fx.FakeDirectory()
+               ^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_17_ldap.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.ldap_fixture.FakeDirectory object at 0x7f88a486bb90>
+
+    def __init__(self) -> None:
+>       from ldap3 import MOCK_SYNC, Connection, Server
+E       ModuleNotFoundError: No module named 'ldap3'
+
+tests/ldap_fixture.py:45: ModuleNotFoundError
+____ ERROR at setup of test_17_r2_search_errors_are_run_errors_not_missing _____
+
+    @pytest.fixture
+    def directory():
+>       fake = fx.FakeDirectory()
+               ^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_17_ldap.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.ldap_fixture.FakeDirectory object at 0x7f88a4893680>
+
+    def __init__(self) -> None:
+>       from ldap3 import MOCK_SYNC, Connection, Server
+E       ModuleNotFoundError: No module named 'ldap3'
+
+tests/ldap_fixture.py:45: ModuleNotFoundError
+=================================== FAILURES ===================================
+_________________ test_17_ldap_host_goes_through_egress_policy _________________
+
+    def test_17_ldap_host_goes_through_egress_policy():
+>       fake = fx.FakeDirectory()
+               ^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_17_ldap.py:98: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.ldap_fixture.FakeDirectory object at 0x7f88a4869df0>
+
+    def __init__(self) -> None:
+>       from ldap3 import MOCK_SYNC, Connection, Server
+E       ModuleNotFoundError: No module named 'ldap3'
+
+tests/ldap_fixture.py:45: ModuleNotFoundError
+=========================== short test summary info ============================
+FAILED tests/unit/test_17_ldap.py::test_17_ldap_host_goes_through_egress_policy
+ERROR tests/unit/test_17_ldap.py::test_17_ldap_authenticate_by_account_name_email_and_upn
+ERROR tests/unit/test_17_ldap.py::test_17_ldap_wrong_password_unknown_and_empty_are_invalid_credentials
+ERROR tests/unit/test_17_ldap.py::test_17_ldap_filter_injection_is_escaped - ...
+ERROR tests/unit/test_17_ldap.py::test_17_ldap_disabled_account_reported_inactive
+ERROR tests/unit/test_17_ldap.py::test_17_ldap_unreachable_and_service_refused_are_unavailable
+ERROR tests/unit/test_17_ldap.py::test_17_ldap_find_by_id_and_email - ModuleN...
+ERROR tests/unit/test_17_ldap.py::test_17_ldap_probe - ModuleNotFoundError: N...
+ERROR tests/unit/test_17_ldap.py::test_17_r2_referrals_off - ModuleNotFoundEr...
+ERROR tests/unit/test_17_ldap.py::test_17_r2_user_bind_refusal_is_invalid_credentials[49]
+ERROR tests/unit/test_17_ldap.py::test_17_r2_user_bind_refusal_is_invalid_credentials[19]
+ERROR tests/unit/test_17_ldap.py::test_17_r2_user_bind_refusal_is_invalid_credentials[50]
+ERROR tests/unit/test_17_ldap.py::test_17_r2_user_bind_refusal_is_invalid_credentials[53]
+ERROR tests/unit/test_17_ldap.py::test_17_r2_search_errors_are_run_errors_not_missing
+1 failed, 2280 passed, 13 errors in 227.14s (0:03:47)
+test-airgap exit=1
+
+=== 17:10:16 test-samples
+
+----------------------------------------------------------------------
+Ran 54 tests in 4.135s
+
+OK (skipped=5)
+samples exit=0
+
+=== 17:10:32 test-int
+........................................................................ [  5%]
+........................................................................ [ 10%]
+........................................................................ [ 15%]
+......................................................................s. [ 20%]
+........................................................................ [ 25%]
+.............................................................s.......... [ 30%]
+..................................test-int exit=137
+
+=== 17:16:45 smoke
+python scripts/smoke.py
+ok    DEPLOY_PROFILE=llmaas INFERENCE_BACKEND=ollama
+ok    database: application connects as ffcore_app
+ok    identity: local accounts only (LOCAL_LOGIN=all)
+ok    backend /healthz 200
+ok    litellm /health/liveliness 200, /key/info 404 (schema present)
+ok    langfuse /api/public/health 200, /api/public/projects 200
+ok    mcp-search /healthz 200
+ok    mcp-sql /healthz 200
+ok    sync-worker sync:health-check present
+ok    skipped: ollama profile inactive
+smoke: passed
+smoke exit=0
+
+=== 17:17:09 frontend typecheck/check:api/vitest (node, --network none, repo root)
