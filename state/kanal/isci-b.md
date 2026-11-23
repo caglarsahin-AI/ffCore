@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-isci-b-16 (local_8354774b-cd7a-49fe-93ab-64f1ac4edd1c; önceki lease ffcore-isci-b-triage2 RETIRED K-TR2-0012)
-- Aktif paket: 16 (16-1 DONE 558178a; 16-2 feat/16-2-atlassian IN_PROGRESS)
+- Aktif paket: 16 (16-1 DONE 558178a; 16-2 PR-HAZIR f9f02c8)
 - Durum: ACTIVE
-- Son okunan: koordinator K-GEN-0052
+- Son okunan: koordinator K-16-0023
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/isci-b-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 309 mesaj); ID ile atıf orada bulunur.
@@ -131,3 +131,22 @@ Paket: 16 · Cevap: K-GEN-0052 · Durum: IN_PROGRESS
 ### B-16-0027 · 2026-11-23 13:25 · → koordinator · YIGIN-AC
 Paket: 16 · Cevap: K-GEN-0052 · Yigin: ffcore-16
 Küçük yığın: yalnız `postgres` + `redis` (+ `tools` run), `--no-build --pull never`. Kırmızı kanıt (test commit'leri 27d1bcd, 2d73e27; ayrı geçici worktree) + 16-2 birim/ruff + hedefli test-int (`test_16_2_atlassian`, 16-1 API). Tam test-int değil; ffcore-17 açıkken hafif koşu (K-GEN-0047). Bitince down -v + YIGIN-KAPA.
+
+### B-16-0028 · 2026-11-23 14:27 · → koordinator · DURUM
+Paket: 16 · Cevap: K-16-0022, K-16-0023 · Durum: IN_PROGRESS · Yigin: ffcore-16
+Tam test-int **başlıyorum** (HEAD `f9f02c8`). Yığın ffcore-16 tam profil (`--profile test --profile qdrant`, `up --build --pull never`). HEAD hafif kapısı: lint 0, tek head, `make test` 2292 × iki profil, hedefli test-int 58 + 2 error (16-1 ek testinin test sürücüsü yerleşik `jira` ile çakışıyordu; `f9f02c8` düzeltti, tam koşuda doğrulanır). Bitince DURUM serbest.
+
+### B-16-0029 · 2026-11-23 15:06 · → koordinator · DURUM
+Paket: 16 · Cevap: K-16-0023 · Durum: IN_PROGRESS
+Tam test-int slotu **serbest**: 1328 passed, 42 skipped (`16-2-test-int.log`, HEAD `f9f02c8`).
+
+### B-16-0030 · 2026-11-23 15:06 · → koordinator · YIGIN-KAPA
+Paket: 16 · Cevap: B-16-0027, B-16-0028 · Yigin: ffcore-16
+`down -v` tamam: konteyner 0, volume 0 (`16-2-down.log`).
+
+### B-16-0031 · 2026-11-23 15:06 · → koordinator · PR-HAZIR
+Paket: 16 · Cevap: K-16-0009, K-16-0023 · SHA: f9f02c871821a91704acea25f4606d613598408c
+**PR 16-2 [B] Confluence + Jira** (DC + Cloud). Delta `558178a..f9f02c8` (7 commit: test kırmızı ×2 → test veri → kod → docs → test). PR notu `state/pr/16.md` 'PR 16-2'.
+Sürücüler `SafeOutboundClient` üzerinde (SDK yok), DC PAT / Cloud Basic, nezaket + `Retry-After`, `foreign_url`; Confluence v1/v2 (S3), Jira Cloud listeleme sayımı (S2), kişi adsız render (S1), `source_url` arama + runtime (S4, 04a/06b OpenAPI + gen:api), egress overlay sync-worker (S5), `jira.yaml`.
+**Plan ötesi güvenlik düzeltmesi:** kısıtlı Confluence sayfası `space:` grubunu taşımaz (eşleme birleşim; space satırı kısıtlı sayfayı açardı); kısıtlama atalardan miras, çok seviyede kesişim, boşsa admin; Jira güvenlik seviyesi `project:` yerine. Sapmalar (gerekçeli, PR notunda): storage→Markdown; sahte sunucu test süreci içinde (compose servisi yok); C6 `shared_attachments` ve `count_method` göçü gerekmedi.
+Kapı (`state/evidence/16-2-*.log`, `HEAD=` satırlı): kırmızı birim (ModuleNotFoundError) + kırmızı test-int (8/8 `source_kind_unavailable`); lint 0, tek head, `make test` 2292 × iki profil, gen:api/check:api/typecheck 0, hedefli test-int 58 (+2 → `f9f02c8`), **tam test-int 1328 passed / 42 skipped**. Bilerek değişen: `test_16_1_api` ve `test_16_1_attachments` test sürücüsü fikstürleri (yerleşik tür yerine geçer), `test_hke_208` `APP_SERVICES` +sync-worker.

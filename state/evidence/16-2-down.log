@@ -1,0 +1,5 @@
+HEAD=f9f02c871821a91704acea25f4606d613598408c 2026-11-23 15:05:38 down -v
+ Volume ffcore-16_langfuse_clickhouse_data  Removed
+ Volume ffcore-16_langfuse_clickhouse_logs  Removed
+ Volume ffcore-16_qdrant_data  Removed
+containers=0 volumes=0

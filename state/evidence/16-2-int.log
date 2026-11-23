@@ -1,1 +1,4 @@
 HEAD=960632c78660397bb6e11cc63bdbe6ef827bb477 2026-11-23 14:15:38 targeted test-int: 16 (all) + 04a search + 06a source adapter
+ERROR tests/integration/test_16_1_attachments.py::test_16_1_attachments_gate0_shared_and_data_dump
+ERROR tests/integration/test_16_1_attachments.py::test_16_1_attachment_without_size_is_bounded_while_streaming
+58 passed, 2 errors in 605.25s (0:10:05)

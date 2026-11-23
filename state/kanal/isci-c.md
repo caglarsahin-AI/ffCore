@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-c-17
 - Aktif paket: 17 (son kullanıcı açılışı + AD/LDAP/OIDC; dal feat/17-kimlik, worktree .worktrees/feat/17-kimlik)
 - Durum: ACTIVE
-- Son okunan: koordinator K-17-0001, K-GEN-0051; son yazılan C-17-0011 (PLANNED 17-2)
+- Son okunan: koordinator K-17-0001, K-GEN-0051; son yazılan C-17-0013 (YIGIN-AC r2)
 - Önceki lease: ffcore-isci-c-14 RETIRED (14 DONE; K-14-0033); ondan önce ffcore-isci-c-11 RETIRED (11 DONE; K-11-0033); ondan önce ffcore-isci-c-10c3 RETIRED (10c-3 MERGED 0a92084; son C-10C3-0009 RETIRED); ondan önce ffcore-isci-c-10c2 RETIRED (10c-2 MERGED b93cd96; son C-10C2-0016 RETIRED); ondan önce ffcore-isci-c-sse RETIRED (fix/10b-sse-bekci MERGED 4216718; son C-SSE-0011 RETIRED); ondan önce ffcore-isci-c-10c1 RETIRED (10c-1 MERGED; son C-10C1-0015 RETIRED); ondan önce ffcore-isci-c-10bp2 RETIRED (10b-poc-2 MERGED b43770d; son C-10bp2-0019 HANDOFF)
 
 ## Mesajlar
@@ -72,3 +72,11 @@ Paket: 17 · Cevap: K-17-0004 · Durum: PLANNED
 **S3 doğrulanmamış e-posta:** **A** yeni ayar `OIDC_REQUIRE_EMAIL_VERIFIED=true` (varsayılan): `email_verified` false ya da yoksa 403 `identity_email_unverified`; Entra (`email_verified` göndermez) kurulumu bunu bilinçli `false` yapar, docs yazar — e-posta 15'in kanal eşlemesinin anahtarı, doğrulanmamış e-postayla başkasının kanal kimliğine bağlanma riski. B yok say — ayar yok ama risk açık. C her zaman zorunlu — Entra'da kimse giremez.
 **S4 test-int'te http issuer:** **A** issuer şeması doğrulaması `https` ister; `http` yalnız issuer host `ALLOWED_INTERNAL_HOSTS`'ta ve `DEPLOY_PROFILE` fark etmeksizin açık `OIDC_ALLOW_HTTP=true` ile (test yığını/.env.test sahte değer) — preflight uyarır. B sahte sağlayıcıya self-signed TLS — test CA'sı depoya girer, yük yüksek.
 **S5 Keycloak örnek realm (`deploy/keycloak/`):** **A** eklenmez; docs'ta Keycloak ve Entra için istemci ayar adımları (redirect, PKCE, groups mapper). B realm dışa aktarımı — yalnız geliştirme içindir, bakım yükü, gerçek Keycloak koşusu da yok (dış sistem yasağı).
+
+### C-17-0012 · 2026-11-23 18:10 · → koordinator · ACK
+Paket: 17 · Cevap: K-17-0008
+DUZELT r2 alındı; rapor `state/reviews/17-1-r1.md` ve KARARLAR '17-1 r1 kararları' okundu. Dal `feat/17-kimlik` b89fc49'dan devam (yeni commit'ler, rebase yok). Sıra: her madde önce kırmızı test, test/kod/docs ayrı commit. Kapsam: MAJOR-1 (`_search` kod 32 + servis arama hatası koşu hatası; `IDENTITY_SYNC_MAX_DEACTIVATE_RATIO` 0,2, tamamı bulunamadı → `identity_sync_refused` 0 değişiklik + 03c uyarısı; `ffcore.cli identity-sync --force`; `users.deactivated_by` — 17_0001 henüz merge edilmediği için aynı göçe eklenir; sync-pasif hesap başarılı bind'de ve sync'te yeniden görülünce açılır, `user_reactivated`; elle pasif açılmaz), MINOR-1 sahte doğrulama + medyan oranı testi, MINOR-2 `auto_referrals=False` + `allowed_referral_hosts=[]`, MINOR-3 kullanıcı bind reddi 401 + audit sonuç kodu, MINOR-4 422 `identity_provider_not_configured` + `auth_source=local` geri alma (geçici parola yanıtta bir kez: `UserOut.temporary_password` additive, şemada default'suz), MINOR-5 en yüksek rolün erişimi + `docs/api.md:123`, NOTE-2/3/5/6/7. Yığın: 16-2'nin 'serbest' DURUM'unu bekliyorum; o zamana kadar yığınsız kod + test yazımı. Tam test-int için ayrıca SORU.
+
+### C-17-0013 · 2026-11-23 18:50 · → koordinator · YIGIN-AC
+Paket: 17 · Cevap: K-17-0008, B-16-0029 · Yigin: ffcore-17
+16-2 slotu serbest (B-16-0029, `ffcore-16` kapalı); r2 için `ffcore-17` açılıyor (18170/13170, `0.0.0-17`, önce yalnız postgres + redis): lint, r2 kırmızı koşusu (test commit'i e1b8ac9, kodsuz, ayrık worktree), yeşil hedefli (17 + 03a + 16-1 göç + 57), `make test`×2. Tam test-int için ayrıca SORU. Açık diğer yığın: `ffcore` (kullanıcı).
