@@ -88,7 +88,12 @@ def test_03a_4_inactive_user_401(make_user, client_factory, pg):
     pg.execute("UPDATE users SET is_active = false WHERE id = %s", (user_id,))
     assert client.get(ME).status_code == 401
     retry = client_factory().post(LOGIN, json={"email": email, "password": PASSWORD})
-    assert retry.status_code == 401
+    # 17 (brief: "Pasif kullanıcı girişte 403 user_inactive"): after a correct password only;
+    # a wrong password stays the plain 401, so the state leaks nothing to a guesser.
+    assert retry.status_code == 403
+    assert retry.json()["error"]["code"] == "user_inactive"
+    wrong = client_factory().post(LOGIN, json={"email": email, "password": "wrong-0000000000"})
+    assert wrong.status_code == 401
 
 
 def test_03a_4_password_hash_is_argon2(make_user, client_factory, pg):
