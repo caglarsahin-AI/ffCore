@@ -43,7 +43,7 @@ def test_17_migration_schema_and_roundtrip(scratch_db):
     ).fetchone()[0]
     assert nullable == "YES"
 
-    db.run("downgrade", "14_0001")
+    db.run("downgrade", "16_0001")
     assert "identity_group_mappings" not in db.tables()
     assert "auth_source" not in _columns(db, "users")
     db.run("upgrade", "head")
@@ -57,7 +57,7 @@ def test_17_migration_downgrade_refuses_with_directory_accounts(scratch_db):
         " VALUES (%s, 'dir@example.test', NULL, 'D', 'ldap', 'guid-1')",
         (uuid.uuid4(),),
     )
-    done = db.alembic("downgrade", "14_0001")
+    done = db.alembic("downgrade", "16_0001")
     assert done.returncode != 0
     assert "17_0001 downgrade refused" in done.stderr
     assert "identity_group_mappings" in db.tables()
