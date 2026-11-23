@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-isci-b-16 (local_8354774b-cd7a-49fe-93ab-64f1ac4edd1c; önceki lease ffcore-isci-b-triage2 RETIRED K-TR2-0012)
-- Aktif paket: 16 (16-2 PR-HAZIR f9f02c8 incelemede; 16-3 PLANNED)
+- Aktif paket: 16 (16-2 r2 IN_PROGRESS feat/16-2-atlassian; 16-3 PLAN-ONAY, hazırlık scratchpad)
 - Durum: ACTIVE
-- Son okunan: koordinator K-16-0026
+- Son okunan: koordinator (16-2 r2 durum sorusu)
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/isci-b-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 309 mesaj); ID ile atıf orada bulunur.
@@ -166,3 +166,15 @@ Açık sorular (A önerilen, ayrıntı ve etkiler PR notunda):
 ### B-16-0033 · 2026-11-23 15:13 · → koordinator · ACK
 Paket: 16 · Cevap: K-16-0026
 16-3 PLAN-ONAY alındı (S1-S6 A; `source-cards.tsx` zone eki; iki PR: 16-3-1 backend, 16-3-2 ekranlar). 16-2 merge'üne kadar yığınsız hazırlık: SharePoint sürücüsü, sahte Graph, birim testleri scratchpad'de (not dosyası `side-session-notes/.../isci-b-16-3-hazirlik.md`). Dal `feat/16-3-ekran` merge sonrası.
+
+### B-16-0034 · 2026-11-23 15:35 · → koordinator · ACK
+Paket: 16 · Cevap: K-16-0027 · Durum: IN_PROGRESS
+16-2 r2 alındı (R-16-0013 B0 M1 m3 N9). Sıra her maddede kırmızı test → kod → docs (ayrı commit): MAJOR-1 kısıtlı (`visibility`) ve iç (`jsdPublic: false`) Jira yorumları belgeye girmez; MINOR-1 `FULL_SYNC_EVERY_DAYS` (7, 0 kapalı) zamanlayıcıda; MINOR-2 indirmede 2xx dışı → `attachment_download_failed`, Jira ek `redirect=false`, docs `api.media.atlassian.com`; MINOR-3 `[~…]` ve `ri:user` anmaları düşer; NOTE-1/3/4/6/7, NOTE-9 `compose config` kanıtı. Yığın ffcore-16 hafif (postgres+redis+tools), YIGIN-AC ayrıca. 16-3 hazırlığı beklemede.
+
+### B-16-0035 · 2026-11-23 15:43 · → koordinator · YIGIN-AC
+Paket: 16 · Cevap: K-16-0027 · Yigin: ffcore-16
+Hafif yığın: `postgres` + `redis` (+ `tools` run), `--no-build --pull never`. r2 kırmızı (test commit'i `5b10a61`, geçici worktree) → kod üzerinde birim/ruff + hedefli 16 test-int + egress `compose config` kanıtı; sonra HEAD'de `make test` × 2. Tam test-int yok. Bitince down -v + YIGIN-KAPA.
+
+### B-16-0036 · 2026-11-23 16:36 · → koordinator · DURUM
+Paket: 16 · Cevap: K-16-0027 · Durum: IN_PROGRESS · Yigin: ffcore-16
+r2 kodu ve testleri yazıldı (kırmızı test commit'i `5b10a61`; kod ve docs commit'lenmedi). Kırmızı koşu 15:44'te askıda kaldı: eski kod, NOTE-1 testindeki kendine işaret eden `next` bağlantısını sonsuza dek izledi (bulgunun kendisi). Konteyner adıyla kaldırıldı. Şimdi kırmızı koşu süre sınırıyla yeniden: döngü testleri `timeout 60` altında ayrı (`16-2-r2-red.log`), sonra birim/ruff (`16-2-r2-unit.log`), hedefli 16 test-int (`16-2-r2-int.log`), egress `compose config` (`16-2-r2-egress-config.log`). Tahmini 25 dk; sonra commit, `make test` × 2, YIGIN-KAPA, PR-HAZIR r2.

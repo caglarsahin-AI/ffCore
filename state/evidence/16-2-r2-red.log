@@ -1,0 +1,60 @@
+HEAD=5b10a613a1386c9bbbded5fe4594542ca260e75d 2026-11-23 16:37:49 r2 red: tests only (code at f9f02c8)
+E   AttributeError: module 'ffcore.sources.scheduler' has no attribute 'scheduled_mode'
+/work/backend/tests/unit/test_16_2_r2.py:242: AttributeError: module 'ffcore.sources.scheduler' has no attribute 'scheduled_mode'
+E   AttributeError: module 'ffcore.sources.scheduler' has no attribute 'scheduled_mode'
+/work/backend/tests/unit/test_16_2_r2.py:242: AttributeError: module 'ffcore.sources.scheduler' has no attribute 'scheduled_mode'
+E   AttributeError: module 'ffcore.sources.scheduler' has no attribute 'scheduled_mode'
+/work/backend/tests/unit/test_16_2_r2.py:242: AttributeError: module 'ffcore.sources.scheduler' has no attribute 'scheduled_mode'
+E   AttributeError: module 'ffcore.sources.scheduler' has no attribute 'scheduled_mode'
+/work/backend/tests/unit/test_16_2_r2.py:242: AttributeError: module 'ffcore.sources.scheduler' has no attribute 'scheduled_mode'
+E   AttributeError: module 'ffcore.sources.scheduler' has no attribute 'scheduled_mode'
+/work/backend/tests/unit/test_16_2_r2.py:242: AttributeError: module 'ffcore.sources.scheduler' has no attribute 'scheduled_mode'
+E   AttributeError: 'Settings' object has no attribute 'full_sync_every_days'
+/opt/venv/lib/python3.12/site-packages/pydantic/main.py:1105: AttributeError: 'Settings' object has no attribute 'full_sync_every_days'
+E   AssertionError: assert ('security:Yonetim',) == ('security:OPS/Yonetim',)
+      
+      At index 0 diff: 'security:Yonetim' != 'security:OPS/Yonetim'
+      Use -v to get more diff
+/work/backend/tests/unit/test_16_2_drivers.py:345: AssertionError: assert ('security:Yonetim',) == ('security:OPS/Yonetim',)
+=========================== short test summary info ============================
+FAILED tests/unit/test_16_2_r2.py::test_16_2_r2_restricted_and_internal_comments_stay_out
+FAILED tests/unit/test_16_2_r2.py::test_16_2_r2_mentions_are_dropped - Assert...
+FAILED tests/unit/test_16_2_r2.py::test_16_2_r2_script_and_style_bodies_are_dropped
+FAILED tests/unit/test_16_2_r2.py::test_16_2_r2_security_level_is_named_per_project
+FAILED tests/unit/test_16_2_r2.py::test_16_2_r2_space_keys_are_quoted_in_cql
+FAILED tests/unit/test_16_2_r2.py::test_16_2_r2_broken_retry_after_falls_back_to_the_default_wait[nan]
+FAILED tests/unit/test_16_2_r2.py::test_16_2_r2_broken_retry_after_falls_back_to_the_default_wait[inf]
+FAILED tests/unit/test_16_2_r2.py::test_16_2_r2_broken_retry_after_falls_back_to_the_default_wait[-5]
+FAILED tests/unit/test_16_2_r2.py::test_16_2_r2_a_download_answer_other_than_2xx_fails_loud[302]
+FAILED tests/unit/test_16_2_r2.py::test_16_2_r2_a_download_answer_other_than_2xx_fails_loud[304]
+FAILED tests/unit/test_16_2_r2.py::test_16_2_r2_a_download_answer_other_than_2xx_fails_loud[401]
+FAILED tests/unit/test_16_2_r2.py::test_16_2_r2_a_download_answer_other_than_2xx_fails_loud[500]
+FAILED tests/unit/test_16_2_r2.py::test_16_2_r2_jira_attachment_download_asks_without_redirect
+FAILED tests/unit/test_16_2_r2.py::test_16_2_r2_scheduled_mode[last_full0-7-full]
+FAILED tests/unit/test_16_2_r2.py::test_16_2_r2_scheduled_mode[last_full1-7-full]
+FAILED tests/unit/test_16_2_r2.py::test_16_2_r2_scheduled_mode[last_full2-7-delta]
+FAILED tests/unit/test_16_2_r2.py::test_16_2_r2_scheduled_mode[None-7-full]
+FAILED tests/unit/test_16_2_r2.py::test_16_2_r2_scheduled_mode[last_full4-0-delta]
+FAILED tests/unit/test_16_2_r2.py::test_16_2_r2_scheduled_mode[None-0-delta]
+FAILED tests/unit/test_16_2_r2.py::test_16_2_r2_full_sync_every_days_setting
+FAILED tests/unit/test_16_2_drivers.py::test_16_2_jira_dc_listing_count_render_without_names
+21 failed, 14 passed, 2 deselected in 11.10s
+rc=0
+loop test under timeout 60: tests/unit/test_16_2_r2.py::test_16_2_r2_a_self_pointing_next_link_is_a_pagination_loop
+exit=124 (124 = still following pages after 60 s)
+loop test under timeout 60: tests/unit/test_16_2_r2.py::test_16_2_r2_a_repeated_jira_page_token_is_a_pagination_loop
+exit=124 (124 = still following pages after 60 s)
+E   AssertionError: gizliyorum
+E   assert (not True)
+E    +  where True = found({'settings': Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('****...en0/sources'), 'root': PosixPath('/tmp/pytest-of-root/pytest-0/test_16_2_r2_restricted_commen0/sources/paylasim'), ...}, 'analyst', 'gizliyorum')
+2026-11-23 13:40:55,242 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 13:40:55,410 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+E   AssertionError: assert 'delta' == 'full'
+E     
+E     - full
+E     + delta
+FAILED tests/integration/test_16_2_r2.py::test_16_2_r2_restricted_comments_never_reach_the_index
+FAILED tests/integration/test_16_2_r2.py::test_16_2_r2_scheduled_run_is_full_once_a_week
+2 failed in 17.71s

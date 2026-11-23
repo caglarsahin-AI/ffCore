@@ -1,0 +1,82 @@
+HEAD=5b10a613a1386c9bbbded5fe4594542ca260e75d 2026-11-23 16:41:05 r2 code (uncommitted) lint + 16 unit
+ M .env.example
+ M backend/ffcore/core/config.py
+ M backend/ffcore/sources/atlassian.py
+ M backend/ffcore/sources/confluence.py
+ M backend/ffcore/sources/jira.py
+ M backend/ffcore/sources/scheduler.py
+ M backend/ffcore/sources/storage_format.py
+ M deploy/docker-compose.yml
+E501 Line too long (150 > 100)
+ --> ffcore/sources/scheduler.py:7:101
+  |
+5 | …run when the source's last completed
+6 | … permission narrowed at the source
+7 | …t anyone starting one; D4 applies). A source with an active run keeps it (the partial unique
+  |                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+8 | …
+9 | …
+  |
+
+E501 Line too long (104 > 100)
+  --> tests/unit/test_16_2_r2.py:29:101
+   |
+28 | def jira(settings, deployment="server", base="https://jira.example.test"):
+29 |     secret = {"token": PAT} if deployment == "server" else {"email": "s@example.test", "api_token": PAT}
+   |                                                                                                     ^^^^
+30 |     spec = SourceSpec(id="j", kind="jira", deployment=deployment, config={"base_url": base})
+31 |     return JiraDriver(spec, secret, None, settings)
+   |
+
+E501 Line too long (103 > 100)
+  --> tests/unit/test_16_2_r2.py:43:101
+   |
+42 | def issue_raw(**fields):
+43 |     issue = {"key": "OPS-1", "fields": {"summary": "Zaman aşımı", "project": {"key": "OPS"}, **fields}}
+   |                                                                                                     ^^^
+44 |     return RawPayload(content=json.dumps(issue).encode(), ext="json")
+   |
+
+E501 Line too long (114 > 100)
+  --> tests/unit/test_16_2_r2.py:56:101
+   |
+54 |     raw = issue_raw(comment={"comments": [
+55 |         {"body": "Herkese açık çözüm notu.", "created": "2026-03-01T10:00:00.000+0300"},
+56 |         {"body": "Yalnız yöneticiler: müşteri adı X.", "visibility": {"type": "role", "value": "Administrators"}},
+   |                                                                                                     ^^^^^^^^^^^^^^
+57 |         {"body": "Yalnız ekip: iç maliyet.", "visibility": {"type": "group", "value": "jira-ops"}},
+58 |         {"body": "Servis masası iç notu.", "jsdPublic": False},
+   |
+
+E501 Line too long (104 > 100)
+  --> tests/unit/test_16_2_r2.py:66:101
+   |
+64 |         assert hidden not in text
+65 |     # Numbering counts the comments in the document only (no gap that tells one was left out).
+66 |     assert "## Comment 1 (2026-03-01)" in text and "## Comment 2" in text and "## Comment 3" not in text
+   |                                                                                                     ^^^^
+
+E501 Line too long (104 > 100)
+  --> tests/unit/test_16_2_r2.py:79:101
+   |
+77 |         '<p>Sorumlu <ac:link><ri:user ri:userkey="8a7f"/></ac:link> ve '
+78 |         '<ac:link><ri:user ri:account-id="557058"/><ac:link-body>Ayse Kaya</ac:link-body></ac:link>'
+79 |         ' ile görüşüldü; <ac:link><ri:page ri:content-title="Kurallar"/></ac:link> sayfasına bakın.</p>'
+   |                                                                                                     ^^^^
+80 |     )
+81 |     md = to_markdown(storage).markdown
+   |
+
+E501 Line too long (107 > 100)
+  --> tests/unit/test_16_2_r2.py:90:101
+   |
+89 | def test_16_2_r2_script_and_style_bodies_are_dropped():
+90 |     md = to_markdown("<p>Metin</p><script>alert(1)</script><style>p{color:red}</style><p>Son</p>").markdown
+   |                                                                                                     ^^^^^^^
+91 |     assert "alert" not in md and "color" not in md and "Metin" in md and "Son" in md
+   |
+
+Found 7 errors.
+........................................................................ [ 61%]
+.............................................                            [100%]
+117 passed in 15.44s
