@@ -51,6 +51,11 @@ dependencies = [
     "langgraph-checkpoint-postgres==3.1.3",
     "langchain-core==1.6.10",
     "psycopg-pool==3.3.3",
+    # 17 directory sign-in (K-17-0002): pure-Python LDAP client with an in-process MOCK_SYNC
+    # server for tests; pyasn1 is its BER codec, pinned here so the offline wheel set is exact.
+    # OIDC needs no new package (PyJWT + cryptography + httpx2, KARARLAR '17 plan kararları').
+    "ldap3==2.9.1",
+    "pyasn1==0.6.1",
 ]
 
 [dependency-groups]

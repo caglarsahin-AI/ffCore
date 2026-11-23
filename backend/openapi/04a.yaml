@@ -2067,9 +2067,9 @@ components:
       - developer
       - admin
       title: Role
-      description: 'Fixed roles, ordered user < analyst < developer < admin. `developer` and `user` are
+      description: 'Fixed roles, ordered user < analyst < developer < admin. `developer` is reserved and
 
-        reserved in the PoC and cannot be assigned yet.'
+        cannot be assigned yet; `user` (end user: chat, own memory, channels) is assignable since 17.'
     ScoreStats:
       properties:
         threshold:

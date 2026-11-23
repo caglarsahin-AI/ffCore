@@ -17,6 +17,7 @@ import logging
 
 from ffcore.core import db, tracing
 from ffcore.core.config import get_settings
+from ffcore.core.identity import identity_sync
 from ffcore.core.logging import configure_logging
 from ffcore.core.prompts import PromptStore
 from ffcore.memory.jobs import extract_memories
@@ -168,6 +169,8 @@ def cron_jobs_for(job_class: JobClass) -> list:
         cron(clear_source_deleted, second=45, unique=True),
         cron(audit_partitions, hour=2, minute=30, second=0, unique=True),
         cron(run_retention, hour=3, minute=0, second=0, unique=True),
+        # 17 (K-17-0002 S4): directory deactivation pass, no model slot.
+        cron(identity_sync, hour=4, minute=15, second=0, unique=True),
         # 09: exam advancer (K-09-0007 S4), every EVAL_ADVANCE_INTERVAL_S seconds.
         cron(
             advance_eval_runs,

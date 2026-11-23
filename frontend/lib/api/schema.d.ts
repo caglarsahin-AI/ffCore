@@ -16,7 +16,9 @@ export interface paths {
         /**
          * Sign in with email and password
          * @description Sets the `ffcore_session` cookie (HttpOnly, SameSite=Strict, Secure). A wrong email or
-         *     password gives the same 401 `invalid_credentials`.
+         *     password gives the same 401 `invalid_credentials`. 17: with LDAP on, a directory login (email,
+         *     UPN or account name) signs in through the directory; the account row decides the path, and an
+         *     unreachable directory is 503 `identity_provider_unavailable` (no local fallback).
          */
         post: operations["login_api_v1_auth_login_post"];
         delete?: never;
@@ -546,6 +548,17 @@ export interface components {
             full_name: string;
             /** Is Superadmin */
             is_superadmin: boolean;
+            /**
+             * Auth Source
+             * @default local
+             * @enum {string}
+             */
+            auth_source: "local" | "ldap" | "oidc";
+            /**
+             * Must Change Password
+             * @default false
+             */
+            must_change_password: boolean;
         };
         /** DriverField */
         DriverField: {
@@ -1117,8 +1130,8 @@ export interface components {
         };
         /**
          * Role
-         * @description Fixed roles, ordered user < analyst < developer < admin. `developer` and `user` are
-         *     reserved in the PoC and cannot be assigned yet.
+         * @description Fixed roles, ordered user < analyst < developer < admin. `developer` is reserved and
+         *     cannot be assigned yet; `user` (end user: chat, own memory, channels) is assignable since 17.
          * @enum {string}
          */
         Role: "user" | "analyst" | "developer" | "admin";
@@ -1169,6 +1182,19 @@ export interface components {
              * Format: date-time
              */
             updated_at: string;
+            /**
+             * Auth Source
+             * @default local
+             * @enum {string}
+             */
+            auth_source: "local" | "ldap" | "oidc";
+            /** Last Login At */
+            last_login_at?: string | null;
+            /**
+             * Must Change Password
+             * @default false
+             */
+            must_change_password: boolean;
         };
         /** UserUpdate */
         UserUpdate: {
@@ -1179,6 +1205,12 @@ export interface components {
             /** Is Superadmin */
             is_superadmin?: boolean;
             superadmin_access?: components["schemas"]["AccessMode"] | null;
+            /**
+             * Auth Source
+             * @description Link this local account to the directory (ldap or oidc). Its password is deleted; it then signs in only with the organisation account.
+             * @enum {string}
+             */
+            auth_source?: "ldap" | "oidc";
         };
     };
     responses: never;

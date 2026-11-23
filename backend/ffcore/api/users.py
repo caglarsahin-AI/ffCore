@@ -16,7 +16,7 @@ from ffcore.api.common import (
     path_resource,
 )
 from ffcore.api.schemas import UserCreate, UserList, UserOut, UserUpdate
-from ffcore.core.audit import audited
+from ffcore.core.audit import AuditEntry, audited, request_context, write_event
 from ffcore.core.auth import Actor, require_superadmin
 from ffcore.core.passwords import hash_password
 from ffcore.models.identity import User
@@ -95,6 +95,37 @@ async def update_user(
     access = changes.get("superadmin_access", user.superadmin_access)
     if superadmin and access is None:
         raise invalid("superadmin_access_required", "A superadmin needs an access mode.")
+    # 17: a superadmin is always a local account (the recovery account).
+    link = changes.pop("auth_source", None)
+    source = link or user.auth_source
+    if superadmin and source != "local":
+        raise invalid("superadmin_must_be_local", "A superadmin must be a local account.")
+    if link is not None and link != user.auth_source:
+        if user.auth_source != "local":
+            raise invalid(
+                "auth_source_change_invalid", "Only a local account can be linked to the directory."
+            )
+        # K-17-0002 S1: the password is deleted and every session ends; the next directory
+        # sign-in with this email binds the account (memberships and history stay).
+        user.auth_source = link
+        user.password_hash = None
+        user.external_id = None
+        user.must_change_password = False
+        user.token_version += 1
+        await write_event(
+            session,
+            AuditEntry(
+                action="user_identity_linked",
+                resource_type="user",
+                outcome="success",
+                actor_type=actor.actor_type,
+                actor_id=actor.actor_id,
+                resource_id=str(user.id),
+                after={"auth_source": link, "password_deleted": True},
+                request_id=request_context(request)[0],
+                ip=request_context(request)[1],
+            ),
+        )
     for field, value in changes.items():
         setattr(user, field, value)
     if not superadmin:

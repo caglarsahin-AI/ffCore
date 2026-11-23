@@ -27,8 +27,8 @@ ModelKey = Annotated[
 
 
 class Role(StrEnum):
-    """Fixed roles, ordered user < analyst < developer < admin. `developer` and `user` are
-    reserved in the PoC and cannot be assigned yet."""
+    """Fixed roles, ordered user < analyst < developer < admin. `developer` is reserved and
+    cannot be assigned yet; `user` (end user: chat, own memory, channels) is assignable since 17."""
 
     user = "user"
     analyst = "analyst"
@@ -95,11 +95,18 @@ class Membership(BaseModel):
     access: AccessMode
 
 
+AuthSource = Literal["local", "ldap", "oidc"]
+
+
 class CurrentUser(BaseModel):
     id: UUID
     email: str
     full_name: str
     is_superadmin: bool
+    # 17 (additive): where the identity lives; a directory account has no password here.
+    auth_source: AuthSource = "local"
+    # 17: set by the CSV import; the console sends the user to the password screen first.
+    must_change_password: bool = False
 
 
 class MeResponse(BaseModel):
@@ -124,6 +131,10 @@ class UserOut(BaseModel):
     superadmin_access: AccessMode | None
     created_at: datetime
     updated_at: datetime
+    # 17 (additive)
+    auth_source: AuthSource = "local"
+    last_login_at: datetime | None = None
+    must_change_password: bool = False
 
 
 class UserCreate(Strict):
@@ -141,6 +152,13 @@ class UserUpdate(Patch):
     is_active: bool = Field(default=None)
     is_superadmin: bool = Field(default=None)
     superadmin_access: AccessMode | None = Field(default=None)
+    # 17 (K-17-0002 S1): link a local account to the directory. The password is removed and
+    # every session ends; the next directory sign-in with the same email binds the account.
+    auth_source: Literal["ldap", "oidc"] = Field(
+        default=None,
+        description="Link this local account to the directory (ldap or oidc). Its password "
+        "is deleted; it then signs in only with the organisation account.",
+    )
 
 
 class UserList(BaseModel):

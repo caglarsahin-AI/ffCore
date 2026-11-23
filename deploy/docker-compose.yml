@@ -125,6 +125,23 @@ x-app-env: &app-env
   EVAL_JUDGE_CALL_S: ${EVAL_JUDGE_CALL_S:-60}
   # 14 user memory: profile value (.env.example; llmaas 0.6, airgap 0.7).
   MEMORY_MIN_CONFIDENCE: ${MEMORY_MIN_CONFIDENCE:-0.6}
+  # 17 directory sign-in (.env.example; LDAP_URL empty = LDAP off). Passed so a value in .env
+  # is never ignored; the bind password is a secret like the other keys here.
+  LOCAL_LOGIN: ${LOCAL_LOGIN:-all}
+  LDAP_URL: ${LDAP_URL:-}
+  LDAP_ALLOW_PLAINTEXT: ${LDAP_ALLOW_PLAINTEXT:-false}
+  LDAP_BIND_DN: ${LDAP_BIND_DN:-}
+  LDAP_BIND_PASSWORD: ${LDAP_BIND_PASSWORD:-}
+  LDAP_USER_BASE: ${LDAP_USER_BASE:-}
+  # Empty = the settings default; a default here would end at its first } (compose syntax).
+  LDAP_USER_FILTER: ${LDAP_USER_FILTER:-}
+  LDAP_GROUP_ATTR: ${LDAP_GROUP_ATTR:-memberOf}
+  LDAP_ID_ATTR: ${LDAP_ID_ATTR:-objectGUID}
+  LDAP_CA_FILE: ${LDAP_CA_FILE:-}
+  LDAP_TIMEOUT_S: ${LDAP_TIMEOUT_S:-10}
+  DEFAULT_PROJECT_FOR_NEW_USERS: ${DEFAULT_PROJECT_FOR_NEW_USERS:-}
+  AUTO_PROVISION_FROM_CHANNELS: ${AUTO_PROVISION_FROM_CHANNELS:-false}
+  OIDC_INACTIVE_AFTER_DAYS: ${OIDC_INACTIVE_AFTER_DAYS:-90}
   # 03c API keys: failed attempts per client address per minute; last_used_at write buffer.
   API_KEY_AUTH_FAILURES_PER_MIN: ${API_KEY_AUTH_FAILURES_PER_MIN:-20}
   API_KEY_LAST_USED_FLUSH_S: ${API_KEY_LAST_USED_FLUSH_S:-60}
