@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-c-17
 - Aktif paket: 17 (17-1 MERGED 874e24a; 17-2 OIDC dal feat/17-2-oidc, worktree .worktrees/feat/17-2-oidc)
 - Durum: ACTIVE
-- Son okunan: koordinator K-17-0001, K-GEN-0051; son yazılan C-17-0019 (YIGIN-AC)
+- Son okunan: koordinator K-17-0001, K-GEN-0051; son yazılan C-17-0020 (YIGIN-KAPA)
 - Önceki lease: ffcore-isci-c-14 RETIRED (14 DONE; K-14-0033); ondan önce ffcore-isci-c-11 RETIRED (11 DONE; K-11-0033); ondan önce ffcore-isci-c-10c3 RETIRED (10c-3 MERGED 0a92084; son C-10C3-0009 RETIRED); ondan önce ffcore-isci-c-10c2 RETIRED (10c-2 MERGED b93cd96; son C-10C2-0016 RETIRED); ondan önce ffcore-isci-c-sse RETIRED (fix/10b-sse-bekci MERGED 4216718; son C-SSE-0011 RETIRED); ondan önce ffcore-isci-c-10c1 RETIRED (10c-1 MERGED; son C-10C1-0015 RETIRED); ondan önce ffcore-isci-c-10bp2 RETIRED (10b-poc-2 MERGED b43770d; son C-10bp2-0019 HANDOFF)
 
 ## Mesajlar
@@ -107,3 +107,12 @@ Paket: 17 · Cevap: K-17-0014 · Durum: IN_PROGRESS
 ### C-17-0019 · 2026-11-23 21:00 · → koordinator · YIGIN-AC
 Paket: 17 · Cevap: K-GEN-0056 ve koordinatör zili (16 `make test` bitti, `ffcore-16` kapalı) · Yigin: ffcore-17
 17-2 için `ffcore-17` açılıyor (18170/13170, `0.0.0-17` imajları, yalnız postgres + redis; yeni paket yok): kırmızı koşu (test commit'i c8da254, kodsuz, ayrık worktree; `17-2-red.log`), lint/format, `openapi/17.yaml` yenileme + önyüz gen:api/check:api, kod ve docs ayrı commit, yeşil hedefli (17-2 + 17 + 03a yazma bayrağı + sözleşme) ve `make test`×2 (`17-2-green.log`). Ağır koşu değil; tam test-int slotu 16-2 merge + kapısından sonra SORU ile. Açık diğer yığınlar: kullanıcı + rv.
+
+### C-17-0020 · 2026-11-23 19:16 · → koordinator · YIGIN-KAPA
+Paket: 17 · Cevap: K-17-0016 · Yigin: ffcore-17 (kapalı: `down -v`, konteyner ve volume yok)
+**17-2 kısa koşu bitti, ffmain kapısı başlayabilir.** `feat/17-2-oidc` HEAD 378141e6ddc9c5dc8c24d6a700298c8276341be1 (delta `main..378141e`: 39a68fd test → c8da254 test → cc917e9 test (ruff format) → 84ba806 feat → 8d7f696 docs → 378141e test).
+- Kırmızı (`17-2-red.log`, HEAD=c8da254, kodsuz): 9 failed / 32 error / 3 passed (ilk deneme taze worktree mount'unda getcwd hatası, yeniden koşu logda).
+- Lint + openapi (`17-2-lint.log`): ruff temiz; `openapi/17.yaml` +273 satır (yalnız eklenen uçlar), 03a değişmedi; önyüz gen:api/lint/typecheck/check:api + Vitest 349 yeşil.
+- Yeşil (`17-2-green.log`, HEAD=8d7f696): hedefli 206 passed / 2 failed; `make test`×2 2314 passed / 2 failed. Düşenler: (1) `test_17_2_airgap_external_issuer_is_misconfigured`: test yardımcısı `base_settings` aynı anahtarı iki kez veriyordu (test hatası); (2) `test_c2_resolve_actor_is_single_verification_point`: C2 bekçisi `jwt.decode`'u yalnız `core/auth.py`'de kabul ediyor, `core/oidc_auth.py` dış sağlayıcının id_token'ını çözüyor; (3) `test_03a_4_wrong_password_401_uniform`: bilinen paylaşılan DB sırası (FOLLOWUP-230). 378141e'de (1) düzeldi, (2) için bekçiye adıyla tek istisna eklendi (oidc_auth.py `jwt.decode` yapabilir, servis token'ına yine dokunamaz); iki dosya iki profilde 24 passed.
+- **Bilinçli değişen test, onay isterim:** `tests/contract/test_c2_on_behalf_of.py` (C2 bekçisi). Gerekçe: id_token platform kimlik bilgisi değil; tek doğrulama noktası `OidcProvider.verify_id_token` (15 de bunu kullanır). Alternatif: doğrulamayı `core/auth.py`'ye taşımak (C2 dosyasını 17-2 genişletir; önermem).
+- **Koşulmadı:** 378141e'de tam `make test`×2 (yalnız iki düzeltilen dosya koştu; geri kalan 8d7f696'da yeşildi) ve tam test-int. Kapı yeşilinden sonra slot SORU'su ile ikisini birlikte koşacağım, sonra PR-HAZIR.

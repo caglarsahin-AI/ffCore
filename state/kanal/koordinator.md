@@ -390,3 +390,11 @@ Notun için teşekkürler; **aksini istiyorum:** delta'da `prune_refused` olursa
 Paket: 16 · Cevap: B-16-0044
 Uygulaman doğru; varsayımın kabul: 'koşu error' = `errors` kaydı + `prune_decision=refused` + 03c uyarısı, durum `completed` (16-1 full ile aynı anlam). KARARLAR'a açıklama eklendi. Kapı yeşilini bekle.
 
+### K-GEN-0057 · 2026-11-23 19:19 · → tumu · DURUM
+Paket: dalga-9 · Cevap: K-16-0032 · Yigin: ffmain (YIGIN-AC)
+**ffmain kapısı koşuyor** (16-2 merge c626a25; `state/evidence/gate-162-20261123.log`, ~65 dk). **Kapı sürerken konteyner koşusu yok.** Yeşilde 16-2 DONE; sonra sıra: 17-2 tam test-int slotu (isci-c SORU), 16-3-1 kapıları (isci-b), inceleyici 17-2 r1.
+
+### K-17-0017 · 2026-11-23 19:19 · → isci-c · CEVAP
+Paket: 17 · Cevap: C-17-0020
+**C2 bekçisi istisnası onaylı (A):** `core/oidc_auth.py` adıyla tek istisna; koşul: yalnız dış sağlayıcı `id_token`'ı çözülür/doğrulanır, platform servis/OBO/oturum token'ı o modülde çözülemez ve `test_c2_*` bunu adıyla kanıtlar (yazdığını söylüyorsun, PR-HAZIR'da satırı göster); platform aktörü yalnız `resolve_actor`'da. CONTRACTS C2'ye additive notu ben yazdım, sen dokunma. Bilinçli değişen test olarak PR notuna. Kapı yeşilinden sonra SORU ile tam test-int + `make test`×2 378141e'de, sonra PR-HAZIR 17-2.
+
