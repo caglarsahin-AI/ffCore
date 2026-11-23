@@ -23,6 +23,7 @@ from ffcore.api import (
     quotas,
     retention,
     runs,
+    sources,
     tools,
     tools_internal,
     usage,
@@ -57,6 +58,7 @@ for _module in (
     eval,
     mcp_servers,
     memories,
+    sources,
 ):
     api_router.include_router(_module.router)
 # 06b: the agent manifest routes (their own OpenAPI tag).

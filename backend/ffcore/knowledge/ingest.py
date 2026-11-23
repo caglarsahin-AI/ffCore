@@ -798,10 +798,18 @@ def _preset_condition(preset: str):
     return Document.convert_engine == _ENGINE.match(preset).group(1)
 
 
-def _silver_scope(kb_id: uuid.UUID, full: bool, preset: str | None = None):
+def _silver_scope(
+    kb_id: uuid.UUID,
+    full: bool,
+    preset: str | None = None,
+    document_ids: list[uuid.UUID] | None = None,
+):
     statement = select(Document.id, Document.filename, Document.meta).where(
         Document.kb_id == kb_id, Document.deleted_at.is_(None)
     )
+    if document_ids is not None:
+        # 16 (K-16-0002 S3 b): a data source's own documents only, never the rest of the KB.
+        statement = statement.where(Document.id.in_(document_ids))
     if preset is not None:
         # A preset selects by the problem, whatever the status (an mhtml page may be indexed).
         return statement.where(_preset_condition(parse_preset(preset)))
@@ -816,7 +824,12 @@ async def preset_document_count(kb_id: uuid.UUID, preset: str) -> int:
 
 
 async def check_reindex_silver(
-    kb_id: uuid.UUID, *, full: bool, accept_personnel_data: bool = False, preset: str | None = None
+    kb_id: uuid.UUID,
+    *,
+    full: bool,
+    accept_personnel_data: bool = False,
+    preset: str | None = None,
+    document_ids: list[uuid.UUID] | None = None,
 ) -> int:
     """r2 NOTE-5 (KARARLAR "08 tam 1b r2 ekleri"): a personnel-data record written with
     `pii_regex` (the M3 mode, names not masked) is reconverted only with
@@ -826,7 +839,7 @@ async def check_reindex_silver(
     With the flag the reindex goes on and the number of such records in scope is returned and
     logged (FOLLOWUP-172 N2: the M3 mode is visible, as ingest-raw's is)."""
     async with db.session_scope() as session:
-        rows = (await session.execute(_silver_scope(kb_id, full, preset))).all()
+        rows = (await session.execute(_silver_scope(kb_id, full, preset, document_ids))).all()
     personnel = 0
     for _, filename, meta in rows:
         meta = meta or {}
@@ -858,8 +871,10 @@ async def reindex_gold(
     settings: Settings,
     store: VectorStore,
     embed_client: EmbedClient,
+    document_ids: list[uuid.UUID] | None = None,
 ) -> ReindexReport:
-    """`make reindex LAYER=gold`: from silver only, never raw or the source (D3)."""
+    """`make reindex LAYER=gold`: from silver only, never raw or the source (D3).
+    `document_ids` (16, additive) narrows the run to a data source's documents."""
     async with db.session_scope() as session:
         statement = select(Document.id).where(
             Document.kb_id == kb_id,
@@ -869,6 +884,8 @@ async def reindex_gold(
                 ("indexed",) if not full else ("indexed", "embedding", "chunking", "failed")
             ),
         )
+        if document_ids is not None:
+            statement = statement.where(Document.id.in_(document_ids))
         ids = list((await session.scalars(statement)).all())
     report = ReindexReport()
     for document_id in ids:
@@ -890,15 +907,23 @@ async def reindex_silver(
     convert: Converter = convert_bounded,
     accept_personnel_data: bool = False,
     preset: str | None = None,
+    document_ids: list[uuid.UUID] | None = None,
 ) -> ReindexReport:
     """`make reindex LAYER=silver`: reconvert from raw (never the source); then gold. Refused
     as a whole when an M3 personnel-data record is in scope without the flag (r2 NOTE-5).
-    With a preset (`make reconvert`) only the documents that problem hit are reconverted."""
+    With a preset (`make reconvert`) only the documents that problem hit are reconverted.
+    `document_ids` (16, additive) narrows the run to a data source's documents."""
     await check_reindex_silver(
-        kb_id, full=full, accept_personnel_data=accept_personnel_data, preset=preset
+        kb_id,
+        full=full,
+        accept_personnel_data=accept_personnel_data,
+        preset=preset,
+        document_ids=document_ids,
     )
     async with db.session_scope() as session:
-        scope = _silver_scope(kb_id, full, preset).order_by(Document.created_at, Document.id)
+        scope = _silver_scope(kb_id, full, preset, document_ids).order_by(
+            Document.created_at, Document.id
+        )
         ids = [row[0] for row in (await session.execute(scope)).all()]
     report = ReindexReport()
     for document_id in ids:

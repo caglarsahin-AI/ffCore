@@ -170,7 +170,33 @@ def check_mcp() -> list[str]:
     return lines
 
 
-CHECKS = (check_preflight, check_backend, check_litellm, check_langfuse, check_mcp, check_ollama)
+def check_sync_worker() -> str:
+    """16: the sync worker has no HTTP port; arq keeps `<queue>:health-check` in Redis while it
+    runs (refreshed every minute, SyncWorkerSettings.health_check_interval)."""
+    import redis
+
+    url = os.environ.get("REDIS_URL")
+    if not url:
+        raise SmokeError("REDIS_URL is not set; cannot see the sync worker")
+    queue = os.environ.get("ARQ_QUEUE_SYNC", "sync")
+    try:
+        value = redis.Redis.from_url(url, socket_timeout=TIMEOUT_S).get(f"{queue}:health-check")
+    except redis.RedisError as exc:
+        raise SmokeError(f"redis unreachable for the sync worker ({type(exc).__name__})") from None
+    if value is None:
+        raise SmokeError(f"sync-worker not running: no {queue}:health-check in Redis")
+    return f"sync-worker {queue}:health-check present"
+
+
+CHECKS = (
+    check_preflight,
+    check_backend,
+    check_litellm,
+    check_langfuse,
+    check_mcp,
+    check_sync_worker,
+    check_ollama,
+)
 
 
 def main() -> int:

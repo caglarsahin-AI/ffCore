@@ -101,6 +101,9 @@ PARITY_EXEMPT_PREFIXES = (
     # 11-1: a conversation's messages need the caller's own conversation in the world; their
     # parity is test_11_4_read_mode_get_parity (/chat/agents and /conversations stay checked here).
     f"{API}/projects/{{project_id}}/conversations/{{conversation_id}}",
+    # 16: a data source's own GETs need a source (and a run) in the world; their parity is
+    # test_16_1_read_mode_get_parity (the /data-sources list stays checked here).
+    f"{API}/projects/{{project_id}}/data-sources/{{source_id}}",
 )
 
 

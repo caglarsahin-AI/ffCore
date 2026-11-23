@@ -14,9 +14,18 @@ from ffcore.models.memory import Memory, MemoryOptOut, MemorySetting  # 14
 from ffcore.models.quota import Quota, UsageDaily  # 03c
 from ffcore.models.retention import RetentionPolicy, RetentionRun  # 03c
 from ffcore.models.runs import Conversation, Message, Run, RunEvent  # 06a
+from ffcore.models.sources import (  # 16
+    AclMapping,
+    DataSource,
+    SourceAttachment,
+    SourceItem,
+    SourceSyncState,
+    SyncRun,
+)
 from ffcore.models.tools import FewShot, SchemaDescription, Tool, ToolAction  # 05a
 
 __all__ = [
+    "AclMapping",
     "Agent",
     "Alert",
     "AlertRule",
@@ -28,6 +37,7 @@ __all__ = [
     "Base",
     "Chunk",
     "Conversation",
+    "DataSource",
     "Document",
     "EvalRun",
     "EvalSuite",
@@ -56,6 +66,10 @@ __all__ = [
     "Run",
     "RunEvent",
     "SchemaDescription",
+    "SourceAttachment",
+    "SourceItem",
+    "SourceSyncState",
+    "SyncRun",
     "Tool",
     "ToolAction",
     "UsageDaily",

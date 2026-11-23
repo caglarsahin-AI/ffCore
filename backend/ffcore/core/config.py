@@ -3,6 +3,7 @@
 Profile differences are configuration values, never `if profile` branches (PLAN 5).
 """
 
+from datetime import date
 from functools import lru_cache
 from typing import Annotated, Literal
 from urllib.parse import urlsplit
@@ -140,6 +141,17 @@ class Settings(BaseSettings):
     fake_embed: bool = False
     allowed_languages: CommaList = ["tr", "en"]
     knowledge_storage_dir: str = "/data/storage"
+    # 16 data sources. Network-folder sources read only below this directory (C5): a source's
+    # root is relative to it, `..`, absolute paths and symlinks out are refused.
+    fs_sources_base: str = "/data/sources"
+    # Safe delete (D4): the largest share of a source's items one run may delete; above it the
+    # run is `prune_refused` and deletes nothing unless started with force_prune (admin).
+    prune_max_ratio: float = Field(default=0.2, gt=0, le=1)
+    # Kapı 0 source-date rule for attachments: older ones are not downloaded (`stale`). Unset
+    # means no date rule (the measured PayCore value 2021-01-01 is an installation choice).
+    attachment_min_date: date | None = None
+    # Queue of the sync worker (C10 name `sync`); a setting so test runs can use their own.
+    arq_queue_sync: str = "sync"
     convert_timeout_seconds: int = Field(default=600, gt=0)
     # A fresh converter worker's spawn and imports, bounded apart from the file (FOLLOWUP-97).
     convert_worker_start_timeout_seconds: int = Field(default=60, gt=0)
@@ -273,6 +285,7 @@ class Settings(BaseSettings):
         "qdrant_api_key",
         "eval_pass_threshold",
         "eval_judge_model",
+        "attachment_min_date",
         mode="before",
     )
     @classmethod

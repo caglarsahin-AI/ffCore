@@ -79,6 +79,12 @@ x-app-env: &app-env
   UPLOAD_MAX_REQUEST_BYTES: ${UPLOAD_MAX_REQUEST_BYTES:-541065216}
   ALLOWED_LANGUAGES: ${ALLOWED_LANGUAGES:-tr,en}
   ARQ_QUEUE_INGEST: ${ARQ_QUEUE_INGEST:-ingest}
+  # 16 data sources: the network-folder root inside the containers, safe delete ratio, Kapı 0
+  # attachment date rule (empty = none) and the sync queue (C10 name `sync`).
+  FS_SOURCES_BASE: ${FS_SOURCES_BASE:-/data/sources}
+  PRUNE_MAX_RATIO: ${PRUNE_MAX_RATIO:-0.2}
+  ATTACHMENT_MIN_DATE: ${ATTACHMENT_MIN_DATE:-}
+  ARQ_QUEUE_SYNC: ${ARQ_QUEUE_SYNC:-sync}
   OFFLINE: ${OFFLINE:?OFFLINE tanımlı değil}
   # 12 (FOLLOWUP-46): the application connects as ffcore_app (no DDL) when APP_DB_PASSWORD
   # is set; empty falls back to the owner. migrate and tools keep the owner (below).
@@ -347,6 +353,8 @@ services:
       - model_cache:/models
       # 04a: raw and silver layers of the knowledge bases (gold is in Postgres).
       - knowledge_storage:/data/storage
+      # 16: network folders, read-only; registration and the connection test check the root.
+      - ${FS_SOURCES_HOST_DIR:-./data/sources}:/data/sources:ro
     depends_on:
       migrate:
         condition: service_completed_successfully
@@ -384,6 +392,30 @@ services:
       - knowledge_storage:/data/storage
     depends_on:
       backend:
+        condition: service_healthy
+
+  sync-worker:
+    # 16 sync worker (arq, queue `sync`, C10): talks to the sources and writes the raw layer
+    # (payload, render input, attachments after Kapı 0), decides the safe delete, and hands
+    # each changed item to the ingest worker (queue `ingest`) for silver and gold. Its minute
+    # tick starts scheduled delta runs. No models, no conversion here (K-16-0002 S1-A).
+    image: ${REGISTRY_PREFIX}ffcore/backend:${FFCORE_VERSION:?FFCORE_VERSION tanımlı değil}
+    command: ["arq", "ffcore.sources.worker.SyncWorkerSettings"]
+    restart: unless-stopped
+    # 16-1 r1 MINOR-2: a file is read whole (Kapı 0 limit 500 MB) and hashed in memory, two
+    # jobs at once (a raw run and the tick).
+    mem_limit: ${SYNC_WORKER_MEM_LIMIT:-2g}
+    environment:
+      <<: *app-env
+    volumes:
+      - knowledge_storage:/data/storage
+      - ${FS_SOURCES_HOST_DIR:-./data/sources}:/data/sources:ro
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+      redis:
         condition: service_healthy
 
   mcp-search:
