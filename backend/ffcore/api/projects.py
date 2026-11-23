@@ -321,6 +321,8 @@ async def update_member(
         raise not_found("member")
     for field, value in body.model_dump(exclude_unset=True).items():
         setattr(member, field, value)
+    # 17 (K-17-0002 S2): an admin's change is a manual decision; group sync no longer moves it.
+    member.membership_source = "manual"
     await session.flush()
     return await _member_out(session, project_id, user_id)
 

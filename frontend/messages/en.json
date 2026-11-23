@@ -1699,7 +1699,8 @@
       "quota_warn": "Quota warning",
       "convert_timeout": "Conversion timeout",
       "disk_memory": "Disk or memory",
-      "checkpoint_purge_overdue": "Checkpoint purge overdue"
+      "checkpoint_purge_overdue": "Checkpoint purge overdue",
+      "identity_sync_refused": "Directory sync refused"
     },
     "ackedBy": "{who}, {when}",
     "ack": "Acknowledge",

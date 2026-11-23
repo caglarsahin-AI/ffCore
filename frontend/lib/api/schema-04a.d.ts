@@ -789,8 +789,8 @@ export interface components {
         };
         /**
          * Role
-         * @description Fixed roles, ordered user < analyst < developer < admin. `developer` and `user` are
-         *     reserved in the PoC and cannot be assigned yet.
+         * @description Fixed roles, ordered user < analyst < developer < admin. `developer` is reserved and
+         *     cannot be assigned yet; `user` (end user: chat, own memory, channels) is assignable since 17.
          * @enum {string}
          */
         Role: "user" | "analyst" | "developer" | "admin";

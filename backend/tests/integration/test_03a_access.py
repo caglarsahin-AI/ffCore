@@ -63,7 +63,8 @@ def test_03a_1_non_member_gets_404_not_data(make_user, make_project, client_fact
     assert response.status_code == 404  # FOLLOWUP-103: same answer as a missing project
 
 
-@pytest.mark.parametrize("role", ["developer", "user"])
+# 17: `user` is assignable now (test_17_user_role_matrix); `developer` stays reserved.
+@pytest.mark.parametrize("role", ["developer"])
 def test_03a_14_reserved_roles_rejected(role, root, make_user, make_project):
     project = make_project()
     user_id, _ = make_user()
@@ -106,7 +107,12 @@ def test_03a_users_projects_members_flow(root, make_user, client_factory):
     )
     assert created.status_code == 201, created.text
     user_id = created.json()["id"]
-    assert "password" not in created.text and "password_hash" not in created.text
+    # 17: `must_change_password` is a flag, not a password; no other password field appears.
+    # 17 r2: `temporary_password` is only filled in the answer that takes a link back.
+    body = created.json()
+    assert {k for k in body if "password" in k} == {"must_change_password", "temporary_password"}
+    assert body["temporary_password"] is None
+    assert "password_hash" not in created.text
     dup = root.post(
         f"{API}/users",
         json={"email": "FLOW@example.test", "full_name": "F", "password": "dummy-not-secret-pw-02"},
@@ -188,9 +194,12 @@ def test_03a_13_each_mutation_one_audit_event(root, make_user, pg):
         response = getattr(root, method)(url, **kwargs)
         assert response.status_code in (200, 201, 204), (url, response.text)
         assert count() == before + 1, url
+    # 17-1 r2 gate: the query had no order and no resource filter, so another test's delete_user
+    # row could come last (the shared database); now it names this user's row.
     rows = pg.execute(
         "SELECT resource_id, before FROM audit_events WHERE action = 'delete_user'"
-        " AND outcome = 'success'"
+        " AND outcome = 'success' AND resource_id = %s ORDER BY ts",
+        (uid,),
     ).fetchall()
     assert rows and rows[-1][0] == uid  # deletions name the resource too
     assert "password_hash" not in str(rows[-1][1])

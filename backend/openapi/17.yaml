@@ -1,0 +1,810 @@
+openapi: 3.1.0
+info:
+  title: FFCore API
+  description: 'Directory sign-in: login screen providers, group to project role mappings, identity provider
+    status and connection test, local CSV import (package 17).'
+  version: '0.17'
+paths:
+  /api/v1/auth/providers:
+    get:
+      tags:
+      - identity
+      summary: Sign-in methods this installation offers (login screen)
+      description: 'No authentication: flags only, never an address or a setting value. `local` is false
+
+        when LOCAL_LOGIN=off (the same form still signs in the superadmin and directory accounts).'
+      operationId: sign_in_providers_api_v1_auth_providers_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignInProviders'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/identity-mappings:
+    get:
+      tags:
+      - identity
+      summary: List all group mappings
+      operationId: list_all_mappings_api_v1_identity_mappings_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MappingList'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/identity-mappings:
+    get:
+      tags:
+      - identity
+      summary: List the project's group mappings
+      operationId: list_mappings_api_v1_projects__project_id__identity_mappings_get
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MappingList'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+    post:
+      tags:
+      - identity
+      summary: Map a directory group to a project role
+      description: Applied at each member's next sign-in (and to directory accounts created later).
+      operationId: create_mapping_api_v1_projects__project_id__identity_mappings_post
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MappingCreate'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MappingOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/identity-mappings/{mapping_id}:
+    delete:
+      tags:
+      - identity
+      summary: Remove a group mapping
+      description: Memberships it gave are removed at each member's next sign-in (manual ones stay).
+      operationId: delete_mapping_api_v1_projects__project_id__identity_mappings__mapping_id__delete
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: mapping_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Mapping Id
+      responses:
+        '204':
+          description: Successful Response
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/identity-providers:
+    get:
+      tags:
+      - identity
+      summary: Identity provider status (no secret)
+      operationId: identity_providers_api_v1_identity_providers_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityProvidersOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/identity-providers/ldap/test:
+    post:
+      tags:
+      - identity
+      summary: Test the directory connection with the service account
+      description: Binds with the service account and reports the time taken; changes nothing.
+      operationId: test_ldap_api_v1_identity_providers_ldap_test_post
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProviderTestOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/users/import:
+    post:
+      tags:
+      - identity
+      summary: Import local users (CSV)
+      description: 'Columns `email, full_name, role, access, project_keys` (keys separated by `;`). A
+        bad
+
+        row never stops the file: it is reported with its line number and skipped. A new account
+
+        gets a temporary password, returned once in the applied answer and never stored in clear or
+
+        audited; it must be changed at first sign-in. Directory accounts are refused: the directory
+
+        manages them.'
+      operationId: import_users_api_v1_users_import_post
+      parameters:
+      - name: dry_run
+        in: query
+        required: false
+        schema:
+          type: boolean
+          description: Report only; nothing is written.
+          default: true
+          title: Dry Run
+        description: Report only; nothing is written.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Body_import_users_api_v1_users_import_post'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportReport'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+components:
+  schemas:
+    AccessMode:
+      type: string
+      enum:
+      - edit
+      - read
+      title: AccessMode
+      description: '`read` sees the same screens and data as `edit` but every mutation returns 403.'
+    Body_import_users_api_v1_users_import_post:
+      properties:
+        file:
+          type: string
+          contentMediaType: application/octet-stream
+          title: File
+          description: 'CSV: email,full_name,role,access,project_keys'
+      type: object
+      required:
+      - file
+      title: Body_import_users_api_v1_users_import_post
+    ErrorBody:
+      properties:
+        error:
+          $ref: '#/components/schemas/ErrorDetail'
+      type: object
+      required:
+      - error
+      title: ErrorBody
+      description: OpenAI-shaped error body used by every 4xx response.
+    ErrorDetail:
+      properties:
+        message:
+          type: string
+          title: Message
+          description: English, actionable, never contains secrets.
+        type:
+          type: string
+          title: Type
+          description: authentication_error, permission_error, not_found_error, ...
+        code:
+          type: string
+          title: Code
+          description: Stable machine-readable code, e.g. read_only_access.
+      type: object
+      required:
+      - message
+      - type
+      - code
+      title: ErrorDetail
+    IdentityProvidersOut:
+      properties:
+        local_login:
+          type: string
+          enum:
+          - all
+          - superadmin_only
+          - 'off'
+          title: Local Login
+        providers:
+          items:
+            $ref: '#/components/schemas/ProviderStatus'
+          type: array
+          title: Providers
+        last_sync:
+          anyOf:
+          - $ref: '#/components/schemas/LastSync'
+          - type: 'null'
+      type: object
+      required:
+      - local_login
+      - providers
+      - last_sync
+      title: IdentityProvidersOut
+    ImportReport:
+      properties:
+        dry_run:
+          type: boolean
+          title: Dry Run
+        summary:
+          $ref: '#/components/schemas/ImportSummary'
+        rows:
+          items:
+            $ref: '#/components/schemas/ImportRow'
+          type: array
+          title: Rows
+      type: object
+      required:
+      - dry_run
+      - summary
+      - rows
+      title: ImportReport
+    ImportRow:
+      properties:
+        line:
+          type: integer
+          title: Line
+          description: Line number in the file (the header is line 1).
+        email:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Email
+        action:
+          type: string
+          enum:
+          - create
+          - update
+          - error
+          title: Action
+        code:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Code
+          description: Why the row is refused.
+        temporary_password:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Temporary Password
+          description: New local accounts only, in the applied answer only, shown once; never stored in
+            clear or audited.
+      type: object
+      required:
+      - line
+      - email
+      - action
+      title: ImportRow
+    ImportSummary:
+      properties:
+        create:
+          type: integer
+          title: Create
+        update:
+          type: integer
+          title: Update
+        error:
+          type: integer
+          title: Error
+      type: object
+      required:
+      - create
+      - update
+      - error
+      title: ImportSummary
+    LastSync:
+      properties:
+        at:
+          type: string
+          format: date-time
+          title: At
+        outcome:
+          type: string
+          title: Outcome
+        checked:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Checked
+        deactivated:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Deactivated
+        error:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Error
+      type: object
+      required:
+      - at
+      - outcome
+      title: LastSync
+    MappingCreate:
+      properties:
+        provider:
+          type: string
+          enum:
+          - ldap
+          - oidc
+          title: Provider
+        external_group:
+          type: string
+          maxLength: 1024
+          minLength: 1
+          title: External Group
+          description: LDAP group DN (compared case-insensitively) or OIDC group claim value.
+        role:
+          $ref: '#/components/schemas/Role'
+        access:
+          $ref: '#/components/schemas/AccessMode'
+          default: read
+      additionalProperties: false
+      type: object
+      required:
+      - provider
+      - external_group
+      - role
+      title: MappingCreate
+    MappingList:
+      properties:
+        data:
+          items:
+            $ref: '#/components/schemas/MappingOut'
+          type: array
+          title: Data
+        affected_members:
+          type: integer
+          title: Affected Members
+      type: object
+      required:
+      - data
+      - affected_members
+      title: MappingList
+    MappingOut:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        project_id:
+          type: string
+          format: uuid
+          title: Project Id
+        project_key:
+          type: string
+          title: Project Key
+        provider:
+          type: string
+          enum:
+          - ldap
+          - oidc
+          title: Provider
+        external_group:
+          type: string
+          title: External Group
+        role:
+          $ref: '#/components/schemas/Role'
+        access:
+          $ref: '#/components/schemas/AccessMode'
+        created_by:
+          type: string
+          title: Created By
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+      type: object
+      required:
+      - id
+      - project_id
+      - project_key
+      - provider
+      - external_group
+      - role
+      - access
+      - created_by
+      - created_at
+      title: MappingOut
+    ProviderStatus:
+      properties:
+        provider:
+          type: string
+          enum:
+          - ldap
+          - oidc
+          title: Provider
+        enabled:
+          type: boolean
+          title: Enabled
+        transport:
+          anyOf:
+          - type: string
+            enum:
+            - ldaps
+            - ldap
+          - type: 'null'
+          title: Transport
+        accounts:
+          type: integer
+          title: Accounts
+          description: Platform accounts of this source.
+      type: object
+      required:
+      - provider
+      - enabled
+      - accounts
+      title: ProviderStatus
+    ProviderTestOut:
+      properties:
+        provider:
+          type: string
+          enum:
+          - ldap
+          - oidc
+          title: Provider
+        ok:
+          type: boolean
+          title: Ok
+        elapsed_ms:
+          type: integer
+          title: Elapsed Ms
+        code:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Code
+          description: Why the test failed (e.g. service_bind_failed); no secret.
+      type: object
+      required:
+      - provider
+      - ok
+      - elapsed_ms
+      title: ProviderTestOut
+    Role:
+      type: string
+      enum:
+      - user
+      - analyst
+      - developer
+      - admin
+      title: Role
+      description: 'Fixed roles, ordered user < analyst < developer < admin. `developer` is reserved and
+
+        cannot be assigned yet; `user` (end user: chat, own memory, channels) is assignable since 17.'
+    SignInProviders:
+      properties:
+        local:
+          type: boolean
+          title: Local
+          description: Local email/password form is offered (LOCAL_LOGIN != off).
+        ldap:
+          type: boolean
+          title: Ldap
+          description: Directory accounts sign in on the same form.
+        oidc:
+          type: boolean
+          title: Oidc
+          description: '''Sign in with your organisation account'' button.'
+      type: object
+      required:
+      - local
+      - ldap
+      - oidc
+      title: SignInProviders
+      description: 'What the login screen offers. Flags only: no address, no setting value.'

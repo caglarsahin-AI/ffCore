@@ -27,8 +27,8 @@ ModelKey = Annotated[
 
 
 class Role(StrEnum):
-    """Fixed roles, ordered user < analyst < developer < admin. `developer` and `user` are
-    reserved in the PoC and cannot be assigned yet."""
+    """Fixed roles, ordered user < analyst < developer < admin. `developer` is reserved and
+    cannot be assigned yet; `user` (end user: chat, own memory, channels) is assignable since 17."""
 
     user = "user"
     analyst = "analyst"
@@ -95,11 +95,24 @@ class Membership(BaseModel):
     access: AccessMode
 
 
+AuthSource = Literal["local", "ldap", "oidc"]
+
+
+def _additive(schema: dict[str, Any]) -> None:
+    """17: a field added to an existing answer has no `default` in the schema, so generated
+    clients see it as optional and older code (and mocks) that never set it keep compiling."""
+    schema.pop("default", None)
+
+
 class CurrentUser(BaseModel):
     id: UUID
     email: str
     full_name: str
     is_superadmin: bool
+    # 17 (additive): where the identity lives; a directory account has no password here.
+    auth_source: AuthSource = Field(default="local", json_schema_extra=_additive)
+    # 17: set by the CSV import; the console sends the user to the password screen first.
+    must_change_password: bool = Field(default=False, json_schema_extra=_additive)
 
 
 class MeResponse(BaseModel):
@@ -124,6 +137,13 @@ class UserOut(BaseModel):
     superadmin_access: AccessMode | None
     created_at: datetime
     updated_at: datetime
+    # 17 (additive)
+    auth_source: AuthSource = Field(default="local", json_schema_extra=_additive)
+    last_login_at: datetime | None = Field(default=None, json_schema_extra=_additive)
+    must_change_password: bool = Field(default=False, json_schema_extra=_additive)
+    # 17 r2: only in the answer that takes a directory link back (PATCH auth_source=local);
+    # shown once, never stored in clear or audited.
+    temporary_password: str | None = Field(default=None, json_schema_extra=_additive)
 
 
 class UserCreate(Strict):
@@ -141,6 +161,14 @@ class UserUpdate(Patch):
     is_active: bool = Field(default=None)
     is_superadmin: bool = Field(default=None)
     superadmin_access: AccessMode | None = Field(default=None)
+    # 17 (K-17-0002 S1): link a local account to the directory. The password is removed and
+    # every session ends; the next directory sign-in with the same email binds the account.
+    auth_source: Literal["ldap", "oidc", "local"] = Field(
+        default=None,
+        description="ldap or oidc: link this local account to a configured directory (its "
+        "password is deleted; it then signs in only with the organisation account). local: take "
+        "a link back before the first directory sign-in (a temporary password is returned once).",
+    )
 
 
 class UserList(BaseModel):

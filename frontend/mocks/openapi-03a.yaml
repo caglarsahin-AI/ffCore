@@ -12,7 +12,11 @@ paths:
       description: 'Sets the `ffcore_session` cookie (HttpOnly, SameSite=Strict, Secure). A wrong email
         or
 
-        password gives the same 401 `invalid_credentials`.'
+        password gives the same 401 `invalid_credentials`. 17: with LDAP on, a directory login (email,
+
+        UPN or account name) signs in through the directory; the account row decides the path, and an
+
+        unreachable directory is 503 `identity_provider_unavailable` (no local fallback).'
       operationId: login_api_v1_auth_login_post
       requestBody:
         content:
@@ -2387,6 +2391,16 @@ components:
         is_superadmin:
           type: boolean
           title: Is Superadmin
+        auth_source:
+          type: string
+          enum:
+          - local
+          - ldap
+          - oidc
+          title: Auth Source
+        must_change_password:
+          type: boolean
+          title: Must Change Password
       type: object
       required:
       - id
@@ -3387,9 +3401,9 @@ components:
       - developer
       - admin
       title: Role
-      description: 'Fixed roles, ordered user < analyst < developer < admin. `developer` and `user` are
+      description: 'Fixed roles, ordered user < analyst < developer < admin. `developer` is reserved and
 
-        reserved in the PoC and cannot be assigned yet.'
+        cannot be assigned yet; `user` (end user: chat, own memory, channels) is assignable since 17.'
     UserCreate:
       properties:
         email:
@@ -3463,6 +3477,27 @@ components:
           type: string
           format: date-time
           title: Updated At
+        auth_source:
+          type: string
+          enum:
+          - local
+          - ldap
+          - oidc
+          title: Auth Source
+        last_login_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Last Login At
+        must_change_password:
+          type: boolean
+          title: Must Change Password
+        temporary_password:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Temporary Password
       type: object
       required:
       - id
@@ -3491,6 +3526,16 @@ components:
           anyOf:
           - $ref: '#/components/schemas/AccessMode'
           - type: 'null'
+        auth_source:
+          type: string
+          enum:
+          - ldap
+          - oidc
+          - local
+          title: Auth Source
+          description: 'ldap or oidc: link this local account to a configured directory (its password
+            is deleted; it then signs in only with the organisation account). local: take a link back
+            before the first directory sign-in (a temporary password is returned once).'
       additionalProperties: false
       type: object
       title: UserUpdate

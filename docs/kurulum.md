@@ -37,6 +37,7 @@ secret is mandatory: compose stops and names the missing variable. For `llmaas`:
 | `CONSOLE_ORIGINS` | `https://<host>` |
 | `COMPOSE_PATH_SEPARATOR`, `COMPOSE_FILE`, `COMPOSE_PROFILES` | `,` / `compose.yaml,deploy/docker-compose.egress.yml,deploy/docker-compose.tls.yml` / `egress,tls` |
 | `TLS_CERT_DIR` | the certificate directory |
+| `LOCAL_LOGIN`, `LDAP_*` | optional: directory sign-in for the organisation's users (`docs/kimlik.md`); with a directory `LOCAL_LOGIN=superadmin_only` |
 
 Langfuse's first install keys and admin password (printed once, copy them into `.env`):
 
@@ -179,6 +180,8 @@ starts a comment, as in compose. `make smoke` runs the same check first. The rul
 | `db_role_owner` | `llmaas` with empty `APP_DB_USER`/`APP_DB_PASSWORD`: the application would connect as the owner ("Database role"); `airgap` only names it |
 | `db_role_incomplete` | `APP_DB_USER` without `APP_DB_PASSWORD` or the reverse, in every profile |
 | `db_role_invalid` | `APP_DB_USER` other than `ffcore_app` |
+| `local_login_invalid` | `LOCAL_LOGIN` other than `all`, `superadmin_only`, `off` (17) |
+| `ldap_url_invalid` / `ldap_plaintext_forbidden` / `ldap_incomplete` | `LDAP_URL` not `ldaps://` (plaintext only with `LDAP_ALLOW_PLAINTEXT=true`, then a warning line), or without `LDAP_BIND_DN`, `LDAP_BIND_PASSWORD`, `LDAP_USER_BASE` (17; directory sign-in, `docs/kimlik.md`) |
 
 Use a comma as the path separator so the same `.env` line works on every OS:
 

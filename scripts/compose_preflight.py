@@ -87,6 +87,52 @@ def egress_list(value: str, ports: str = "443") -> list[str]:
     return [f"{host} {port}/tcp" for host in hosts for port in _ports(ports)]
 
 
+LOCAL_LOGIN_VALUES = ("all", "superadmin_only", "off")
+TRUE_VALUES = ("1", "true", "yes", "on")
+
+
+def _identity(env: dict) -> list[str]:
+    """17: directory sign-in settings. The backend refuses the same mistakes at start-up; here
+    they surface before anything starts, with the fix."""
+    local_login = env.get("LOCAL_LOGIN", "") or "all"
+    if local_login not in LOCAL_LOGIN_VALUES:
+        raise PreflightError(
+            "local_login_invalid",
+            f"LOCAL_LOGIN={local_login}; use one of {', '.join(LOCAL_LOGIN_VALUES)}",
+        )
+    url = env.get("LDAP_URL", "")
+    if not url:
+        return [f"identity: local accounts only (LOCAL_LOGIN={local_login})"]
+    scheme = url.split("://", 1)[0].lower() if "://" in url else ""
+    if scheme not in ("ldaps", "ldap"):
+        raise PreflightError("ldap_url_invalid", "LDAP_URL must be ldaps://host[:port]")
+    lines = []
+    if scheme == "ldap":
+        if env.get("LDAP_ALLOW_PLAINTEXT", "").lower() not in TRUE_VALUES:
+            raise PreflightError(
+                "ldap_plaintext_forbidden",
+                "LDAP_URL is ldap:// (passwords cross the network in clear text); use ldaps:// "
+                "or, for a test directory only, LDAP_ALLOW_PLAINTEXT=true",
+            )
+        lines.append("warning: LDAP_URL is plaintext ldap:// (LDAP_ALLOW_PLAINTEXT=true)")
+    missing = [
+        name
+        for name in ("LDAP_BIND_DN", "LDAP_BIND_PASSWORD", "LDAP_USER_BASE")
+        if not env.get(name)
+    ]
+    if missing:
+        raise PreflightError(
+            "ldap_incomplete", f"LDAP_URL is set but {', '.join(missing)} is empty"
+        )
+    lines.append(f"identity: ldap ({scheme}), LOCAL_LOGIN={local_login}")
+    if local_login == "all":
+        lines.append(
+            "note: LOCAL_LOGIN=all with a directory; superadmin_only keeps local passwords to "
+            "the recovery account (docs/kimlik.md)"
+        )
+    return lines
+
+
 def check(env: dict) -> list[str]:
     deploy = env.get("DEPLOY_PROFILE", "")
     backend = env.get("INFERENCE_BACKEND", "")
@@ -175,6 +221,8 @@ def check(env: dict) -> list[str]:
         )
     else:
         lines.append("database: application connects as the owner (APP_DB_PASSWORD empty)")
+
+    lines.extend(_identity(env))
 
     if "egress" in profiles:
         if deploy != "llmaas":

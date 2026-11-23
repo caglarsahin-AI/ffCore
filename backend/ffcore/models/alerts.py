@@ -38,6 +38,8 @@ ALERT_KINDS = (
     "convert_timeout",
     "disk_memory",
     "checkpoint_purge_overdue",
+    # 17 r2: identity_sync refused a mass deactivation (IDENTITY_SYNC_MAX_DEACTIVATE_RATIO).
+    "identity_sync_refused",
 )
 ALERT_CHANNELS = ("email", "webhook", "ui")
 SEVERITIES = ("info", "warning", "critical")

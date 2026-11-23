@@ -48,11 +48,12 @@ def _run(db, source, status="queued"):
 def test_16_1_migration_round_trip(scratch_db):
     db = scratch_db
     heads = [line for line in db.run("heads").splitlines() if line.strip()]
-    assert len(heads) == 1 and heads[0].startswith("16_0001")
+    # 17_0001 sits above 16_0001 (17-1 rebase): one head, and 17's table goes down with it.
+    assert len(heads) == 1 and heads[0].startswith("17_0001")
     schema = db.tables()
     assert TABLES <= schema
     db.run("downgrade", "14_0001")
-    assert db.tables() == schema - TABLES
+    assert db.tables() == schema - TABLES - {"identity_group_mappings"}
     db.run("upgrade", "head")
     assert db.tables() == schema
 

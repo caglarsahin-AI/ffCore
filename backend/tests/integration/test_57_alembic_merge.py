@@ -19,7 +19,7 @@ PRE_MERGE_ROWS = {"03c_0002", "04a_0001", "05a_0001", "08_0001"}
 LIFETIME = {"checkpoint_deleted_at", "source_deleted_at"}  # 06a_0002
 RETENTION = {"retention_policies", "retention_runs", "alert_rules", "alerts"}  # 03c_0002
 # Tables of the plain chain above the merge (06b_0001 adds a column only; 09_0001 two tables;
-# 05b_0001 two tables; 14_0001 three tables; 16_0001 six tables).
+# 05b_0001 two tables; 14_0001 three tables; 16_0001 six tables; 17_0001 one table).
 ABOVE_MERGE = {
     "eval_suites",
     "eval_runs",
@@ -34,6 +34,7 @@ ABOVE_MERGE = {
     "sync_runs",
     "source_sync_state",
     "acl_mappings",
+    "identity_group_mappings",
 }
 
 

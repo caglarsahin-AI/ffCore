@@ -37,6 +37,8 @@ EMITTED_KINDS = (
     "checkpoint_purge_overdue",
     # 16: a data source's full run refused to delete (D4: ratio over PRUNE_MAX_RATIO).
     "prune_refused",
+    # 17 r2: identity_sync refused to deactivate (ratio over IDENTITY_SYNC_MAX_DEACTIVATE_RATIO).
+    "identity_sync_refused",
 )
 SEVERITY = {"service_down": "critical", "budget_threshold": "warning"}
 DEFAULT_THRESHOLDS = (50, 80, 100)

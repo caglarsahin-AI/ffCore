@@ -3,6 +3,7 @@
 Profile differences are configuration values, never `if profile` branches (PLAN 5).
 """
 
+import os
 from datetime import date
 from functools import lru_cache
 from typing import Annotated, Literal
@@ -14,6 +15,8 @@ from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 from ffcore.evaluation.ticks import TICK_PLAN_S
 
 CommaList = Annotated[list[str], NoDecode]
+# 17: email, UPN or account name; `{login}` is the escaped value the user typed.
+LDAP_DEFAULT_FILTER = "(|(mail={login})(userPrincipalName={login})(sAMAccountName={login}))"
 
 
 def _plain_proxy_origin(value: str) -> str:
@@ -248,6 +251,39 @@ class Settings(BaseSettings):
     # airgap 0.7 for the local model; a profile value in .env.example, not an `if profile`).
     memory_min_confidence: float = Field(default=0.6, ge=0, le=1)
 
+    # --- 17: directory sign-in (LDAP / Active Directory bind; OIDC in 17-2) ---
+    # Who may sign in with a local password: all, superadmin_only or off. A superadmin always
+    # can (recovery account), whatever the value.
+    local_login: Literal["all", "superadmin_only", "off"] = "all"
+    # Unset: LDAP sign-in is off. ldaps:// is required; ldap:// only with LDAP_ALLOW_PLAINTEXT.
+    ldap_url: str | None = None
+    ldap_allow_plaintext: bool = False
+    # Service account that searches the directory (the user's own DN then binds).
+    ldap_bind_dn: str | None = None
+    ldap_bind_password: SecretStr | None = None
+    ldap_user_base: str | None = None
+    # `{login}` is replaced by the escaped value the user typed.
+    ldap_user_filter: str = LDAP_DEFAULT_FILTER
+    ldap_group_attr: str = "memberOf"
+    # The stable account id: objectGUID (Active Directory) or entryUUID (OpenLDAP); explicit,
+    # never guessed (ARCH-10).
+    ldap_id_attr: str = "objectGUID"
+    # Enterprise CA bundle for ldaps (12 PENDING_ENV); unset: the system trust store.
+    ldap_ca_file: str | None = None
+    # Connect and each directory answer.
+    ldap_timeout_s: int = Field(default=10, gt=0)
+    # A new directory account joins this project as user/read (a project key); unset: none.
+    default_project_for_new_users: str | None = None
+    # Channel users (15) without an account get one from the directory only when true.
+    auto_provision_from_channels: bool = False
+    # OIDC accounts with no sign-in for this many days are deactivated by identity_sync.
+    oidc_inactive_after_days: int = Field(default=90, gt=0)
+    # identity_sync refuses to deactivate when more than this share of the checked directory
+    # accounts is missing (or all of them are): a moved base or a narrowed service account looks
+    # like everyone left (r2 MAJOR-1; 16's PRUNE_MAX_RATIO pattern). `ffcore.cli identity-sync
+    # --force` overrides it once.
+    identity_sync_max_deactivate_ratio: float = Field(default=0.2, gt=0, le=1)
+
     # --- 03c governance ---
     # Wrong API keys from one client address per minute before 429 too_many_auth_failures.
     api_key_auth_failures_per_min: int = Field(default=20, gt=0)
@@ -271,6 +307,12 @@ class Settings(BaseSettings):
             return [item.strip().lower() for item in value.split(",") if item.strip()]
         return value
 
+    @field_validator("ldap_user_filter", mode="before")
+    @classmethod
+    def _filter_default(cls, value: object) -> object:
+        # Compose passes an unset LDAP_USER_FILTER as "" (its default syntax cannot hold `}`).
+        return LDAP_DEFAULT_FILTER if value == "" else value
+
     @field_validator("console_origins", mode="before")
     @classmethod
     def _split_origins(cls, value: object) -> object:
@@ -286,6 +328,12 @@ class Settings(BaseSettings):
         "eval_pass_threshold",
         "eval_judge_model",
         "attachment_min_date",
+        "ldap_url",
+        "ldap_bind_dn",
+        "ldap_bind_password",
+        "ldap_user_base",
+        "ldap_ca_file",
+        "default_project_for_new_users",
         mode="before",
     )
     @classmethod
@@ -315,6 +363,44 @@ class Settings(BaseSettings):
                 "video_disabled and can be reconverted later with the video preset)"
             )
         return self
+
+    @model_validator(mode="after")
+    def _ldap_coherent(self) -> "Settings":
+        """17: a half-configured directory stops the start-up with the missing names; the
+        password never appears in the message."""
+        if self.ldap_url is None:
+            return self
+        scheme = urlsplit(self.ldap_url).scheme.lower()
+        if scheme not in ("ldaps", "ldap") or not urlsplit(self.ldap_url).hostname:
+            raise ValueError("ldap_url_invalid: LDAP_URL must be ldaps://host[:port]")
+        if scheme == "ldap" and not self.ldap_allow_plaintext:
+            raise ValueError(
+                "ldap_plaintext_forbidden: LDAP_URL is ldap:// (passwords in clear text); use "
+                "ldaps:// or set LDAP_ALLOW_PLAINTEXT=1 for a test directory"
+            )
+        missing = [
+            name
+            for name, value in (
+                ("LDAP_BIND_DN", self.ldap_bind_dn),
+                ("LDAP_BIND_PASSWORD", self.ldap_bind_password),
+                ("LDAP_USER_BASE", self.ldap_user_base),
+            )
+            if value is None
+        ]
+        if missing:
+            raise ValueError(f"ldap_incomplete: LDAP_URL is set but {', '.join(missing)} not")
+        if "{login}" not in self.ldap_user_filter:
+            raise ValueError("ldap_filter_invalid: LDAP_USER_FILTER must contain {login}")
+        if self.ldap_ca_file is not None and not os.path.isfile(self.ldap_ca_file):
+            raise ValueError(
+                "ldap_ca_file_missing: LDAP_CA_FILE does not name a file in this container "
+                "(mount the corporate CA bundle, docs/kimlik.md)"
+            )
+        return self
+
+    @property
+    def ldap_enabled(self) -> bool:
+        return self.ldap_url is not None
 
     @model_validator(mode="after")
     def _no_langsmith(self) -> "Settings":

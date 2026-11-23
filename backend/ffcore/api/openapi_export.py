@@ -1,7 +1,7 @@
 """Render a package's OpenAPI draft (`backend/openapi/<package>.yaml`) from the application routes.
 
 Tools container: python -m ffcore.api.openapi_export <package> > openapi/<package>.yaml (03a, 03c,
-04a, 05a, 05b, 06a, 06b, 07, 08).
+04a, 05a, 05b, 06a, 06b, 07, 08, 09, 14, 17).
 The contract tests compare each committed file with this output, so no draft ever drifts.
 Each draft holds only its package's routes: adding a package never changes an earlier draft.
 """
@@ -86,6 +86,13 @@ PACKAGES = {
         "SharePoint), test it, start raw/silver/gold sync runs, follow runs and items, and map "
         "source groups to roles or users (package 16).",
         "tags": {"data-sources"},
+    },
+    "17": {
+        "version": "0.17",
+        "description": "Directory sign-in: login screen providers, group to project role "
+        "mappings, identity provider status and connection test, local CSV import "
+        "(package 17).",
+        "tags": {"identity"},
     },
 }
 

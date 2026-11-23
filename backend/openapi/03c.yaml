@@ -2262,6 +2262,7 @@ components:
       - convert_timeout
       - disk_memory
       - checkpoint_purge_overdue
+      - identity_sync_refused
       title: AlertKind
     AlertKinds:
       properties:

@@ -1,10 +1,10 @@
-"""Login, logout, current user and own password (03a)."""
+"""Login, logout, current user and own password (03a); directory sign-in (17)."""
 
 import uuid
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Request, Response
-from sqlalchemy import func, select
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ffcore.api.common import ERROR_RESPONSES
@@ -26,7 +26,9 @@ from ffcore.core.audit import (
 from ffcore.core.auth import ROLE_ORDER, Actor, resolve_actor
 from ffcore.core.config import Settings, get_settings
 from ffcore.core.errors import ApiError
-from ffcore.core.passwords import hash_password, needs_rehash, verify_password
+from ffcore.core.identity import LoginRefused, record_sign_in, sign_in
+from ffcore.core.ldap_auth import LdapDirectory, get_ldap_directory
+from ffcore.core.passwords import hash_password, verify_password
 from ffcore.core.session import clear_session_cookie, issue_token, set_session_cookie
 from ffcore.models.identity import Project, ProjectMember, User
 
@@ -84,7 +86,12 @@ async def me_payload(
         role = access = None
     return MeResponse(
         user=CurrentUser(
-            id=user.id, email=user.email, full_name=user.full_name, is_superadmin=user.is_superadmin
+            id=user.id,
+            email=user.email,
+            full_name=user.full_name,
+            is_superadmin=user.is_superadmin,
+            auth_source=user.auth_source,
+            must_change_password=user.must_change_password,
         ),
         role=role,
         access=access,
@@ -99,33 +106,40 @@ async def login(
     response: Response,
     session: SessionDep,
     settings: SettingsDep,
+    directory: Annotated[LdapDirectory | None, Depends(get_ldap_directory)],
 ):
     """Sets the `ffcore_session` cookie (HttpOnly, SameSite=Strict, Secure). A wrong email or
-    password gives the same 401 `invalid_credentials`."""
+    password gives the same 401 `invalid_credentials`. 17: with LDAP on, a directory login (email,
+    UPN or account name) signs in through the directory; the account row decides the path, and an
+    unreachable directory is 503 `identity_provider_unavailable` (no local fallback)."""
     request_id, ip = request_context(request)
-    user = await session.scalar(
-        select(User).where(func.lower(User.email) == body.email.lower(), User.deleted_at.is_(None))
-    )
-    usable = user is not None and user.is_active
-    if not verify_password(user.password_hash if usable else None, body.password):
+    try:
+        result = await sign_in(session, body.email, body.password, settings, directory)
+    except LoginRefused as refused:
+        await session.rollback()
         # No email in the record: a failed login must not store what someone typed.
         await write_event_detached(
             AuditEntry(
                 action="auth.login",
                 resource_type="auth",
-                outcome="denied",
+                outcome="error" if refused.status_code >= 500 else "denied",
                 actor_type="system",
                 actor_id="anonymous",
-                after={"code": "invalid_credentials"},
+                resource_id=str(refused.user_id) if refused.user_id else None,
+                after={
+                    "code": refused.code,
+                    "reason": refused.reason,
+                    "source": refused.source,
+                },
                 request_id=request_id,
                 ip=ip,
             )
         )
         raise ApiError(
-            401, "authentication_error", "invalid_credentials", "Email or password is incorrect."
-        )
-    if needs_rehash(user.password_hash):
-        user.password_hash = hash_password(body.password)
+            refused.status_code, refused.error_type, refused.code, refused.message
+        ) from None
+    user = result.user
+    record_sign_in(user)
     await write_event(
         session,
         AuditEntry(
@@ -135,6 +149,7 @@ async def login(
             actor_type="user",
             actor_id=str(user.id),
             resource_id=str(user.id),
+            after={"source": result.source},
             request_id=request_id,
             ip=ip,
         ),
@@ -177,10 +192,21 @@ async def change_password(
 ) -> None:
     """Allowed in read-only access mode (own data). Revokes other sessions."""
     user = await _load_user(session, actor)
+    if user.auth_source != "local":
+        raise ApiError(
+            400,
+            "invalid_request_error",
+            "external_identity",
+            "This account's password is managed by your organisation's directory.",
+        )
     if not verify_password(user.password_hash, body.current_password):
         raise ApiError(
             400, "invalid_request_error", "invalid_current_password", "Password is incorrect."
         )
+    if body.new_password == body.current_password:
+        # r1 NOTE-3: a temporary password "changed" to itself is not a change.
+        raise ApiError(400, "invalid_request_error", "password_unchanged", "Choose a new password.")
     user.password_hash = hash_password(body.new_password)
+    user.must_change_password = False
     user.token_version += 1
     set_session_cookie(response, issue_token(str(user.id), user.token_version, settings), settings)

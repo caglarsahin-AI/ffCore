@@ -4,6 +4,40 @@ Behaviour and configuration changes that a deployment or an API client notices, 
 (handbook/RELEASE_AND_ROLLBACK.md, CHANGE_CONTROL.md). Each entry names the package and what to do,
 if anything.
 
+## 2026-11-23 · 17-1 · Directory sign-in (LDAP / Active Directory)
+
+- **What:** organisation users sign in with their directory account on the same login form;
+  their account is created at the first sign-in and directory groups map to project roles
+  (`identity_group_mappings`, edited per project). The `user` role (end user: chat, own memory)
+  is assignable. A daily `identity_sync` deactivates accounts the directory removed or disabled.
+  Superadmins import local exception accounts from CSV. Guide: `docs/kimlik.md`.
+- **Configuration:** new `.env` names `LOCAL_LOGIN`, `LDAP_*`, `DEFAULT_PROJECT_FOR_NEW_USERS`,
+  `AUTO_PROVISION_FROM_CHANNELS`, `OIDC_INACTIVE_AFTER_DAYS` (all optional; empty `LDAP_URL`
+  keeps today's behaviour). Incoherent LDAP settings stop the start-up and the preflight.
+- **Migration `17_0001` (additive):** `users.auth_source`, `external_id`, `last_login_at`,
+  `must_change_password`; `users.password_hash` becomes nullable (directory accounts have none);
+  a superadmin must be local (CHECK); `project_members.membership_source`; new table
+  `identity_group_mappings`. The downgrade refuses while directory accounts exist.
+- **API (additive):** `GET /auth/providers`, `…/identity-mappings`, `GET /identity-providers`,
+  `POST /identity-providers/ldap/test`, `POST /users/import` (`openapi/17.yaml`);
+  `CurrentUser`/`UserOut` gain `auth_source` and `must_change_password` (`UserOut` also
+  `last_login_at`); `PATCH /users/{id}` accepts `auth_source` to link a local account (its
+  password is deleted). New refusals: 503 `identity_provider_unavailable` (no local fallback),
+  403 `user_inactive` (a disabled account used to get 401), 403 `local_login_disabled`,
+  409 `identity_conflict`, 400 `external_identity`, 422 `superadmin_must_be_local`, 403
+  `password_change_required` (an imported account before its first password change), 400
+  `password_unchanged`, 422 `identity_provider_not_configured`. `PATCH /users/{id}` also takes
+  `auth_source: local` to take a link back before the first directory sign-in (answer field
+  `temporary_password`, once).
+- **Deactivation guard (r2):** `identity_sync` deactivates nothing when the directory cannot
+  be asked or more than `IDENTITY_SYNC_MAX_DEACTIVATE_RATIO` (0.2) of the accounts are
+  missing (alert kind `identity_sync_refused`, new; `ffcore.cli identity-sync --force`). Its own
+  deactivations reopen when the directory accepts the account again (`users.deactivated_by`).
+  Several mappings: the highest role brings its own access. LDAP referrals are not followed.
+- **Behaviour:** changing a member on the members screen marks the membership manual (group sync
+  no longer moves it). Dependencies: `ldap3` 2.9.1, `pyasn1` 0.6.1 (in `uv.lock`, so in the
+  offline wheel set).
+
 ## 2026-11-22 · 16-1 · Data sources: core and network folder
 
 - **What:** a knowledge base can be fed from a live source on a schedule instead of uploads
