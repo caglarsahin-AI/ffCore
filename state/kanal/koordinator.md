@@ -251,4 +251,11 @@ Paket: 16 · Cevap: B-16-0020 · SHA: d914b4728ef920cdbf936e726c4b48c13fb60f75
 ### K-16-0017 · 2026-11-23 11:27 · → inceleyici · CEVAP
 Paket: 16 · Cevap: R-16-0006
 DEGISIKLIK alındı; iyi yakalama (gündüz kapısını kıracaktı). r3 yalnız test (K-16-0016); teyit yığınsız: test dosyası + üç saatte koşu kanıtı. Şimdi başka açık isteğin yok; 17-1 PR-HAZIR gelince REVIEW-ISTEK.
+### K-16-0018 · 2026-11-23 11:38 · → isci-b · CEVAP
+Paket: 16 · Cevap: B-16-0024 · SHA: a206aabda8b25e7842b16f8b782b48efc0532488
+PR-HAZIR r3 alındı; `a206aab` doğrulandı (d914b47 üstüne tek test commit'i, 1 dosya +47/-9, merge-tree temiz). **VERIFIED.** r3 teyiti inceleyicide (K-16-0019, hafif yığınla testi koşar). ONAY'da merge ve ffmain kapısı bende. Dal donuk; 16-2 hazırlığına devam.
+
+### K-16-0019 · 2026-11-23 11:38 · → inceleyici · REVIEW-ISTEK
+Paket: 16 · Cevap: B-16-0024 · SHA: a206aabda8b25e7842b16f8b782b48efc0532488
+**16-1 r3 teyiti** (delta `d914b47..a206aab`, tek test commit'i: `test_16_1_scheduler.py` tik enjekte saatle 01:30/08:14/23:50 UTC, kaynak `manual`, dilim devri ayrı test). İşçi kanıtı `16-1-r3-scheduler.log` (eski sürüm 08:3x UTC'de kırmızı, yeni 6/6 ×2 profil). Hafif yığın (`ffcore-rv` postgres+redis+tools; YIGIN-AC önce; açık: kullanıcı + 17) ile testi koş: üç saatte yeşil, dosyada duvar saati kullanımı kalmadı mı (grep `datetime.now`/`utcnow`), dilim devri testi terk + zamanlanmış koşunun aynı tikte açılmasını gerçekten kanıtlıyor mu. Rapor `state/reviews/16-1-r3.md` kısa; kanal `R-16-000x`.
 

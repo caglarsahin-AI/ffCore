@@ -1,0 +1,31 @@
+HEAD=d914b4728ef920cdbf936e726c4b48c13fb60f75 + uncommitted r3 test 2026-11-23 11:30:45 up postgres redis
+ Container ffcore-16-redis-1  Healthy
+ Container ffcore-16-postgres-1  Healthy
+=== ruff
+All checks passed!
+1 file already formatted
+=== scheduler run 1 08:31 UTC
+tests/integration/test_16_1_scheduler.py::test_16_1_tick_starts_due_schedules_only PASSED [ 16%]
+tests/integration/test_16_1_scheduler.py::test_16_1_tick_fails_abandoned_runs[0130] PASSED [ 33%]
+tests/integration/test_16_1_scheduler.py::test_16_1_tick_fails_abandoned_runs[0814] PASSED [ 50%]
+tests/integration/test_16_1_scheduler.py::test_16_1_tick_fails_abandoned_runs[2350] PASSED [ 66%]
+tests/integration/test_16_1_scheduler.py::test_16_1_tick_abandon_then_the_daily_slot_takes_over PASSED [ 83%]
+tests/integration/test_16_1_scheduler.py::test_16_1_cli_queues_and_audits_force_prune PASSED [100%]
+========================= 6 passed in 87.31s (0:01:27) =========================
+=== scheduler run 2 08:33 UTC
+tests/integration/test_16_1_scheduler.py::test_16_1_tick_starts_due_schedules_only PASSED [ 16%]
+tests/integration/test_16_1_scheduler.py::test_16_1_tick_fails_abandoned_runs[0130] PASSED [ 33%]
+tests/integration/test_16_1_scheduler.py::test_16_1_tick_fails_abandoned_runs[0814] PASSED [ 50%]
+tests/integration/test_16_1_scheduler.py::test_16_1_tick_fails_abandoned_runs[2350] PASSED [ 66%]
+tests/integration/test_16_1_scheduler.py::test_16_1_tick_abandon_then_the_daily_slot_takes_over PASSED [ 83%]
+tests/integration/test_16_1_scheduler.py::test_16_1_cli_queues_and_audits_force_prune PASSED [100%]
+========================= 6 passed in 64.38s (0:01:04) =========================
+=== red: d914b47 version of test_16_1_scheduler at 08:35 UTC (temporary copy, deleted after)
+tests/integration/test_16_1_r3_red_tmp.py::test_16_1_tick_fails_abandoned_runs FAILED [ 66%]
+tests/integration/test_16_1_r3_red_tmp.py::test_16_1_cli_queues_and_audits_force_prune PASSED [100%]
+        assert result["abandoned"] == 1
+        assert (status, error) == ("failed", "run_abandoned")
+>       assert w["admin"].post(sources_url(w, f"/{source['id']}/sync"), json={}).status_code == 202
+E       AssertionError: assert 409 == 202
+FAILED tests/integration/test_16_1_r3_red_tmp.py::test_16_1_tick_fails_abandoned_runs
+========================= 1 failed, 2 passed in 32.58s =========================

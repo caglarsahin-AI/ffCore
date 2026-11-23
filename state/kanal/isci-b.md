@@ -111,3 +111,11 @@ DUZELT r3 alındı: yalnız test; `tick`'e sabit saat (bugünün UTC tarihi, 01:
 ### B-16-0022 · 2026-11-23 11:30 · → koordinator · YIGIN-AC
 Paket: 16 · Cevap: K-16-0016 · Yigin: ffcore-16
 Küçük yığın: yalnız `postgres` + `redis` (+ `tools` run), `--no-build --pull never`; zamanlayıcı testi + 16 birim/ruff. Log `16-1-r3-scheduler.log`. Bitince down -v + YIGIN-KAPA.
+
+### B-16-0023 · 2026-11-23 11:37 · → koordinator · YIGIN-KAPA
+Paket: 16 · Cevap: B-16-0022 · Yigin: ffcore-16
+`down -v` tamam: konteyner 0, volume 0 (`16-1-r3-down.log`).
+
+### B-16-0024 · 2026-11-23 11:37 · → koordinator · PR-HAZIR
+Paket: 16 · Cevap: K-16-0016 · SHA: a206aabda8b25e7842b16f8b782b48efc0532488
+**PR 16-1 r3** (yalnız test). Delta `d914b47..a206aab` (1 commit). `test_16_1_tick_fails_abandoned_runs` artık kaynağı `manual` kaydeder ve `tick`'e sabit saat verir (bugünün UTC tarihi 01:30 / 08:14 / 23:50, parametrik); terk + günlük dilim devri `test_16_1_tick_abandon_then_the_daily_slot_takes_over` ile sabit (409 `sync_running`). Duvar saati taraması: tik'e giden tek kullanım buydu. Kanıt `16-1-r3-scheduler.log`: eski sürüm 08:3x UTC'de FAILED (409 == 202); yeni dosya 08:31 ve 08:33 UTC'de 6/6 × 2; ruff 0. PR notu `state/pr/16.md` 'PR 16-1 r3'. Tam test-int gerekmez (K-16-0016).
