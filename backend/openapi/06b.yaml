@@ -1579,6 +1579,13 @@ components:
           - type: number
           - type: 'null'
           title: Rerank Score
+        source_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Source Url
+          description: The item in its source system (Confluence page, Jira issue) for documents a data
+            source brought (16); null for uploads.
       type: object
       required:
       - chunk_id

@@ -38,6 +38,28 @@ if anything.
   no longer moves it). Dependencies: `ldap3` 2.9.1, `pyasn1` 0.6.1 (in `uv.lock`, so in the
   offline wheel set).
 
+## 2026-11-23 · 16-2 · Data sources: Confluence and Jira
+
+- **What:** `kind: confluence` and `kind: jira` sources, Server/Data Center (`deployment:
+  server`, personal access token) and Cloud (`deployment: cloud`, e-mail + API token; refused
+  with `OFFLINE=true`). Registered by the project admin with an address, a credential and an
+  optional scope (space keys, JQL); docs/veri-kaynaklari.md.
+- **Search and chat (additive):** a search hit and a chat source carry `source_url` (the page
+  or issue in its system; `null` for uploads). Existing clients ignore the new field.
+- **Egress overlay:** `sync-worker` gets `EGRESS_PROXY_URL`; add Atlassian Cloud sites to
+  `EGRESS_ALLOWLIST`, internal Confluence/Jira hosts to `ALLOWED_INTERNAL_HOSTS`.
+- **Permissions:** a restricted Confluence page or a Jira issue with a security level is
+  readable only through a mapping of its restriction (`group:`, `user:`,
+  `security:<KEY>/<level>`); the space or project mapping does not open it. Jira comments
+  restricted to a role or group and service desk internal notes are not indexed; person name
+  fields and mentions are not indexed.
+- **Weekly full run:** `FULL_SYNC_EVERY_DAYS` (default 7, `0` = never; sync-worker) turns a
+  scheduled run into a full run when the last full is that old, so narrowed permissions and
+  deletions reach the index without a person starting one. Set it in `.env` to change it.
+- **Cloud attachments:** add `api.media.atlassian.com` to `EGRESS_ALLOWLIST` for Confluence
+  Cloud attachments (otherwise each fails loudly in the run).
+- **Nothing to migrate.**
+
 ## 2026-11-22 · 16-1 · Data sources: core and network folder
 
 - **What:** a knowledge base can be fed from a live source on a schedule instead of uploads

@@ -153,6 +153,9 @@ class Settings(BaseSettings):
     # Kapı 0 source-date rule for attachments: older ones are not downloaded (`stale`). Unset
     # means no date rule (the measured PayCore value 2021-01-01 is an installation choice).
     attachment_min_date: date | None = None
+    # A scheduled run is a full run when the source's last completed full run is this many days
+    # old (R-16-0013 MINOR-1: narrowed permissions and deletions reach the index); 0 = never.
+    full_sync_every_days: int = Field(default=7, ge=0)
     # Queue of the sync worker (C10 name `sync`); a setting so test runs can use their own.
     arq_queue_sync: str = "sync"
     convert_timeout_seconds: int = Field(default=600, gt=0)

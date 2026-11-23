@@ -13,10 +13,12 @@ from importlib.metadata import entry_points
 
 from ffcore.core.config import Settings
 from ffcore.sources.base import SourceError
+from ffcore.sources.confluence import ConfluenceDriver
 from ffcore.sources.fs import FsDriver
+from ffcore.sources.jira import JiraDriver
 
 GROUP = "ffcore.sources"
-BUILTIN: dict[str, type] = {FsDriver.kind: FsDriver}
+BUILTIN: dict[str, type] = {d.kind: d for d in (FsDriver, ConfluenceDriver, JiraDriver)}
 REQUIRED = (
     "kind",
     "tombstones",

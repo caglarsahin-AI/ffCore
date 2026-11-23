@@ -53,6 +53,7 @@ class Hit:
     age_days: int | None
     embed_score: float | None
     rerank_score: float | None
+    source_url: str | None = None  # 16-2: the item in its source system (connector documents)
 
 
 @dataclass
@@ -156,6 +157,7 @@ async def _details(
         text(
             "SELECT c.id, c.document_id, d.filename, c.page, c.section_path, c.breadcrumb,"
             " c.text, c.chunk_status, d.updated_at_source,"
+            " d.metadata->>'source_url' AS source_url,"
             " CASE WHEN c.embedding IS NULL THEN NULL"
             " ELSE 1 - (c.embedding <=> CAST(:vec AS vector)) END AS embed_score"
             " FROM chunks c JOIN documents d ON d.id = c.document_id"
@@ -318,6 +320,7 @@ async def search(
                 age_days=(now - updated).days if updated else None,
                 embed_score=row["embed_score"],
                 rerank_score=candidate["rerank_score"],
+                source_url=row["source_url"],
             )
         )
     # Newest source first; undated last (recency is shown, the reranker chose the set).

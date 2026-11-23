@@ -47,6 +47,7 @@ from ffcore.api.sources_schemas import (
 from ffcore.core.audit import audited
 from ffcore.core.auth import Actor, authorize, require_role, require_superadmin
 from ffcore.core.config import Settings, get_settings
+from ffcore.core.egress import refuse_platform_target
 from ffcore.core.errors import ApiError
 from ffcore.core.secrets import decrypt_json, encrypt_json
 from ffcore.knowledge import jobs, raw_staging
@@ -156,9 +157,18 @@ def _validate(kind: str, deployment: str | None, config: dict, secret: dict | No
         if not secret:
             raise invalid("secret_required", f"{kind} sources need credentials.")
         try:
-            clean_secret = driver.secret_model.model_validate(secret).model_dump(mode="json")
+            clean_secret = driver.secret_model.model_validate(secret).model_dump(
+                mode="json", exclude_none=True
+            )
         except ValidationError as exc:
             raise invalid("secret_invalid", _first_error(exc, values=False)) from None
+    refuse_platform_target(normalized.get("base_url"), settings, "base URL")
+    check = getattr(driver, "check", None)  # 16-2: rules across config, secret and deployment
+    if check is not None:
+        try:
+            check(deployment, normalized, clean_secret)
+        except SourceError as exc:
+            raise _source_error(exc) from None
     if kind == "fs":
         try:
             paths.resolve_root(settings.fs_sources_base, normalized["root"])

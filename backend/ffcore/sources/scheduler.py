@@ -1,9 +1,11 @@
 """The `sync` queue (C10) and the sync worker's minute tick, importable without a worker.
 
 `tick` fails runs left `running` past the job timeout (`run_abandoned`: the worker died; the
-source can sync again, never silently) and starts a raw delta run for every active source whose
-schedule slot passed (`schedule.due`). A source with an active run keeps it (the partial unique
-index); the slot is taken by that run.
+source can sync again, never silently) and starts a raw run for every active source whose
+schedule slot passed (`schedule.due`): a delta, or a full run when the source's last completed
+full run is FULL_SYNC_EVERY_DAYS old (R-16-0013 MINOR-1: a permission narrowed at the source
+and a deletion only a full run sees reach the index without anyone starting one; D4 applies).
+A source with an active run keeps it (the partial unique index); the slot is taken by that run.
 """
 
 import logging
@@ -23,6 +25,15 @@ log = logging.getLogger("ffcore.sources.scheduler")
 JOB_TIMEOUT_S = 12 * 3600
 ABANDON_AFTER = timedelta(seconds=JOB_TIMEOUT_S + 3600)
 SCHEDULE_ACTOR = "system:schedule"
+
+
+def scheduled_mode(last_full: datetime | None, now: datetime, every_days: int) -> str:
+    """`full` when `every_days` > 0 and no full run completed in the last `every_days` days."""
+    if every_days <= 0:
+        return "delta"
+    if last_full is None or now - last_full >= timedelta(days=every_days):
+        return "full"
+    return "delta"
 
 
 class SyncQueue:
@@ -85,6 +96,19 @@ async def tick(
                 )
             ).all()
         )
+        last_full = dict(
+            (
+                await session.execute(
+                    select(SyncRun.data_source_id, func.max(SyncRun.ended_at))
+                    .where(
+                        SyncRun.layer == "raw",
+                        SyncRun.mode == "full",
+                        SyncRun.status == "completed",
+                    )
+                    .group_by(SyncRun.data_source_id)
+                )
+            ).all()
+        )
         sources = (
             await session.scalars(
                 select(DataSource).where(
@@ -107,7 +131,9 @@ async def tick(
                         session,
                         source,
                         layer="raw",
-                        mode="delta",
+                        mode=scheduled_mode(
+                            last_full.get(source.id), now, settings.full_sync_every_days
+                        ),
                         trigger="schedule",
                         requested_by=SCHEDULE_ACTOR,
                     )

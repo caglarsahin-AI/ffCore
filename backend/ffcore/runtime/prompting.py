@@ -36,6 +36,7 @@ class Source:
     text: str
     updated_at_source: str | None
     rerank_score: float | None
+    source_url: str | None = None  # 16-2, additive in the `sources` event (C9)
 
     def public(self) -> dict[str, Any]:
         """What the `sources` event and the message carry: no chunk text (it stays in the KB)."""
@@ -49,6 +50,7 @@ class Source:
             "breadcrumb": self.breadcrumb,
             "updated_at_source": self.updated_at_source,
             "rerank_score": self.rerank_score,
+            "source_url": self.source_url,
         }
 
 

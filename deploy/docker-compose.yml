@@ -84,6 +84,7 @@ x-app-env: &app-env
   FS_SOURCES_BASE: ${FS_SOURCES_BASE:-/data/sources}
   PRUNE_MAX_RATIO: ${PRUNE_MAX_RATIO:-0.2}
   ATTACHMENT_MIN_DATE: ${ATTACHMENT_MIN_DATE:-}
+  FULL_SYNC_EVERY_DAYS: ${FULL_SYNC_EVERY_DAYS:-7}
   ARQ_QUEUE_SYNC: ${ARQ_QUEUE_SYNC:-sync}
   OFFLINE: ${OFFLINE:?OFFLINE tanımlı değil}
   # 12 (FOLLOWUP-46): the application connects as ffcore_app (no DDL) when APP_DB_PASSWORD

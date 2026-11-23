@@ -12,7 +12,8 @@ REPO = Path(__file__).resolve().parents[3]
 EGRESS = yaml.safe_load((REPO / "deploy" / "docker-compose.egress.yml").read_text("utf-8"))
 PROXY_URL = "http://egress-proxy:3128"
 # Every service that runs ffcore with SafeOutboundClient for external hosts.
-APP_SERVICES = ["backend", "worker", "agent-worker", "agent-worker-bg"]
+# 16-2: the sync worker reads Confluence/Jira Cloud through the same proxy (K-16-0009 S5).
+APP_SERVICES = ["backend", "worker", "agent-worker", "agent-worker-bg", "sync-worker"]
 
 
 @pytest.mark.parametrize("service", APP_SERVICES)

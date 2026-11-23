@@ -117,7 +117,9 @@ RECENT = datetime(2025, 6, 1, tzinfo=UTC)
 
 @pytest.fixture
 def issues(monkeypatch):
-    drivers = registry.build(registry.BUILTIN, [("test-jira", FakeIssues)])
+    # 16-2: `jira` is built in now; the test driver stands in for it (one kind, one driver).
+    builtin = {k: v for k, v in registry.BUILTIN.items() if k != "jira"}
+    drivers = registry.build(builtin, [("test-jira", FakeIssues)])
     monkeypatch.setattr(registry, "drivers", lambda: drivers)
     FakeIssues.downloads = []
     FakeIssues.pages = {
