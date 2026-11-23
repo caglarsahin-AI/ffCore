@@ -219,7 +219,21 @@
   <div class="notes"><b>Not:</b> Yetki sınırını canlı gösterin: CMO asistanına "iade yap" dendiğinde reddedip doğru kuyruğa yönlendirmesi. Dürüstlük: bugün uzmanlık ayrı asistan ya da araç olarak bağlanır; bir asistanın başka asistanı kendi içinden çağırıp sonucu birleştirmesi yol haritasında.</div>
 </section>
 
-<!-- 10 -->
+<!-- 10: demo -->
+<section class="slide">
+  <p class="kicker">Canlı demo</p>
+  <h2>Dört ekran, beş dakika</h2>
+  <div class="grid g2">
+    <div class="card"><h3>1 · Sohbet: kaynak kartlı cevap</h3><p>"Almanya'ya baklava gönderiyor musunuz, gümrük kim öder?" → cevap SSS maddesini ve güncelleme tarihini gösterir; bilinmeyen soruda kayıtlı "bilmiyorum".</p></div>
+    <div class="card"><h3>2 · Araç: "siparişim nerede"</h3><p>Sipariş numarasıyla Shopify sorgusu, kargo durumu; araç çağrısı kartta görünür, kişi verisi maskeli.</p></div>
+    <div class="card"><h3>3 · Onay kuyruğu</h3><p>Hasar fotoğraflı iade talebi → politika kararı taslağı → onay ekranında yetkili onaylar; CMO asistanına "iade yap" dendiğinde ret ve yönlendirme.</p></div>
+    <div class="card"><h3>4 · Hafıza ve izleme</h3><p>Kullanıcının "Hafızam" sayfası (gör, sil, kapat); konsolda koşu zaman çizelgesi, maliyet ve değerlendirme puanları.</p></div>
+  </div>
+  <p class="legend">Demo verisi sentetik. Onların SSS ve politika metinlerini önceden bilgi tabanına koyarsak etki iki katı: kendi sorularını sorarlar.</p>
+  <div class="notes"><b>Not:</b> Demo yığını toplantıdan önce açık ve ısınmış olsun; ağ yoksa ekran görüntüleriyle aynı dört adım. Süre 5 dakikayı geçmesin; soru gelirse yol haritası slaytında toplayın.</div>
+</section>
+
+<!-- 11 -->
 <section class="slide">
   <p class="kicker">Yol haritası</p>
   <h2>Platform bir kez kurulur, asistanlar eklenir</h2>
@@ -289,6 +303,83 @@
   </div>
   <p class="legend">Dürüst notlar: web widget ve WhatsApp kanalı dalga 10'da; kurumsal giriş bu hafta; tahmin ve anomali motoru pilotta birlikte kurulur, asistan açıklama ve aksiyon katmanıdır.</p>
   <div class="notes"><b>Not:</b> Kapanış: "Platform bir kez kurulur, dijital ekip büyür." Toplantıdan çıkarken keşif tarihini almış olun.</div>
+</section>
+
+<!-- Ek A1 -->
+<section class="slide">
+  <p class="kicker">Ek A1 · sorulursa</p>
+  <h2>Mimari ayrıntı ve model seçenekleri</h2>
+  <div class="grid g2">
+    <div class="card"><h3>Bileşenler</h3><ul>
+      <li>API ve asistan çalışma zamanı (FastAPI, LangGraph, Postgres checkpoint); kuyruklar: etkileşimli, arka plan, senkron</li>
+      <li>Model geçidi (LiteLLM): sağlayıcı değişimi yapılandırmayla; kota ve harcama tavanı proje başına</li>
+      <li>İzleme ve değerlendirme (Langfuse): her koşu izli; prompt sürümleri; sınav setleri</li>
+      <li>Bilgi tabanı: Docling dönüşüm, Türkçe ve çok dilli embedding, pgvector/Qdrant, yeniden sıralama</li>
+      <li>Araç yüzeyi: OpenAPI → MCP; onay kuralları araç başına</li>
+      <li>Kanal ve kaynak bağlayıcıları: uzantı noktası; Confluence/Jira/SharePoint/ağ klasörü</li>
+    </ul></div>
+    <div class="card"><h3>Model seçenekleri</h3><ul>
+      <li><b>Azure OpenAI, AB bölgesi</b> (Frankfurt/Paris): kurumsal sözleşme, veri eğitimde kullanılmaz</li>
+      <li><b>Anthropic</b> (AB veri işleme seçenekleriyle) uzun belge ve araç kullanımı için</li>
+      <li><b>Açık modeller</b> (Qwen ailesi) kendi sunucunuzda, kapalı ağda; aynı ürün, aynı asistanlar</li>
+      <li>Embedding ve kişi verisi tanıma modelleri her zaman kurum içinde çalışır</li>
+      <li>Model değişimi asistan tanımını değiştirmez; sınav setleri geçişi ölçer</li>
+    </ul></div>
+  </div>
+  <div class="notes"><b>Not:</b> Teknik dinleyici varsa. Vurgu: "sağlayıcı bir yapılandırma satırı, kalite sınavla ölçülür."</div>
+</section>
+
+<!-- Ek A2 -->
+<section class="slide">
+  <p class="kicker">Ek A2 · sorulursa</p>
+  <h2>Ölçek ve maliyet örneği (yapı; rakamlar keşiften sonra)</h2>
+  <div class="grid g2">
+    <div class="card"><h3>Örnek varsayım: aylık 20.000 destek mesajı</h3><ul>
+      <li>Mesaj başına ortalama 3.000 giriş + 400 çıkış token (bilgi tabanı bağlamı dâhil)</li>
+      <li>Asistan yanıtlarının %70'i insan dokunuşu olmadan kapanır (pilot hedefi)</li>
+      <li>Model gideri = token × sağlayıcı birim fiyatı; konsolda gerçek zamanlı, tavanla sınırlı</li>
+      <li>Anomali ve tahmin işleri LLM'siz çalışır; model gideri yalnız açıklama adımında</li>
+    </ul></div>
+    <div class="card"><h3>Üç kalem nasıl oluşur</h3><ul>
+      <li><b>Platform aboneliği:</b> asistan sayısı ve kullanıcı sayısı kademeleri</li>
+      <li><b>Model kullanımı:</b> geçiş fiyatı + küçük işletme payı; aylık rapor</li>
+      <li><b>Kurulum:</b> bilgi tabanı hazırlığı, araç tanımları, ilk sınav setleri; bir kerelik</li>
+      <li>Karşılaştırma kalemi: gece vardiyası ve çok dilli temsilci maliyeti, iade/gümrük kaybı</li>
+    </ul></div>
+  </div>
+  <div class="notes"><b>Not:</b> Rakamları toplantıda vermeyin; varsayımları onların hacimleriyle değiştirip teklifle gönderin. Token başına fiyat sağlayıcıya göre değişir; güncel listeyi teklif gününde alın.</div>
+</section>
+
+<!-- Ek A3 -->
+<section class="slide">
+  <p class="kicker">Ek A3 · sorulursa</p>
+  <h2>Referans ve ekip</h2>
+  <div class="grid g2">
+    <div class="card"><h3>Nerede çalışıyor</h3><ul>
+      <li>Kapalı ağda (airgap) kurumsal pilot: Confluence/Jira korpusu, Türkçe belge ve SQL asistanları; iki profil aynı test kapısından geçer</li>
+      <li>Her sürüm: birim ve sözleşme testleri iki profilde, entegrasyon ve uçtan uca testler, güvenlik turu; sayılar istenirse paylaşılır</li>
+      <li>Geliştirme düzeni: her değişiklik bağımsız incelemeden ve ana kapıdan geçer; karar ve değişiklik kayıtları tutulur</li>
+    </ul></div>
+    <div class="card"><h3>Ekip ve rol</h3><ul>
+      <li>Ürün sahibi ve mimar: ______</li>
+      <li>Kurulum ve işletme: ______</li>
+      <li>Bilgi tabanı ve değerlendirme: ______</li>
+      <li>Müşteri tarafı ürün sahibi: haftada 2 saat</li>
+    </ul></div>
+  </div>
+  <div class="notes"><b>Not:</b> Referans adı vermeden önce izin alın; isimsiz "kurumsal pilot" ifadesi yeterli. Test sayılarını kapı loglarından güncel alın.</div>
+</section>
+
+<!-- Ek A4 -->
+<section class="slide">
+  <p class="kicker">Ek A4 · sorulursa</p>
+  <h2>Neden şimdi</h2>
+  <div class="grid g3">
+    <div class="card"><h3>Rakipler</h3><p>Sınır ötesi e-ticaret siteleri destek ve içerikte asistan kullanıyor; müşteri beklentisi "anında, kendi dilimde" oldu. Geç kalan destek maliyetini artırarak yarışır.</p></div>
+    <div class="card"><h3>Teknoloji olgunlaştı</h3><p>Çok dilli modeller, araç çağrısı ve kaynak gösterme üretim kalitesinde; fark artık modelde değil, kurumun bilgisini ve kurallarını bağlayan platformda.</p></div>
+    <div class="card"><h3>Düzenleme</h3><p>GDPR ve AB yapay zekâ kuralları şeffaflık, denetim izi ve insan gözetimi ister; onay kuyruğu, kaynak gösterme ve maske bunu baştan sağlar.</p></div>
+  </div>
+  <div class="notes"><b>Not:</b> Rakip adı vermeyin; genel eğilim yeter. Düzenleme cümlesini hukuk ekibi varsa ona bırakın.</div>
 </section>
 
 </div>
