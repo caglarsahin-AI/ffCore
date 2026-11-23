@@ -342,7 +342,7 @@ def test_16_2_jira_dc_listing_count_render_without_names(fake, local):
     assert "## Resolution\n\nZaman aşımı 30 sn yapıldı." in text
     assert "## Comment 1 (" in text and "Yeniden denendi." in text
     assert "Ayşe" not in text and "Mehmet" not in text  # K-16-0009 S1
-    assert acl.groups == ("security:Yonetim",)  # the level narrows the project, not adds to it
+    assert acl.groups == ("security:OPS/Yonetim",)  # narrows the project; named per project (r2)
     assert acl_open.groups == ("project:OPS",)
     assert [a.name for a in attachments] == ["log.txt"]
 
