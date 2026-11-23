@@ -1,0 +1,19 @@
+HEAD=960632c78660397bb6e11cc63bdbe6ef827bb477 2026-11-23 14:05:39 make lint, alembic heads, make test llmaas + airgap
+ruff check backend scripts data/samples/scripts services tests/deploy
+All checks passed!
+ruff format --check backend scripts data/samples/scripts services tests/deploy
+622 files already formatted
+lint=0
+16_0001 (05a, 08, 11, 06b, 05b, 03c, 09, 04b, 14, 07, 12, 03a, 16, 03b, 06a, 04a) (head)
+tests/contract/test_c2_on_behalf_of.py ..                                [ 99%]
+tests/contract/test_c3_common_columns.py .....                           [ 99%]
+tests/contract/test_c5_vectorstore.py ...                                [ 99%]
+tests/contract/test_c9_runs.py .......                                   [100%]
+
+======================= 2292 passed in 248.22s (0:04:08) =======================
+tests/contract/test_c2_on_behalf_of.py ..                                [ 99%]
+tests/contract/test_c3_common_columns.py .....                           [ 99%]
+tests/contract/test_c5_vectorstore.py ...                                [ 99%]
+tests/contract/test_c9_runs.py .......                                   [100%]
+
+======================= 2292 passed in 288.22s (0:04:48) =======================

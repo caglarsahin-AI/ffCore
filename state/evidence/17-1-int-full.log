@@ -1,0 +1,1445 @@
+=== 17-1 full test-int HEAD=ad82edffde2731eefea2783a302bc212eff48262 2026-11-23 13:19:20
+=== 13:19:21 up -d --build --pull never --wait (test profile)
+2026/11/23 13:19:30 http2: server: error reading preface from client //./pipe/docker_engine: file has already been closed
+#0 building with "default" instance using docker driver
+
+#1 [backend internal] load .dockerignore
+#1 transferring context: 2B 0.0s done
+#1 DONE 0.0s
+
+#2 [backend internal] load build definition from Dockerfile
+#2 transferring dockerfile: 2.41kB 0.0s done
+#2 DONE 0.1s
+
+#3 [backend internal] load metadata for ghcr.io/astral-sh/uv:0.10.12
+#3 ...
+
+#4 [backend internal] load metadata for docker.io/library/python:3.12.10-slim-bookworm
+#4 DONE 3.1s
+
+#3 [backend internal] load metadata for ghcr.io/astral-sh/uv:0.10.12
+#3 DONE 3.3s
+
+#5 [backend uv 1/1] FROM ghcr.io/astral-sh/uv:0.10.12@sha256:72ab0aeb448090480ccabb99fb5f52b0dc3c71923bffb5e2e26517a1c27b7fec
+#5 DONE 0.0s
+
+#6 [backend base 1/6] FROM docker.io/library/python:3.12.10-slim-bookworm@sha256:fd95fa221297a88e1cf49c55ec1828edd7c5a428187e67b5d1805692d11588db
+#6 DONE 0.0s
+
+#7 [backend internal] load build context
+#7 transferring context: 5.25MB 0.3s done
+#7 DONE 0.3s
+
+#8 [backend base 4/6] RUN mkdir -p /models /data/storage && chown 10001 /models /data/storage
+#8 CACHED
+
+#9 [backend runtime 1/5] RUN uv sync --frozen --no-dev --no-install-project
+#9 CACHED
+
+#10 [backend base 2/6] COPY --from=uv /uv /usr/local/bin/uv
+#10 CACHED
+
+#11 [backend base 3/6] RUN apt-get update     && apt-get install -y --no-install-recommends libgomp1 libgl1 libglib2.0-0 libxcb1 make curl     && rm -rf /var/lib/apt/lists/*
+#11 CACHED
+
+#12 [backend base 5/6] WORKDIR /app
+#12 CACHED
+
+#13 [backend base 6/6] COPY pyproject.toml uv.lock ./
+#13 CACHED
+
+#14 [backend runtime 2/5] COPY alembic.ini ./
+#14 CACHED
+
+#15 [backend runtime 3/5] COPY alembic ./alembic
+#15 DONE 0.1s
+
+#16 [backend runtime 4/5] COPY ffcore ./ffcore
+#16 DONE 0.2s
+
+#17 [backend runtime 5/5] RUN useradd --system --uid 10001 --home-dir /models ffcore
+#17 0.342 useradd warning: ffcore's uid 10001 is greater than SYS_UID_MAX 999
+#17 DONE 0.4s
+
+#18 [backend] exporting to image
+#18 exporting layers
+#18 exporting layers 0.2s done
+#18 writing image sha256:bc19cff8d0674c2d9bc26f8bc2ed8e258cf765e38a91d8e7af96e0f745e43fa7 done
+#18 naming to docker.io/ffcore/backend:0.0.0-17 0.0s done
+#18 DONE 0.2s
+
+#19 [frontend internal] load .dockerignore
+#19 transferring context: 115B 0.0s done
+#19 DONE 0.0s
+
+#20 [frontend internal] load build definition from Dockerfile
+#20 transferring dockerfile: 665B 0.0s done
+#20 DONE 0.1s
+
+#21 [frontend internal] load metadata for docker.io/library/node:20.19.5-alpine
+#21 DONE 0.0s
+
+#22 [frontend 1/6] FROM docker.io/library/node:20.19.5-alpine
+#22 DONE 0.0s
+
+#23 [frontend internal] load build context
+#23 transferring context: 4.20MB 0.2s done
+#23 DONE 0.2s
+
+#24 [frontend 3/6] COPY package.json package-lock.json ./
+#24 CACHED
+
+#25 [frontend 2/6] WORKDIR /app
+#25 CACHED
+
+#26 [frontend 4/6] RUN npm ci --no-audit --no-fund
+#26 CACHED
+
+#27 [frontend 5/6] COPY . .
+#27 DONE 0.1s
+
+#28 [frontend 6/6] RUN npm run build
+#28 0.421 
+#28 0.421 > ffcore-frontend@0.1.0 build
+#28 0.421 > next build
+#28 0.421 
+#28 2.813    ▲ Next.js 15.5.28
+#28 2.814 
+#28 2.862    Creating an optimized production build ...
+#28 38.94  ✓ Compiled successfully in 35.9s
+#28 38.94    Linting and checking validity of types ...
+#28 63.41    Collecting page data ...
+#28 67.63    Generating static pages (0/30) ...
+#28 68.52    Generating static pages (7/30) 
+#28 68.56    Generating static pages (14/30) 
+#28 68.79    Generating static pages (22/30) 
+#28 68.86  ✓ Generating static pages (30/30)
+#28 70.45    Finalizing page optimization ...
+#28 70.45    Collecting build traces ...
+#28 86.44 
+#28 86.45 Route (app)                                 Size  First Load JS
+#28 86.45 ┌ ƒ /                                    6.43 kB         146 kB
+#28 86.45 ├ ƒ /_not-found                             1 kB         103 kB
+#28 86.45 ├ ƒ /[section]                           1.56 kB         116 kB
+#28 86.45 ├ ƒ /agents                              5.65 kB         193 kB
+#28 86.45 ├ ƒ /agents/[agentId]                    13.1 kB         197 kB
+#28 86.45 ├ ƒ /alerts                              8.16 kB         166 kB
+#28 86.45 ├ ƒ /api-keys                             6.7 kB         165 kB
+#28 86.45 ├ ○ /apple-icon.png                          0 B            0 B
+#28 86.45 ├ ƒ /approvals                           7.58 kB         152 kB
+#28 86.45 ├ ƒ /approvals/[approvalId]              4.47 kB         166 kB
+#28 86.45 ├ ƒ /chat                                  208 B         203 kB
+#28 86.45 ├ ƒ /chat/[agentKey]                       136 B         103 kB
+#28 86.45 ├ ƒ /chat/[agentKey]/[conversationId]      136 B         103 kB
+#28 86.45 ├ ƒ /dev/theme                             307 B         122 kB
+#28 86.45 ├ ƒ /evaluations                         1.43 kB         170 kB
+#28 86.45 ├ ƒ /evaluations/[suiteId]               3.67 kB         172 kB
+#28 86.45 ├ ƒ /evaluations/compare                 5.59 kB         177 kB
+#28 86.45 ├ ƒ /evaluations/runs/[evalRunId]        5.98 kB         195 kB
+#28 86.45 ├ ○ /icon.png                                0 B            0 B
+#28 86.45 ├ ƒ /knowledge-bases                     1.49 kB         195 kB
+#28 86.45 ├ ƒ /knowledge-bases/[kbId]              6.13 kB         209 kB
+#28 86.45 ├ ƒ /login                                6.1 kB         181 kB
+#28 86.45 ├ ○ /manifest.webmanifest                  136 B         103 kB
+#28 86.45 ├ ƒ /mcp-servers                         1.52 kB         195 kB
+#28 86.45 ├ ƒ /mcp-servers/[serverId]              5.24 kB         209 kB
+#28 86.45 ├ ƒ /memory                              9.33 kB         173 kB
+#28 86.45 ├ ƒ /models                              8.29 kB         166 kB
+#28 86.45 ├ ƒ /overview                            3.97 kB         263 kB
+#28 86.45 ├ ƒ /projects                             3.4 kB         191 kB
+#28 86.45 ├ ƒ /projects/[id]/members               3.96 kB         159 kB
+#28 86.45 ├ ƒ /providers                           6.48 kB         164 kB
+#28 86.45 ├ ƒ /quotas                              7.41 kB         165 kB
+#28 86.45 ├ ƒ /retention                            5.7 kB         186 kB
+#28 86.45 ├ ƒ /runs                                8.78 kB         153 kB
+#28 86.45 ├ ƒ /runs/[runId]                        7.98 kB         170 kB
+#28 86.45 ├ ƒ /settings                            4.67 kB         156 kB
+#28 86.45 ├ ƒ /system-status                       8.71 kB         136 kB
+#28 86.45 ├ ƒ /tools                               1.16 kB         194 kB
+#28 86.45 ├ ƒ /tools/[toolId]                      3.33 kB         196 kB
+#28 86.45 └ ƒ /usage                               3.09 kB         261 kB
+#28 86.45 + First Load JS shared by all             102 kB
+#28 86.45   ├ chunks/1255-60d8dc7c8c9309a1.js      46.3 kB
+#28 86.45   ├ chunks/4bd1b696-100b9d70ed4e49c1.js  54.2 kB
+#28 86.45   └ other shared chunks (total)          1.94 kB
+#28 86.45 
+#28 86.45 
+#28 86.45 ○  (Static)   prerendered as static content
+#28 86.45 ƒ  (Dynamic)  server-rendered on demand
+#28 86.45 
+#28 DONE 86.6s
+
+#29 [frontend] exporting to image
+#29 exporting layers
+#29 exporting layers 1.5s done
+#29 writing image sha256:a33e31d79466f7658b9374a04db40b9a050c18b6a4961d0b17a82543bcc71259 done
+#29 naming to docker.io/ffcore/frontend:0.0.0-17 0.0s done
+#29 DONE 1.5s
+ Container ffcore-17-fake-llm-1  Creating
+ Container ffcore-17-langfuse-clickhouse-1  Creating
+ Container ffcore-17-langfuse-postgres-1  Creating
+ Container ffcore-17-langfuse-minio-1  Creating
+ Container ffcore-17-ticket-desk-1  Creating
+ Container ffcore-17-langfuse-redis-1  Creating
+ Container ffcore-17-postgres-1  Running
+ Container ffcore-17-migrate-1  Creating
+ Container ffcore-17-redis-1  Running
+ Container ffcore-17-litellm-1  Creating
+ Container ffcore-17-langfuse-redis-1  Created
+ Container ffcore-17-langfuse-clickhouse-1  Created
+ Container ffcore-17-fake-llm-1  Created
+ Container ffcore-17-langfuse-minio-1  Created
+ Container ffcore-17-ticket-desk-1  Created
+ Container ffcore-17-migrate-1  Created
+ Container ffcore-17-sync-worker-1  Creating
+ Container ffcore-17-langfuse-postgres-1  Created
+ Container ffcore-17-langfuse-web-1  Creating
+ Container ffcore-17-langfuse-worker-1  Creating
+ Container ffcore-17-litellm-1  Created
+ Container ffcore-17-backend-1  Creating
+ Container ffcore-17-langfuse-worker-1  Created
+ Container ffcore-17-sync-worker-1  Created
+ Container ffcore-17-langfuse-web-1  Created
+ Container ffcore-17-backend-1  Created
+ Container ffcore-17-agent-worker-bg-1  Creating
+ Container ffcore-17-mcp-sql-1  Creating
+ Container ffcore-17-agent-worker-1  Creating
+ Container ffcore-17-mcp-search-1  Creating
+ Container ffcore-17-frontend-1  Creating
+ Container ffcore-17-worker-1  Creating
+ Container ffcore-17-mcp-sql-1  Created
+ Container ffcore-17-agent-worker-bg-1  Created
+ Container ffcore-17-agent-worker-1  Created
+ Container ffcore-17-mcp-search-1  Created
+ Container ffcore-17-worker-1  Created
+ Container ffcore-17-frontend-1  Created
+ Container ffcore-17-ticket-desk-1  Starting
+ Container ffcore-17-langfuse-minio-1  Starting
+ Container ffcore-17-langfuse-postgres-1  Starting
+ Container ffcore-17-langfuse-redis-1  Starting
+ Container ffcore-17-langfuse-clickhouse-1  Starting
+ Container ffcore-17-fake-llm-1  Starting
+ Container ffcore-17-postgres-1  Waiting
+ Container ffcore-17-postgres-1  Waiting
+ Container ffcore-17-ticket-desk-1  Started
+ Container ffcore-17-postgres-1  Healthy
+ Container ffcore-17-postgres-1  Healthy
+ Container ffcore-17-migrate-1  Starting
+ Container ffcore-17-litellm-1  Starting
+ Container ffcore-17-langfuse-postgres-1  Started
+ Container ffcore-17-langfuse-clickhouse-1  Started
+ Container ffcore-17-langfuse-redis-1  Started
+ Container ffcore-17-langfuse-minio-1  Started
+ Container ffcore-17-langfuse-redis-1  Waiting
+ Container ffcore-17-langfuse-postgres-1  Waiting
+ Container ffcore-17-langfuse-clickhouse-1  Waiting
+ Container ffcore-17-langfuse-minio-1  Waiting
+ Container ffcore-17-langfuse-minio-1  Waiting
+ Container ffcore-17-langfuse-redis-1  Waiting
+ Container ffcore-17-langfuse-postgres-1  Waiting
+ Container ffcore-17-langfuse-clickhouse-1  Waiting
+ Container ffcore-17-fake-llm-1  Started
+ Container ffcore-17-litellm-1  Started
+ Container ffcore-17-migrate-1  Started
+ Container ffcore-17-migrate-1  Waiting
+ Container ffcore-17-postgres-1  Waiting
+ Container ffcore-17-redis-1  Waiting
+ Container ffcore-17-litellm-1  Waiting
+ Container ffcore-17-postgres-1  Waiting
+ Container ffcore-17-redis-1  Waiting
+ Container ffcore-17-migrate-1  Waiting
+ Container ffcore-17-redis-1  Healthy
+ Container ffcore-17-postgres-1  Healthy
+ Container ffcore-17-postgres-1  Healthy
+ Container ffcore-17-redis-1  Healthy
+ Container ffcore-17-langfuse-redis-1  Healthy
+ Container ffcore-17-langfuse-postgres-1  Healthy
+ Container ffcore-17-langfuse-redis-1  Healthy
+ Container ffcore-17-langfuse-postgres-1  Healthy
+ Container ffcore-17-langfuse-minio-1  Healthy
+ Container ffcore-17-langfuse-minio-1  Healthy
+ Container ffcore-17-langfuse-clickhouse-1  Healthy
+ Container ffcore-17-langfuse-web-1  Starting
+ Container ffcore-17-langfuse-clickhouse-1  Healthy
+ Container ffcore-17-langfuse-worker-1  Starting
+ Container ffcore-17-langfuse-web-1  Started
+ Container ffcore-17-langfuse-worker-1  Started
+ Container ffcore-17-migrate-1  Exited
+ Container ffcore-17-migrate-1  Exited
+ Container ffcore-17-sync-worker-1  Starting
+ Container ffcore-17-sync-worker-1  Started
+ Container ffcore-17-litellm-1  Healthy
+ Container ffcore-17-backend-1  Starting
+ Container ffcore-17-backend-1  Started
+ Container ffcore-17-backend-1  Waiting
+ Container ffcore-17-backend-1  Waiting
+ Container ffcore-17-postgres-1  Waiting
+ Container ffcore-17-backend-1  Waiting
+ Container ffcore-17-backend-1  Waiting
+ Container ffcore-17-backend-1  Waiting
+ Container ffcore-17-backend-1  Waiting
+ Container ffcore-17-postgres-1  Healthy
+ Container ffcore-17-backend-1  Healthy
+ Container ffcore-17-agent-worker-1  Starting
+ Container ffcore-17-backend-1  Healthy
+ Container ffcore-17-frontend-1  Starting
+ Container ffcore-17-backend-1  Healthy
+ Container ffcore-17-mcp-search-1  Starting
+ Container ffcore-17-backend-1  Healthy
+ Container ffcore-17-worker-1  Starting
+ Container ffcore-17-backend-1  Healthy
+ Container ffcore-17-agent-worker-bg-1  Starting
+ Container ffcore-17-backend-1  Healthy
+ Container ffcore-17-mcp-sql-1  Starting
+ Container ffcore-17-agent-worker-1  Started
+ Container ffcore-17-mcp-sql-1  Started
+ Container ffcore-17-frontend-1  Started
+ Container ffcore-17-mcp-search-1  Started
+ Container ffcore-17-worker-1  Started
+ Container ffcore-17-agent-worker-bg-1  Started
+ Container ffcore-17-ticket-desk-1  Waiting
+ Container ffcore-17-langfuse-web-1  Waiting
+ Container ffcore-17-langfuse-clickhouse-1  Waiting
+ Container ffcore-17-agent-worker-1  Waiting
+ Container ffcore-17-mcp-search-1  Waiting
+ Container ffcore-17-mcp-sql-1  Waiting
+ Container ffcore-17-fake-llm-1  Waiting
+ Container ffcore-17-langfuse-worker-1  Waiting
+ Container ffcore-17-postgres-1  Waiting
+ Container ffcore-17-agent-worker-bg-1  Waiting
+ Container ffcore-17-litellm-1  Waiting
+ Container ffcore-17-migrate-1  Waiting
+ Container ffcore-17-langfuse-redis-1  Waiting
+ Container ffcore-17-backend-1  Waiting
+ Container ffcore-17-redis-1  Waiting
+ Container ffcore-17-sync-worker-1  Waiting
+ Container ffcore-17-frontend-1  Waiting
+ Container ffcore-17-langfuse-minio-1  Waiting
+ Container ffcore-17-langfuse-postgres-1  Waiting
+ Container ffcore-17-worker-1  Waiting
+ Container ffcore-17-langfuse-postgres-1  Healthy
+ Container ffcore-17-ticket-desk-1  Healthy
+ Container ffcore-17-worker-1  Healthy
+ Container ffcore-17-migrate-1  Exited
+ Container ffcore-17-litellm-1  Healthy
+ Container ffcore-17-langfuse-redis-1  Healthy
+ Container ffcore-17-fake-llm-1  Healthy
+ Container ffcore-17-langfuse-worker-1  Healthy
+ Container ffcore-17-postgres-1  Healthy
+ Container ffcore-17-langfuse-clickhouse-1  Healthy
+ Container ffcore-17-backend-1  Healthy
+ Container ffcore-17-redis-1  Healthy
+ Container ffcore-17-langfuse-minio-1  Healthy
+ Container ffcore-17-agent-worker-1  Healthy
+ Container ffcore-17-frontend-1  Healthy
+ Container ffcore-17-agent-worker-bg-1  Healthy
+ Container ffcore-17-sync-worker-1  Healthy
+ Container ffcore-17-langfuse-web-1  Healthy
+ Container ffcore-17-mcp-sql-1  Healthy
+ Container ffcore-17-mcp-search-1  Healthy
+up exit=0
+=== 13:22:32 alembic heads
+17_0001 (17, 08, 05b, 14, 04a, 11, 06b, 12, 05a, 03a, 06a, 07, 03c, 03b, 04b, 09, 16) (head)
+=== 13:22:47 test-int
+cd backend && QDRANT_URL=http://qdrant:6333 RUN_QDRANT_TESTS=1 pytest tests/integration
+============================= test session starts ==============================
+platform linux -- Python 3.12.10, pytest-9.2.0, pluggy-1.7.0
+rootdir: /work/backend
+configfile: pyproject.toml
+plugins: Faker-40.43.0, anyio-4.15.1, langsmith-0.14.8
+collected 1399 items
+
+============================ no tests ran in 38.65s ============================
+! _pytest.outcomes.Exit: integration services not reachable: qdrant (profile qdrant) at http://qdrant:6333. Start them: docker compose --profile test --profile qdrant up -d --wait !
+make: *** [Makefile:31: test-int] Error 1
+test-int exit=2
+=== 13:23:49 lint + make test DEPLOY_PROFILE=llmaas
+ruff check backend scripts data/samples/scripts services tests/deploy
+All checks passed!
+ruff format --check backend scripts data/samples/scripts services tests/deploy
+621 files already formatted
+cd backend && pytest tests/unit tests/contract
+============================= test session starts ==============================
+platform linux -- Python 3.12.10, pytest-9.2.0, pluggy-1.7.0
+rootdir: /work/backend
+configfile: pyproject.toml
+plugins: Faker-40.43.0, anyio-4.15.1, langsmith-0.14.8
+collected 2287 items
+
+tests/unit/test_00_1_healthz.py .                                        [  0%]
+tests/unit/test_00_package.py ..                                         [  0%]
+tests/unit/test_00_repo_skeleton.py ...........                          [  0%]
+tests/unit/test_00_smoke_script.py ....                                  [  0%]
+tests/unit/test_01_client.py ..............                              [  1%]
+tests/unit/test_01_config.py ...                                         [  1%]
+tests/unit/test_01_egress_stream.py ..................                   [  2%]
+tests/unit/test_01_r1_safety.py ..............................           [  3%]
+tests/unit/test_01_reconcile_params.py ................                  [  4%]
+tests/unit/test_01_scheduler.py .....                                    [  4%]
+tests/unit/test_01_seed.py .............                                 [  5%]
+tests/unit/test_02_logging.py ...........                                [  5%]
+tests/unit/test_02_pricing.py ...                                        [  5%]
+tests/unit/test_02_r1_logging.py ..............                          [  6%]
+tests/unit/test_02_r1_tracing.py ...                                     [  6%]
+tests/unit/test_02_tracing.py .......................                    [  7%]
+tests/unit/test_03a_providers_service.py .....                           [  7%]
+tests/unit/test_03a_session.py ........                                  [  8%]
+tests/unit/test_03a_write_flag.py ....                                   [  8%]
+tests/unit/test_03b_auth.py .................                            [  8%]
+tests/unit/test_03b_config_errors.py ........                            [  9%]
+tests/unit/test_03b_dns_opt_in.py ..                                     [  9%]
+tests/unit/test_03b_egress.py .................................----------------------------------------......... [ 11%]
+............                                                             [ 11%]
+tests/unit/test_04a_convert.py .............................             [ 13%]
+tests/unit/test_04a_redis_pin.py ...                                     [ 13%]
+tests/unit/test_04a_review_r1_audit_fields.py ..                         [ 13%]
+tests/unit/test_04a_review_r1_chunk_budget.py .....                      [ 13%]
+tests/unit/test_04a_review_r1_limits.py ...........                      [ 13%]
+tests/unit/test_04a_review_r1_offline.py ......                          [ 14%]
+tests/unit/test_04a_text_rules.py ..............................         [ 15%]
+tests/unit/test_04b_2_markdown_prose.py .......                          [ 15%]
+tests/unit/test_04b_2_normalize_tr.py ....                               [ 16%]
+tests/unit/test_04b_2_r2_ollama_ps.py ......                             [ 16%]
+tests/unit/test_04b_2_scope.py .......                                   [ 16%]
+tests/unit/test_04b_cli.py ........                                      [ 16%]
+tests/unit/test_05a_mcp_client.py ...................................... [ 18%]
+.                                                                        [ 18%]
+tests/unit/test_05a_obo_verifier.py .....                                [ 18%]
+tests/unit/test_05a_services_config.py ..........                        [ 19%]
+tests/unit/test_05a_sql_validator.py ................................... [ 20%]
+................                                                         [ 21%]
+tests/unit/test_05a_tool_read_roles.py ..                                [ 21%]
+tests/unit/test_05a_unverified_claims.py ....                            [ 21%]
+tests/unit/test_05b_guardrail_mode.py ........                           [ 22%]
+tests/unit/test_05b_openapi_ops.py ..................................... [ 23%]
+..................                                                       [ 24%]
+tests/unit/test_05b_platform_targets.py ................................ [ 25%]
+..                                                                       [ 26%]
+tests/unit/test_06a_definition.py .................                      [ 26%]
+tests/unit/test_06a_model_adapter.py .                                   [ 26%]
+tests/unit/test_06a_no_langsmith.py ...                                  [ 26%]
+tests/unit/test_06a_prompting.py .....................                   [ 27%]
+tests/unit/test_06a_search_adapter.py .                                  [ 27%]
+tests/unit/test_06b2_external.py ....................................... [ 29%]
+.......................                                                  [ 30%]
+tests/unit/test_06b_facade.py .......................................... [ 32%]
+                                                                         [ 32%]
+tests/unit/test_07_rules.py ...........                                  [ 32%]
+tests/unit/test_07_worker.py .                                           [ 32%]
+tests/unit/test_07f_compose.py .                                         [ 33%]
+tests/unit/test_07f_follow.py ...                                        [ 33%]
+tests/unit/test_08_cost.py .......                                       [ 33%]
+tests/unit/test_08_egress_enforce.py ...............................     [ 34%]
+tests/unit/test_08_engine.py .....................                       [ 35%]
+tests/unit/test_08_masking.py ..........                                 [ 36%]
+tests/unit/test_08_recognizers.py .............                          [ 36%]
+tests/unit/test_08t1c_12_offline_models_listed.py .....                  [ 36%]
+tests/unit/test_08t1c_1_local_ner_single_load.py .                       [ 36%]
+tests/unit/test_08t1c_6_ingest_raw_text_filter.py .....                  [ 37%]
+tests/unit/test_08t1c_7_ner_quality.py .......                           [ 37%]
+tests/unit/test_08t_15_pii_ner.py ...........                            [ 37%]
+tests/unit/test_08t_16_builtin_v3.py .........                           [ 38%]
+tests/unit/test_08t_18_ner_candidates.py ...                             [ 38%]
+tests/unit/test_08t_19_egress_from_default.py ....                       [ 38%]
+tests/unit/test_08t_20_http_ner_windows.py ....                          [ 38%]
+tests/unit/test_08t_23_egress_ner_fail_loud.py ......                    [ 39%]
+tests/unit/test_08t_24_ner_transport_errors.py ...                       [ 39%]
+tests/unit/test_08t_25_ner_weights_at_startup.py ...                     [ 39%]
+tests/unit/test_08t_27_ner_span_trim.py ........                         [ 39%]
+tests/unit/test_08t_29_manifest_filter_buckets.py .                      [ 39%]
+tests/unit/test_08t_c17_facade.py .....                                  [ 40%]
+tests/unit/test_08t_c17_masking.py ...........                           [ 40%]
+tests/unit/test_08t_c17_runtime.py ..                                    [ 40%]
+tests/unit/test_08t_egress_http.py .......................               [ 41%]
+tests/unit/test_08t_m3_url_context.py .............                      [ 42%]
+tests/unit/test_08t_ner.py ............                                  [ 42%]
+tests/unit/test_08t_r1_minors.py .....                                   [ 42%]
+tests/unit/test_08t_r2_minors.py .....                                   [ 43%]
+tests/unit/test_08t_r2_rescope.py .....                                  [ 43%]
+tests/unit/test_08t_r2_url_lines.py .................................... [ 44%]
+........................................................................ [ 48%]
+..............................................                           [ 50%]
+tests/unit/test_08t_r3_blank_line.py ............................        [ 51%]
+tests/unit/test_08t_r3_minors.py ...                                     [ 51%]
+tests/unit/test_08t_r3_range.py ............                             [ 51%]
+tests/unit/test_08t_r3_url_rules.py .................................... [ 53%]
+........................................................................ [ 56%]
+....................                                                     [ 57%]
+tests/unit/test_08t_r3_url_scan.py ......                                [ 57%]
+tests/unit/test_08t_r4_html_response.py ................................ [ 59%]
+........................................................................ [ 62%]
+.....................                                                    [ 63%]
+tests/unit/test_08t_r5_tail.py .................                         [ 64%]
+tests/unit/test_08t_secrets_linear.py .......                            [ 64%]
+tests/unit/test_08t_secrets_short.py ...............................     [ 65%]
+tests/unit/test_08t_source_egress.py .....                               [ 65%]
+tests/unit/test_09_2_r1.py ...............................               [ 67%]
+tests/unit/test_09_compare.py ....                                       [ 67%]
+tests/unit/test_09_engine.py ........................................... [ 69%]
+..                                                                       [ 69%]
+tests/unit/test_09_followup176.py ............                           [ 69%]
+tests/unit/test_09_judge_ner.py ...                                      [ 70%]
+tests/unit/test_09_langfuse_api.py .......                               [ 70%]
+tests/unit/test_09_r2.py ......................                          [ 71%]
+tests/unit/test_09_r3.py .....                                           [ 71%]
+tests/unit/test_09_r4.py .......                                         [ 71%]
+tests/unit/test_09_r5.py ........                                        [ 72%]
+tests/unit/test_09_scorers.py ................................           [ 73%]
+tests/unit/test_10c1_stream_headers.py ..                                [ 73%]
+tests/unit/test_10c2_eval_items.py ............                          [ 74%]
+tests/unit/test_10c2_r2_summary_invalid.py ...                           [ 74%]
+tests/unit/test_10c3_0_summary_scalar.py .......                         [ 74%]
+tests/unit/test_116_source_state.py ..                                   [ 74%]
+tests/unit/test_11_title.py ...                                          [ 74%]
+tests/unit/test_12_46_app_role_static.py .................               [ 75%]
+tests/unit/test_12_95_vllm.py ........                                   [ 75%]
+tests/unit/test_12_backend_port_single_source.py .                       [ 75%]
+tests/unit/test_12_backup_scripts.py ..........                          [ 76%]
+tests/unit/test_12_compose_overlays.py .......................           [ 77%]
+tests/unit/test_12_compose_preflight.py ................................ [ 78%]
+.......                                                                  [ 79%]
+tests/unit/test_12_smoke.py ..........                                   [ 79%]
+tests/unit/test_134_egress_all_messages.py ........                      [ 79%]
+tests/unit/test_137_gate2_headings.py ......................             [ 80%]
+tests/unit/test_14_extract.py ..............                             [ 81%]
+tests/unit/test_14_pii.py ......                                         [ 81%]
+tests/unit/test_14_recall.py ................                            [ 82%]
+tests/unit/test_16_1_fs_driver.py ................                       [ 83%]
+tests/unit/test_16_1_r2_policy.py ...                                    [ 83%]
+tests/unit/test_16_1_rules.py ........................................   [ 85%]
+tests/unit/test_17_ldap.py ..................                            [ 85%]
+tests/unit/test_18td_server.py ...........                               [ 86%]
+tests/unit/test_18td_sql_write_attempts.py ................              [ 87%]
+tests/unit/test_19_eval_out.py ..............                            [ 87%]
+tests/unit/test_19_offline.py ............                               [ 88%]
+tests/unit/test_19_preflight.py ...............                          [ 88%]
+tests/unit/test_19_raw_staging.py ........................               [ 89%]
+tests/unit/test_19r_154_internal_hosts.py ...                            [ 89%]
+tests/unit/test_19r_cli_exit.py .                                        [ 90%]
+tests/unit/test_af_1_definition_error_codes.py ...........               [ 90%]
+tests/unit/test_af_2_structural_breadcrumb.py .........                  [ 90%]
+tests/unit/test_af_2c_source_mask_paths.py ..                            [ 90%]
+tests/unit/test_fake_openai_tool_mode.py .....                           [ 91%]
+tests/unit/test_hke_208_compose.py ......                                [ 91%]
+tests/unit/test_hke_208_egress_proxy.py ........................         [ 92%]
+tests/unit/test_hke_208_settings_classes.py ......                       [ 92%]
+tests/unit/test_trj_194_platform_targets.py ............................ [ 94%]
+...........................                                              [ 95%]
+tests/contract/test_03a_openapi.py ....                                  [ 95%]
+tests/contract/test_03c_openapi.py ....                                  [ 95%]
+tests/contract/test_04a_makefile_test_int.py ...                         [ 95%]
+tests/contract/test_04a_openapi.py ......                                [ 95%]
+tests/contract/test_04b_schema.py ....                                   [ 96%]
+tests/contract/test_05a_openapi.py ....                                  [ 96%]
+tests/contract/test_05b_openapi.py .....                                 [ 96%]
+tests/contract/test_06a_openapi.py ....                                  [ 96%]
+tests/contract/test_06b2_reserved_hosts.py ...                           [ 96%]
+tests/contract/test_06b_litellm_not_published.py .                       [ 96%]
+tests/contract/test_06b_openapi.py ...                                   [ 96%]
+tests/contract/test_07_openapi.py ....                                   [ 97%]
+tests/contract/test_08_openapi.py .......                                [ 97%]
+tests/contract/test_09_openapi.py ...                                    [ 97%]
+tests/contract/test_14_openapi.py .....                                  [ 97%]
+tests/contract/test_16_openapi.py ....                                   [ 97%]
+tests/contract/test_17_openapi.py ....                                   [ 98%]
+tests/contract/test_57_alembic_single_head.py ...                        [ 98%]
+tests/contract/test_c11_facade.py .....                                  [ 98%]
+tests/contract/test_c1_namespace.py ...............                      [ 99%]
+tests/contract/test_c2_api_key_scopes.py ..                              [ 99%]
+tests/contract/test_c2_on_behalf_of.py ..                                [ 99%]
+tests/contract/test_c3_common_columns.py .....                           [ 99%]
+tests/contract/test_c5_vectorstore.py ...                                [ 99%]
+tests/contract/test_c9_runs.py .......                                   [100%]
+
+=============================== warnings summary ===============================
+tests/unit/test_17_ldap.py::test_17_ldap_authenticate_by_account_name_email_and_upn
+  /opt/venv/lib/python3.12/site-packages/pyasn1/codec/ber/encoder.py:952: DeprecationWarning: tagMap is deprecated. Please use TAG_MAP instead.
+    warnings.warn(f"{attr} is deprecated. Please use {newAttr} instead.", DeprecationWarning)
+
+tests/unit/test_17_ldap.py::test_17_ldap_authenticate_by_account_name_email_and_upn
+  /opt/venv/lib/python3.12/site-packages/pyasn1/codec/ber/encoder.py:952: DeprecationWarning: typeMap is deprecated. Please use TYPE_MAP instead.
+    warnings.warn(f"{attr} is deprecated. Please use {newAttr} instead.", DeprecationWarning)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+================= 2287 passed, 2 warnings in 308.71s (0:05:08) =================
+make test llmaas exit=0
+=== 13:29:18 lint + make test DEPLOY_PROFILE=airgap
+ruff check backend scripts data/samples/scripts services tests/deploy
+All checks passed!
+ruff format --check backend scripts data/samples/scripts services tests/deploy
+621 files already formatted
+cd backend && pytest tests/unit tests/contract
+============================= test session starts ==============================
+platform linux -- Python 3.12.10, pytest-9.2.0, pluggy-1.7.0
+rootdir: /work/backend
+configfile: pyproject.toml
+plugins: Faker-40.43.0, anyio-4.15.1, langsmith-0.14.8
+collected 2287 items
+
+tests/unit/test_00_1_healthz.py .                                        [  0%]
+tests/unit/test_00_package.py ..                                         [  0%]
+tests/unit/test_00_repo_skeleton.py ...........                          [  0%]
+tests/unit/test_00_smoke_script.py ....                                  [  0%]
+tests/unit/test_01_client.py ..............                              [  1%]
+tests/unit/test_01_config.py ...                                         [  1%]
+tests/unit/test_01_egress_stream.py ..................                   [  2%]
+tests/unit/test_01_r1_safety.py ..............................           [  3%]
+tests/unit/test_01_reconcile_params.py ................                  [  4%]
+tests/unit/test_01_scheduler.py .....                                    [  4%]
+tests/unit/test_01_seed.py .............                                 [  5%]
+tests/unit/test_02_logging.py ...........                                [  5%]
+tests/unit/test_02_pricing.py ...                                        [  5%]
+tests/unit/test_02_r1_logging.py ..............                          [  6%]
+tests/unit/test_02_r1_tracing.py ...                                     [  6%]
+tests/unit/test_02_tracing.py .......................                    [  7%]
+tests/unit/test_03a_providers_service.py .....                           [  7%]
+tests/unit/test_03a_session.py ........                                  [  8%]
+tests/unit/test_03a_write_flag.py ....                                   [  8%]
+tests/unit/test_03b_auth.py .................                            [  8%]
+tests/unit/test_03b_config_errors.py ........                            [  9%]
+tests/unit/test_03b_dns_opt_in.py ..                                     [  9%]
+tests/unit/test_03b_egress.py .......................................... [ 11%]
+............                                                             [ 11%]
+tests/unit/test_04a_convert.py .............................             [ 13%]
+tests/unit/test_04a_redis_pin.py ...                                     [ 13%]
+tests/unit/test_04a_review_r1_audit_fields.py ..                         [ 13%]
+tests/unit/test_04a_review_r1_chunk_budget.py .....                      [ 13%]
+tests/unit/test_04a_review_r1_limits.py ...........                      [ 13%]
+tests/unit/test_04a_review_r1_offline.py ......                          [ 14%]
+tests/unit/test_04a_text_rules.py ..............................         [ 15%]
+tests/unit/test_04b_2_markdown_prose.py .......                          [ 15%]
+tests/unit/test_04b_2_normalize_tr.py ....                               [ 16%]
+tests/unit/test_04b_2_r2_ollama_ps.py ......                             [ 16%]
+tests/unit/test_04b_2_scope.py .......                                   [ 16%]
+tests/unit/test_04b_cli.py ........                                      [ 16%]
+tests/unit/test_05a_mcp_client.py ........Message: 'Got event: http.disconnect. Stop streaming.'
+Arguments: ()
+.............................. [ 18%]
+.                                                                        [ 18%]
+tests/unit/test_05a_obo_verifier.py .....                                [ 18%]
+tests/unit/test_05a_services_config.py ..........                        [ 19%]
+tests/unit/test_05a_sql_validator.py ..........................Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/logging/__init__.py", line 1163, in emit
+    stream.write(msg + self.terminator)
+ValueError: I/O operation on closed file.
+Call stack:
+.  File "/usr/local/lib/python3.12/threading.py", line 1075, in _bootstrap_inner
+    self.run()
+  File "/usr/local/lib/python3.12/threading.py", line 1012, in run
+    self._target(*self._args, **self._kwargs)
+  File "/opt/venv/lib/python3.12/site-packages/uvicorn/server.py", line 86, in run
+    return asyncio_run(self.serve(sockets=sockets), loop_factory=self.config.get_loop_factory())
+  File "/usr/local/lib/python3.12/asyncio/runners.py", line 195, in run
+    return runner.run(main)
+  File "/usr/local/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+  File "/opt/venv/lib/python3.12/site-packages/uvicorn/lifespan/on.py", line 86, in main
+    await app(scope, self.receive, self.send)
+  File "/opt/venv/lib/python3.12/site-packages/uvicorn/middleware/proxy_headers.py", line 30, in __call__
+    return await self.app(scope, receive, send)
+  File "/work/backend/tests/mcp_fixture.py", line 68, in app
+    await inner(scope, receive, send)
+  File "/opt/venv/lib/python3.12/site-packages/starlette/applications.py", line 96, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/opt/venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 151, in __call__
+    await self.app(scope, receive, send)
+.  File "/opt/venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 49, in __call__
+    await self.app(scope, receive, send)
+.  File "/usr/local/lib/python3.12/contextlib.py", line 217, in __aexit__
+    await anext(self.gen)
+...... [ 20%]
+................                                                         [ 21%]
+tests/unit/test_05a_tool_read_roles.py ..                                [ 21%]
+tests/unit/test_05a_unverified_claims.py ....                            [ 21%]
+tests/unit/test_05b_guardrail_mode.py ........                           [ 22%]
+tests/unit/test_05b_openapi_ops.py ..............--- Logging error ---
+.Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/logging/__init__.py", line 1163, in emit
+    stream.write(msg + self.terminator)
+ValueError: I/O operation on closed file.
+Call stack:
+..  File "/usr/local/lib/python3.12/threading.py", line 1032, in _bootstrap
+    self._bootstrap_inner()
+  File "/usr/local/lib/python3.12/threading.py", line 1075, in _bootstrap_inner
+    self.run()
+  File "/usr/local/lib/python3.12/threading.py", line 1012, in run
+    self._target(*self._args, **self._kwargs)
+  File "/opt/venv/lib/python3.12/site-packages/uvicorn/server.py", line 86, in run
+    return asyncio_run(self.serve(sockets=sockets), loop_factory=self.config.get_loop_factory())
+  File "/usr/local/lib/python3.12/asyncio/runners.py", line 195, in run
+    return runner.run(main)
+  File "/usr/local/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+  File "/opt/venv/lib/python3.12/site-packages/anyio/_core/_tasks.py", line 327, in _run_coro
+    retval = await self._coro
+  File "/opt/venv/lib/python3.12/site-packages/mcp/shared/jsonrpc_dispatcher.py", line 702, in run
+    await fn(*args)
+  File "/opt/venv/lib/python3.12/site-packages/mcp/shared/jsonrpc_dispatcher.py", line 764, in _handle_request
+    await self._final_write(
+  File "/opt/venv/lib/python3.12/site-packages/mcp/shared/jsonrpc_dispatcher.py", line 846, in _final_write
+    logger.warning("%s gave up: transport write blocked", describe)
+Message: '%s gave up: transport write blocked'
+Arguments: ('shutdown error response for request 2',)
+--- Logging error ---
+...Traceback (most recent call last):
+  File "/opt/venv/lib/python3.12/site-packages/anyio/streams/memory.py", line 118, in receive
+    return self.receive_nowait()
+           ^^^^^^^^^^^^^^^^^^^^^
+.  File "/opt/venv/lib/python3.12/site-packages/anyio/streams/memory.py", line 113, in receive_nowait
+    raise WouldBlock
+.anyio._core._exceptions.WouldBlock
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/opt/venv/lib/python3.12/site-packages/mcp/server/streamable_http_manager.py", line 357, in run_server
+    await serve_loop(
+.  File "/opt/venv/lib/python3.12/site-packages/mcp/server/runner.py", line 499, in serve_loop
+    await serve_connection(
+  File "/opt/venv/lib/python3.12/site-packages/mcp/server/runner.py", line 465, in serve_connection
+    await dispatcher.run(runner.on_request, runner.on_notify, task_status=task_status)
+  File "/opt/venv/lib/python3.12/site-packages/mcp/shared/jsonrpc_dispatcher.py", line 510, in run
+    async with anyio.create_task_group() as tg:
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 851, in __aexit__
+    raise exc_val
+  File "/opt/venv/lib/python3.12/site-packages/mcp/shared/jsonrpc_dispatcher.py", line 517, in run
+    async for item in self._read_stream:
+  File "/opt/venv/lib/python3.12/site-packages/mcp/shared/_context_streams.py", line 89, in __anext__
+    return await self.receive()
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/mcp/shared/_context_streams.py", line 71, in receive
+    ctx, item = await self._inner.receive()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/anyio/streams/memory.py", line 126, in receive
+    await receive_event.wait()
+  File "/opt/venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 1936, in wait
+    await self._event.wait()
+..  File "/usr/local/lib/python3.12/asyncio/locks.py", line 212, in wait
+    await fut
+asyncio.exceptions.CancelledError: Cancelled via cancel scope 7fdeec6eda90 by <Task pending name='Task-608' coro=<LifespanOn.main() running at /opt/venv/lib/python3.12/site-packages/uvicorn/lifespan/on.py:86>>
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/logging/__init__.py", line 1163, in emit
+    stream.write(msg + self.terminator)
+ValueError: I/O operation on closed file.
+Call stack:
+  File "/usr/local/lib/python3.12/threading.py", line 1032, in _bootstrap
+    self._bootstrap_inner()
+  File "/usr/local/lib/python3.12/threading.py", line 1075, in _bootstrap_inner
+    self.run()
+  File "/usr/local/lib/python3.12/threading.py", line 1012, in run
+    self._target(*self._args, **self._kwargs)
+  File "/opt/venv/lib/python3.12/site-packages/uvicorn/server.py", line 86, in run
+    return asyncio_run(self.serve(sockets=sockets), loop_factory=self.config.get_loop_factory())
+  File "/usr/local/lib/python3.12/asyncio/runners.py", line 195, in run
+    return runner.run(main)
+  File "/usr/local/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+  File "/opt/venv/lib/python3.12/site-packages/anyio/_core/_tasks.py", line 327, in _run_coro
+    retval = await self._coro
+  File "/opt/venv/lib/python3.12/site-packages/mcp/server/streamable_http_manager.py", line 372, in run_server
+    await self._discard_session(session_id, http_transport)
+  File "/opt/venv/lib/python3.12/site-packages/mcp/server/streamable_http_manager.py", line 395, in _discard_session
+    await transport.terminate()
+  File "/opt/venv/lib/python3.12/site-packages/mcp/server/streamable_http.py", line 855, in terminate
+    logger.info(f"Terminating session: {self.mcp_session_id}")
+Message: 'Terminating session: 99fdf5ca11c345aab3569e864e405b31'
+Arguments: ()
+............ [ 23%]
+..................                                                       [ 24%]
+tests/unit/test_05b_platform_targets.py ................................ [ 25%]
+..                                                                       [ 26%]
+tests/unit/test_06a_definition.py .................                      [ 26%]
+tests/unit/test_06a_model_adapter.py .                                   [ 26%]
+tests/unit/test_06a_no_langsmith.py ...                                  [ 26%]
+tests/unit/test_06a_prompting.py .....................                   [ 27%]
+tests/unit/test_06a_search_adapter.py .                                  [ 27%]
+tests/unit/test_06b2_external.py ....................................... [ 29%]
+.......................                                                  [ 30%]
+tests/unit/test_06b_facade.py .......................................... [ 32%]
+                                                                         [ 32%]
+tests/unit/test_07_rules.py ...........                                  [ 32%]
+tests/unit/test_07_worker.py .                                           [ 32%]
+tests/unit/test_07f_compose.py .                                         [ 33%]
+tests/unit/test_07f_follow.py ...                                        [ 33%]
+tests/unit/test_08_cost.py .......                                       [ 33%]
+tests/unit/test_08_egress_enforce.py ...............................     [ 34%]
+tests/unit/test_08_engine.py .....................                       [ 35%]
+tests/unit/test_08_masking.py ..........                                 [ 36%]
+tests/unit/test_08_recognizers.py .............                          [ 36%]
+tests/unit/test_08t1c_12_offline_models_listed.py .....                  [ 36%]
+tests/unit/test_08t1c_1_local_ner_single_load.py .                       [ 36%]
+tests/unit/test_08t1c_6_ingest_raw_text_filter.py .....                  [ 37%]
+tests/unit/test_08t1c_7_ner_quality.py .......                           [ 37%]
+tests/unit/test_08t_15_pii_ner.py ...........                            [ 37%]
+tests/unit/test_08t_16_builtin_v3.py .........                           [ 38%]
+tests/unit/test_08t_18_ner_candidates.py ...                             [ 38%]
+tests/unit/test_08t_19_egress_from_default.py ....                       [ 38%]
+tests/unit/test_08t_20_http_ner_windows.py ....                          [ 38%]
+tests/unit/test_08t_23_egress_ner_fail_loud.py ......                    [ 39%]
+tests/unit/test_08t_24_ner_transport_errors.py ...                       [ 39%]
+tests/unit/test_08t_25_ner_weights_at_startup.py ...                     [ 39%]
+tests/unit/test_08t_27_ner_span_trim.py ........                         [ 39%]
+tests/unit/test_08t_29_manifest_filter_buckets.py .                      [ 39%]
+tests/unit/test_08t_c17_facade.py .....                                  [ 40%]
+tests/unit/test_08t_c17_masking.py ...........                           [ 40%]
+tests/unit/test_08t_c17_runtime.py ..                                    [ 40%]
+tests/unit/test_08t_egress_http.py .......................               [ 41%]
+tests/unit/test_08t_m3_url_context.py .............                      [ 42%]
+tests/unit/test_08t_ner.py ............                                  [ 42%]
+tests/unit/test_08t_r1_minors.py .....                                   [ 42%]
+tests/unit/test_08t_r2_minors.py .....                                   [ 43%]
+tests/unit/test_08t_r2_rescope.py .....                                  [ 43%]
+tests/unit/test_08t_r2_url_lines.py .................................... [ 44%]
+........................................................................ [ 48%]
+..............................................                           [ 50%]
+tests/unit/test_08t_r3_blank_line.py ............................        [ 51%]
+tests/unit/test_08t_r3_minors.py ...                                     [ 51%]
+tests/unit/test_08t_r3_range.py ............                             [ 51%]
+tests/unit/test_08t_r3_url_rules.py .................................... [ 53%]
+........................................................................ [ 56%]
+....................                                                     [ 57%]
+tests/unit/test_08t_r3_url_scan.py ......                                [ 57%]
+tests/unit/test_08t_r4_html_response.py ................................ [ 59%]
+........................................................................ [ 62%]
+.....................                                                    [ 63%]
+tests/unit/test_08t_r5_tail.py .................                         [ 64%]
+tests/unit/test_08t_secrets_linear.py .......                            [ 64%]
+tests/unit/test_08t_secrets_short.py ...............................     [ 65%]
+tests/unit/test_08t_source_egress.py .....                               [ 65%]
+tests/unit/test_09_2_r1.py ...............................               [ 67%]
+tests/unit/test_09_compare.py ....                                       [ 67%]
+tests/unit/test_09_engine.py ........................................... [ 69%]
+..                                                                       [ 69%]
+tests/unit/test_09_followup176.py ............                           [ 69%]
+tests/unit/test_09_judge_ner.py ...                                      [ 70%]
+tests/unit/test_09_langfuse_api.py .......                               [ 70%]
+tests/unit/test_09_r2.py ......................                          [ 71%]
+tests/unit/test_09_r3.py .....                                           [ 71%]
+tests/unit/test_09_r4.py .......                                         [ 71%]
+tests/unit/test_09_r5.py ........                                        [ 72%]
+tests/unit/test_09_scorers.py ................................           [ 73%]
+tests/unit/test_10c1_stream_headers.py ..                                [ 73%]
+tests/unit/test_10c2_eval_items.py ............                          [ 74%]
+tests/unit/test_10c2_r2_summary_invalid.py ...                           [ 74%]
+tests/unit/test_10c3_0_summary_scalar.py .......                         [ 74%]
+tests/unit/test_116_source_state.py ..                                   [ 74%]
+tests/unit/test_11_title.py ...                                          [ 74%]
+tests/unit/test_12_46_app_role_static.py .................               [ 75%]
+tests/unit/test_12_95_vllm.py ........                                   [ 75%]
+tests/unit/test_12_backend_port_single_source.py .                       [ 75%]
+tests/unit/test_12_backup_scripts.py ..........                          [ 76%]
+tests/unit/test_12_compose_overlays.py .......................           [ 77%]
+tests/unit/test_12_compose_preflight.py ................................ [ 78%]
+.......                                                                  [ 79%]
+tests/unit/test_12_smoke.py ..........                                   [ 79%]
+tests/unit/test_134_egress_all_messages.py ........                      [ 79%]
+tests/unit/test_137_gate2_headings.py ......................             [ 80%]
+tests/unit/test_14_extract.py ..............                             [ 81%]
+tests/unit/test_14_pii.py ......                                         [ 81%]
+tests/unit/test_14_recall.py ................                            [ 82%]
+tests/unit/test_16_1_fs_driver.py ................                       [ 83%]
+tests/unit/test_16_1_r2_policy.py ...                                    [ 83%]
+tests/unit/test_16_1_rules.py ........................................   [ 85%]
+tests/unit/test_17_ldap.py ..................                            [ 85%]
+tests/unit/test_18td_server.py ...........                               [ 86%]
+tests/unit/test_18td_sql_write_attempts.py ................              [ 87%]
+tests/unit/test_19_eval_out.py ..............                            [ 87%]
+tests/unit/test_19_offline.py ............                               [ 88%]
+tests/unit/test_19_preflight.py ...............                          [ 88%]
+tests/unit/test_19_raw_staging.py ........................               [ 89%]
+tests/unit/test_19r_154_internal_hosts.py ...                            [ 89%]
+tests/unit/test_19r_cli_exit.py .                                        [ 90%]
+tests/unit/test_af_1_definition_error_codes.py ...........               [ 90%]
+tests/unit/test_af_2_structural_breadcrumb.py .........                  [ 90%]
+tests/unit/test_af_2c_source_mask_paths.py ..                            [ 90%]
+tests/unit/test_fake_openai_tool_mode.py .....                           [ 91%]
+tests/unit/test_hke_208_compose.py ......                                [ 91%]
+tests/unit/test_hke_208_egress_proxy.py ........................         [ 92%]
+tests/unit/test_hke_208_settings_classes.py ......                       [ 92%]
+tests/unit/test_trj_194_platform_targets.py ............................ [ 94%]
+...........................                                              [ 95%]
+tests/contract/test_03a_openapi.py ....                                  [ 95%]
+tests/contract/test_03c_openapi.py ....                                  [ 95%]
+tests/contract/test_04a_makefile_test_int.py ...                         [ 95%]
+tests/contract/test_04a_openapi.py ......                                [ 95%]
+tests/contract/test_04b_schema.py ....                                   [ 96%]
+tests/contract/test_05a_openapi.py ....                                  [ 96%]
+tests/contract/test_05b_openapi.py .....                                 [ 96%]
+tests/contract/test_06a_openapi.py ....                                  [ 96%]
+tests/contract/test_06b2_reserved_hosts.py ...                           [ 96%]
+tests/contract/test_06b_litellm_not_published.py .                       [ 96%]
+tests/contract/test_06b_openapi.py ...                                   [ 96%]
+tests/contract/test_07_openapi.py ....                                   [ 97%]
+tests/contract/test_08_openapi.py .......                                [ 97%]
+tests/contract/test_09_openapi.py ...                                    [ 97%]
+tests/contract/test_14_openapi.py .....                                  [ 97%]
+tests/contract/test_16_openapi.py ....                                   [ 97%]
+tests/contract/test_17_openapi.py ....                                   [ 98%]
+tests/contract/test_57_alembic_single_head.py ...                        [ 98%]
+tests/contract/test_c11_facade.py .....                                  [ 98%]
+tests/contract/test_c1_namespace.py ...............                      [ 99%]
+tests/contract/test_c2_api_key_scopes.py ..                              [ 99%]
+tests/contract/test_c2_on_behalf_of.py ..                                [ 99%]
+tests/contract/test_c3_common_columns.py .....                           [ 99%]
+tests/contract/test_c5_vectorstore.py ...                                [ 99%]
+tests/contract/test_c9_runs.py .......                                   [100%]
+
+=============================== warnings summary ===============================
+tests/unit/test_17_ldap.py::test_17_ldap_authenticate_by_account_name_email_and_upn
+  /opt/venv/lib/python3.12/site-packages/pyasn1/codec/ber/encoder.py:952: DeprecationWarning: tagMap is deprecated. Please use TAG_MAP instead.
+    warnings.warn(f"{attr} is deprecated. Please use {newAttr} instead.", DeprecationWarning)
+
+tests/unit/test_17_ldap.py::test_17_ldap_authenticate_by_account_name_email_and_upn
+  /opt/venv/lib/python3.12/site-packages/pyasn1/codec/ber/encoder.py:952: DeprecationWarning: typeMap is deprecated. Please use TYPE_MAP instead.
+    warnings.warn(f"{attr} is deprecated. Please use {newAttr} instead.", DeprecationWarning)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+================= 2287 passed, 2 warnings in 239.91s (0:03:59) =================
+make test airgap exit=0
+=== 13:33:37 done
+=== 17-1 full test-int (run 2, qdrant profile) HEAD=ad82edffde2731eefea2783a302bc212eff48262 2026-11-23 13:34:37
+=== 13:34:38 up -d --build --pull never --wait (test profile)
+#0 building with "default" instance using docker driver
+
+#1 [backend internal] load build definition from Dockerfile
+#1 transferring dockerfile: 2.41kB done
+#1 DONE 0.0s
+
+#2 [backend internal] load .dockerignore
+#2 transferring context: 2B done
+#2 DONE 0.0s
+
+#3 [backend internal] load metadata for ghcr.io/astral-sh/uv:0.10.12
+#3 ...
+
+#4 [backend internal] load metadata for docker.io/library/python:3.12.10-slim-bookworm
+#4 DONE 2.3s
+
+#3 [backend internal] load metadata for ghcr.io/astral-sh/uv:0.10.12
+#3 DONE 2.7s
+
+#5 [backend uv 1/1] FROM ghcr.io/astral-sh/uv:0.10.12@sha256:72ab0aeb448090480ccabb99fb5f52b0dc3c71923bffb5e2e26517a1c27b7fec
+#5 DONE 0.0s
+
+#6 [backend base 1/6] FROM docker.io/library/python:3.12.10-slim-bookworm@sha256:fd95fa221297a88e1cf49c55ec1828edd7c5a428187e67b5d1805692d11588db
+#6 DONE 0.0s
+
+#7 [backend internal] load build context
+#7 transferring context: 46.98kB 0.0s done
+#7 DONE 0.0s
+
+#8 [backend base 5/6] WORKDIR /app
+#8 CACHED
+
+#9 [backend base 6/6] COPY pyproject.toml uv.lock ./
+#9 CACHED
+
+#10 [backend base 4/6] RUN mkdir -p /models /data/storage && chown 10001 /models /data/storage
+#10 CACHED
+
+#11 [backend runtime 1/5] RUN uv sync --frozen --no-dev --no-install-project
+#11 CACHED
+
+#12 [backend runtime 2/5] COPY alembic.ini ./
+#12 CACHED
+
+#13 [backend base 2/6] COPY --from=uv /uv /usr/local/bin/uv
+#13 CACHED
+
+#14 [backend base 3/6] RUN apt-get update     && apt-get install -y --no-install-recommends libgomp1 libgl1 libglib2.0-0 libxcb1 make curl     && rm -rf /var/lib/apt/lists/*
+#14 CACHED
+
+#15 [backend runtime 3/5] COPY alembic ./alembic
+#15 CACHED
+
+#16 [backend runtime 4/5] COPY ffcore ./ffcore
+#16 DONE 0.2s
+
+#17 [backend runtime 5/5] RUN useradd --system --uid 10001 --home-dir /models ffcore
+#17 0.226 useradd warning: ffcore's uid 10001 is greater than SYS_UID_MAX 999
+#17 DONE 0.3s
+
+#18 [backend] exporting to image
+#18 exporting layers 0.1s done
+2026/11/23 13:34:54 http2: server: error reading preface from client //./pipe/docker_engine: file has already been closed
+#18 writing image sha256:52265da661246f7b15b9abc9744c6e39a4c4d64b52848f84252d18e8ffaa6687 done
+#18 naming to docker.io/ffcore/backend:0.0.0-17 done
+#18 DONE 0.1s
+
+#19 [frontend internal] load .dockerignore
+#19 transferring context: 115B done
+#19 DONE 0.0s
+
+#20 [frontend internal] load build definition from Dockerfile
+#20 transferring dockerfile: 665B done
+#20 DONE 0.0s
+
+#21 [frontend internal] load metadata for docker.io/library/node:20.19.5-alpine
+#21 DONE 0.0s
+
+#22 [frontend 1/6] FROM docker.io/library/node:20.19.5-alpine
+#22 DONE 0.0s
+
+#23 [frontend internal] load build context
+#23 transferring context: 23.32kB 0.0s done
+#23 DONE 0.1s
+
+#24 [frontend 2/6] WORKDIR /app
+#24 CACHED
+
+#25 [frontend 5/6] COPY . .
+#25 CACHED
+
+#26 [frontend 4/6] RUN npm ci --no-audit --no-fund
+#26 CACHED
+
+#27 [frontend 3/6] COPY package.json package-lock.json ./
+#27 CACHED
+
+#28 [frontend 6/6] RUN npm run build
+#28 CACHED
+
+#29 [frontend] exporting to image
+#29 exporting layers done
+#29 writing image sha256:a33e31d79466f7658b9374a04db40b9a050c18b6a4961d0b17a82543bcc71259 done
+#29 naming to docker.io/ffcore/frontend:0.0.0-17 done
+#29 DONE 0.0s
+ Volume "ffcore-17_qdrant_data"  Creating
+ Volume "ffcore-17_qdrant_data"  Created
+ Container ffcore-17-qdrant-1  Creating
+ Container ffcore-17-langfuse-minio-1  Running
+ Container ffcore-17-redis-1  Running
+ Container ffcore-17-langfuse-clickhouse-1  Running
+ Container ffcore-17-langfuse-redis-1  Running
+ Container ffcore-17-langfuse-postgres-1  Running
+ Container ffcore-17-ticket-desk-1  Recreate
+ Container ffcore-17-langfuse-worker-1  Running
+ Container ffcore-17-fake-llm-1  Recreate
+ Container ffcore-17-langfuse-web-1  Running
+ Container ffcore-17-postgres-1  Running
+ Container ffcore-17-litellm-1  Running
+ Container ffcore-17-migrate-1  Recreate
+ Container ffcore-17-qdrant-1  Created
+ Container ffcore-17-migrate-1  Recreated
+ Container ffcore-17-sync-worker-1  Recreate
+ Container ffcore-17-backend-1  Recreate
+ Container ffcore-17-ticket-desk-1  Recreated
+ Container ffcore-17-sync-worker-1  Recreated
+ Container ffcore-17-backend-1  Recreated
+ Container ffcore-17-frontend-1  Recreate
+ Container ffcore-17-worker-1  Recreate
+ Container ffcore-17-mcp-search-1  Recreate
+ Container ffcore-17-agent-worker-bg-1  Recreate
+ Container ffcore-17-agent-worker-1  Recreate
+ Container ffcore-17-mcp-sql-1  Recreate
+ Container ffcore-17-worker-1  Recreated
+ Container ffcore-17-frontend-1  Recreated
+ Container ffcore-17-mcp-search-1  Recreated
+ Container ffcore-17-mcp-sql-1  Recreated
+ Container ffcore-17-agent-worker-1  Recreated
+ Container ffcore-17-agent-worker-bg-1  Recreated
+ Container ffcore-17-fake-llm-1  Recreated
+ Container ffcore-17-qdrant-1  Starting
+ Container ffcore-17-ticket-desk-1  Starting
+ Container ffcore-17-fake-llm-1  Starting
+ Container ffcore-17-postgres-1  Waiting
+ Container ffcore-17-postgres-1  Waiting
+ Container ffcore-17-langfuse-postgres-1  Waiting
+ Container ffcore-17-langfuse-postgres-1  Waiting
+ Container ffcore-17-langfuse-clickhouse-1  Waiting
+ Container ffcore-17-langfuse-clickhouse-1  Waiting
+ Container ffcore-17-langfuse-minio-1  Waiting
+ Container ffcore-17-langfuse-minio-1  Waiting
+ Container ffcore-17-langfuse-redis-1  Waiting
+ Container ffcore-17-langfuse-redis-1  Waiting
+ Container ffcore-17-fake-llm-1  Started
+ Container ffcore-17-langfuse-redis-1  Healthy
+ Container ffcore-17-langfuse-clickhouse-1  Healthy
+ Container ffcore-17-langfuse-minio-1  Healthy
+ Container ffcore-17-langfuse-clickhouse-1  Healthy
+ Container ffcore-17-langfuse-minio-1  Healthy
+ Container ffcore-17-langfuse-postgres-1  Healthy
+ Container ffcore-17-postgres-1  Healthy
+ Container ffcore-17-langfuse-postgres-1  Healthy
+ Container ffcore-17-postgres-1  Healthy
+ Container ffcore-17-migrate-1  Starting
+ Container ffcore-17-langfuse-redis-1  Healthy
+ Container ffcore-17-qdrant-1  Started
+ Container ffcore-17-ticket-desk-1  Started
+ Container ffcore-17-migrate-1  Started
+ Container ffcore-17-migrate-1  Waiting
+ Container ffcore-17-postgres-1  Waiting
+ Container ffcore-17-migrate-1  Waiting
+ Container ffcore-17-redis-1  Waiting
+ Container ffcore-17-postgres-1  Waiting
+ Container ffcore-17-redis-1  Waiting
+ Container ffcore-17-litellm-1  Waiting
+ Container ffcore-17-postgres-1  Healthy
+ Container ffcore-17-redis-1  Healthy
+ Container ffcore-17-redis-1  Healthy
+ Container ffcore-17-postgres-1  Healthy
+ Container ffcore-17-litellm-1  Healthy
+ Container ffcore-17-migrate-1  Exited
+ Container ffcore-17-sync-worker-1  Starting
+ Container ffcore-17-migrate-1  Exited
+ Container ffcore-17-backend-1  Starting
+ Container ffcore-17-backend-1  Started
+ Container ffcore-17-backend-1  Waiting
+ Container ffcore-17-backend-1  Waiting
+ Container ffcore-17-postgres-1  Waiting
+ Container ffcore-17-backend-1  Waiting
+ Container ffcore-17-backend-1  Waiting
+ Container ffcore-17-backend-1  Waiting
+ Container ffcore-17-backend-1  Waiting
+ Container ffcore-17-sync-worker-1  Started
+ Container ffcore-17-postgres-1  Healthy
+ Container ffcore-17-backend-1  Healthy
+ Container ffcore-17-agent-worker-1  Starting
+ Container ffcore-17-backend-1  Healthy
+ Container ffcore-17-mcp-search-1  Starting
+ Container ffcore-17-backend-1  Healthy
+ Container ffcore-17-mcp-sql-1  Starting
+ Container ffcore-17-backend-1  Healthy
+ Container ffcore-17-agent-worker-bg-1  Starting
+ Container ffcore-17-backend-1  Healthy
+ Container ffcore-17-worker-1  Starting
+ Container ffcore-17-backend-1  Healthy
+ Container ffcore-17-frontend-1  Starting
+ Container ffcore-17-agent-worker-1  Started
+ Container ffcore-17-mcp-search-1  Started
+ Container ffcore-17-mcp-sql-1  Started
+ Container ffcore-17-worker-1  Started
+ Container ffcore-17-agent-worker-bg-1  Started
+ Container ffcore-17-frontend-1  Started
+ Container ffcore-17-langfuse-web-1  Waiting
+ Container ffcore-17-backend-1  Waiting
+ Container ffcore-17-agent-worker-bg-1  Waiting
+ Container ffcore-17-langfuse-worker-1  Waiting
+ Container ffcore-17-fake-llm-1  Waiting
+ Container ffcore-17-postgres-1  Waiting
+ Container ffcore-17-mcp-search-1  Waiting
+ Container ffcore-17-ticket-desk-1  Waiting
+ Container ffcore-17-mcp-sql-1  Waiting
+ Container ffcore-17-litellm-1  Waiting
+ Container ffcore-17-langfuse-redis-1  Waiting
+ Container ffcore-17-agent-worker-1  Waiting
+ Container ffcore-17-redis-1  Waiting
+ Container ffcore-17-qdrant-1  Waiting
+ Container ffcore-17-migrate-1  Waiting
+ Container ffcore-17-worker-1  Waiting
+ Container ffcore-17-langfuse-postgres-1  Waiting
+ Container ffcore-17-langfuse-clickhouse-1  Waiting
+ Container ffcore-17-sync-worker-1  Waiting
+ Container ffcore-17-frontend-1  Waiting
+ Container ffcore-17-langfuse-minio-1  Waiting
+ Container ffcore-17-redis-1  Healthy
+ Container ffcore-17-fake-llm-1  Healthy
+ Container ffcore-17-qdrant-1  Healthy
+ Container ffcore-17-backend-1  Healthy
+ Container ffcore-17-litellm-1  Healthy
+ Container ffcore-17-frontend-1  Healthy
+ Container ffcore-17-langfuse-minio-1  Healthy
+ Container ffcore-17-agent-worker-bg-1  Healthy
+ Container ffcore-17-agent-worker-1  Healthy
+ Container ffcore-17-langfuse-redis-1  Healthy
+ Container ffcore-17-langfuse-clickhouse-1  Healthy
+ Container ffcore-17-ticket-desk-1  Healthy
+ Container ffcore-17-langfuse-worker-1  Healthy
+ Container ffcore-17-langfuse-postgres-1  Healthy
+ Container ffcore-17-postgres-1  Healthy
+ Container ffcore-17-sync-worker-1  Healthy
+ Container ffcore-17-worker-1  Healthy
+ Container ffcore-17-langfuse-web-1  Healthy
+ Container ffcore-17-migrate-1  Exited
+ Container ffcore-17-mcp-search-1  Healthy
+ Container ffcore-17-mcp-sql-1  Healthy
+up exit=0
+=== 13:35:45 alembic heads
+=== run 3 13:38:47 HEAD=ad82edffde2731eefea2783a302bc212eff48262 (run 2 stopped after up; stack kept)
+17_0001 (06a, 09, 11, 08, 17, 16, 07, 03a, 04a, 04b, 05a, 12, 05b, 03b, 06b, 03c, 14) (head)
+=== 13:39:01 test-int
+cd backend && QDRANT_URL=http://qdrant:6333 RUN_QDRANT_TESTS=1 pytest tests/integration
+============================= test session starts ==============================
+platform linux -- Python 3.12.10, pytest-9.2.0, pluggy-1.7.0
+rootdir: /work/backend
+configfile: pyproject.toml
+plugins: Faker-40.43.0, anyio-4.15.1, langsmith-0.14.8
+collected 1399 items
+
+tests/integration/test_01_client.py .......                              [  0%]
+tests/integration/test_01_events.py ...                                  [  0%]
+tests/integration/test_01_reconcile.py ...........                       [  1%]
+tests/integration/test_01_reconcile_shutdown.py ...                      [  1%]
+tests/integration/test_01_seed.py ...                                    [  1%]
+tests/integration/test_02_langfuse.py ....                               [  2%]
+tests/integration/test_02_pricing.py .                                   [  2%]
+tests/integration/test_02_r1_worker_logging.py .                         [  2%]
+tests/integration/test_03a_access.py ...........                         [  3%]
+tests/integration/test_03a_auth.py .....F........                        [  4%]
+tests/integration/test_03a_models.py ...........                         [  4%]
+tests/integration/test_03a_nonmember_404.py ............................ [  6%]
+........................................................................ [ 12%]
+...........................................................              [ 16%]
+tests/integration/test_03a_obo_scope.py ................                 [ 17%]
+tests/integration/test_03a_providers.py ................                 [ 18%]
+tests/integration/test_03a_read_side.py .......                          [ 19%]
+tests/integration/test_03a_schema.py .......                             [ 19%]
+tests/integration/test_03b_audit.py ............                         [ 20%]
+tests/integration/test_03b_egress_dns.py s                               [ 20%]
+tests/integration/test_03c_alerts.py ................                    [ 21%]
+tests/integration/test_03c_keys.py ..............................        [ 23%]
+tests/integration/test_03c_quota_engine.py ............                  [ 24%]
+tests/integration/test_03c_quotas_api.py .......                         [ 25%]
+tests/integration/test_03c_r1_audit_throttle.py .....                    [ 25%]
+tests/integration/test_03c_retention_content.py ...........              [ 26%]
+tests/integration/test_03c_retention_document_delete.py ..               [ 26%]
+tests/integration/test_03c_retention_job.py ...............              [ 27%]
+tests/integration/test_03c_run_quota.py .......                          [ 28%]
+tests/integration/test_04a_api.py .............                          [ 28%]
+tests/integration/test_04a_embed_api.py ....                             [ 29%]
+tests/integration/test_04a_ingest.py ............s                       [ 30%]
+tests/integration/test_04a_qdrant.py ....                                [ 30%]
+tests/integration/test_04a_readyz.py .....                               [ 30%]
+tests/integration/test_04a_review_r1_acl.py ........                     [ 31%]
+tests/integration/test_04a_review_r1_ingest.py ......                    [ 31%]
+tests/integration/test_04a_review_r1_upload.py ..                        [ 31%]
+tests/integration/test_04a_search.py ........                            [ 32%]
+tests/integration/test_04a_store.py ..........                           [ 33%]
+tests/integration/test_04a_worker.py ..                                  [ 33%]
+tests/integration/test_04b_2_normalize_tr.py ..                          [ 33%]
+tests/integration/test_04b_2_query_stats.py ...                          [ 33%]
+tests/integration/test_04b_2_readyz.py .........                         [ 34%]
+tests/integration/test_04b_2_scope_key_search.py .                       [ 34%]
+tests/integration/test_04b_2_scope_search.py ..                          [ 34%]
+tests/integration/test_04b_2_video.py ..                                 [ 34%]
+tests/integration/test_04b_api.py .......                                [ 35%]
+tests/integration/test_04b_knowledge.py ...............                  [ 36%]
+tests/integration/test_04b_migrate.py .....                              [ 36%]
+tests/integration/test_04b_r2_acl.py ....                                [ 36%]
+tests/integration/test_04b_r3_upload_acl.py ............                 [ 37%]
+tests/integration/test_05a_live_services.py .....                        [ 38%]
+tests/integration/test_05a_obo_verify.py .......                         [ 38%]
+tests/integration/test_05a_search.py ........                            [ 39%]
+tests/integration/test_05a_sql.py ...............s.....                  [ 40%]
+tests/integration/test_05a_tools_api.py ................................ [ 43%]
+................                                                         [ 44%]
+tests/integration/test_05b_mcp_endpoint.py ..............                [ 45%]
+tests/integration/test_05b_mcp_servers_api.py ..................         [ 46%]
+tests/integration/test_05b_r2_origin.py .........                        [ 47%]
+tests/integration/test_05b_superset_e2e.py .                             [ 47%]
+tests/integration/test_06a_adapters.py ..                                [ 47%]
+tests/integration/test_06a_agents.py ........                            [ 47%]
+tests/integration/test_06a_feedback.py .....                             [ 48%]
+tests/integration/test_06a_graph.py ............................         [ 50%]
+tests/integration/test_06a_mcp_tools.py ............                     [ 51%]
+tests/integration/test_06a_read_side.py .                                [ 51%]
+tests/integration/test_06a_readyz.py ...                                 [ 51%]
+tests/integration/test_06a_run_access.py ..........                      [ 52%]
+tests/integration/test_06a_runs_api.py .........                         [ 52%]
+tests/integration/test_06a_scheduler.py .......                          [ 53%]
+tests/integration/test_06a_schema.py .........                           [ 53%]
+tests/integration/test_06b2_external_agent.py .........................  [ 55%]
+tests/integration/test_06b2_migration.py .                               [ 55%]
+tests/integration/test_06b_agent.py ......................               [ 57%]
+tests/integration/test_06b_direct.py ..............................      [ 59%]
+tests/integration/test_06b_identity.py ............                      [ 60%]
+tests/integration/test_06b_key_search.py ......                          [ 60%]
+tests/integration/test_06b_manifest.py .....                             [ 61%]
+tests/integration/test_07_api_read.py ............                       [ 61%]
+tests/integration/test_07_decide.py .........                            [ 62%]
+tests/integration/test_07_flow.py ..........                             [ 63%]
+tests/integration/test_07_schema.py ...........                          [ 64%]
+tests/integration/test_07_service.py ........                            [ 64%]
+tests/integration/test_07f_followups.py ....                             [ 64%]
+tests/integration/test_07f_sql_context_roles.py ..                       [ 65%]
+tests/integration/test_08_api.py .................                       [ 66%]
+tests/integration/test_08t_21_text_filter_mismatch.py ..                 [ 66%]
+tests/integration/test_08t_22_attachment_names.py ...                    [ 66%]
+tests/integration/test_08t_26_builtin_egress_key.py ..                   [ 66%]
+tests/integration/test_08t_28_internal_ner_http_auth.py .                [ 66%]
+tests/integration/test_08t_30_reindex_prsim.py ......                    [ 67%]
+tests/integration/test_08t_c17_exit.py ...                               [ 67%]
+tests/integration/test_08t_c17_facade_direct.py ....                     [ 67%]
+tests/integration/test_08t_m1_counter.py ...                             [ 68%]
+tests/integration/test_08t_m2_facade_history.py ..                       [ 68%]
+tests/integration/test_08t_m2_history.py .......                         [ 68%]
+tests/integration/test_08t_m3_paths.py .....                             [ 69%]
+tests/integration/test_08t_m7_blocked_deleted.py ..                      [ 69%]
+tests/integration/test_08t_m7_s8_endpoints.py .                          [ 69%]
+tests/integration/test_08t_r2_history_e2e.py .                           [ 69%]
+tests/integration/test_08t_r2_paths.py ............                      [ 70%]
+tests/integration/test_08t_r3_resume.py ......                           [ 70%]
+tests/integration/test_09_advance.py ...................                 [ 71%]
+tests/integration/test_09_api.py ...........                             [ 72%]
+tests/integration/test_09_exam_stack.py ssssssss                         [ 73%]
+tests/integration/test_09_from_run.py .................                  [ 74%]
+tests/integration/test_09_publish_gate.py ......................         [ 76%]
+tests/integration/test_10c2_eval_items_int.py .....                      [ 76%]
+tests/integration/test_10c3_summary_scalar_int.py ..                     [ 76%]
+tests/integration/test_116_checkpoint_sources.py ..........              [ 77%]
+tests/integration/test_11_2_chat.py .......................              [ 78%]
+tests/integration/test_11_chat.py ...................                    [ 80%]
+tests/integration/test_12_46_app_role.py ......................          [ 81%]
+tests/integration/test_12_egress.py sssssssssssssssss                    [ 83%]
+tests/integration/test_12_tls.py sssssssssssss                           [ 84%]
+tests/integration/test_134_egress_real_engine.py ..                      [ 84%]
+tests/integration/test_134_provider_request.py ..                        [ 84%]
+tests/integration/test_14_api.py ............................            [ 86%]
+tests/integration/test_14_facade.py .                                    [ 86%]
+tests/integration/test_14_runs.py .............................          [ 88%]
+tests/integration/test_16_1_api.py ...................                   [ 89%]
+tests/integration/test_16_1_attachments.py ..                            [ 89%]
+tests/integration/test_16_1_migration.py F.                              [ 90%]
+tests/integration/test_16_1_r2.py ...                                    [ 90%]
+tests/integration/test_16_1_scale.py .                                   [ 90%]
+tests/integration/test_16_1_scheduler.py ......                          [ 90%]
+tests/integration/test_16_1_sync.py ............                         [ 91%]
+tests/integration/test_17_identity.py ................................   [ 93%]
+tests/integration/test_17_migration.py ...                               [ 94%]
+tests/integration/test_18td_tools_api.py ...                             [ 94%]
+tests/integration/test_19_ingest_raw.py .....s................           [ 95%]
+tests/integration/test_57_alembic_merge.py .FF....                       [ 96%]
+tests/integration/test_af_2b_deleted_source_breadcrumb.py ..             [ 96%]
+tests/integration/test_af_3_updated_at_source.py ...                     [ 96%]
+tests/integration/test_trj_194_platform_registration.py ................ [ 97%]
+............                                                             [ 98%]
+tests/integration/test_trj_202_admin_manages_acl.py ............         [ 99%]
+tests/integration/test_trj_203_single_denied_row.py ....                 [100%]
+
+=================================== FAILURES ===================================
+_________________________ test_03a_4_inactive_user_401 _________________________
+
+make_user = <function make_user.<locals>.make at 0x7fbd6e746ac0>
+client_factory = <function client_factory.<locals>.make at 0x7fbd6e9345e0>
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_a6766ee4d05e) at 0x7fbd6e86b620>
+
+    def test_03a_4_inactive_user_401(make_user, client_factory, pg):
+        user_id, email = make_user()
+        client = client_factory(email)
+        pg.execute("UPDATE users SET is_active = false WHERE id = %s", (user_id,))
+        assert client.get(ME).status_code == 401
+        retry = client_factory().post(LOGIN, json={"email": email, "password": PASSWORD})
+>       assert retry.status_code == 401
+E       assert 403 == 401
+E        +  where 403 = <Response [403 Forbidden]>.status_code
+
+tests/integration/test_03a_auth.py:91: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-23 10:41:05,073 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 10:41:05,402 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p80af58b3.chat-default code=egress_not_allowlisted
+2026-11-23 10:41:05,402 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=1
+2026-11-23 10:41:05,454 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=375
+2026-11-23 10:41:05,486 INFO ffcore.access access method=GET path=/api/v1/auth/me status=401 ms=21
+2026-11-23 10:41:05,608 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 10:41:05,995 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p80af58b3.chat-default code=egress_not_allowlisted
+2026-11-23 10:41:05,995 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=1
+2026-11-23 10:41:06,016 INFO ffcore.access access method=POST path=/api/v1/auth/login status=403 ms=402
+------------------------------ Captured log call -------------------------------
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:376 litellm_model_not_written model=p80af58b3.chat-default code=egress_not_allowlisted
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:377 litellm_reconciled created=0 updated=0 deleted=0 problems=1
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=375
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/auth/me status=401 ms=21
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:376 litellm_model_not_written model=p80af58b3.chat-default code=egress_not_allowlisted
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:377 litellm_reconciled created=0 updated=0 deleted=0 problems=1
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=403 ms=402
+________________________ test_16_1_migration_round_trip ________________________
+
+scratch_db = <tests.integration.conftest.ScratchDatabase object at 0x7fbc4a0ecda0>
+
+    def test_16_1_migration_round_trip(scratch_db):
+        db = scratch_db
+        heads = [line for line in db.run("heads").splitlines() if line.strip()]
+>       assert len(heads) == 1 and heads[0].startswith("16_0001")
+E       AssertionError: assert (1 == 1 and False)
+E        +  where 1 = len(['17_0001 (03c, 07, 03b, 06b, 03a, 08, 04a, 09, 11, 14, 06a, 12, 17, 05b, 04b, 05a, 16) (head)'])
+E        +  and   False = <built-in method startswith of str object at 0x7fbc39a00ae0>('16_0001')
+E        +    where <built-in method startswith of str object at 0x7fbc39a00ae0> = '17_0001 (03c, 07, 03b, 06b, 03a, 08, 04a, 09, 11, 14, 06a, 12, 17, 05b, 04b, 05a, 16) (head)'.startswith
+
+tests/integration/test_16_1_migration.py:51: AssertionError
+________________ test_57_2_empty_database_upgrade_head_and_back ________________
+
+scratch_db = <tests.integration.conftest.ScratchDatabase object at 0x7fbc27d5ba40>
+
+    def test_57_2_empty_database_upgrade_head_and_back(scratch_db):
+        db = scratch_db  # the fixture already ran `upgrade head` on an empty database
+        assert db.versions() == {_head()}
+        schema = db.tables()
+        assert {"projects", "audit_events", "runs", "approvals", "api_keys"} | RETENTION <= schema
+    
+        db.run("downgrade", "57_0001")  # undo step 2 of the merge and the chain above it
+        assert db.versions() == PRE_MERGE_ROWS | {"57_0001"}
+>       assert db.tables() == schema - ABOVE_MERGE  # the merge revisions carry no schema
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert {'agent_versi...pi_keys', ...} == {'agent_versi...pi_keys', ...}
+E         
+E         Extra items in the right set:
+E         'identity_group_mappings'
+E         Use -v to get more diff
+
+tests/integration/test_57_alembic_merge.py:68: AssertionError
+______________ test_57_3_pre_merge_database_upgrades_to_one_head _______________
+
+scratch_db = <tests.integration.conftest.ScratchDatabase object at 0x7fbc27ec9b80>
+
+    def test_57_3_pre_merge_database_upgrades_to_one_head(scratch_db):
+        # A database installed from main before the merge (four rows), as on a running installation,
+        # with data in it: the merge revisions carry no schema, so nothing is lost.
+        db = scratch_db
+        db.run("downgrade", "0001")
+        assert db.versions() == {"0001"}
+        for rev in sorted(PRE_MERGE_ROWS):
+            db.run("upgrade", rev)
+        assert db.versions() == PRE_MERGE_ROWS
+        schema = db.tables()
+        project = uuid.uuid4()
+        db.conn.execute(
+            "INSERT INTO projects (id, key, name, created_by) VALUES (%s, %s, %s, 'test')",
+            (project, f"p57-{project.hex[:8]}", "Merge test"),
+        )
+    
+        db.run("upgrade", "head")
+        assert db.versions() == {_head()}
+>       assert db.tables() == schema | ABOVE_MERGE
+E       AssertionError: assert {'acl_mapping...'alerts', ...} == {'acl_mapping...'alerts', ...}
+E         
+E         Extra items in the left set:
+E         'identity_group_mappings'
+E         Use -v to get more diff
+
+tests/integration/test_57_alembic_merge.py:97: AssertionError
+=============================== warnings summary ===============================
+tests/integration/test_04a_worker.py::test_04a_upload_job_runs_in_worker
+tests/integration/test_04a_worker.py::test_04a_job_for_missing_row_retries_then_fails_loud
+  /opt/venv/lib/python3.12/site-packages/arq/worker.py:877: DeprecationWarning: Call to deprecated close. (Use aclose() instead) -- Deprecated since version 5.0.1.
+    await self.pool.close(close_connection_pool=True)
+
+tests/integration/test_17_identity.py::test_17_1_directory_user_provisioned_with_user_read
+  /opt/venv/lib/python3.12/site-packages/pyasn1/codec/ber/encoder.py:952: DeprecationWarning: tagMap is deprecated. Please use TAG_MAP instead.
+    warnings.warn(f"{attr} is deprecated. Please use {newAttr} instead.", DeprecationWarning)
+
+tests/integration/test_17_identity.py::test_17_1_directory_user_provisioned_with_user_read
+  /opt/venv/lib/python3.12/site-packages/pyasn1/codec/ber/encoder.py:952: DeprecationWarning: typeMap is deprecated. Please use TYPE_MAP instead.
+    warnings.warn(f"{attr} is deprecated. Please use {newAttr} instead.", DeprecationWarning)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/integration/test_03a_auth.py::test_03a_4_inactive_user_401 - ass...
+FAILED tests/integration/test_16_1_migration.py::test_16_1_migration_round_trip
+FAILED tests/integration/test_57_alembic_merge.py::test_57_2_empty_database_upgrade_head_and_back
+FAILED tests/integration/test_57_alembic_merge.py::test_57_3_pre_merge_database_upgrades_to_one_head
+===== 4 failed, 1353 passed, 42 skipped, 4 warnings in 1667.29s (0:27:47) ======
+make: *** [Makefile:31: test-int] Error 1
+test-int exit=2
+=== 14:07:18 done
+=== run 4 14:09:28 HEAD=ad82edffde2731eefea2783a302bc212eff48262 + 3 intentional test updates (uncommitted): the 4 failures of run 3
+All checks passed!
+334 files already formatted
+.......................                                                  [100%]
+23 passed in 105.21s (0:01:45)
+rerun exit=0

@@ -127,3 +127,7 @@ Paket: 16 · Cevap: K-16-0020 · Durum: PLANNED
 ### B-16-0026 · 2026-11-23 13:07 · → koordinator · ACK
 Paket: 16 · Cevap: K-GEN-0052 · Durum: IN_PROGRESS
 16-2 başladı: dal `feat/16-2-atlassian` main `558178a`'dan açıldı (worktree `.worktrees/feat/16-2-atlassian`). Sıra: kırmızı testler (sürücü birim + sahte Atlassian) → kod (sürücüler, kayıt, API `check`, `16_0002` `sync_runs.count_method`, C6) → yığın ffcore-16 ile test-int (compose `fake-atlassian`, test profili) → docs. Ağır koşu öncesi K-GEN-0047 sırasıyla DURUM; 17 ile paylaşım bildirilecek. Yığın şu an kapalı.
+
+### B-16-0027 · 2026-11-23 13:25 · → koordinator · YIGIN-AC
+Paket: 16 · Cevap: K-GEN-0052 · Yigin: ffcore-16
+Küçük yığın: yalnız `postgres` + `redis` (+ `tools` run), `--no-build --pull never`. Kırmızı kanıt (test commit'leri 27d1bcd, 2d73e27; ayrı geçici worktree) + 16-2 birim/ruff + hedefli test-int (`test_16_2_atlassian`, 16-1 API). Tam test-int değil; ffcore-17 açıkken hafif koşu (K-GEN-0047). Bitince down -v + YIGIN-KAPA.

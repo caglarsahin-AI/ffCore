@@ -1,0 +1,18 @@
+HEAD=2d73e2766194e86c86d443b95519889d1a962f45 2026-11-23 13:51:49 red unit (tests only, no 16-2 code)
+__init__.py acl.py base.py cli.py engine.py fs.py gate0.py paths.py policy.py prune.py registry.py schedule.py scheduler.py worker.py 
+__init__.py acl.py base.py cli.py engine.py fs.py gate0.py paths.py policy.py prune.py registry.py schedule.py scheduler.py worker.py 
+ImportError while importing test module '/work/backend/tests/unit/test_16_2_registry.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/local/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/unit/test_16_2_registry.py:8: in <module>
+    from ffcore.sources.confluence import ConfluenceDriver
+E   ModuleNotFoundError: No module named 'ffcore.sources.confluence'
+=========================== short test summary info ============================
+ERROR tests/unit/test_16_2_storage_format.py
+ERROR tests/unit/test_16_2_drivers.py
+ERROR tests/unit/test_16_2_registry.py
+!!!!!!!!!!!!!!!!!!! Interrupted: 3 errors during collection !!!!!!!!!!!!!!!!!!!!
+3 errors in 2.71s

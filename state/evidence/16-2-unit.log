@@ -1,0 +1,26 @@
+HEAD=2d73e2766194e86c86d443b95519889d1a962f45 2026-11-23 13:52:45 lint + unit + contract (working tree)
+ M backend/ffcore/api/knowledge_schemas.py
+ M backend/ffcore/api/sources.py
+ M backend/ffcore/knowledge/search.py
+ M backend/ffcore/runtime/adapters.py
+ M backend/ffcore/runtime/prompting.py
+ M backend/ffcore/sources/registry.py
+ M backend/openapi/04a.yaml
+ M backend/openapi/06b.yaml
+ M backend/tests/fakes/fake_atlassian.py
+ M backend/tests/integration/test_16_2_atlassian.py
+ M backend/tests/unit/test_16_2_drivers.py
+ M backend/tests/unit/test_16_2_fake_atlassian.py
+ M backend/tests/unit/test_16_2_storage_format.py
+ M deploy/docker-compose.egress.yml
+?? backend/ffcore/sources/atlassian.py
+?? backend/ffcore/sources/confluence.py
+?? backend/ffcore/sources/jira.py
+?? backend/ffcore/sources/storage_format.py
+?? data/samples/openapi/jira.yaml
+All checks passed!
+558 files already formatted
+........................................................................ [ 34%]
+........................................................................ [ 69%]
+..............................................................           [100%]
+206 passed in 39.31s

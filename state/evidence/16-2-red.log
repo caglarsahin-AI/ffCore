@@ -1,0 +1,51 @@
+HEAD=2d73e2766194e86c86d443b95519889d1a962f45 2026-11-23 13:26:37 red unit + red test-int (tests only, no 16-2 code)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/opt/venv/lib/python3.12/site-packages/pytest/__main__.py", line 9, in <module>
+    raise SystemExit(_console_main())
+                     ^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/_pytest/config/__init__.py", line 286, in _console_main
+    code = _main(prog=_get_prog_name(sys.argv))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/_pytest/config/__init__.py", line 253, in _main
+    config = _prepareconfig(new_args, plugins, prog=prog)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/_pytest/config/__init__.py", line 434, in _prepareconfig
+    initial_config = get_config(args, plugins, prog=prog)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/_pytest/config/__init__.py", line 395, in get_config
+    dir=pathlib.Path.cwd(),
+        ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/pathlib.py", line 1195, in cwd
+    return cls().absolute()
+           ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/pathlib.py", line 1216, in absolute
+    cwd = os.getcwd()
+          ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+E       AssertionError: {"error":{"message":"no driver serves source kind 'jira'","type":"invalid_request_error","code":"source_kind_unavailable"}}
+E       assert 422 == 201
+E        +  where 422 = <Response [422 Unprocessable Content]>.status_code
+
+tests/integration/test_16_2_atlassian.py:79: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=243
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=206
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=257
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=546
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/42195d25-9a81-4005-9cd4-10dc14435121/knowledge-bases status=201 ms=248
+----------------------------- Captured stderr call -----------------------------
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/42195d25-9a81-4005-9cd4-10dc14435121/data-sources status=422 ms=204
+=========================== short test summary info ============================
+FAILED tests/integration/test_16_2_atlassian.py::test_16_2_project_admin_registers_and_credentials_stay_masked
+FAILED tests/integration/test_16_2_atlassian.py::test_16_2_confluence_full_then_delta_asks_only_for_the_changed_page
+FAILED tests/integration/test_16_2_atlassian.py::test_16_2_confluence_full_prunes_three_deleted_pages
+FAILED tests/integration/test_16_2_atlassian.py::test_16_2_lost_space_and_cut_listing_delete_nothing
+FAILED tests/integration/test_16_2_atlassian.py::test_16_2_silver_and_gold_never_ask_atlassian
+FAILED tests/integration/test_16_2_atlassian.py::test_16_2_restricted_page_is_not_opened_by_the_space_mapping
+FAILED tests/integration/test_16_2_atlassian.py::test_16_2_shared_attachment_is_downloaded_once_and_big_files_never
+FAILED tests/integration/test_16_2_atlassian.py::test_16_2_jira_issues_become_documents_without_person_names
+8 failed, 19 passed in 249.19s (0:04:09)

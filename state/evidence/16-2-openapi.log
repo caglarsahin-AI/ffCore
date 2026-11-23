@@ -1,0 +1,5 @@
+HEAD=2d73e2766194e86c86d443b95519889d1a962f45 2026-11-23 13:52:14 openapi regenerate 04a 06b 16
+regenerated
+ backend/openapi/04a.yaml | 7 +++++++
+ backend/openapi/06b.yaml | 7 +++++++
+ 2 files changed, 14 insertions(+)

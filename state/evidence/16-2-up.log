@@ -1,0 +1,5 @@
+HEAD=2d73e2766194e86c86d443b95519889d1a962f45 2026-11-23 13:26:08 up postgres redis
+ Container ffcore-16-redis-1  Waiting
+ Container ffcore-16-postgres-1  Waiting
+ Container ffcore-16-redis-1  Healthy
+ Container ffcore-16-postgres-1  Healthy

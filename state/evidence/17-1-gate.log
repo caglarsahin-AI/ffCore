@@ -34,4 +34,65 @@ tests/unit/test_03a_write_flag.py ....                                   [  8%]
 tests/unit/test_03b_auth.py .................                            [  8%]
 tests/unit/test_03b_config_errors.py ........                            [  9%]
 tests/unit/test_03b_dns_opt_in.py ..                                     [  9%]
-tests/unit/test_03b_egress.py .........................
+tests/unit/test_03b_egress.py .......................................... [ 11%]
+............                                                             [ 11%]
+tests/unit/test_04a_convert.py .............................             [ 13%]
+tests/unit/test_04a_redis_pin.py ...                                     [ 13%]
+tests/unit/test_04a_review_r1_audit_fields.py ..                         [ 13%]
+tests/unit/test_04a_review_r1_chunk_budget.py .....                      [ 13%]
+tests/unit/test_04a_review_r1_limits.py ...........                      [ 13%]
+tests/unit/test_04a_review_r1_offline.py ......                          [ 14%]
+tests/unit/test_04a_text_rules.py ..............................         [ 15%]
+tests/unit/test_04b_2_markdown_prose.py .......                          [ 15%]
+tests/unit/test_04b_2_normalize_tr.py ....                               [ 16%]
+tests/unit/test_04b_2_r2_ollama_ps.py ......                             [ 16%]
+tests/unit/test_04b_2_scope.py .......                                   [ 16%]
+tests/unit/test_04b_cli.py ........                                      [ 16%]
+tests/unit/test_05a_mcp_client.py ........Call stack:
+  File "/usr/local/lib/python3.12/threading.py", line 1032, in _bootstrap
+    self._bootstrap_inner()
+  File "/usr/local/lib/python3.12/threading.py", line 1075, in _bootstrap_inner
+    self.run()
+  File "/usr/local/lib/python3.12/threading.py", line 1012, in run
+    self._target(*self._args, **self._kwargs)
+  File "/opt/venv/lib/python3.12/site-packages/uvicorn/server.py", line 86, in run
+    return asyncio_run(self.serve(sockets=sockets), loop_factory=self.config.get_loop_factory())
+  File "/usr/local/lib/python3.12/asyncio/runners.py", line 195, in run
+    return runner.run(main)
+  File "/usr/local/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+  File "/opt/venv/lib/python3.12/site-packages/anyio/_core/_tasks.py", line 327, in _run_coro
+    retval = await self._coro
+  File "/opt/venv/lib/python3.12/site-packages/sse_starlette/sse.py", line 513, in cancel_on_finish
+    await coro()
+  File "/opt/venv/lib/python3.12/site-packages/sse_starlette/sse.py", line 403, in _listen_for_disconnect
+    logger.debug("Got event: http.disconnect. Stop streaming.")
+Message: 'Got event: http.disconnect. Stop streaming.'
+Arguments: ()
+.............................. [ 18%]
+.                                                                        [ 18%]
+tests/unit/test_05a_obo_verifier.py .....                                [ 18%]
+tests/unit/test_05a_services_config.py ..........                        [ 19%]
+tests/unit/test_05a_sql_validator.py ................................... [ 20%]
+................                                                         [ 21%]
+tests/unit/test_05a_tool_read_roles.py ..                                [ 21%]
+tests/unit/test_05a_unverified_claims.py ....                            [ 21%]
+tests/unit/test_05b_guardrail_mode.py ........                           [ 22%]
+tests/unit/test_05b_openapi_ops.py ..................................... [ 23%]
+..................                                                       [ 24%]
+tests/unit/test_05b_platform_targets.py ................................ [ 25%]
+..                                                                       [ 26%]
+tests/unit/test_06a_definition.py .................                      [ 26%]
+tests/unit/test_06a_model_adapter.py .                                   [ 26%]
+tests/unit/test_06a_no_langsmith.py ...                                  [ 26%]
+tests/unit/test_06a_prompting.py .....................                   [ 27%]
+tests/unit/test_06a_search_adapter.py .                                  [ 27%]
+tests/unit/test_06b2_external.py ....................................... [ 29%]
+.......................                                                  [ 30%]
+tests/unit/test_06b_facade.py .......................................... [ 32%]
+                                                                         [ 32%]
+tests/unit/test_07_rules.py ...........                                  [ 32%]
+tests/unit/test_07_worker.py .                                           [ 32%]
+tests/unit/test_07f_compose.py .                                         [ 33%]
+tests/unit/test_07f_follow.py ...                                        [ 33%]
+tests/unit/test_08_cost.py ..STOPPED: superseded by the full test-int slot (K-17-0003); unit gate re-run in 17-1-gate-unit-ad82edf.log
