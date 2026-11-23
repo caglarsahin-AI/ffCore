@@ -213,7 +213,9 @@ class SecretDriver(FsDriver):
 
 @pytest.fixture
 def secret_driver(monkeypatch):
-    drivers = registry.build(registry.BUILTIN, [("test-confluence", SecretDriver)])
+    # 16-2: `confluence` is built in now; the test driver stands in for it (one kind, one driver).
+    builtin = {k: v for k, v in registry.BUILTIN.items() if k != "confluence"}
+    drivers = registry.build(builtin, [("test-confluence", SecretDriver)])
     monkeypatch.setattr(registry, "drivers", lambda: drivers)
     SecretDriver.seen_secrets.clear()
     return SecretDriver
