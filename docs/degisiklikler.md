@@ -15,8 +15,15 @@ if anything.
 - **Egress overlay:** `sync-worker` gets `EGRESS_PROXY_URL`; add Atlassian Cloud sites to
   `EGRESS_ALLOWLIST`, internal Confluence/Jira hosts to `ALLOWED_INTERNAL_HOSTS`.
 - **Permissions:** a restricted Confluence page or a Jira issue with a security level is
-  readable only through a mapping of its restriction (`group:`, `user:`, `security:`); the space
-  or project mapping does not open it.
+  readable only through a mapping of its restriction (`group:`, `user:`,
+  `security:<KEY>/<level>`); the space or project mapping does not open it. Jira comments
+  restricted to a role or group and service desk internal notes are not indexed; person name
+  fields and mentions are not indexed.
+- **Weekly full run:** `FULL_SYNC_EVERY_DAYS` (default 7, `0` = never; sync-worker) turns a
+  scheduled run into a full run when the last full is that old, so narrowed permissions and
+  deletions reach the index without a person starting one. Set it in `.env` to change it.
+- **Cloud attachments:** add `api.media.atlassian.com` to `EGRESS_ALLOWLIST` for Confluence
+  Cloud attachments (otherwise each fails loudly in the run).
 - **Nothing to migrate.**
 
 ## 2026-11-22 · 16-1 · Data sources: core and network folder

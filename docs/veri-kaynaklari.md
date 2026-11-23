@@ -49,7 +49,11 @@ cancelled; a running raw run stops between two items (no deletion, no cursor mov
 A source syncs on one of four fixed choices (no cron strings): `manual`, `hourly` (minute),
 `daily` (`HH:MM`), `weekly` (weekday 0 = Monday, `HH:MM`). Times are **UTC**. The default for a
 new source is `daily` at `02:00` UTC (out of office hours; ingest slows chat on CPU). A scheduled
-run is a raw **delta**; a full run (and so a deletion) is always started by a person. A source
+run is a raw **delta**, except when the source's last completed full run is
+`FULL_SYNC_EVERY_DAYS` old (default 7; `0` = never): then that scheduled run is a **full** run
+under the safe delete rule. A full run is what sees deletions without tombstones and permissions
+narrowed at the source, so they reach the index within a week without anyone starting one;
+otherwise a full run is started by a person. A source
 that has never synced is not started by the schedule: run the first full sync yourself, before
 users rely on the knowledge base. The sync worker checks schedules once a minute; a slot missed
 while it was down runs once. A run left `running` longer than the job limit (13 hours) is failed
@@ -163,18 +167,29 @@ refused with `OFFLINE=true` (`source_kind_unavailable`); with the egress overlay
 worker goes through the forward proxy (add the site to `EGRESS_ALLOWLIST`). A Server/Data
 Center host inside the network goes into `ALLOWED_INTERNAL_HOSTS`.
 
+**Cloud attachments.** Confluence Cloud answers an attachment download with a redirect to its
+media host; add `api.media.atlassian.com` to `EGRESS_ALLOWLIST` in llmaas. Redirects are not
+followed for any source (`max_redirects=0`), so without it each Confluence Cloud attachment
+fails loudly with an `egress_*` code in the run (the page itself is indexed). Jira asks for
+attachments with `redirect=false` and gets the bytes directly. Any other answer than a 2xx to a
+download is `attachment_download_failed` (a 404 is `attachment_gone`), never a file.
+
 - **What is read:** pages (`type=page`) with their storage-format body; Server/Data Center
   lists bodies with the listing (one request per 50 pages), Cloud lists with the v1 CQL search
   and reads each changed page's body from the v2 API. The count is the search's `totalSize`.
 - **Delta:** only pages modified since the last run, `lastmodified >= now("-Nm")` with N =
   minutes since the cursor + 10 (no time zone in the query; the 10 minutes cover clock skew).
   A delta never deletes; a page deleted, archived or out of scope leaves in a **full** run under
-  the safe delete rule. Scheduled runs are deltas.
+  the safe delete rule. Adding a read restriction does not change the page's version, so a
+  delta does not see it: **a narrowed permission reaches the index with a full run** (the
+  weekly scheduled full, `FULL_SYNC_EVERY_DAYS`, or one you start). Space keys are quoted in
+  the query (personal spaces `~user` work).
 - **Document:** the body is turned into Markdown (headings, lists, tables, code blocks kept;
   `toc`, `children`, `pagetree`, attachment galleries removed; `include`d pages are not expanded
   because they are indexed themselves; an unknown macro keeps its rich body or is dropped and
-  counted). The breadcrumb is `space › parent pages › page`; the search hit's `source_url` is
-  the page in Confluence.
+  counted; `script`/`style` bodies are dropped). User mentions are dropped (the person's name
+  is not indexed). The breadcrumb is `space › parent pages › page`; the search hit's
+  `source_url` is the page in Confluence.
 - **Attachments:** listing metadata first (newest version per title), Kapı 0 before any
   download; the same name and size on two pages is downloaded and indexed once.
 - **Permissions:** a page with no read restriction (on itself or any parent page) reports
@@ -193,21 +208,31 @@ Center host inside the network goes into `ALLOWED_INTERNAL_HOSTS`.
 - **Document:** one per issue, `# KEY: summary`, a metadata block (project, type, status,
   priority, resolution, labels, created, updated), `## Description`, `## Resolution` and one
   `## Comment <n> (<date>)` per comment, so chunks break at comment boundaries. Jira wiki code
-  blocks and headings become Markdown. **Person names are not indexed** (assignee, reporter,
-  comment authors): the issue's knowledge is the problem and its solution, not who said it.
-  `source_url` is `<base_url>/browse/<KEY>`.
+  blocks and headings become Markdown. **Person name fields and mentions are not indexed**
+  (assignee, reporter, comment authors, `[~user]` mentions; in Confluence `ri:user` mentions):
+  the issue's knowledge is the problem and its solution, not who said it. Names written as
+  plain text in a description or comment are not recognised here; that is 08's name masking
+  (NER), when the knowledge base uses it. `source_url` is `<base_url>/browse/<KEY>`.
+- **Restricted comments stay out:** a comment visible only to a role or a group
+  (`visibility`) and a service desk internal note (`jsdPublic: false`) are not in the document
+  (the issue's permission is wider than theirs); they stay in the raw layer as the API answered.
+  Comment numbers count the comments in the document.
 - **Count:** Server/Data Center asks the search for `total`; Jira Cloud has only an approximate
   count, so the driver counts by a key-only listing (two light scans per full run) to keep the
   safe delete rule exact.
-- **Delta:** `updated >= "-Nm"` (as Confluence). Deleted issues leave in a full run.
+- **Delta:** `updated >= "-Nm"` (as Confluence). Deleted issues leave in a full run; a
+  security level added to an issue updates it, so the next delta carries the new permission.
 - **Permissions:** `project:<KEY>`; an issue with a security level reports only
-  `security:<level>` (map it to the role that may see that level).
+  `security:<KEY>/<level>` (map it to the role that may see that level; named per project
+  because level names repeat across security schemes).
 
 Requests are paced (0.5 s between reads, 0.1 s between downloads, two at a time per source);
 `429` and `503` wait for `Retry-After` (at most 30 s) or back off exponentially, four tries,
-then a coded error (`rate_limited`, `source_unavailable`). A link the source returns that
-points to another host is not followed (`foreign_url`). Wrong credentials are
-`source_auth_failed` on the connection test and in the run.
+then a coded error (`rate_limited`, `source_unavailable`); a `Retry-After` that is not a
+finite number of seconds falls back to the exponential wait. A link the source returns that
+points to another host is not followed (`foreign_url`); a next link or page token seen before
+is `pagination_loop`. Wrong credentials are `source_auth_failed` on the connection test and in
+the run.
 
 The Jira sample `data/samples/openapi/jira.yaml` (search, get, create, comment) can be published
 as agent tools through the OpenAPI → MCP road (05b); publish create and comment with approval.
@@ -246,7 +271,7 @@ Error codes: `path_outside_base` (400), `fs_source_superadmin_only` (403),
 `kb_deleted`, `count_failed`, `listing_failed`, `prune_failed`, `raw_failed`, `run_abandoned`.
 Confluence/Jira (16-2): `source_auth_failed`, `source_not_found`, `source_query_refused`,
 `source_unavailable`, `source_bad_response`, `rate_limited`, `foreign_url`, `attachment_gone`,
-`endpoint_is_platform` (400 at registration).
+`attachment_download_failed`, `pagination_loop`, `endpoint_is_platform` (400 at registration).
 
 ## Settings
 
@@ -256,6 +281,7 @@ Confluence/Jira (16-2): `source_auth_failed`, `source_not_found`, `source_query_
 | `FS_SOURCES_BASE` | `/data/sources` | the only directory network-folder sources read |
 | `PRUNE_MAX_RATIO` | `0.2` | largest share one full run may delete without `force_prune` |
 | `ATTACHMENT_MIN_DATE` | empty | Kapı 0 date rule for attachments (`YYYY-MM-DD`) |
+| `FULL_SYNC_EVERY_DAYS` | `7` | a scheduled run is full when the last full is this old; `0` = never |
 | `ARQ_QUEUE_SYNC` | `sync` | the sync worker's queue (test runs use another) |
 | `SYNC_WORKER_MEM_LIMIT` | `2g` | sync-worker container memory (a file is read whole, up to 500 MB) |
 
