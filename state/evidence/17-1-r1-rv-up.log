@@ -1,0 +1,12 @@
+HEAD=b89fc49136c91808c6926e49acf3fda79066bbeb stack=ffcore-rv (git archive copy)
+utc now 2026-11-23 11:24
+cmd: docker compose -p ffcore-rv --env-file .env.test up -d --wait --pull never postgres redis
+2
+cmd: docker compose -p ffcore-rv --env-file .env.test --profile tools up --build --pull never --no-start --no-deps tools
+
+ Container ffcore-rv-tools-1  Creating
+ Container ffcore-rv-tools-1  Created
+NAME                STATUS              CONFIG FILES
+ffcore              running(17)         C:\ai_paycore\ffcore\compose.yaml,C:\ai_paycore\ffcore\deploy\docker-compose.ollama.yml
+ffcore-16           running(3)          C:\ai_paycore\ffcore\.worktrees\feat\16-2-atlassian\compose.yaml
+ffcore-rv           running(2)          C:\Users\caglar.sahin\AppData\Local\Temp\claude\9398d5fca5badfb5\d866dade-595b-43f0-b74a-a212bc018d6b\scratchpad\p171\compose.yaml

@@ -1,0 +1,24 @@
+HEAD=b89fc49136c91808c6926e49acf3fda79066bbeb stack=ffcore-rv (git archive copy)
+utc now 2026-11-23 11:24
+cmd: tools pytest tests/unit/test_17_ldap.py tests/contract/test_17_openapi.py tests/integration/test_17_identity.py tests/integration/test_17_migration.py -q (llmaas)
+.........................................................                [100%]
+=============================== warnings summary ===============================
+tests/unit/test_17_ldap.py::test_17_ldap_authenticate_by_account_name_email_and_upn
+  /opt/venv/lib/python3.12/site-packages/pyasn1/codec/ber/encoder.py:952: DeprecationWarning: tagMap is deprecated. Please use TAG_MAP instead.
+    warnings.warn(f"{attr} is deprecated. Please use {newAttr} instead.", DeprecationWarning)
+
+tests/unit/test_17_ldap.py::test_17_ldap_authenticate_by_account_name_email_and_upn
+  /opt/venv/lib/python3.12/site-packages/pyasn1/codec/ber/encoder.py:952: DeprecationWarning: typeMap is deprecated. Please use TYPE_MAP instead.
+    warnings.warn(f"{attr} is deprecated. Please use {newAttr} instead.", DeprecationWarning)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+57 passed, 2 warnings in 254.16s (0:04:14)
+cmd: tools pytest <changed 03a/16/57 + 03a/04a contract> -q (llmaas)
+27
+............................................                             [100%]
+44 passed in 275.66s (0:04:35)
+cmd: tools alembic heads; ruff check + format --check (17 files)
+17_0001 (05a, 06a, 03b, 03c, 17, 09, 06b, 12, 07, 11, 08, 04a, 03a, 05b, 16, 04b, 14) (head)
+All checks passed!
+6 files already formatted
+utc now 11:34

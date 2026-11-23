@@ -1,0 +1,8 @@
+HEAD=b89fc49136c91808c6926e49acf3fda79066bbeb stack=ffcore-rv
+utc now 2026-11-23 11:47
+cmd: docker compose -p ffcore-rv --env-file .env.test --profile test --profile e2e --profile tools down -v
+ Network ffcore-rv_default  Removed
+containers=0 volumes=0 networks=0
+NAME                STATUS                       CONFIG FILES
+ffcore              running(17)                  C:\ai_paycore\ffcore\compose.yaml,C:\ai_paycore\ffcore\deploy\docker-compose.ollama.yml
+ffcore-16           restarting(1), running(20)   C:\ai_paycore\ffcore\.worktrees\feat\16-2-atlassian\compose.yaml

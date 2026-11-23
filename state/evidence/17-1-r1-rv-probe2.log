@@ -1,0 +1,277 @@
+HEAD=b89fc49136c91808c6926e49acf3fda79066bbeb stack=ffcore-rv (git archive copy + reviewer probe file tests/integration/test_rv_17_probe.py, not in the branch)
+utc now 2026-11-23 11:44
+cmd: tools pytest tests/integration/test_rv_17_probe.py -q -s (llmaas)
+RV S1 inject '*'                                                -> 401 invalid_credentials
+RV S1 inject 'user-a-cc616*'                                    -> 401 invalid_credentials
+RV S1 inject '*)(objectClass=*'                                 -> 401 invalid_credentials
+RV S1 inject 'user-a-cc616b9e)(|(cn=*'                          -> 401 invalid_credentials
+RV S1 inject '*user-a-cc616b9e'                                 -> 401 invalid_credentials
+RV S1 inject '\\2a'                                             -> 401 invalid_credentials
+RV S1 inject 'user-a-cc616b9e)(&)'                              -> 401 invalid_credentials
+RV S1 inject 'cn=user-a-cc616b9e,ou=people,dc=example,dc=test'  -> 401 invalid_credentials
+RV S1 inject 'user-a-cc616b9e))(|(mail=*'                       -> 401 invalid_credentials
+RV S1 inject '('                                                -> 401 invalid_credentials
+RV S1 inject ')'                                                -> 401 invalid_credentials
+RV S1 inject '\\'                                               -> 401 invalid_credentials
+RV S1 filter (|(mail=\2a\29\28objectClass=\2a)(userPrincipalName=\2a\29\28objectClass=\2a)(sAMAccountName=\2a\29\28objectClass=\2a))
+RV S1 filter (|(mail=a\5cb)(userPrincipalName=a\5cb)(sAMAccountName=a\5cb))
+RV S1 filter (|(mail=x\00y)(userPrincipalName=x\00y)(sAMAccountName=x\00y))
+RV S1 filter (|(mail=\28a\29)(userPrincipalName=\28a\29)(sAMAccountName=\28a\29))
+RV S1 password '' -> 422 validation_error
+RV S1 password ' ' -> 401 invalid_credentials
+RV S1 password '\t' -> 503 identity_provider_unavailable
+F2026-11-23 11:45:06,546 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 11:45:06,762 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 11:45:07,051 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 11:45:07,093 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 11:45:07,894 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 11:45:08,232 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 11:45:08,553 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 11:45:09,634 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 11:45:09,848 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 11:45:10,109 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 11:45:13,056 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 11:45:13,107 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 11:45:13,108 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 11:45:13,109 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 11:45:13,110 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 11:45:13,110 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 11:45:13,111 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 11:45:13,112 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 11:45:13,112 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 11:45:13,113 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 11:45:13,113 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 11:45:13,113 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 11:45:13,114 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 11:45:13,115 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 11:45:13,115 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 11:45:13,547 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 11:45:13,749 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 11:45:14,044 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 11:45:14,681 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 11:45:14,804 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 11:45:14,805 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 11:45:15,035 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 11:45:15,116 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 11:45:15,222 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 11:45:15,533 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 11:45:15,660 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 11:45:15,883 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 11:45:16,866 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 11:45:17,145 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 11:45:17,797 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 11:45:19,562 ERROR ffcore.litellm_reconcile litellm_reconcile_failed attempts=3 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 11:45:19,578 ERROR ffcore.litellm_reconcile litellm_reconcile_failed attempts=3 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 11:45:19,778 ERROR ffcore.litellm_reconcile litellm_reconcile_failed attempts=3 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 11:45:19,902 ERROR ffcore.litellm_reconcile litellm_reconcile_failed attempts=3 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 11:45:19,963 ERROR ffcore.litellm_reconcile litellm_reconcile_failed attempts=3 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 11:45:20,270 ERROR ffcore.litellm_reconcile litellm_reconcile_failed attempts=3 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 11:45:20,678 ERROR ffcore.litellm_reconcile litellm_reconcile_failed attempts=3 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 11:45:23,712 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 11:45:23,925 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 11:45:24,072 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 11:45:24,214 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 11:45:25,218 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 11:45:25,353 ERROR ffcore.readiness warmup failed: ModelMissing
+RV S2 test (service refused) 200 {"provider":"ldap","ok":false,"elapsed_ms":0,"code":"service_bind_failed"}
+2026-11-23 11:45:25,513 ERROR ffcore.readiness warmup failed: ModelMissing
+RV S2 test (unreachable) 200 {"provider":"ldap","ok":false,"elapsed_ms":0,"code":"directory_unreachable"}
+RV S2 second import {'create': 0, 'update': 1, 'error': 0} temp in answer: False
+RV S2 service        log=False audit=False answers=False
+RV S2 user           log=False audit=False answers=False
+RV S2 wrong1         log=False audit=False answers=False
+RV S2 wrong2         log=False audit=False answers=False
+RV S2 wrong-service  log=False audit=False answers=False
+RV S2 temp           log=False audit=False answers=False
+RV S2 bind-dn        log=False audit=False answers=False
+RV S2 user_imported audit after: {'rows': '***', 'dry_run': False, 'summary': {'error': 0, 'create': 0, 'update': 1}}
+RV S2 audit rows with argon2 text: 0
+RV S2 identity-providers answer: {"local_login":"all","providers":[{"provider":"ldap","enabled":true,"transport":"ldaps","accounts":1},{"provider":"oidc","enabled":false,"transport":null,"accounts":0}],"last_sync":null}
+.2026-11-23 11:45:29,144 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 11:45:29,272 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 11:45:29,513 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 11:45:29,724 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 11:45:29,889 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 11:45:30,092 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 11:45:30,279 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 11:45:30,534 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 11:45:30,798 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 11:45:30,988 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 11:45:31,220 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 11:45:31,468 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 11:45:31,732 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 11:45:32,075 ERROR ffcore.readiness warmup failed: ModelMissing
+RV S3 unreachable                  -> 503 identity_provider_unavailable
+RV S3 unreachable-by-email         -> 503 identity_provider_unavailable
+RV S3 unreachable-unknown          -> 503 identity_provider_unavailable
+RV S3 unreachable-superadmin       -> 200 None
+RV S3 unreachable-local            -> 200 None
+RV S3 service-refused              -> 503 identity_provider_unavailable
+RV S3 egress-denied                -> 503 identity_provider_unavailable
+RV S3 off-superadmin               -> 200 None
+RV S3 off-local                    -> 403 local_login_disabled
+RV S3 off-local-wrong              -> 401 invalid_credentials
+RV S3 ldap-off-directory-account   -> 503 identity_provider_unavailable
+RV S3 audit error reasons [{'code': 'identity_provider_unavailable', 'reason': 'directory_unreachable', 'source': 'ldap'}, {'code': 'identity_provider_unavailable', 'reason': 'directory_unreachable', 'source': 'ldap'}, {'code': 'identity_provider_unavailable', 'reason': 'directory_unreachable', 'source': 'ldap'}, {'code': 'identity_provider_unavailable', 'reason': 'service_bind_failed', 'source': 'ldap'}, {'code': 'i
+.RV S3 bind code 53 -> ProviderUnavailable directory_error
+.RV S3 ldap3 2.9.1 allowed_referral_hosts = [('*', True)]
+RV S3 ldap3 auto_referrals = True
+.2026-11-23 11:45:40,327 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 11:45:40,569 ERROR ffcore.readiness warmup failed: ModelMissing
+RV S4 superadmin->ldap 422 superadmin_must_be_local
+RV S4 ldap->superadmin 422 superadmin_must_be_local
+2026-11-23 11:45:40,916 ERROR ffcore.readiness warmup failed: ModelMissing
+RV S4 link local->oidc (no OIDC yet) 200 oidc
+RV S4 then ->ldap 422 auth_source_change_invalid
+RV S4 that account signs in 401 invalid_credentials
+RV S4 patch name of ldap account 200
+.2026-11-23 11:45:49,088 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 11:45:49,184 ERROR ffcore.readiness warmup failed: ModelMissing
+RV S4 sync with a wrong base: error=None checked=5 deactivated=5 active before=5 after=0
+RV S4 open session after 401
+2026-11-23 11:45:49,476 ERROR ffcore.readiness warmup failed: ModelMissing
+RV S4 sign-in after the base is fixed 403 user_inactive
+RV S4 identity.sync audit ('success', {'checked': 5, 'deactivated': 5})
+.2026-11-23 11:45:57,782 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 11:45:58,127 ERROR ffcore.readiness warmup failed: ModelMissing
+RV S4 group left, after sync memberships: {UUID('fff26198-8aa2-46b9-9452-95936c72f8a4'): ('user', 'read', 'idp')} error None
+RV S4 session still reads chat: 200
+RV S4 disabled: is_active False token_version 1
+.2026-11-23 11:46:06,412 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 11:46:06,853 ERROR ffcore.readiness warmup failed: ModelMissing
+RV S5 GET /api/v1/auth/me                               -> 200 None
+RV S5 GET /api/v1/projects                              -> 403 password_change_required
+RV S5 GET /api/v1/projects/<p>                          -> 403 password_change_required
+RV S5 GET /api/v1/projects/<p>/members                  -> 403 password_change_required
+RV S5 GET /api/v1/projects/<p>/agents                   -> 403 password_change_required
+RV S5 GET /api/v1/projects/<p>/chat/agents              -> 403 password_change_required
+RV S5 GET /api/v1/projects/<p>/identity-mappings        -> 403 password_change_required
+RV S5 GET /api/v1/projects/<p>/memories                 -> 403 password_change_required
+RV S5 GET /api/v1/memories                              -> 404 not_found
+RV S5 GET /api/v1/users                                 -> 403 password_change_required
+RV S5 GET /v1/models                                    -> 403 password_change_required
+RV S5 GET /api/v1/projects/<p>/audit                    -> 404 not_found
+RV S5 GET /api/v1/projects/<p>/keys                     -> 404 not_found
+RV S5 POST /api/v1/projects/<p>/keys                     -> 404 not_found
+RV S5 change to the same temporary password -> 204 False
+.2026-11-23 11:46:10,829 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 11:46:11,287 ERROR ffcore.readiness warmup failed: ModelMissing
+RV J (admin,read)+(user,edit) -> ('admin', 'edit', 'idp')
+2026-11-23 11:46:11,615 ERROR ffcore.readiness warmup failed: ModelMissing
+RV J manual row after sync -> ('user', 'edit', 'manual')
+2026-11-23 11:46:11,925 ERROR ffcore.readiness warmup failed: ModelMissing
+RV J idp row deleted by hand 204 after next sign-in -> ('admin', 'edit', 'idp')
+2026-11-23 11:46:12,114 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 11:46:12,387 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 11:46:12,647 ERROR ffcore.readiness warmup failed: ModelMissing
+RV J project admin on another project 404
+RV J user role list/create 403 403
+RV J analyst list/create 403 403
+2026-11-23 11:46:13,157 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+RV J tenant list as project admin 403 import 403 providers 403
+RV J user GET agents           403
+RV J user GET tools            403
+RV J user GET knowledge-bases  403
+RV J user GET members          403
+RV J user GET sources          404
+RV J user GET audit            404
+2026-11-23 11:46:13,599 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+RV J user chat/agents 200 memories 200
+.2026-11-23 11:46:22,722 ERROR ffcore.readiness warmup failed: ModelMissing
+RV J disabled directory user 403 row: None
+.2026-11-23 11:46:31,034 ERROR ffcore.readiness warmup failed: ModelMissing
+RV T median ms: known email wrong password=150.3 unknown email=41.5
+.RV W interactive  identity_sync registered: False
+RV W interactive_low identity_sync registered: False
+RV W background   identity_sync registered: True
+RV N NUL in login -> 500 Internal Server Error
+            print(f"RV S1 inject {value!r:50} -> {r.status_code} {r.json().get('error', {}).get('code')}")
+            print("RV S1 filter", item[:140])
+            print(f"RV S1 password {pw!r} -> {r.status_code} {r.json().get('error', {}).get('code')}")
+E           assert 503 in (401, 422)
+E            +  where 503 = <Response [503 Service Unavailable]>.status_code
+tests/integration/test_rv_17_probe.py:153: AssertionError
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:452 litellm_reconcile_failed attempts=3 error=EgressRequestFailed: egress_dns_failed
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:452 litellm_reconcile_failed attempts=3 error=EgressRequestFailed: egress_dns_failed
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:452 litellm_reconcile_failed attempts=3 error=EgressRequestFailed: egress_dns_failed
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:452 litellm_reconcile_failed attempts=3 error=EgressRequestFailed: egress_dns_failed
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:452 litellm_reconcile_failed attempts=3 error=EgressRequestFailed: egress_dns_failed
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:452 litellm_reconcile_failed attempts=3 error=EgressRequestFailed: egress_dns_failed
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:452 litellm_reconcile_failed attempts=3 error=EgressRequestFailed: egress_dns_failed
+tests/integration/test_rv_17_probe.py::test_rv_s1_filter_injection_and_empty_password
+tests/integration/test_rv_17_probe.py::test_rv_s1_filter_injection_and_empty_password
+FAILED tests/integration/test_rv_17_probe.py::test_rv_s1_filter_injection_and_empty_password
+1 failed, 13 passed, 2 warnings in 118.01s (0:01:58)
+cmd: tools grep referral handling in ldap3 (library source)
+77:                 allowed_referral_hosts=None,
+158:        if allowed_referral_hosts is None:  # defaults to any server with authentication
+159:            allowed_referral_hosts = [('*', True)]
+161:        if isinstance(allowed_referral_hosts, SEQUENCE_TYPES):
+162:            self.allowed_referral_hosts = []
+163:            for referral_host in allowed_referral_hosts:
+166:                        self.allowed_referral_hosts.append(referral_host)
+167:        elif isinstance(allowed_referral_hosts, tuple):
+667:    def valid_referral_list(self, referrals):
+668-        referral_list = []
+669-        for referral in referrals:
+670-            candidate_referral = parse_uri(referral)
+671-            if candidate_referral:
+672-                for ref_host in self.connection.server.allowed_referral_hosts:
+673-                    if ref_host[0] == candidate_referral['host'] or ref_host[0] == '*':
+674-                        if candidate_referral['host'] not in self._referrals:
+675-                            candidate_referral['anonymousBindOnly'] = not ref_host[1]
+676-                            referral_list.append(candidate_referral)
+677-                            break
+678-
+679-        return referral_list
+680-
+681-    def do_next_range_search(self, request, response, attr_name):
+682-        done = False
+683-        current_response = response
+684-        while not done:
+685-            attr_type, _, returned_range = attr_name.partition(';range=')
+686-            _, _, high_range = returned_range.partition('-')
+687-            response['raw_attributes'][attr_type] += current_response['raw_attributes'][attr_name]
+688-            response['attributes'][attr_type] += current_response['attributes'][attr_name]
+689-            if high_range != '*':
+utc now 11:46
