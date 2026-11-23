@@ -1,0 +1,10 @@
+HEAD=e0653b07f074fa44777eedef4eaa64d04ef10425 stack=ffcore-rv (git archive copy)
+utc now 2026-11-23 15:39
+cmd: tools pytest tests/unit/test_16_2_drivers.py tests/unit/test_16_2_r2.py tests/unit/test_16_2_fake_atlassian.py tests/unit/test_16_2_registry.py tests/unit/test_16_2_storage_format.py tests/unit/test_hke_208_compose.py tests/integration/test_16_2_atlassian.py tests/integration/test_16_2_r2.py tests/integration/test_16_1_scheduler.py -q (llmaas); ruff
+73 passed in 335.73s (0:05:35)
+All checks passed!
+18 files already formatted
+utc now 15:45
+cmd: tools (-e DEPLOY_PROFILE=airgap -e OFFLINE=true) pytest tests/unit/test_16_2_drivers.py tests/unit/test_16_2_r2.py tests/unit/test_16_2_fake_atlassian.py tests/unit/test_16_2_registry.py tests/unit/test_16_2_storage_format.py tests/unit/test_hke_208_compose.py tests/integration/test_16_2_atlassian.py tests/integration/test_16_2_r2.py tests/integration/test_16_1_scheduler.py -q
+73 passed in 306.18s (0:05:06)
+utc now 15:51

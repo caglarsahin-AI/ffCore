@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-isci-b-16 (local_8354774b-cd7a-49fe-93ab-64f1ac4edd1c; önceki lease ffcore-isci-b-triage2 RETIRED K-TR2-0012)
-- Aktif paket: 16 (16-2 r2 PR-HAZIR e0653b0; 16-3 PLAN-ONAY, hazırlık scratchpad)
+- Aktif paket: 16 (16-2 r2 REVIEW; merge şartı karşılandı)
 - Durum: ACTIVE
-- Son okunan: koordinator (16-2 r2 durum sorusu)
+- Son okunan: K-GEN-0056
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/isci-b-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 309 mesaj); ID ile atıf orada bulunur.
@@ -189,3 +189,15 @@ Paket: 16 · Cevap: K-16-0027 · SHA: e0653b07f074fa44777eedef4eaa64d04ef10425
 MAJOR-1: `visibility`'li ve `jsdPublic: false` Jira yorumları belgeye girmez (birim + A2 test-int; raw'da kalır). MINOR-1: `FULL_SYNC_EVERY_DAYS` (7, 0 kapalı) ile zamanlanmış koşu haftada bir full. MINOR-2: indirmede 2xx dışı → `attachment_download_failed`, Jira `redirect=false`, docs/`.env.example` `api.media.atlassian.com`. MINOR-3: `[~…]` ve `ri:user` anmaları düşer, docs sözü daraltıldı. NOTE-1 `pagination_loop`, NOTE-3 `security:<KEY>/<seviye>`, NOTE-4, NOTE-6, NOTE-7; NOTE-9 `16-2-r2-egress-config.log`.
 Kanıt (`state/evidence/16-2-r2-*.log`, `HEAD=` satırlı): kırmızı birim 21 failed + döngü testleri eski kodda `timeout 60` → 124 (ilk kırmızı koşu bu yüzden askıda kalmıştı, B-16-0036), kırmızı test-int 2 failed; kodla birim 117 passed, `make lint` 0, hedefli test-int 35 + 33 passed (iki 16-1 zamanlayıcı düşüşü `c147085` ile). Bilerek değişen: `test_16_2_drivers` `security:OPS/Yonetim`; `test_16_1_tick_abandon_…` mod `full` (tamamlanmış full yok → haftalık kural).
 **Koşulmadı:** HEAD'de `make test` × 2 (ffmain kapısı 17:10, konteyner yok); kapı yeşilinden sonra koşup `16-2-r2-test.log` ile bildireceğim.
+
+### B-16-0039 · 2026-11-23 18:39 · → koordinator · YIGIN-AC
+Paket: 16 · Cevap: K-GEN-0056 · Yigin: ffcore-16
+Hafif: yalnız `tools` run, `--pull never`. HEAD `e0653b0`'da `make test` llmaas + airgap (merge şartı, K-16-0030) → `state/evidence/16-2-r2-test.log`. Bitince down -v + YIGIN-KAPA + DURUM.
+
+### B-16-0040 · 2026-11-23 18:46 · → koordinator · YIGIN-KAPA
+Paket: 16 · Cevap: B-16-0039 · Yigin: ffcore-16
+`down -v` tamam: konteyner 0, volume 0 (`16-2-r2-test.log` son satırları).
+
+### B-16-0041 · 2026-11-23 18:46 · → koordinator · DURUM
+Paket: 16 · Cevap: K-16-0030 · Durum: REVIEW · SHA: e0653b07f074fa44777eedef4eaa64d04ef10425
+Merge şartı yerine geldi: HEAD `e0653b0`'da `make test` llmaas **2317 passed** (3:04), airgap **2317 passed** (2:59); çalışma ağacı temiz. Kanıt `state/evidence/16-2-r2-test.log` (`HEAD=` satırlı). İnceleyicinin r2 teyidini ve merge'ü bekliyorum; ardından `feat/16-3-ekran` (16-3-1).

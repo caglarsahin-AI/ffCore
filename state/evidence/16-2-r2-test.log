@@ -1,0 +1,38 @@
+HEAD=e0653b07f074fa44777eedef4eaa64d04ef10425 2026-11-23 18:39:22 r2 merge condition (K-16-0030): make test llmaas + airgap
+ Network ffcore-16_default  Creating
+ Network ffcore-16_default  Created
+ Volume "ffcore-16_langfuse_clickhouse_logs"  Creating
+ Volume "ffcore-16_langfuse_clickhouse_logs"  Created
+ Volume "ffcore-16_postgres_data"  Creating
+ Volume "ffcore-16_postgres_data"  Created
+ Volume "ffcore-16_langfuse_minio_data"  Creating
+ Volume "ffcore-16_langfuse_minio_data"  Created
+ Volume "ffcore-16_langfuse_postgres_data"  Creating
+ Volume "ffcore-16_langfuse_postgres_data"  Created
+ Volume "ffcore-16_model_cache"  Creating
+ Volume "ffcore-16_model_cache"  Created
+ Volume "ffcore-16_knowledge_storage"  Creating
+ Volume "ffcore-16_knowledge_storage"  Created
+ Volume "ffcore-16_redis_data"  Creating
+ Volume "ffcore-16_redis_data"  Created
+ Volume "ffcore-16_langfuse_clickhouse_data"  Creating
+ Volume "ffcore-16_langfuse_clickhouse_data"  Created
+tests/contract/test_c2_on_behalf_of.py ..                                [ 99%]
+tests/contract/test_c3_common_columns.py .....                           [ 99%]
+tests/contract/test_c5_vectorstore.py ...                                [ 99%]
+tests/contract/test_c9_runs.py .......                                   [100%]
+
+======================= 2317 passed in 184.97s (0:03:04) =======================
+--- airgap 2026-11-23 18:42:43
+tests/contract/test_c2_on_behalf_of.py ..                                [ 99%]
+tests/contract/test_c3_common_columns.py .....                           [ 99%]
+tests/contract/test_c5_vectorstore.py ...                                [ 99%]
+tests/contract/test_c9_runs.py .......                                   [100%]
+
+======================= 2317 passed in 179.27s (0:02:59) =======================
+end 2026-11-23 18:45:55
+HEAD=e0653b07f074fa44777eedef4eaa64d04ef10425 2026-11-23 18:46:14 down -v ffcore-16
+ Volume ffcore-16_postgres_data  Removed
+ Volume ffcore-16_langfuse_minio_data  Removed
+ Network ffcore-16_default  Removed
+containers=0 volumes=0

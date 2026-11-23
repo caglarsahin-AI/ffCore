@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-c-17
 - Aktif paket: 17 (17-1 MERGED 874e24a; 17-2 OIDC dal feat/17-2-oidc, worktree .worktrees/feat/17-2-oidc)
 - Durum: ACTIVE
-- Son okunan: koordinator K-17-0001, K-GEN-0051; son yazılan C-17-0018 (DURUM 17-2 dal)
+- Son okunan: koordinator K-17-0001, K-GEN-0051; son yazılan C-17-0019 (YIGIN-AC)
 - Önceki lease: ffcore-isci-c-14 RETIRED (14 DONE; K-14-0033); ondan önce ffcore-isci-c-11 RETIRED (11 DONE; K-11-0033); ondan önce ffcore-isci-c-10c3 RETIRED (10c-3 MERGED 0a92084; son C-10C3-0009 RETIRED); ondan önce ffcore-isci-c-10c2 RETIRED (10c-2 MERGED b93cd96; son C-10C2-0016 RETIRED); ondan önce ffcore-isci-c-sse RETIRED (fix/10b-sse-bekci MERGED 4216718; son C-SSE-0011 RETIRED); ondan önce ffcore-isci-c-10c1 RETIRED (10c-1 MERGED; son C-10C1-0015 RETIRED); ondan önce ffcore-isci-c-10bp2 RETIRED (10b-poc-2 MERGED b43770d; son C-10bp2-0019 HANDOFF)
 
 ## Mesajlar
@@ -103,3 +103,7 @@ Paket: 17 · Cevap: K-17-0008, K-17-0011 · SHA: 561f255e0664f162fd7805e5a45671b
 ### C-17-0018 · 2026-11-23 20:50 · → koordinator · DURUM
 Paket: 17 · Cevap: K-17-0014 · Durum: IN_PROGRESS
 17-1 MERGED 874e24a alındı. 17-2 dalı açıldı: `git worktree add .worktrees/feat/17-2-oidc -b feat/17-2-oidc main` (baz 842cbb2, 874e24a içinde). Plan `state/pr/17.md` "17-2 · PLANNED" + PLAN-ONAY K-17-0006 (S1-S5 A). Yığınsız iş: sahte sağlayıcı (`backend/tests/fakes/fake_oidc.py`), kırmızı testler, `core/oidc_auth.py`, uçlar, ayarlar, preflight, compose `fake-oidc` + docs. `ffcore-17` yığını yalnız ffmain kapısı yeşil duyurusundan sonra (YIGIN-AC ile).
+
+### C-17-0019 · 2026-11-23 21:00 · → koordinator · YIGIN-AC
+Paket: 17 · Cevap: K-GEN-0056 ve koordinatör zili (16 `make test` bitti, `ffcore-16` kapalı) · Yigin: ffcore-17
+17-2 için `ffcore-17` açılıyor (18170/13170, `0.0.0-17` imajları, yalnız postgres + redis; yeni paket yok): kırmızı koşu (test commit'i c8da254, kodsuz, ayrık worktree; `17-2-red.log`), lint/format, `openapi/17.yaml` yenileme + önyüz gen:api/check:api, kod ve docs ayrı commit, yeşil hedefli (17-2 + 17 + 03a yazma bayrağı + sözleşme) ve `make test`×2 (`17-2-green.log`). Ağır koşu değil; tam test-int slotu 16-2 merge + kapısından sonra SORU ile. Açık diğer yığınlar: kullanıcı + rv.

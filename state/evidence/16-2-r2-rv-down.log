@@ -1,0 +1,8 @@
+HEAD=e0653b07f074fa44777eedef4eaa64d04ef10425 stack=ffcore-rv (git archive copy)
+utc now 2026-11-23 15:51
+cmd: docker compose -p ffcore-rv --env-file .env.test --profile test --profile e2e --profile tools down -v
+ Network ffcore-rv_default  Removed
+containers=0 volumes=0 networks=0
+NAME                STATUS              CONFIG FILES
+ffcore              running(17)         C:\ai_paycore\ffcore\compose.yaml,C:\ai_paycore\ffcore\deploy\docker-compose.ollama.yml
+ffcore-17           running(2)          C:\ai_paycore\ffcore\.worktrees\feat\17-2-oidc\compose.yaml
