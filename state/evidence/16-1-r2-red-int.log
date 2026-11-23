@@ -1,0 +1,10 @@
+HEAD=b63964cb0b88afabe84e5258db5dbb76a5c3d4a2 (r2 test commit only) 2026-11-22 22:13:01 red int
+E           AssertionError: ('developer', '{"id":"1b910684-147a-4909-b509-7f5b362172df","project_id":"6a5ce929-be04-40c3-9526-a9cb753e7af3","kb_id...6-c4e8-4fe7-ad74-2fb614999129","created_at":"2026-11-22T19:13:27.681800Z","updated_at":"2026-11-22T19:13:27.681800Z"}')
+E           assert 201 == 403
+E               AssertionError: ('.', '{"id":"e2f23405-dfa7-441b-a3ab-34f1a40cd2ba","project_id":"d147c7a3-9048-4f6c-b8f9-1bd123bac0c0","kb_id":"e416a...c-cc89-4bcb-b4de-ab196d134095","created_at":"2026-11-22T19:13:29.470313Z","updated_at":"2026-11-22T19:13:29.470313Z"}')
+E               assert 201 == 403
+E       assert (204 == 409)
+FAILED tests/integration/test_16_1_r2.py::test_16_1_r2_fs_registration_and_root_are_superadmin_only
+FAILED tests/integration/test_16_1_r2.py::test_16_1_r2_project_b_cannot_index_project_a_share
+FAILED tests/integration/test_16_1_r2.py::test_16_1_r2_knowledge_base_with_a_live_source
+3 failed in 20.63s

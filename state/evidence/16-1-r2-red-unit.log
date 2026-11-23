@@ -1,0 +1,9 @@
+HEAD=b63964cb0b88afabe84e5258db5dbb76a5c3d4a2 (r2 test commit only) 2026-11-22 22:10:47 red unit
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/unit/test_16_1_r2_policy.py:11: in <module>
+    from ffcore.sources import policy
+E   ImportError: cannot import name 'policy' from 'ffcore.sources' (/work/backend/ffcore/sources/__init__.py)
+=========================== short test summary info ============================
+ERROR tests/unit/test_16_1_r2_policy.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+1 error in 2.69s

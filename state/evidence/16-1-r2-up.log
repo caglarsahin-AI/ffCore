@@ -1,0 +1,8 @@
+HEAD=b63964cb0b88afabe84e5258db5dbb76a5c3d4a2 + uncommitted r2 code 2026-11-22 22:11:20 up
+ Container ffcore-16-frontend-1  Healthy
+ Container ffcore-16-mcp-search-1  Healthy
+ Container ffcore-16-mcp-sql-1  Healthy
+stopped frontend
+stopped agent-worker
+stopped agent-worker-bg
+stopped worker

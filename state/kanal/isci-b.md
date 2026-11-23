@@ -93,3 +93,13 @@ ffmain kapısı nedeniyle kapatıldı: yarım kalan `up --build` durduruldu (yet
 ### B-16-0018 · 2026-11-22 22:10 · → koordinator · YIGIN-AC
 Paket: 16 · Cevap: K-16-0013 · Yigin: ffcore-16
 r2 kapıları: kırmızı (test commit'i `b63964c` ayrı worktree), `openapi/16.yaml`, kod/docs commit'leri, main `7db7483`'e rebase (tek çakışma `docs/degisiklikler.md`, iki girdi korunur), sonra rebase'li HEAD'de lint, `make test` ×2, hedefli test-int (16 + 04b silme + 03a yetki), compose config. `up -d --wait --build --pull never`; gereksiz servisler adıyla durdurulur.
+
+### B-16-0019 · 2026-11-23 11:08 · → koordinator · YIGIN-KAPA
+Paket: 16 · Cevap: B-16-0018 · Yigin: ffcore-16
+`down -v` tamam: konteyner 0, volume 0 (`16-1-r2-down.log`). Kesinti öncesi başlayan hedefli test-int tamamlanmıştı (272 passed); yeniden koşu gerekmedi.
+
+### B-16-0020 · 2026-11-23 11:08 · → koordinator · PR-HAZIR
+Paket: 16 · Cevap: K-16-0011, K-16-0013 · SHA: d914b4728ef920cdbf936e726c4b48c13fb60f75
+**PR 16-1 r2.** Main `7db7483`'e rebase (14-2 sonrası; tek çakışma `docs/degisiklikler.md`, iki girdi korundu; range-diff diğer commit'lerde birebir). Tam delta `7db7483..d914b47` (9 commit), r2 delta `bb24990..d914b47` (4 commit: test kırmızı → test biçim → kod → docs); eşleme PR notunda. PR notu `state/pr/16.md` 'PR 16-1 r2'.
+MAJOR-1 A: `sources/policy.py` (fs → süperadmin, diğer türler → proje admin'i), kayıt ve `config/secret` değişikliği 403 `fs_source_superadmin_only` (audit `denied`); S3 testi: B'nin developer'ı ve admin'i üç kökte de 403, B aramasında A'nın metni yok. MINOR-1: KB DELETE 409 `knowledge_base_has_sources`; raw/silver/gold başında `kb_deleted`, yazım yok (S8 testi). MINOR-2: `SYNC_WORKER_MEM_LIMIT` 2g. Docs NOTE-2/4/5 + süperadmin gerekçesi.
+Kapı (`state/evidence/16-1-r2-*.log`, `HEAD=` satırlı): kırmızı birim + test-int (3 failed, S3/S8 kodsuz üretildi); rebase'li HEAD'de `make lint` 0, tek head, `make test` 2265 × iki profil, hedefli test-int 272/272 (16 tamamı + 03a + 04a/04b silme + 57 + trj), gen:api/check:api 0, compose config 0 (mem 2 GiB). Bilerek değişen: mevcut 16-1 testlerinde fs kaydı süperadmin'le; `test_16_1_sync_worker_service` mem_limit.
