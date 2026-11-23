@@ -18,6 +18,10 @@ from ffcore.core.errors import ApiError
 
 COOKIE_NAME = "ffcore_session"
 UNSAFE_METHODS = frozenset({"POST", "PUT", "PATCH", "DELETE"})
+# 17: what a session with `must_change_password` may reach (who am I, change it, sign out).
+PASSWORD_CHANGE_PATHS = frozenset(
+    {"/api/v1/auth/me", "/api/v1/auth/password", "/api/v1/auth/logout"}
+)
 
 issue_token = issue_session_token
 
@@ -87,4 +91,12 @@ async def session_resolver(request: Request, settings: Settings) -> Actor | None
     if user is None or not user.is_active or user.token_version != claims.token_version:
         return None
     check_same_origin(request, settings)
+    if user.must_change_password and request.url.path not in PASSWORD_CHANGE_PATHS:
+        # 17: an imported account's temporary password opens only the password screen.
+        raise ApiError(
+            403,
+            "permission_error",
+            "password_change_required",
+            "Change your temporary password first.",
+        )
     return Actor(actor_type="user", actor_id=str(user.id))
