@@ -1,0 +1,45 @@
+HEAD=fc741a1aa668c27ee69e9134db2f14fdd34bcc9e (+ schema default fix, uncommitted)
+
+> ffcore-frontend@0.1.0 gen:api
+> cp ../backend/openapi/03a.yaml mocks/openapi-03a.yaml && openapi-typescript mocks/openapi-03a.yaml -o lib/api/schema.d.ts && openapi-typescript ../backend/openapi/04a.yaml -o lib/api/schema-04a.d.ts && openapi-typescript ../backend/openapi/05a.yaml -o lib/api/schema-05a.d.ts && openapi-typescript ../backend/openapi/06a.yaml -o lib/api/schema-06a.d.ts && openapi-typescript ../backend/openapi/07.yaml -o lib/api/schema-07.d.ts && openapi-typescript ../backend/openapi/09.yaml -o lib/api/schema-09.d.ts && openapi-typescript ../backend/openapi/03c.yaml -o lib/api/schema-03c.d.ts && openapi-typescript ../backend/openapi/06b.yaml -o lib/api/schema-06b.d.ts && openapi-typescript ../backend/openapi/05b.yaml -o lib/api/schema-05b.d.ts && openapi-typescript ../backend/openapi/14.yaml -o lib/api/schema-14.d.ts
+
+✨ openapi-typescript 7.13.0
+🚀 mocks/openapi-03a.yaml → lib/api/schema.d.ts [828.1ms]
+✨ openapi-typescript 7.13.0
+🚀 ../backend/openapi/04a.yaml → lib/api/schema-04a.d.ts [482.7ms]
+✨ openapi-typescript 7.13.0
+🚀 ../backend/openapi/05a.yaml → lib/api/schema-05a.d.ts [240.3ms]
+✨ openapi-typescript 7.13.0
+🚀 ../backend/openapi/06a.yaml → lib/api/schema-06a.d.ts [398.1ms]
+✨ openapi-typescript 7.13.0
+🚀 ../backend/openapi/07.yaml → lib/api/schema-07.d.ts [110.8ms]
+✨ openapi-typescript 7.13.0
+🚀 ../backend/openapi/09.yaml → lib/api/schema-09.d.ts [197.9ms]
+✨ openapi-typescript 7.13.0
+🚀 ../backend/openapi/03c.yaml → lib/api/schema-03c.d.ts [302.9ms]
+✨ openapi-typescript 7.13.0
+🚀 ../backend/openapi/06b.yaml → lib/api/schema-06b.d.ts [252.7ms]
+✨ openapi-typescript 7.13.0
+🚀 ../backend/openapi/05b.yaml → lib/api/schema-05b.d.ts [225.7ms]
+✨ openapi-typescript 7.13.0
+🚀 ../backend/openapi/14.yaml → lib/api/schema-14.d.ts [327.4ms]
+
+> ffcore-frontend@0.1.0 lint
+> eslint
+
+
+> ffcore-frontend@0.1.0 typecheck
+> tsc --noEmit
+
+
+> ffcore-frontend@0.1.0 check:api
+> node scripts/check-api.mjs
+
+API contract copies and generated types are current.
+
+[2m Test Files [22m [1m[32m63 passed[39m[22m[90m (63)[39m
+[2m      Tests [22m [1m[32m349 passed[39m[22m[90m (349)[39m
+[2m   Start at [22m 09:52:42
+[2m   Duration [22m 86.24s[2m (transform 204.70s, setup 0ms, import 293.88s, tests 96.75s, environment 80.10s)[22m
+
+exit=0

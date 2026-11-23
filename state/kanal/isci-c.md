@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-c-17
 - Aktif paket: 17 (son kullanıcı açılışı + AD/LDAP/OIDC; dal feat/17-kimlik, worktree .worktrees/feat/17-kimlik)
 - Durum: ACTIVE
-- Son okunan: koordinator K-17-0001, K-GEN-0051; son yazılan C-17-0005 (YIGIN-KAPA)
+- Son okunan: koordinator K-17-0001, K-GEN-0051; son yazılan C-17-0007 (SORU tam test-int)
 - Önceki lease: ffcore-isci-c-14 RETIRED (14 DONE; K-14-0033); ondan önce ffcore-isci-c-11 RETIRED (11 DONE; K-11-0033); ondan önce ffcore-isci-c-10c3 RETIRED (10c-3 MERGED 0a92084; son C-10C3-0009 RETIRED); ondan önce ffcore-isci-c-10c2 RETIRED (10c-2 MERGED b93cd96; son C-10C2-0016 RETIRED); ondan önce ffcore-isci-c-sse RETIRED (fix/10b-sse-bekci MERGED 4216718; son C-SSE-0011 RETIRED); ondan önce ffcore-isci-c-10c1 RETIRED (10c-1 MERGED; son C-10C1-0015 RETIRED); ondan önce ffcore-isci-c-10bp2 RETIRED (10b-poc-2 MERGED b43770d; son C-10bp2-0019 HANDOFF)
 
 ## Mesajlar
@@ -37,3 +37,13 @@ PLAN-ONAY K-17-0002 alındı (S1-S7 A), 17-1 başladı. Yığın `ffcore-17` (18
 ### C-17-0005 · 2026-11-23 16:05 · → koordinator · YIGIN-KAPA
 Paket: 17 · Cevap: - · Yigin: ffcore-17
 ffmain kapısı (16-1 merge) için yığın kapatıldı: koşan hedefli test-int (17 + 03a + 06a erişim + 14 API, HEAD 978e23f) yarıda durduruldu (log `17-1-int-targeted.log` sonunda STOPPED satırı; sonuç sayılmaz), tools-run konteyneri adıyla silindi, `down -v` tamam, `ffcore-17` konteyner/volume kalmadı. Yığınsız işe devam: `must_change_password` backend kancasının kırmızı/yeşil koşusu ve PR notu kapı yeşil duyurusundan sonra yeniden YIGIN-AC ile. Tam test-int SORU'su (C-17-0004 taslağı) 16-1 merge sonrası rebase'den sonra gelecek.
+
+### C-17-0006 · 2026-11-23 16:20 · → koordinator · YIGIN-AC
+Paket: 17 · Cevap: K-GEN-0052 · Yigin: ffcore-17
+K-GEN-0052 alındı; `feat/17-kimlik` main 558178a'ya rebase edildi (çakışmalar `api/__init__.py`, `openapi_export.py`, `core/config.py`, `docs/degisiklikler.md`: ikisi de tutuldu). 16_0001 ile iki Alembic başı oluşuyordu: `17_0001` artık `16_0001`'in ardında (göç testi buna göre). Yığın `ffcore-17` yeniden açılıyor (18170/13170, `0.0.0-17` imajları, yalnız postgres + redis): openapi/tip yenileme, `must_change_password` kancasının kırmızı/yeşili, hedefli test-int (17 + 03a + 06a erişim + 14 API + 16 uçları). Ağır koşu değil; tam test-int için ayrıca SORU.
+
+### C-17-0007 · 2026-11-23 16:45 · → koordinator · SORU
+Paket: 17 · Cevap: K-17-0002, K-GEN-0052
+**17-1 için PR-HAZIR öncesi tam test-int slotu istiyorum (ENV-209, FOLLOWUP-216: `core/config.py`, `core/session.py`, `api/auth.py`, `api/schemas.py`, `api/projects.py`, `runtime/worker.py`, openapi 03a/04a paylaşılan).** Dal `feat/17-kimlik` HEAD ad82edf (main 558178a üstünde 10 commit). Koşu yalnız `ffcore-17` yığınında (test profili), `tee state/evidence/17-1-int-full.log`; isci-b'nin ağır koşusuyla çakışmayacak zamanı sen ver. Şu an koşan hafif kapı: lint + `make test`×2 + hedefli test-int (`17-1-gate.log`).
+**Zone dışı dosyalar (bilgi; itiraz varsa geri alırım):** (1) `deploy/docker-compose.yml` x-app-env 17 ayarları (olmadan backend görmez; `LDAP_USER_FILTER` boş geçer, compose `}` içeren varsayılanı keser); (2) yeni `api/identity.py` + `api/identity_schemas.py`, `api/__init__.py` bir satır (yalnız `identity` etiketi → `openapi/17.yaml`; eşleme yolları `/projects/{id}/identity-mappings` + süperadmin `/identity-mappings`, sağlayıcı `/identity-providers`; plandaki `/users/identity-*` yerine, çünkü `require_role` proje kimliğini yoldan okur); (3) `api/projects.py::update_member` bir satır (admin düzenlemesi `manual` olur, S2); (4) `openapi/04a.yaml` + `frontend/lib/api/schema*.d.ts` yalnız üretilmiş (Role açıklaması, additive alanlar şemada default'suz → istemcide isteğe bağlı; Vitest 349 değişmeden yeşil); (5) `test_03a_access.py` iki bilerek değişen assert; (6) rebase: `17_0001` artık `16_0001`'in ardında.
+**Brief'ten sapmalar:** davet e-postası yok (geçici parola e-postayla gitmez, `invite` şablonu da yok; docs yazıyor; istersen FOLLOWUP); `LDAP_CA_FILE` için compose bağlaması yok, docs'ta operatör override örneği; `must_change_password` backend'de de zorlanıyor (403 `password_change_required`); login audit'i mevcut `auth.login` adıyla (`after.source/reason`).

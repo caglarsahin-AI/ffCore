@@ -1,0 +1,15 @@
+HEAD=390eb3f02499060cc291e7f766ad5d9824bc4642 (uncommitted 17-1 work)
+ruff check backend scripts data/samples/scripts services tests/deploy
+B017 Do not assert blind exception: `Exception`
+  --> backend/tests/integration/test_17_migration.py:71:14
+   |
+69 |         ("x3@example.test", "hash", "saml"),  # unknown source
+70 |     ):
+71 |         with pytest.raises(Exception):
+   |              ^^^^^^^^^^^^^^^^^^^^^^^^
+72 |             scratch_db.conn.execute(
+73 |                 "INSERT INTO users (id, email, password_hash, full_name, auth_source)"
+   |
+
+Found 1 error.
+make: *** [Makefile:9: lint] Error 1

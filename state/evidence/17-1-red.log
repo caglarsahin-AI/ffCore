@@ -1,0 +1,721 @@
+HEAD=567ef7e157760df1525d32c44e093740a31ceec2 (17-1 tests on base code 390eb3f)
+FFFFEEEEEEEEEEEEEEEEEEEFEEEEEEEEEEEEFFF.......F...                       [100%]
+==================================== ERRORS ====================================
+_________________ ERROR collecting tests/unit/test_17_ldap.py __________________
+ImportError while importing test module '/work/backend/tests/unit/test_17_ldap.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/local/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/unit/test_17_ldap.py:11: in <module>
+    from ffcore.core.ldap_auth import (
+E   ModuleNotFoundError: No module named 'ffcore.core.ldap_auth'
+____ ERROR at setup of test_17_1_directory_user_provisioned_with_user_read _____
+
+app = <fastapi.applications.FastAPI object at 0x7f2a266d69f0>
+app_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+fake = <tests.ldap_fixture.FakeDirectory object at 0x7f2a2606ddf0>
+
+    @pytest.fixture
+    def configure(app, app_settings, fake):
+        """configure(**settings) switches the running app to the fake directory (or LDAP off)."""
+        from ffcore.core.config import get_settings
+>       from ffcore.core.ldap_auth import get_ldap_directory
+E       ModuleNotFoundError: No module named 'ffcore.core.ldap_auth'
+
+tests/integration/test_17_identity.py:37: ModuleNotFoundError
+____ ERROR at setup of test_17_1_login_by_email_and_upn_finds_same_account _____
+
+app = <fastapi.applications.FastAPI object at 0x7f2a266d69f0>
+app_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+fake = <tests.ldap_fixture.FakeDirectory object at 0x7f2a25f0ab10>
+
+    @pytest.fixture
+    def configure(app, app_settings, fake):
+        """configure(**settings) switches the running app to the fake directory (or LDAP off)."""
+        from ffcore.core.config import get_settings
+>       from ffcore.core.ldap_auth import get_ldap_directory
+E       ModuleNotFoundError: No module named 'ffcore.core.ldap_auth'
+
+tests/integration/test_17_identity.py:37: ModuleNotFoundError
+___ ERROR at setup of test_17_1_unmapped_group_member_enters_without_project ___
+
+app = <fastapi.applications.FastAPI object at 0x7f2a266d69f0>
+app_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+fake = <tests.ldap_fixture.FakeDirectory object at 0x7f2a25c30320>
+
+    @pytest.fixture
+    def configure(app, app_settings, fake):
+        """configure(**settings) switches the running app to the fake directory (or LDAP off)."""
+        from ffcore.core.config import get_settings
+>       from ffcore.core.ldap_auth import get_ldap_directory
+E       ModuleNotFoundError: No module named 'ffcore.core.ldap_auth'
+
+tests/integration/test_17_identity.py:37: ModuleNotFoundError
+_________ ERROR at setup of test_17_1_default_project_gives_user_read __________
+
+app = <fastapi.applications.FastAPI object at 0x7f2a266d69f0>
+app_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+fake = <tests.ldap_fixture.FakeDirectory object at 0x7f2a25c32720>
+
+    @pytest.fixture
+    def configure(app, app_settings, fake):
+        """configure(**settings) switches the running app to the fake directory (or LDAP off)."""
+        from ffcore.core.config import get_settings
+>       from ffcore.core.ldap_auth import get_ldap_directory
+E       ModuleNotFoundError: No module named 'ffcore.core.ldap_auth'
+
+tests/integration/test_17_identity.py:37: ModuleNotFoundError
+________ ERROR at setup of test_17_1_default_project_missing_fails_loud ________
+
+app = <fastapi.applications.FastAPI object at 0x7f2a266d69f0>
+app_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+fake = <tests.ldap_fixture.FakeDirectory object at 0x7f2a25cf47a0>
+
+    @pytest.fixture
+    def configure(app, app_settings, fake):
+        """configure(**settings) switches the running app to the fake directory (or LDAP off)."""
+        from ffcore.core.config import get_settings
+>       from ffcore.core.ldap_auth import get_ldap_directory
+E       ModuleNotFoundError: No module named 'ffcore.core.ldap_auth'
+
+tests/integration/test_17_identity.py:37: ModuleNotFoundError
+_______ ERROR at setup of test_17_1_several_groups_highest_role_and_edit _______
+
+app = <fastapi.applications.FastAPI object at 0x7f2a266d69f0>
+app_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+fake = <tests.ldap_fixture.FakeDirectory object at 0x7f2a25cf6180>
+
+    @pytest.fixture
+    def configure(app, app_settings, fake):
+        """configure(**settings) switches the running app to the fake directory (or LDAP off)."""
+        from ffcore.core.config import get_settings
+>       from ffcore.core.ldap_auth import get_ldap_directory
+E       ModuleNotFoundError: No module named 'ffcore.core.ldap_auth'
+
+tests/integration/test_17_identity.py:37: ModuleNotFoundError
+___ ERROR at setup of test_17_2_left_group_loses_idp_membership_manual_stays ___
+
+app = <fastapi.applications.FastAPI object at 0x7f2a266d69f0>
+app_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+fake = <tests.ldap_fixture.FakeDirectory object at 0x7f2a25cf7fb0>
+
+    @pytest.fixture
+    def configure(app, app_settings, fake):
+        """configure(**settings) switches the running app to the fake directory (or LDAP off)."""
+        from ffcore.core.config import get_settings
+>       from ffcore.core.ldap_auth import get_ldap_directory
+E       ModuleNotFoundError: No module named 'ffcore.core.ldap_auth'
+
+tests/integration/test_17_identity.py:37: ModuleNotFoundError
+___ ERROR at setup of test_17_2_admin_edit_of_idp_membership_becomes_manual ____
+
+app = <fastapi.applications.FastAPI object at 0x7f2a266d69f0>
+app_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+fake = <tests.ldap_fixture.FakeDirectory object at 0x7f2a25d01b50>
+
+    @pytest.fixture
+    def configure(app, app_settings, fake):
+        """configure(**settings) switches the running app to the fake directory (or LDAP off)."""
+        from ffcore.core.config import get_settings
+>       from ffcore.core.ldap_auth import get_ldap_directory
+E       ModuleNotFoundError: No module named 'ffcore.core.ldap_auth'
+
+tests/integration/test_17_identity.py:37: ModuleNotFoundError
+_______ ERROR at setup of test_17_2_mapping_change_applies_at_next_login _______
+
+app = <fastapi.applications.FastAPI object at 0x7f2a266d69f0>
+app_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+fake = <tests.ldap_fixture.FakeDirectory object at 0x7f2a25d03a70>
+
+    @pytest.fixture
+    def configure(app, app_settings, fake):
+        """configure(**settings) switches the running app to the fake directory (or LDAP off)."""
+        from ffcore.core.config import get_settings
+>       from ffcore.core.ldap_auth import get_ldap_directory
+E       ModuleNotFoundError: No module named 'ffcore.core.ldap_auth'
+
+tests/integration/test_17_identity.py:37: ModuleNotFoundError
+_____ ERROR at setup of test_17_3_bad_credentials_one_body_reason_in_audit _____
+
+app = <fastapi.applications.FastAPI object at 0x7f2a266d69f0>
+app_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+fake = <tests.ldap_fixture.FakeDirectory object at 0x7f2a25c59400>
+
+    @pytest.fixture
+    def configure(app, app_settings, fake):
+        """configure(**settings) switches the running app to the fake directory (or LDAP off)."""
+        from ffcore.core.config import get_settings
+>       from ffcore.core.ldap_auth import get_ldap_directory
+E       ModuleNotFoundError: No module named 'ffcore.core.ldap_auth'
+
+tests/integration/test_17_identity.py:37: ModuleNotFoundError
+_______ ERROR at setup of test_17_3_directory_down_503_no_local_fallback _______
+
+app = <fastapi.applications.FastAPI object at 0x7f2a266d69f0>
+app_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+fake = <tests.ldap_fixture.FakeDirectory object at 0x7f2a25c5b380>
+
+    @pytest.fixture
+    def configure(app, app_settings, fake):
+        """configure(**settings) switches the running app to the fake directory (or LDAP off)."""
+        from ffcore.core.config import get_settings
+>       from ffcore.core.ldap_auth import get_ldap_directory
+E       ModuleNotFoundError: No module named 'ffcore.core.ldap_auth'
+
+tests/integration/test_17_identity.py:37: ModuleNotFoundError
+_____ ERROR at setup of test_17_3_directory_account_while_ldap_off_is_503 ______
+
+app = <fastapi.applications.FastAPI object at 0x7f2a266d69f0>
+app_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+fake = <tests.ldap_fixture.FakeDirectory object at 0x7f2a25c8cdd0>
+
+    @pytest.fixture
+    def configure(app, app_settings, fake):
+        """configure(**settings) switches the running app to the fake directory (or LDAP off)."""
+        from ffcore.core.config import get_settings
+>       from ffcore.core.ldap_auth import get_ldap_directory
+E       ModuleNotFoundError: No module named 'ffcore.core.ldap_auth'
+
+tests/integration/test_17_identity.py:37: ModuleNotFoundError
+_____ ERROR at setup of test_17_3_local_login_policy_keeps_superadmin[off] _____
+
+app = <fastapi.applications.FastAPI object at 0x7f2a266d69f0>
+app_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+fake = <tests.ldap_fixture.FakeDirectory object at 0x7f2a25c5ac60>
+
+    @pytest.fixture
+    def configure(app, app_settings, fake):
+        """configure(**settings) switches the running app to the fake directory (or LDAP off)."""
+        from ffcore.core.config import get_settings
+>       from ffcore.core.ldap_auth import get_ldap_directory
+E       ModuleNotFoundError: No module named 'ffcore.core.ldap_auth'
+
+tests/integration/test_17_identity.py:37: ModuleNotFoundError
+_ ERROR at setup of test_17_3_local_login_policy_keeps_superadmin[superadmin_only] _
+
+app = <fastapi.applications.FastAPI object at 0x7f2a266d69f0>
+app_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+fake = <tests.ldap_fixture.FakeDirectory object at 0x7f2a25c5a390>
+
+    @pytest.fixture
+    def configure(app, app_settings, fake):
+        """configure(**settings) switches the running app to the fake directory (or LDAP off)."""
+        from ffcore.core.config import get_settings
+>       from ffcore.core.ldap_auth import get_ldap_directory
+E       ModuleNotFoundError: No module named 'ffcore.core.ldap_auth'
+
+tests/integration/test_17_identity.py:37: ModuleNotFoundError
+__________ ERROR at setup of test_17_3_disabled_directory_account_403 __________
+
+app = <fastapi.applications.FastAPI object at 0x7f2a266d69f0>
+app_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+fake = <tests.ldap_fixture.FakeDirectory object at 0x7f2a25d03680>
+
+    @pytest.fixture
+    def configure(app, app_settings, fake):
+        """configure(**settings) switches the running app to the fake directory (or LDAP off)."""
+        from ffcore.core.config import get_settings
+>       from ffcore.core.ldap_auth import get_ldap_directory
+E       ModuleNotFoundError: No module named 'ffcore.core.ldap_auth'
+
+tests/integration/test_17_identity.py:37: ModuleNotFoundError
+_____ ERROR at setup of test_17_3_directory_account_without_email_refused ______
+
+app = <fastapi.applications.FastAPI object at 0x7f2a266d69f0>
+app_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+fake = <tests.ldap_fixture.FakeDirectory object at 0x7f2a25d02a50>
+
+    @pytest.fixture
+    def configure(app, app_settings, fake):
+        """configure(**settings) switches the running app to the fake directory (or LDAP off)."""
+        from ffcore.core.config import get_settings
+>       from ffcore.core.ldap_auth import get_ldap_directory
+E       ModuleNotFoundError: No module named 'ffcore.core.ldap_auth'
+
+tests/integration/test_17_identity.py:37: ModuleNotFoundError
+_____ ERROR at setup of test_17_3_external_account_cannot_change_password ______
+
+app = <fastapi.applications.FastAPI object at 0x7f2a266d69f0>
+app_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+fake = <tests.ldap_fixture.FakeDirectory object at 0x7f2a25cf6330>
+
+    @pytest.fixture
+    def configure(app, app_settings, fake):
+        """configure(**settings) switches the running app to the fake directory (or LDAP off)."""
+        from ffcore.core.config import get_settings
+>       from ffcore.core.ldap_auth import get_ldap_directory
+E       ModuleNotFoundError: No module named 'ffcore.core.ldap_auth'
+
+tests/integration/test_17_identity.py:37: ModuleNotFoundError
+___ ERROR at setup of test_17_s1_same_email_local_account_conflict_then_link ___
+
+app = <fastapi.applications.FastAPI object at 0x7f2a266d69f0>
+app_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+fake = <tests.ldap_fixture.FakeDirectory object at 0x7f2a25cf6780>
+
+    @pytest.fixture
+    def configure(app, app_settings, fake):
+        """configure(**settings) switches the running app to the fake directory (or LDAP off)."""
+        from ffcore.core.config import get_settings
+>       from ffcore.core.ldap_auth import get_ldap_directory
+E       ModuleNotFoundError: No module named 'ffcore.core.ldap_auth'
+
+tests/integration/test_17_identity.py:37: ModuleNotFoundError
+___________ ERROR at setup of test_17_s1_superadmin_must_stay_local ____________
+
+app = <fastapi.applications.FastAPI object at 0x7f2a266d69f0>
+app_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+fake = <tests.ldap_fixture.FakeDirectory object at 0x7f2a25c31310>
+
+    @pytest.fixture
+    def configure(app, app_settings, fake):
+        """configure(**settings) switches the running app to the fake directory (or LDAP off)."""
+        from ffcore.core.config import get_settings
+>       from ffcore.core.ldap_auth import get_ldap_directory
+E       ModuleNotFoundError: No module named 'ffcore.core.ldap_auth'
+
+tests/integration/test_17_identity.py:37: ModuleNotFoundError
+___ ERROR at setup of test_17_2_identity_sync_deactivates_and_drops_session ____
+
+app = <fastapi.applications.FastAPI object at 0x7f2a266d69f0>
+app_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+fake = <tests.ldap_fixture.FakeDirectory object at 0x7f2a25c306b0>
+
+    @pytest.fixture
+    def configure(app, app_settings, fake):
+        """configure(**settings) switches the running app to the fake directory (or LDAP off)."""
+        from ffcore.core.config import get_settings
+>       from ffcore.core.ldap_auth import get_ldap_directory
+E       ModuleNotFoundError: No module named 'ffcore.core.ldap_auth'
+
+tests/integration/test_17_identity.py:37: ModuleNotFoundError
+___ ERROR at setup of test_17_2_identity_sync_directory_down_changes_nothing ___
+
+app = <fastapi.applications.FastAPI object at 0x7f2a266d69f0>
+app_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+fake = <tests.ldap_fixture.FakeDirectory object at 0x7f2a25f0b380>
+
+    @pytest.fixture
+    def configure(app, app_settings, fake):
+        """configure(**settings) switches the running app to the fake directory (or LDAP off)."""
+        from ffcore.core.config import get_settings
+>       from ffcore.core.ldap_auth import get_ldap_directory
+E       ModuleNotFoundError: No module named 'ffcore.core.ldap_auth'
+
+tests/integration/test_17_identity.py:37: ModuleNotFoundError
+_________ ERROR at setup of test_17_2_identity_sync_oidc_idle_accounts _________
+
+app = <fastapi.applications.FastAPI object at 0x7f2a266d69f0>
+app_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+fake = <tests.ldap_fixture.FakeDirectory object at 0x7f2a25c8e210>
+
+    @pytest.fixture
+    def configure(app, app_settings, fake):
+        """configure(**settings) switches the running app to the fake directory (or LDAP off)."""
+        from ffcore.core.config import get_settings
+>       from ffcore.core.ldap_auth import get_ldap_directory
+E       ModuleNotFoundError: No module named 'ffcore.core.ldap_auth'
+
+tests/integration/test_17_identity.py:37: ModuleNotFoundError
+____ ERROR at setup of test_17_mappings_project_admin_scope_and_validation _____
+
+app = <fastapi.applications.FastAPI object at 0x7f2a266d69f0>
+app_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+fake = <tests.ldap_fixture.FakeDirectory object at 0x7f2a25c7c320>
+
+    @pytest.fixture
+    def configure(app, app_settings, fake):
+        """configure(**settings) switches the running app to the fake directory (or LDAP off)."""
+        from ffcore.core.config import get_settings
+>       from ffcore.core.ldap_auth import get_ldap_directory
+E       ModuleNotFoundError: No module named 'ffcore.core.ldap_auth'
+
+tests/integration/test_17_identity.py:37: ModuleNotFoundError
+_______ ERROR at setup of test_17_mappings_read_only_admin_cannot_change _______
+
+app = <fastapi.applications.FastAPI object at 0x7f2a266d69f0>
+app_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+fake = <tests.ldap_fixture.FakeDirectory object at 0x7f2a25c8fb90>
+
+    @pytest.fixture
+    def configure(app, app_settings, fake):
+        """configure(**settings) switches the running app to the fake directory (or LDAP off)."""
+        from ffcore.core.config import get_settings
+>       from ffcore.core.ldap_auth import get_ldap_directory
+E       ModuleNotFoundError: No module named 'ffcore.core.ldap_auth'
+
+tests/integration/test_17_identity.py:37: ModuleNotFoundError
+_______________ ERROR at setup of test_17_user_role_matrix[edit] _______________
+
+app = <fastapi.applications.FastAPI object at 0x7f2a266d69f0>
+app_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+fake = <tests.ldap_fixture.FakeDirectory object at 0x7f2a25f0bef0>
+
+    @pytest.fixture
+    def configure(app, app_settings, fake):
+        """configure(**settings) switches the running app to the fake directory (or LDAP off)."""
+        from ffcore.core.config import get_settings
+>       from ffcore.core.ldap_auth import get_ldap_directory
+E       ModuleNotFoundError: No module named 'ffcore.core.ldap_auth'
+
+tests/integration/test_17_identity.py:37: ModuleNotFoundError
+_______________ ERROR at setup of test_17_user_role_matrix[read] _______________
+
+app = <fastapi.applications.FastAPI object at 0x7f2a266d69f0>
+app_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+fake = <tests.ldap_fixture.FakeDirectory object at 0x7f2a25c302f0>
+
+    @pytest.fixture
+    def configure(app, app_settings, fake):
+        """configure(**settings) switches the running app to the fake directory (or LDAP off)."""
+        from ffcore.core.config import get_settings
+>       from ffcore.core.ldap_auth import get_ldap_directory
+E       ModuleNotFoundError: No module named 'ffcore.core.ldap_auth'
+
+tests/integration/test_17_identity.py:37: ModuleNotFoundError
+_____________ ERROR at setup of test_17_import_dry_run_then_apply ______________
+
+app = <fastapi.applications.FastAPI object at 0x7f2a266d69f0>
+app_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+fake = <tests.ldap_fixture.FakeDirectory object at 0x7f2a25c30d10>
+
+    @pytest.fixture
+    def configure(app, app_settings, fake):
+        """configure(**settings) switches the running app to the fake directory (or LDAP off)."""
+        from ffcore.core.config import get_settings
+>       from ffcore.core.ldap_auth import get_ldap_directory
+E       ModuleNotFoundError: No module named 'ffcore.core.ldap_auth'
+
+tests/integration/test_17_identity.py:37: ModuleNotFoundError
+___________ ERROR at setup of test_17_import_header_and_permissions ____________
+
+app = <fastapi.applications.FastAPI object at 0x7f2a266d69f0>
+app_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+fake = <tests.ldap_fixture.FakeDirectory object at 0x7f2a25cf6d80>
+
+    @pytest.fixture
+    def configure(app, app_settings, fake):
+        """configure(**settings) switches the running app to the fake directory (or LDAP off)."""
+        from ffcore.core.config import get_settings
+>       from ffcore.core.ldap_auth import get_ldap_directory
+E       ModuleNotFoundError: No module named 'ffcore.core.ldap_auth'
+
+tests/integration/test_17_identity.py:37: ModuleNotFoundError
+________ ERROR at setup of test_17_providers_and_status_without_secrets ________
+
+app = <fastapi.applications.FastAPI object at 0x7f2a266d69f0>
+app_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+fake = <tests.ldap_fixture.FakeDirectory object at 0x7f2a25d035f0>
+
+    @pytest.fixture
+    def configure(app, app_settings, fake):
+        """configure(**settings) switches the running app to the fake directory (or LDAP off)."""
+        from ffcore.core.config import get_settings
+>       from ffcore.core.ldap_auth import get_ldap_directory
+E       ModuleNotFoundError: No module named 'ffcore.core.ldap_auth'
+
+tests/integration/test_17_identity.py:37: ModuleNotFoundError
+__________ ERROR at setup of test_17_no_credentials_in_logs_or_audit ___________
+
+app = <fastapi.applications.FastAPI object at 0x7f2a266d69f0>
+app_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+fake = <tests.ldap_fixture.FakeDirectory object at 0x7f2a25d008f0>
+
+    @pytest.fixture
+    def configure(app, app_settings, fake):
+        """configure(**settings) switches the running app to the fake directory (or LDAP off)."""
+        from ffcore.core.config import get_settings
+>       from ffcore.core.ldap_auth import get_ldap_directory
+E       ModuleNotFoundError: No module named 'ffcore.core.ldap_auth'
+
+tests/integration/test_17_identity.py:37: ModuleNotFoundError
+_____________ ERROR at setup of test_17_resolve_external_identity ______________
+
+app = <fastapi.applications.FastAPI object at 0x7f2a266d69f0>
+app_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+fake = <tests.ldap_fixture.FakeDirectory object at 0x7f2a25c5a540>
+
+    @pytest.fixture
+    def configure(app, app_settings, fake):
+        """configure(**settings) switches the running app to the fake directory (or LDAP off)."""
+        from ffcore.core.config import get_settings
+>       from ffcore.core.ldap_auth import get_ldap_directory
+E       ModuleNotFoundError: No module named 'ffcore.core.ldap_auth'
+
+tests/integration/test_17_identity.py:37: ModuleNotFoundError
+=================================== FAILURES ===================================
+______________________ test_17_openapi_draft_matches_app _______________________
+
+    def test_17_openapi_draft_matches_app():
+>       assert DRAFT.exists(), f"missing {DRAFT}; regenerate with: {REGENERATE}"
+E       AssertionError: missing /work/backend/openapi/17.yaml; regenerate with: python -m ffcore.api.openapi_export 17 > openapi/17.yaml
+E       assert False
+E        +  where False = exists()
+E        +    where exists = PosixPath('/work/backend/openapi/17.yaml').exists
+
+tests/contract/test_17_openapi.py:26: AssertionError
+____________________________ test_17_openapi_paths _____________________________
+
+    def test_17_openapi_paths():
+>       spec = yaml.safe_load(render("17"))
+                              ^^^^^^^^^^^^
+
+tests/contract/test_17_openapi.py:31: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+package = '17'
+
+    def render(package: str = "03a") -> str:
+>       info = PACKAGES[package]
+               ^^^^^^^^^^^^^^^^^
+E       KeyError: '17'
+
+ffcore/api/openapi_export.py:107: KeyError
+___________ test_17_03a_draft_gains_identity_fields_only_additively ____________
+
+    def test_17_03a_draft_gains_identity_fields_only_additively():
+        schemas = yaml.safe_load(render("03a"))["components"]["schemas"]
+        for name in ("CurrentUser", "UserOut"):
+            props = schemas[name]["properties"]
+>           assert "auth_source" in props and "must_change_password" in props
+E           AssertionError: assert ('auth_source' in {'id': {'type': 'string', 'format': 'uuid', 'title': 'Id'}, 'email': {'type': 'string', 'title': 'Email'}, 'full_name': {'type': 'string', 'title': 'Full Name'}, 'is_superadmin': {'type': 'boolean', 'title': 'Is Superadmin'}})
+
+tests/contract/test_17_openapi.py:39: AssertionError
+_________________ test_17_no_secret_fields_in_identity_schemas _________________
+
+    def test_17_no_secret_fields_in_identity_schemas():
+>       schemas = yaml.safe_load(render("17"))["components"]["schemas"]
+                                 ^^^^^^^^^^^^
+
+tests/contract/test_17_openapi.py:47: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+package = '17'
+
+    def render(package: str = "03a") -> str:
+>       info = PACKAGES[package]
+               ^^^^^^^^^^^^^^^^^
+E       KeyError: '17'
+
+ffcore/api/openapi_export.py:107: KeyError
+_______________ test_17_s1_database_refuses_external_superadmin ________________
+
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_bd59b4402d18) at 0x7f2a26502f60>
+
+    def test_17_s1_database_refuses_external_superadmin(pg):
+        with pytest.raises(Exception) as caught:
+            pg.execute(
+                "INSERT INTO users (id, email, password_hash, full_name, is_superadmin,"
+                " superadmin_access, auth_source) VALUES (%s, %s, NULL, 'X', true, 'edit', 'ldap')",
+                (uuid.uuid4(), f"x-{uuid.uuid4().hex[:6]}@example.test"),
+            )
+>       assert "superadmin_is_local" in str(caught.value)
+E       assert 'superadmin_is_local' in 'column "auth_source" of relation "users" does not exist\nLINE 1: ...ash, full_name, is_superadmin, superadmin_access, auth_sourc...\n                                                             ^'
+E        +  where 'column "auth_source" of relation "users" does not exist\nLINE 1: ...ash, full_name, is_superadmin, superadmin_access, auth_sourc...\n                                                             ^' = str(UndefinedColumn('column "auth_source" of relation "users" does not exist\nLINE 1: ...ash, full_name, is_superadmin, superadmin_access, auth_sourc...\n                                                             ^'))
+E        +    where UndefinedColumn('column "auth_source" of relation "users" does not exist\nLINE 1: ...ash, full_name, is_superadmin, superadmin_access, auth_sourc...\n                                                             ^') = <ExceptionInfo UndefinedColumn('column "auth_source" of relation "users" does not exist\nLINE 1: ...ash, full_name, is_superadmin, superadmin_access, auth_sourc...\n                                                             ^') tblen=2>.value
+
+tests/integration/test_17_identity.py:338: AssertionError
+____________________ test_17_migration_schema_and_roundtrip ____________________
+
+scratch_db = <tests.integration.conftest.ScratchDatabase object at 0x7f2a25c5a000>
+
+    def test_17_migration_schema_and_roundtrip(scratch_db):
+        db = scratch_db
+        heads = [line for line in db.run("heads").splitlines() if line.strip()]
+        assert len(heads) == 1
+>       assert {"auth_source", "external_id", "last_login_at", "must_change_password"} <= _columns(
+            db, "users"
+        )
+E       AssertionError: assert {'auth_source...nge_password'} <= {'created_at'..._active', ...}
+E         
+E         Extra items in the left set:
+E         'auth_source'
+E         'last_login_at'
+E         'must_change_password'
+E         'external_id'
+
+tests/integration/test_17_migration.py:29: AssertionError
+_________ test_17_migration_downgrade_refuses_with_directory_accounts __________
+
+scratch_db = <tests.integration.conftest.ScratchDatabase object at 0x7f2a25c5b8c0>
+
+    def test_17_migration_downgrade_refuses_with_directory_accounts(scratch_db):
+        db = scratch_db
+>       db.conn.execute(
+            "INSERT INTO users (id, email, password_hash, full_name, auth_source, external_id)"
+            " VALUES (%s, 'dir@example.test', NULL, 'D', 'ldap', 'guid-1')",
+            (uuid.uuid4(),),
+        )
+
+tests/integration/test_17_migration.py:55: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_scratch_b1f2537e5de3) at 0x7f2a25c58530>
+query = "INSERT INTO users (id, email, password_hash, full_name, auth_source, external_id) VALUES (%s, 'dir@example.test', NULL, 'D', 'ldap', 'guid-1')"
+params = (UUID('73951969-70b1-4256-ba9c-889e2305d168'),), prepare = None
+binary = False
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool = False,
+    ) -> Cursor[Row]:
+        """Execute a query and return a cursor to read its results."""
+        try:
+            cur = self.cursor()
+            if binary:
+                cur.format = BINARY
+    
+            if isinstance(query, Template):
+                if params is not None:
+                    raise TypeError(
+                        "'execute()' with string template query doesn't support parameters"
+                    )
+                return cur.execute(query, prepare=prepare)
+            else:
+                return cur.execute(query, params, prepare=prepare)
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.UndefinedColumn: column "auth_source" of relation "users" does not exist
+E           LINE 1: ... INTO users (id, email, password_hash, full_name, auth_sourc...
+E                                                                        ^
+
+/opt/venv/lib/python3.12/site-packages/psycopg/connection.py:304: UndefinedColumn
+________________________ test_17_migration_user_checks _________________________
+
+scratch_db = <tests.integration.conftest.ScratchDatabase object at 0x7f2a25c7e690>
+
+    def test_17_migration_user_checks(scratch_db):
+        for email, password_hash, source in (
+            ("x1@example.test", "hash", "ldap"),  # a directory account never has a password
+            ("x2@example.test", None, "local"),  # a local account always has one
+            ("x3@example.test", "hash", "saml"),  # unknown source
+        ):
+            with pytest.raises(psycopg.errors.CheckViolation):
+>               scratch_db.conn.execute(
+                    "INSERT INTO users (id, email, password_hash, full_name, auth_source)"
+                    " VALUES (%s, %s, %s, 'X', %s)",
+                    (uuid.uuid4(), email, password_hash, source),
+                )
+
+tests/integration/test_17_migration.py:73: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_scratch_3f5b16573d4c) at 0x7f2a25c7fb90>
+query = "INSERT INTO users (id, email, password_hash, full_name, auth_source) VALUES (%s, %s, %s, 'X', %s)"
+params = (UUID('e0159b58-b4ce-479e-9007-c14cf91db879'), 'x1@example.test', 'hash', 'ldap')
+prepare = None, binary = False
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool = False,
+    ) -> Cursor[Row]:
+        """Execute a query and return a cursor to read its results."""
+        try:
+            cur = self.cursor()
+            if binary:
+                cur.format = BINARY
+    
+            if isinstance(query, Template):
+                if params is not None:
+                    raise TypeError(
+                        "'execute()' with string template query doesn't support parameters"
+                    )
+                return cur.execute(query, prepare=prepare)
+            else:
+                return cur.execute(query, params, prepare=prepare)
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.UndefinedColumn: column "auth_source" of relation "users" does not exist
+E           LINE 1: ... INTO users (id, email, password_hash, full_name, auth_sourc...
+E                                                                        ^
+
+/opt/venv/lib/python3.12/site-packages/psycopg/connection.py:304: UndefinedColumn
+_____________________ test_03a_users_projects_members_flow _____________________
+
+root = <starlette.testclient.TestClient object at 0x7f2a05f52900>
+make_user = <function make_user.<locals>.make at 0x7f299f6bfec0>
+client_factory = <function client_factory.<locals>.make at 0x7f2a05f33ba0>
+
+    def test_03a_users_projects_members_flow(root, make_user, client_factory):
+        created = root.post(
+            f"{API}/users",
+            json={
+                "email": "flow@example.test",
+                "full_name": "Flow",
+                "password": "dummy-not-secret-pw-01",
+            },
+        )
+        assert created.status_code == 201, created.text
+        user_id = created.json()["id"]
+        # 17: `must_change_password` is a flag, not a password; no other password field appears.
+>       assert {k for k in created.json() if "password" in k} == {"must_change_password"}
+E       AssertionError: assert set() == {'must_change_password'}
+E         
+E         Extra items in the right set:
+E         'must_change_password'
+E         Use -v to get more diff
+
+tests/integration/test_03a_access.py:111: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-23 09:34:14,843 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 09:34:15,236 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=389
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=389
+----------------------------- Captured stderr call -----------------------------
+2026-11-23 09:34:15,683 INFO ffcore.access access method=POST path=/api/v1/users status=201 ms=441
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/users status=201 ms=441
+=========================== short test summary info ============================
+FAILED tests/contract/test_17_openapi.py::test_17_openapi_draft_matches_app
+FAILED tests/contract/test_17_openapi.py::test_17_openapi_paths - KeyError: '17'
+FAILED tests/contract/test_17_openapi.py::test_17_03a_draft_gains_identity_fields_only_additively
+FAILED tests/contract/test_17_openapi.py::test_17_no_secret_fields_in_identity_schemas
+FAILED tests/integration/test_17_identity.py::test_17_s1_database_refuses_external_superadmin
+FAILED tests/integration/test_17_migration.py::test_17_migration_schema_and_roundtrip
+FAILED tests/integration/test_17_migration.py::test_17_migration_downgrade_refuses_with_directory_accounts
+FAILED tests/integration/test_17_migration.py::test_17_migration_user_checks
+FAILED tests/integration/test_03a_access.py::test_03a_users_projects_members_flow
+ERROR tests/unit/test_17_ldap.py
+ERROR tests/integration/test_17_identity.py::test_17_1_directory_user_provisioned_with_user_read
+ERROR tests/integration/test_17_identity.py::test_17_1_login_by_email_and_upn_finds_same_account
+ERROR tests/integration/test_17_identity.py::test_17_1_unmapped_group_member_enters_without_project
+ERROR tests/integration/test_17_identity.py::test_17_1_default_project_gives_user_read
+ERROR tests/integration/test_17_identity.py::test_17_1_default_project_missing_fails_loud
+ERROR tests/integration/test_17_identity.py::test_17_1_several_groups_highest_role_and_edit
+ERROR tests/integration/test_17_identity.py::test_17_2_left_group_loses_idp_membership_manual_stays
+ERROR tests/integration/test_17_identity.py::test_17_2_admin_edit_of_idp_membership_becomes_manual
+ERROR tests/integration/test_17_identity.py::test_17_2_mapping_change_applies_at_next_login
+ERROR tests/integration/test_17_identity.py::test_17_3_bad_credentials_one_body_reason_in_audit
+ERROR tests/integration/test_17_identity.py::test_17_3_directory_down_503_no_local_fallback
+ERROR tests/integration/test_17_identity.py::test_17_3_directory_account_while_ldap_off_is_503
+ERROR tests/integration/test_17_identity.py::test_17_3_local_login_policy_keeps_superadmin[off]
+ERROR tests/integration/test_17_identity.py::test_17_3_local_login_policy_keeps_superadmin[superadmin_only]
+ERROR tests/integration/test_17_identity.py::test_17_3_disabled_directory_account_403
+ERROR tests/integration/test_17_identity.py::test_17_3_directory_account_without_email_refused
+ERROR tests/integration/test_17_identity.py::test_17_3_external_account_cannot_change_password
+ERROR tests/integration/test_17_identity.py::test_17_s1_same_email_local_account_conflict_then_link
+ERROR tests/integration/test_17_identity.py::test_17_s1_superadmin_must_stay_local
+ERROR tests/integration/test_17_identity.py::test_17_2_identity_sync_deactivates_and_drops_session
+ERROR tests/integration/test_17_identity.py::test_17_2_identity_sync_directory_down_changes_nothing
+ERROR tests/integration/test_17_identity.py::test_17_2_identity_sync_oidc_idle_accounts
+ERROR tests/integration/test_17_identity.py::test_17_mappings_project_admin_scope_and_validation
+ERROR tests/integration/test_17_identity.py::test_17_mappings_read_only_admin_cannot_change
+ERROR tests/integration/test_17_identity.py::test_17_user_role_matrix[edit]
+ERROR tests/integration/test_17_identity.py::test_17_user_role_matrix[read]
+ERROR tests/integration/test_17_identity.py::test_17_import_dry_run_then_apply
+ERROR tests/integration/test_17_identity.py::test_17_import_header_and_permissions
+ERROR tests/integration/test_17_identity.py::test_17_providers_and_status_without_secrets
+ERROR tests/integration/test_17_identity.py::test_17_no_credentials_in_logs_or_audit
+ERROR tests/integration/test_17_identity.py::test_17_resolve_external_identity
+9 failed, 10 passed, 32 errors in 152.12s (0:02:32)

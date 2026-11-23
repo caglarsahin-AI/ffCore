@@ -1,0 +1,28 @@
+HEAD=390eb3f02499060cc291e7f766ad5d9824bc4642 (uncommitted 17-1 work)
+F................................................................        [100%]
+=================================== FAILURES ===================================
+___________ test_17_ldap_authenticate_by_account_name_email_and_upn ____________
+
+directory = (<tests.ldap_fixture.FakeDirectory object at 0x7f8af8e12540>, <ffcore.core.ldap_auth.LdapDirectory object at 0x7f8af0de09e0>)
+
+    def test_17_ldap_authenticate_by_account_name_email_and_upn(directory):
+        fake, ldap = directory
+        for login in (fake.login("user-a"), fake.email("user-a"), fake.email("user-a").upper()):
+            user = run(ldap.authenticate(login, fake.password("user-a")))
+            assert user.provider == "ldap"
+            assert user.external_id == fake.guid("user-a")  # canonical text from AD's bytes
+            assert user.email == fake.email("user-a")
+            assert user.full_name == "Directory User A"
+>           assert user.groups == {fx.GROUPS["chat"].lower()}
+E           AssertionError: assert frozenset({'c...ple,dc=test'}) == {'cn=ffcore-c...mple,dc=test'}
+E             
+E             Extra items in the left set:
+E             'cn=ffcore-chat-abdd54aa,ou=groups,dc=example,dc=test'
+E             Extra items in the right set:
+E             'cn=ffcore-chat,ou=groups,dc=example,dc=test'
+E             Use -v to get more diff
+
+tests/unit/test_17_ldap.py:51: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/test_17_ldap.py::test_17_ldap_authenticate_by_account_name_email_and_upn
+1 failed, 64 passed in 288.23s (0:04:48)

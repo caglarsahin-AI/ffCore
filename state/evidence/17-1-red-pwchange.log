@@ -1,0 +1,101 @@
+HEAD=9416c7380970b81c84dcb82577cf68b12e35fd32 (test 357a882 without the session hook)
+F                                                                        [100%]
+=================================== FAILURES ===================================
+______________________ test_17_import_dry_run_then_apply _______________________
+
+configure = <function configure.<locals>.apply at 0x7f1ebe8e1260>
+fake = <tests.ldap_fixture.FakeDirectory object at 0x7f1ebea46ed0>
+root = <starlette.testclient.TestClient object at 0x7f1ebe573500>
+make_user = <function make_user.<locals>.make at 0x7f1ebe56ef20>
+make_project = <function make_project.<locals>.make at 0x7f1ebc85c720>
+client_factory = <function client_factory.<locals>.make at 0x7f1ebe56f100>
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_cea9dfe5c59a) at 0x7f1ebe572390>
+
+    def test_17_import_dry_run_then_apply(
+        configure, fake, root, make_user, make_project, client_factory, pg
+    ):
+        project = make_project()
+        key = pg.execute("SELECT key FROM projects WHERE id = %s", (project,)).fetchone()[0]
+        _, existing = make_user()
+        login(client_factory(), fake.login("user-a"), fake.password("user-a"))
+        tag = uuid.uuid4().hex[:6]
+        body = [
+            f"new-{tag}@example.test,New Person,user,read,{key}",
+            f"{existing},Renamed Person,analyst,edit,{key}",
+            "not-an-email,X,user,read,",
+            f"bad-role-{tag}@example.test,X,developer,read,",
+            f"unknown-{tag}@example.test,X,user,read,no-such-key",
+            f"{fake.email('user-a')},X,user,read,",
+            f"new-{tag}@example.test,Again,user,read,",
+        ]
+        preview = root.post(f"{API}/users/import", files={"file": ("u.csv", _csv(*body), "text/csv")})
+        assert preview.status_code == 200, preview.text
+        report = preview.json()
+        assert report["dry_run"] is True
+        assert report["summary"] == {"create": 1, "update": 1, "error": 5}
+        codes = {r["line"]: r["code"] for r in report["rows"] if r["action"] == "error"}
+        assert codes == {
+            4: "invalid_email",
+            5: "invalid_role",
+            6: "unknown_project",
+            7: "external_identity",
+            8: "duplicate_email",
+        }
+        assert user_row(pg, f"new-{tag}@example.test") is None  # nothing written
+        applied = root.post(
+            f"{API}/users/import?dry_run=false", files={"file": ("u.csv", _csv(*body), "text/csv")}
+        ).json()
+        created = [r for r in applied["rows"] if r["action"] == "create"]
+        assert len(created) == 1 and len(created[0]["temporary_password"]) >= 16
+        temp = created[0]["temporary_password"]
+        row = user_row(pg, f"new-{tag}@example.test")
+        assert row[1] == "local" and row[6] is True
+        assert memberships(pg, row[0]) == {project: ("user", "read", "manual")}
+        # once: the password is in no audit row
+        for audit in audit_rows(pg, "user_imported"):
+            assert temp not in str(audit[2])
+        me = login(client_factory(), f"new-{tag}@example.test", temp).json()
+        assert me["user"]["must_change_password"] is True
+        client = client_factory(f"new-{tag}@example.test", temp)
+        # the temporary password opens only the password screen
+        blocked = client.get(f"{API}/projects/{project}/chat/agents")
+>       assert blocked.status_code == 403
+E       assert 200 == 403
+E        +  where 200 = <Response [200 OK]>.status_code
+
+tests/integration/test_17_identity.py:548: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-23 10:14:10,606 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=770
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=770
+----------------------------- Captured stderr call -----------------------------
+2026-11-23 10:14:11,084 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=356
+2026-11-23 10:14:11,663 INFO ffcore.access access method=POST path=/api/v1/users/import status=200 ms=574
+2026-11-23 10:14:11,858 INFO ffcore.access access method=POST path=/api/v1/users/import status=200 ms=188
+2026-11-23 10:14:12,173 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=209
+2026-11-23 10:14:12,432 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=143
+2026-11-23 10:14:12,523 INFO ffcore.access access method=GET path=/api/v1/projects/769d66f5-90d0-415e-bd71-c0ce448ca79b/chat/agents status=200 ms=85
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=356
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/users/import status=200 ms=574
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/users/import status=200 ms=188
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=209
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=143
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/769d66f5-90d0-415e-bd71-c0ce448ca79b/chat/agents status=200 ms=85
+--------------------------- Captured stderr teardown ---------------------------
+2026-11-23 10:14:18,842 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 10:14:19,791 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 10:14:20,095 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-23 10:14:22,141 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 10:14:22,142 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-23 10:14:22,143 ERROR ffcore.readiness warmup failed: ModelMissing
+---------------------------- Captured log teardown -----------------------------
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:73 warmup failed: ModelMissing
+=========================== short test summary info ============================
+FAILED tests/integration/test_17_identity.py::test_17_import_dry_run_then_apply
+1 failed, 31 deselected in 25.42s

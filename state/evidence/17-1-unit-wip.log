@@ -1,0 +1,266 @@
+HEAD=390eb3f02499060cc291e7f766ad5d9824bc4642 (uncommitted 17-1 work)
+cd backend && pytest tests/unit tests/contract
+============================= test session starts ==============================
+platform linux -- Python 3.12.10, pytest-9.2.0, pluggy-1.7.0
+rootdir: /work/backend
+configfile: pyproject.toml
+plugins: Faker-40.43.0, anyio-4.15.1, langsmith-0.14.8
+collected 2224 items
+
+tests/unit/test_00_1_healthz.py .                                        [  0%]
+tests/unit/test_00_package.py ..                                         [  0%]
+tests/unit/test_00_repo_skeleton.py ...........                          [  0%]
+tests/unit/test_00_smoke_script.py ....                                  [  0%]
+tests/unit/test_01_client.py ..............                              [  1%]
+tests/unit/test_01_config.py ...                                         [  1%]
+tests/unit/test_01_egress_stream.py ..................                   [  2%]
+tests/unit/test_01_r1_safety.py ..............................           [  3%]
+tests/unit/test_01_reconcile_params.py ................                  [  4%]
+tests/unit/test_01_scheduler.py .....                                    [  4%]
+tests/unit/test_01_seed.py .............                                 [  5%]
+tests/unit/test_02_logging.py ...........                                [  5%]
+tests/unit/test_02_pricing.py ...                                        [  5%]
+tests/unit/test_02_r1_logging.py ..............                          [  6%]
+tests/unit/test_02_r1_tracing.py ...                                     [  6%]
+tests/unit/test_02_tracing.py .......................                    [  7%]
+tests/unit/test_03a_providers_service.py .....                           [  7%]
+tests/unit/test_03a_session.py ........                                  [  8%]
+tests/unit/test_03a_write_flag.py ....                                   [  8%]
+tests/unit/test_03b_auth.py .................                            [  9%]
+tests/unit/test_03b_config_errors.py ........                            [  9%]
+tests/unit/test_03b_dns_opt_in.py ..                                     [  9%]
+tests/unit/test_03b_egress.py .......................................... [ 11%]
+............                                                             [ 12%]
+tests/unit/test_04a_convert.py .............................             [ 13%]
+tests/unit/test_04a_redis_pin.py ...                                     [ 13%]
+tests/unit/test_04a_review_r1_audit_fields.py ..                         [ 13%]
+tests/unit/test_04a_review_r1_chunk_budget.py .....                      [ 13%]
+tests/unit/test_04a_review_r1_limits.py ...........                      [ 14%]
+tests/unit/test_04a_review_r1_offline.py ......                          [ 14%]
+tests/unit/test_04a_text_rules.py ..............................         [ 15%]
+tests/unit/test_04b_2_markdown_prose.py .......                          [ 16%]
+tests/unit/test_04b_2_normalize_tr.py ....                               [ 16%]
+tests/unit/test_04b_2_r2_ollama_ps.py ......                             [ 16%]
+tests/unit/test_04b_2_scope.py .......                                   [ 17%]
+tests/unit/test_04b_cli.py ........                                      [ 17%]
+tests/unit/test_05a_mcp_client.py ...................................... [ 19%]
+.                                                                        [ 19%]
+tests/unit/test_05a_obo_verifier.py .....                                [ 19%]
+tests/unit/test_05a_services_config.py ..........                        [ 19%]
+tests/unit/test_05a_sql_validator.py ................................... [ 21%]
+................                                                         [ 22%]
+tests/unit/test_05a_tool_read_roles.py ..                                [ 22%]
+tests/unit/test_05a_unverified_claims.py ....                            [ 22%]
+tests/unit/test_05b_guardrail_mode.py ........                           [ 22%]
+tests/unit/test_05b_openapi_ops.py ..................................... [ 24%]
+..................                                                       [ 25%]
+tests/unit/test_05b_platform_targets.py ................................ [ 26%]
+..                                                                       [ 26%]
+tests/unit/test_06a_definition.py .................                      [ 27%]
+tests/unit/test_06a_model_adapter.py .                                   [ 27%]
+tests/unit/test_06a_no_langsmith.py ...                                  [ 27%]
+tests/unit/test_06a_prompting.py .....................                   [ 28%]
+tests/unit/test_06a_search_adapter.py .                                  [ 28%]
+tests/unit/test_06b2_external.py ....................................... [ 30%]
+.......................                                                  [ 31%]
+tests/unit/test_06b_facade.py .......................................... [ 33%]
+                                                                         [ 33%]
+tests/unit/test_07_rules.py ...........                                  [ 33%]
+tests/unit/test_07_worker.py .                                           [ 33%]
+tests/unit/test_07f_compose.py .                                         [ 33%]
+tests/unit/test_07f_follow.py ...                                        [ 34%]
+tests/unit/test_08_cost.py .......                                       [ 34%]
+tests/unit/test_08_egress_enforce.py ...............................     [ 35%]
+tests/unit/test_08_engine.py .....................                       [ 36%]
+tests/unit/test_08_masking.py ..........                                 [ 37%]
+tests/unit/test_08_recognizers.py .............                          [ 37%]
+tests/unit/test_08t1c_12_offline_models_listed.py .....                  [ 37%]
+tests/unit/test_08t1c_1_local_ner_single_load.py .                       [ 38%]
+tests/unit/test_08t1c_6_ingest_raw_text_filter.py .....                  [ 38%]
+tests/unit/test_08t1c_7_ner_quality.py .......                           [ 38%]
+tests/unit/test_08t_15_pii_ner.py ...........                            [ 39%]
+tests/unit/test_08t_16_builtin_v3.py .........                           [ 39%]
+tests/unit/test_08t_18_ner_candidates.py ...                             [ 39%]
+tests/unit/test_08t_19_egress_from_default.py ....                       [ 39%]
+tests/unit/test_08t_20_http_ner_windows.py ....                          [ 39%]
+tests/unit/test_08t_23_egress_ner_fail_loud.py ......                    [ 40%]
+tests/unit/test_08t_24_ner_transport_errors.py ...                       [ 40%]
+tests/unit/test_08t_25_ner_weights_at_startup.py ...                     [ 40%]
+tests/unit/test_08t_27_ner_span_trim.py ........                         [ 40%]
+tests/unit/test_08t_29_manifest_filter_buckets.py .                      [ 40%]
+tests/unit/test_08t_c17_facade.py .....                                  [ 41%]
+tests/unit/test_08t_c17_masking.py ...........                           [ 41%]
+tests/unit/test_08t_c17_runtime.py ..                                    [ 41%]
+tests/unit/test_08t_egress_http.py .......................               [ 42%]
+tests/unit/test_08t_m3_url_context.py .............                      [ 43%]
+tests/unit/test_08t_ner.py ............                                  [ 43%]
+tests/unit/test_08t_r1_minors.py .....                                   [ 44%]
+tests/unit/test_08t_r2_minors.py .....                                   [ 44%]
+tests/unit/test_08t_r2_rescope.py .....                                  [ 44%]
+tests/unit/test_08t_r2_url_lines.py .................................... [ 46%]
+........................................................................ [ 49%]
+..............................................                           [ 51%]
+tests/unit/test_08t_r3_blank_line.py ............................        [ 52%]
+tests/unit/test_08t_r3_minors.py ...                                     [ 52%]
+tests/unit/test_08t_r3_range.py ............                             [ 53%]
+tests/unit/test_08t_r3_url_rules.py .................................... [ 55%]
+........................................................................ [ 58%]
+....................                                                     [ 59%]
+tests/unit/test_08t_r3_url_scan.py ......                                [ 59%]
+tests/unit/test_08t_r4_html_response.py ................................ [ 60%]
+........................................................................ [ 64%]
+.....................                                                    [ 65%]
+tests/unit/test_08t_r5_tail.py .................                         [ 65%]
+tests/unit/test_08t_secrets_linear.py .......                            [ 66%]
+tests/unit/test_08t_secrets_short.py ...............................     [ 67%]
+tests/unit/test_08t_source_egress.py .....                               [ 67%]
+tests/unit/test_09_2_r1.py ...............................               [ 69%]
+tests/unit/test_09_compare.py ....                                       [ 69%]
+tests/unit/test_09_engine.py ........................................... [ 71%]
+..                                                                       [ 71%]
+tests/unit/test_09_followup176.py ............                           [ 71%]
+tests/unit/test_09_judge_ner.py ...                                      [ 72%]
+tests/unit/test_09_langfuse_api.py .......                               [ 72%]
+tests/unit/test_09_r2.py ......................                          [ 73%]
+tests/unit/test_09_r3.py .....                                           [ 73%]
+tests/unit/test_09_r4.py .......                                         [ 73%]
+tests/unit/test_09_r5.py ........                                        [ 74%]
+tests/unit/test_09_scorers.py ................................           [ 75%]
+tests/unit/test_10c1_stream_headers.py ..                                [ 75%]
+tests/unit/test_10c2_eval_items.py ............                          [ 76%]
+tests/unit/test_10c2_r2_summary_invalid.py ...                           [ 76%]
+tests/unit/test_10c3_0_summary_scalar.py .......                         [ 76%]
+tests/unit/test_116_source_state.py ..                                   [ 76%]
+tests/unit/test_11_title.py ...                                          [ 76%]
+tests/unit/test_12_46_app_role_static.py .................               [ 77%]
+tests/unit/test_12_95_vllm.py ........                                   [ 78%]
+tests/unit/test_12_backend_port_single_source.py .                       [ 78%]
+tests/unit/test_12_backup_scripts.py ..........                          [ 78%]
+tests/unit/test_12_compose_overlays.py .......................           [ 79%]
+tests/unit/test_12_compose_preflight.py ................................ [ 81%]
+.......                                                                  [ 81%]
+tests/unit/test_12_smoke.py ..........                                   [ 81%]
+tests/unit/test_134_egress_all_messages.py ........                      [ 82%]
+tests/unit/test_137_gate2_headings.py ......................             [ 83%]
+tests/unit/test_14_extract.py ..............                             [ 83%]
+tests/unit/test_14_pii.py ......                                         [ 84%]
+tests/unit/test_14_recall.py ................                            [ 84%]
+tests/unit/test_17_ldap.py ..................                            [ 85%]
+tests/unit/test_18td_server.py ...........                               [ 86%]
+tests/unit/test_18td_sql_write_attempts.py ................              [ 86%]
+tests/unit/test_19_eval_out.py ..............                            [ 87%]
+tests/unit/test_19_offline.py ............                               [ 87%]
+tests/unit/test_19_preflight.py ...............                          [ 88%]
+tests/unit/test_19_raw_staging.py ........................               [ 89%]
+tests/unit/test_19r_154_internal_hosts.py ...                            [ 89%]
+tests/unit/test_19r_cli_exit.py .                                        [ 89%]
+tests/unit/test_af_1_definition_error_codes.py ...........               [ 90%]
+tests/unit/test_af_2_structural_breadcrumb.py .........                  [ 90%]
+tests/unit/test_af_2c_source_mask_paths.py ..                            [ 90%]
+tests/unit/test_fake_openai_tool_mode.py .....                           [ 91%]
+tests/unit/test_hke_208_compose.py ......                                [ 91%]
+tests/unit/test_hke_208_egress_proxy.py ........................         [ 92%]
+tests/unit/test_hke_208_settings_classes.py ......                       [ 92%]
+tests/unit/test_trj_194_platform_targets.py ............................ [ 94%]
+...........................                                              [ 95%]
+tests/contract/test_03a_openapi.py ....                                  [ 95%]
+tests/contract/test_03c_openapi.py ....                                  [ 95%]
+tests/contract/test_04a_makefile_test_int.py ...                         [ 95%]
+tests/contract/test_04a_openapi.py F.....                                [ 95%]
+tests/contract/test_04b_schema.py ....                                   [ 96%]
+tests/contract/test_05a_openapi.py ....                                  [ 96%]
+tests/contract/test_05b_openapi.py .....                                 [ 96%]
+tests/contract/test_06a_openapi.py ...F                                  [ 96%]
+tests/contract/test_06b2_reserved_hosts.py ...                           [ 96%]
+tests/contract/test_06b_litellm_not_published.py .                       [ 96%]
+tests/contract/test_06b_openapi.py ..F                                   [ 97%]
+tests/contract/test_07_openapi.py ....                                   [ 97%]
+tests/contract/test_08_openapi.py .......                                [ 97%]
+tests/contract/test_09_openapi.py ...                                    [ 97%]
+tests/contract/test_14_openapi.py .....                                  [ 97%]
+tests/contract/test_17_openapi.py ....                                   [ 98%]
+tests/contract/test_57_alembic_single_head.py ...                        [ 98%]
+tests/contract/test_c11_facade.py .....                                  [ 98%]
+tests/contract/test_c1_namespace.py ...............                      [ 99%]
+tests/contract/test_c2_api_key_scopes.py ..                              [ 99%]
+tests/contract/test_c2_on_behalf_of.py ..                                [ 99%]
+tests/contract/test_c3_common_columns.py .....                           [ 99%]
+tests/contract/test_c5_vectorstore.py ...                                [ 99%]
+tests/contract/test_c9_runs.py .......                                   [100%]
+
+=================================== FAILURES ===================================
+____________________ test_04a_20_openapi_draft_matches_app _____________________
+
+    def test_04a_20_openapi_draft_matches_app():
+        assert DRAFT.exists(), f"missing {DRAFT}; regenerate with: {REGENERATE}"
+>       assert DRAFT.read_text(encoding="utf-8") == render("04a"), f"draft drifted; run: {REGENERATE}"
+E       AssertionError: draft drifted; run: python -m ffcore.api.openapi_export 04a > openapi/04a.yaml
+E       assert 'openapi: 3.1...dedDocument\n' == 'openapi: 3.1...dedDocument\n'
+E         
+E         Skipping 58545 identical leading characters in diff, use -v to show
+E         - eveloper` is reserved and
+E         + eveloper` and `user` are
+E           
+E         -         cannot be assigned yet; `user` (end user: chat, own memory, channels) is assignable since 17.'
+E         +         reserved in the PoC and cannot be assigned yet.'...
+E         
+E         ...Full output truncated, use '-vv' to show
+
+tests/contract/test_04a_openapi.py:39: AssertionError
+___________________ test_06a_0_other_drafts_unchanged_by_06a ___________________
+
+    def test_06a_0_other_drafts_unchanged_by_06a():
+        # Adding a package never changes an earlier draft.
+        for package in ("03a", "04a", "08"):
+            committed = DRAFT.parent / f"{package}.yaml"
+>           assert committed.read_text(encoding="utf-8") == render(package), package
+E           AssertionError: 04a
+E           assert 'openapi: 3.1...dedDocument\n' == 'openapi: 3.1...dedDocument\n'
+E             
+E             Skipping 58545 identical leading characters in diff, use -v to show
+E             - eveloper` is reserved and
+E             + eveloper` and `user` are
+E               
+E             -         cannot be assigned yet; `user` (end user: chat, own memory, channels) is assignable since 17.'
+E             +         reserved in the PoC and cannot be assigned yet.'...
+E             
+E             ...Full output truncated, use '-vv' to show
+
+tests/contract/test_06a_openapi.py:65: AssertionError
+___________________ test_06b_0_other_drafts_unchanged_by_06b ___________________
+
+    def test_06b_0_other_drafts_unchanged_by_06b():
+        for package in PACKAGES:
+            if package == "06b":
+                continue
+            committed = DRAFT.parent / f"{package}.yaml"
+>           assert committed.read_text(encoding="utf-8") == render(package), package
+E           AssertionError: 04a
+E           assert 'openapi: 3.1...dedDocument\n' == 'openapi: 3.1...dedDocument\n'
+E             
+E             Skipping 58545 identical leading characters in diff, use -v to show
+E             - eveloper` is reserved and
+E             + eveloper` and `user` are
+E               
+E             -         cannot be assigned yet; `user` (end user: chat, own memory, channels) is assignable since 17.'
+E             +         reserved in the PoC and cannot be assigned yet.'...
+E             
+E             ...Full output truncated, use '-vv' to show
+
+tests/contract/test_06b_openapi.py:42: AssertionError
+=============================== warnings summary ===============================
+tests/unit/test_17_ldap.py::test_17_ldap_authenticate_by_account_name_email_and_upn
+  /opt/venv/lib/python3.12/site-packages/pyasn1/codec/ber/encoder.py:952: DeprecationWarning: tagMap is deprecated. Please use TAG_MAP instead.
+    warnings.warn(f"{attr} is deprecated. Please use {newAttr} instead.", DeprecationWarning)
+
+tests/unit/test_17_ldap.py::test_17_ldap_authenticate_by_account_name_email_and_upn
+  /opt/venv/lib/python3.12/site-packages/pyasn1/codec/ber/encoder.py:952: DeprecationWarning: typeMap is deprecated. Please use TYPE_MAP instead.
+    warnings.warn(f"{attr} is deprecated. Please use {newAttr} instead.", DeprecationWarning)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/contract/test_04a_openapi.py::test_04a_20_openapi_draft_matches_app
+FAILED tests/contract/test_06a_openapi.py::test_06a_0_other_drafts_unchanged_by_06a
+FAILED tests/contract/test_06b_openapi.py::test_06b_0_other_drafts_unchanged_by_06b
+============ 3 failed, 2221 passed, 2 warnings in 234.46s (0:03:54) ============
+make: *** [Makefile:18: test] Error 1
